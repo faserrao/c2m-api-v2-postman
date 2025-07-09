@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "description": "Design-first API with OpenAPI, Redoc, and Spectral linting",
   "scripts": {
-    "lint": "spectral lint lob-api-public.yml",
+    "lint": "spectral lint openapi/lob_openapi_spec_final.yaml",
     "docs:build": "redocly build-docs .redocly.yaml",
     "docs:preview": "redocly preview-docs .redocly.yaml"
+}
+
   },
   "devDependencies": {
     "@redocly/cli": "^1.0.0-beta.145",

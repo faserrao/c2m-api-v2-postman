@@ -1,3 +1,35 @@
 extends: spectral:oas
+
 rules:
+  # Require 'description' field in all operations
+  operation-description:
+    description: "Every operation should have a description."
+    severity: warn
+    given: "$.paths.*.*"
+    then:
+      field: description
+      function: truthy
+
+  # Require 'summary' for each operation
+  operation-summary:
+    description: "Operations should have a summary."
+    severity: warn
+    given: "$.paths.*.*"
+    then:
+      field: summary
+      function: truthy
+
+  # Ensure info object has a description
+  info-description:
+    description: "API info block must include a description."
+    severity: warn
+    given: "$.info"
+    then:
+      field: description
+      function: truthy
+
+  # Disable rules you don't care about
   info-contact: off
+  info-license: off
+  openapi-tags: off
+

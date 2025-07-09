@@ -1,3 +1,13 @@
+apiDefinitions:
+  lob:
+    root: ./openapi/lob_openapi_spec_final.yaml
+
+output:
+  path: ./docs
+
 theme:
   openapi:
     schemaExpansionLevel: all
+    hideDownloadButton: false
+    hideHostname: true
+

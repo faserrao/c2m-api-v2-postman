@@ -13,4 +13,4 @@ jobs:
     - name: Install Spectral CLI
       run: npm install -g @stoplight/spectral-cli
     - name: Lint Spec
-      run: spectral lint lob-api-public.yml
+      run: spectral lint openapi/lob_openapi_spec_final.yaml
