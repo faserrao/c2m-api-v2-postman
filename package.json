@@ -1,0 +1,14 @@
+{
+  "name": "my-api",
+  "version": "1.0.0",
+  "description": "Design-first API with OpenAPI, Redoc, and Spectral linting",
+  "scripts": {
+    "lint": "spectral lint lob-api-public.yml",
+    "docs:build": "redocly build-docs .redocly.yaml",
+    "docs:preview": "redocly preview-docs .redocly.yaml"
+  },
+  "devDependencies": {
+    "@redocly/cli": "^1.0.0-beta.145",
+    "@stoplight/spectral-cli": "^6.7.0"
+  }
+}
