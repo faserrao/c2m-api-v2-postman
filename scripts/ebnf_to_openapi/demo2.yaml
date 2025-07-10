@@ -1,0 +1,202 @@
+openapi: 3.0.3
+info:
+  title: Generated from EBNF
+  version: 4.0.0
+paths:
+  /documentSourceIdentifier:
+    post:
+      summary: Create DocumentSourceIdentifier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentSourceIdentifier'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentSourceIdentifier'
+  /recipientAddressSource:
+    post:
+      summary: Create RecipientAddressSource
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecipientAddressSource'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipientAddressSource'
+  /recipientAddress:
+    post:
+      summary: Create RecipientAddress
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecipientAddress'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipientAddress'
+  /jobTemplate:
+    post:
+      summary: Create JobTemplate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JobTemplate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobTemplate'
+  /jobs/submit/single/doc:
+    post:
+      summary: POST /jobs/submit/single/doc
+      responses:
+        '200':
+          description: OK
+  /jobs/submit/multi/doc:
+    post:
+      summary: POST /jobs/submit/multi/doc
+      responses:
+        '200':
+          description: OK
+  /jobs/submit/multi/doc/merge:
+    post:
+      summary: POST /jobs/submit/multi/doc/merge
+      responses:
+        '200':
+          description: OK
+  /jobs/submit/single/doc/jobTemplate:
+    post:
+      summary: POST /jobs/submit/single/doc/jobTemplate
+      responses:
+        '200':
+          description: OK
+  /jobs/submit/multi/docs/jobtemplate:
+    post:
+      summary: POST /jobs/submit/multi/docs/jobtemplate
+      responses:
+        '200':
+          description: OK
+  /jobs/submit/multi/doc/merge/jobTemplate:
+    post:
+      summary: POST /jobs/submit/multi/doc/merge/jobTemplate
+      responses:
+        '200':
+          description: OK
+  /jobs/submit/single/pdf/split:
+    post:
+      summary: POST /jobs/submit/single/pdf/split
+      responses:
+        '200':
+          description: OK
+  /jobs/submit/single/pdf/split/addressCapture:
+    post:
+      summary: POST /jobs/submit/single/pdf/split/addressCapture
+      responses:
+        '200':
+          description: OK
+  /jobs/submit/multi/pdf/addressCapture:
+    post:
+      summary: POST /jobs/submit/multi/pdf/addressCapture
+      responses:
+        '200':
+          description: OK
+components:
+  schemas:
+    DocumentSourceIdentifier:
+      oneOf:
+      - $ref: '#/components/schemas/documentId'
+      - $ref: '#/components/schemas/externalUrl'
+      - type: object
+        properties:
+          uploadRequestId:
+            $ref: '#/components/schemas/uploadRequestId'
+          documentName:
+            $ref: '#/components/schemas/documentName'
+        required:
+        - uploadRequestId
+        - documentName
+      - type: object
+        properties:
+          uploadRequestId:
+            $ref: '#/components/schemas/uploadRequestId'
+          zipId:
+            $ref: '#/components/schemas/zipId'
+          documentName:
+            $ref: '#/components/schemas/documentName'
+        required:
+        - uploadRequestId
+        - zipId
+        - documentName
+      - type: object
+        properties:
+          zipId:
+            $ref: '#/components/schemas/zipId'
+          documentName:
+            $ref: '#/components/schemas/documentName'
+        required:
+        - zipId
+        - documentName
+    RecipientAddressSource:
+      oneOf:
+      - $ref: '#/components/schemas/exactlyOneNewAddress'
+      - $ref: '#/components/schemas/exactlyOneListId'
+      - $ref: '#/components/schemas/exactlyOneId'
+    RecipientAddress:
+      type: object
+      properties:
+        firstName:
+          $ref: '#/components/schemas/firstName'
+        lastName:
+          $ref: '#/components/schemas/lastName'
+        address1:
+          $ref: '#/components/schemas/address1'
+        city:
+          $ref: '#/components/schemas/city'
+        state:
+          $ref: '#/components/schemas/state'
+        zip:
+          $ref: '#/components/schemas/zip'
+        country:
+          $ref: '#/components/schemas/country'
+        nickName:
+          $ref: '#/components/schemas/nickName'
+        address2:
+          $ref: '#/components/schemas/address2'
+        address3:
+          $ref: '#/components/schemas/address3'
+        phoneNumber:
+          $ref: '#/components/schemas/phoneNumber'
+      required:
+      - firstName
+      - lastName
+      - address1
+      - city
+      - state
+      - zip
+      - country
+    JobTemplate:
+      oneOf:
+      - $ref: '#/components/schemas/jobTemplateId'
+      - $ref: '#/components/schemas/fullJobTemplate'
+      - $ref: '#/components/schemas/jobTemplateName'

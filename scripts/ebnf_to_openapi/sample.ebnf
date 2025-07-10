@@ -1,0 +1,7 @@
+(* Endpoint: POST /jobs/submit/single/pdf/split *)
+
+printOption = "none" | "color" | "grayscale" ;
+
+tag = string ;
+
+Job = jobId + printOption + [ { tag } ] ;

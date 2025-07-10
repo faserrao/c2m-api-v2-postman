@@ -1,0 +1,62 @@
+openapi: 3.0.3
+info:
+  title: Generated from EBNF
+  version: 1.0.0
+paths:
+  /recipientAddress:
+    post:
+      summary: Create RecipientAddress
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecipientAddress'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipientAddress'
+  /job:
+    post:
+      summary: Create Job
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Job'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+components:
+  schemas:
+    RecipientAddress:
+      type: object
+      properties:
+        firstName:
+          $ref: '#/components/schemas/firstName'
+        lastName:
+          $ref: '#/components/schemas/lastName'
+        zip:
+          $ref: '#/components/schemas/zip'
+      required:
+      - firstName
+      - lastName
+      - zip
+    Job:
+      type: object
+      properties:
+        RecipientAddress:
+          $ref: '#/components/schemas/RecipientAddress'
+        billingType:
+          $ref: '#/components/schemas/billingType'
+      required:
+      - RecipientAddress
+      - billingType

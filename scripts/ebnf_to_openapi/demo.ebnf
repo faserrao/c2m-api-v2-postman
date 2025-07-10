@@ -1,0 +1,7 @@
+(* demo.ebnf *)
+billingType = "creditCard" | "invoice" | "ach" | "userCredit" ;
+
+RecipientAddress = firstName + lastName + zip ;
+
+Job = RecipientAddress + billingType ;
+

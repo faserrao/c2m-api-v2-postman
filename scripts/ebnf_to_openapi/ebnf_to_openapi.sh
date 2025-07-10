@@ -1,0 +1,1 @@
+python ebnf_to_openapi.py c2m-api-dd_v3_withComments_v2.ebnf demo2.yaml
