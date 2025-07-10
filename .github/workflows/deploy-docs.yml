@@ -22,7 +22,7 @@ jobs:
         run: npm install -g @redocly/cli
 
       - name: Build Redoc static docs
-        run: redocly build-docs .redocly.yaml
+        run: redocly build-docs openapi/c2m_openapi_spec_final.yaml -o docs/redoc-static.html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
