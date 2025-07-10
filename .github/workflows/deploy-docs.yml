@@ -23,12 +23,12 @@ jobs:
         run: npm install -g @redocly/cli
 
       - name: Build Redoc HTML
-        run: redocly build-docs openapi/c2m_openapi_spec_final.yaml -o docs/redoc-static.html
+        run: redocly build-docs openapi/c2m_openapi_spec_final.yaml -o docs/index.html
 
       - name: Commit and push generated docs
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git add docs/redoc-static.html
+          git add docs/index.html
           git commit -m "Update Redoc static docs" || echo "No changes to commit"
           git push origin main

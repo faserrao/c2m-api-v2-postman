@@ -22,4 +22,4 @@ jobs:
         run: npm install -g @redocly/cli
 
       - name: Build Redoc static docs
-        run: redocly build-docs openapi/c2m_openapi_spec_final.yaml -o docs/redoc-static.html
+        run: redocly build-docs openapi/c2m_openapi_spec_final.yaml -o docs/index.html
