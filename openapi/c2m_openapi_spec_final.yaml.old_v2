@@ -247,7 +247,22 @@ components:
           type: string
         jobId:
           type: string
-  parameters: {}
+  parameters:
+    Authorization:
+      name: Authorization
+      in: header
+      required: true
+      schema:
+        type: string
+        example: Bearer <your-jwt-token>
+      description: JWT Bearer token for authorization
+    Content-Type:
+      name: Content-Type
+      in: header
+      required: true
+      schema:
+        type: string
+        example: application/json
 security:
 - bearerAuth: []
 paths:
@@ -295,11 +310,6 @@ paths:
           description: Invalid request
         '401':
           description: Unauthorized
-      tags:
-      - jobs
-      security:
-      - bearerAuth: []
-      description: Submit a single document to multiple recipients
   /jobs/submit/multi/doc:
     post:
       summary: Submit multiple documents, each to a different recipient
@@ -340,12 +350,6 @@ paths:
           description: Invalid request
         '401':
           description: Unauthorized
-      operationId: post_jobs_submit_multi_doc
-      tags:
-      - jobs
-      security:
-      - bearerAuth: []
-      description: Submit multiple documents, each to a different recipient
   /jobs/submit/multi/doc/merge:
     post:
       summary: Merge multiple documents and send to a single recipient
@@ -376,12 +380,6 @@ paths:
           description: Invalid request
         '401':
           description: Unauthorized
-      operationId: post_jobs_submit_multi_doc_merge
-      tags:
-      - jobs
-      security:
-      - bearerAuth: []
-      description: Merge multiple documents and send to a single recipient
   /jobs/submit/single/doc/jobTemplate:
     post:
       summary: Submit a document using a job template
@@ -418,12 +416,6 @@ paths:
           description: Invalid request
         '401':
           description: Unauthorized
-      operationId: post_jobs_submit_single_doc_jobTemplate
-      tags:
-      - jobs
-      security:
-      - bearerAuth: []
-      description: Submit a document using a job template
   /jobs/submit/multi/docs/jobtemplate:
     post:
       summary: Submit multiple documents with recipient addresses and job template
@@ -454,12 +446,6 @@ paths:
           description: Invalid request
         '401':
           description: Unauthorized
-      operationId: post_jobs_submit_multi_docs_jobtemplate
-      tags:
-      - jobs
-      security:
-      - bearerAuth: []
-      description: Submit multiple documents with recipient addresses and job template
   /jobs/submit/multi/doc/merge/jobTemplate:
     post:
       summary: Merge documents, send to recipient using job template
@@ -492,12 +478,6 @@ paths:
           description: Invalid request
         '401':
           description: Unauthorized
-      operationId: post_jobs_submit_multi_doc_merge_jobTemplate
-      tags:
-      - jobs
-      security:
-      - bearerAuth: []
-      description: Merge documents, send to recipient using job template
   /jobs/submit/single/pdf/split:
     post:
       summary: Split a PDF into page ranges and send to different recipients
@@ -541,12 +521,6 @@ paths:
           description: Invalid request
         '401':
           description: Unauthorized
-      operationId: post_jobs_submit_single_pdf_split
-      tags:
-      - jobs
-      security:
-      - bearerAuth: []
-      description: Split a PDF into page ranges and send to different recipients
   /jobs/submit/single/pdf/split/addressCapture:
     post:
       summary: Split PDF and extract embedded recipient addresses
@@ -607,12 +581,6 @@ paths:
           description: Invalid request
         '401':
           description: Unauthorized
-      operationId: post_jobs_submit_single_pdf_split_addressCapture
-      tags:
-      - jobs
-      security:
-      - bearerAuth: []
-      description: Split PDF and extract embedded recipient addresses
   /jobs/submit/multi/pdf/addressCapture:
     post:
       summary: Submit multiple PDFs with embedded address regions
@@ -676,12 +644,6 @@ paths:
           description: Invalid request
         '401':
           description: Unauthorized
-      operationId: post_jobs_submit_multi_pdf_addressCapture
-      tags:
-      - jobs
-      security:
-      - bearerAuth: []
-      description: Submit multiple PDFs with embedded address regions
   /webhooks/jobStatusUpdate:
     post:
       summary: Webhook endpoint to receive job status updates
@@ -729,14 +691,3 @@ paths:
           description: Invalid payload
         '401':
           description: Unauthorized
-      operationId: post_webhooks_jobStatusUpdate
-      tags:
-      - webhooks
-      security:
-      - bearerAuth: []
-      description: Webhook endpoint to receive job status updates
-tags:
-- name: jobs
-  description: Operations related to jobs
-- name: webhooks
-  description: Operations related to webhooks

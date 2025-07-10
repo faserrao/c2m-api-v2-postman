@@ -1,12 +1,10 @@
-apiDefinitions:
-  c2m:
+apis:
+  click2mail:
     root: ./openapi/c2m_openapi_spec_final.yaml
-
-output:
-  path: ./docs
 
 theme:
   openapi:
     schemaExpansionLevel: all
     hideDownloadButton: false
     hideHostname: true
+
