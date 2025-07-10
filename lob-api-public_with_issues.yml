@@ -1,0 +1,14 @@
+openapi: 3.0.3
+info:
+  title: Bad API
+  version: 1.0.0
+# Missing description on purpose
+
+paths:
+  /jobs:
+    post:
+      summary: Submit a job
+      # Missing description on purpose
+      responses:
+        '200':
+          description: OK

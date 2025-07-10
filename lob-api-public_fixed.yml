@@ -1,0 +1,14 @@
+openapi: 3.0.3
+info:
+  title: Fixed API
+  version: 1.0.0
+  description: This is a properly documented API.
+
+paths:
+  /jobs:
+    post:
+      summary: Submit a job
+      description: Submits a job to the processing queue.
+      responses:
+        '200':
+          description: OK
