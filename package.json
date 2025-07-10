@@ -3,14 +3,12 @@
   "version": "1.0.0",
   "description": "Design-first API with OpenAPI, Redoc, and Spectral linting",
   "scripts": {
-    "lint": "spectral lint openapi/c2m_openapi_spec_final.yaml",
+    "lint": "spectral lint ./openapi/c2m_openapi_spec_final.yaml",
     "docs:build": "redocly build-docs .redocly.yaml",
     "docs:preview": "redocly preview-docs .redocly.yaml"
-}
-
   },
   "devDependencies": {
-    "@redocly/cli": "^1.0.0-beta.145",
+    "@redocly/cli": "^1.34.4",
     "@stoplight/spectral-cli": "^6.7.0"
   }
 }
