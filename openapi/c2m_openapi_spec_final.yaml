@@ -2,10 +2,13 @@ openapi: 3.0.3
 info:
   title: Click2Mail Document Submission API
   version: 1.0.0
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/NONE_YET
   description: API for submitting document jobs using the Click2Mail API
     Version 2
 servers:
-- url: https://api.example.com
+- url: https://api.noname.com
 components:
   securitySchemes:
     bearerAuth:

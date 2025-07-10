@@ -8,7 +8,10 @@ theme:
     hideDownloadButton: false
     hideHostname: true
 
-lint:
-  extends:
-    - recommended
+extends:
+  - recommended
+
+rules:
+  operation-operationId: error
+  info-contact: off
 
