@@ -1,0 +1,15 @@
+apiDefinitions:
+  lob:
+    root: ./lob-api-public.yml
+
+output:
+  path: ./docs
+
+theme:
+  openapi:
+    schemaExpansionLevel: all
+    hideDownloadButton: false
+    hideHostname: true
+    logo:
+      url: ./logo.png
+      altText: Click2Mail Logo
