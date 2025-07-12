@@ -1,3 +1,6 @@
+(* In this version need to change all PascalCase to camelCase. *)
+
+
 (********************************)
 (*        CORE FIELD DEFINITIONS         *)
 (********************************)
@@ -9,7 +12,7 @@
   - External URLs for remote-hosted documents
   - Complex identifiers for zip archives and multipart uploads
 *)
-DocumentSourceIdentifier = 
+documentSourceIdentifier = 
       documentId                          (* Unique ID for a document previously uploaded and stored in the system *)
     | externalUrl                         (* Full HTTP/HTTPS URL pointing to a downloadable document file *)
     | (uploadRequestId + documentName)    (* Refers to a document uploaded in a session identified by uploadRequestId *)
@@ -22,12 +25,12 @@ DocumentSourceIdentifier =
   - A reference to a preloaded address list
   - Or a reference to a saved address
 *)
-RecipientAddressSource = 
+recipientAddressSource = 
     exactlyOneNewAddress
     | exactlyOneListId
     | exactlyOneId ;
 
-exactlyOneNewAddress = RecipientAddress ;
+exactlyOneNewAddress = recipientAddress ;
 exactlyOneListId     = addressListId ;
 exactlyOneId         = addressId ;
 
@@ -35,7 +38,7 @@ exactlyOneId         = addressId ;
   Comprehensive recipient address block.
   Required fields ensure mailable accuracy; optional fields enhance personalization or flexibility.
 *)
-RecipientAddress = 
+recipientAddress = 
       firstName + lastName                (* Full recipient name, split into first and last *)
     + address1                            (* Primary delivery line (e.g., 123 Main St) *)
     + city + state + zip + country        (* Required to resolve destination geography *)
@@ -109,7 +112,7 @@ optionalPaymentFields =
     + [ creditAmount ] ;
 
 addressListId        = string ; (* New as of 07082025 *)
-addressId            = string ; (* New as of 07082025 *)
+addressId            = string ;
 documentName         = string ;
 documentId           = string ; (* New as of 07082025 *)
 externalUrl          = string ; (* New as of 07082025 *)
@@ -126,7 +129,8 @@ state                = string ;
 country              = string ;
 zip                  = string ;
 phoneNumber          = string ;
-tag                  = string ;  (* Optional metadata tag for analytics or categorization *)
+tags                 = { tags } ; (* New as of 07102025 *)
+tag                  = string ;  (* Optional metadata tags for analytics or categorization *)
 
 (* Basic lexical types *)
 integer = number ;                          (* Any whole number *)
@@ -149,7 +153,7 @@ singleDocJobParams =
     + { recipientAddressSource }            (* One or more recipients, each defined or referenced *)
     + jobOptions                            (* Layout, print, delivery preferences *)
     + [ paymentDetails ]                    (* Optional billing info, depending on configuration *)
-    + [ { tag } ] ;                         (* Optional metadata tags, e.g., campaign identifiers *)
+    + [ tags ] ;                         (* Optional metadata tags, e.g., campaign identifiers *)
 
 (* 
   Use Case 2: I have multiple documents; each goes to a different recipient address.
@@ -160,9 +164,9 @@ submitMultiDocParams =
       { documentSourceIdentifier + recipientAddressSource } 
     + jobOptions 
     + [ paymentDetails ] 
-    + [ { tag } ] ;
+    + [ tags ] ;
 
-(* 
+(*
   Use Case 3: I want to merge multiple documents into one document and send it to a single recipient.
   Endpoint: POST /jobs/submit/multi/doc/merge
   Ideal for assembling packets (e.g., onboarding kits) before delivery.
@@ -170,7 +174,7 @@ submitMultiDocParams =
 mergeMultiDocParams = 
       documentsToMerge 
     + recipientAddressSource 
-    + [ { tag } ] ;
+    + [ tags ] ;
 
 documentsToMerge = 
       documentSourceIdentifier 
@@ -187,7 +191,7 @@ submitSingleDocWithTemplateParams =
     + jobTemplate 
     + [ jobOptions ] 
     + [ paymentDetails ] 
-    + [ { tag } ] ;
+    + [ tags ] ;
 
 (* 
   Use Case 5: I have multiple documents each to different recipient addresses & a job template.
@@ -198,7 +202,7 @@ submitMultiDocWithTemplateParams =
       { documentSourceIdentifier + recipientAddressSource } 
     + jobTemplate 
     + paymentDetails 
-    + [ { tag } ] ;
+    + [ tags ] ;
 
 (* 
   Use Case 6: I want to merge multiple documents, send them to a single recipient, and use a job template.
@@ -210,7 +214,7 @@ mergeMultiDocWithTemplateParams =
     + recipientAddressSource 
     + jobTemplate 
     + [ paymentDetails ] 
-    + [ { tag } ] ;
+    + [ tags ] ;
 
 (* 
   Use Case 7: I have a big PDF to send to different recipients.
@@ -221,7 +225,7 @@ splitPdfParams =
       documentSourceIdentifier 
     + { pageRange + { recipientAddressSource } } 
     + [ paymentDetails ] 
-    + [ { tag } ] ;
+    + [ tags ] ;
 
 pageRange = 
 startPage + endPage ;
@@ -237,7 +241,7 @@ splitPdfWithCaptureParams =
       documentSourceIdentifier 
     + embeddedExtractionSpecs 
     + [ paymentDetails ] 
-    + [ { tag } ] ;
+    + [ tags ] ;
 
 embeddedExtractionSpecs = 
       extractionSpec + { extractionSpec } ;
@@ -257,7 +261,7 @@ multiPdfWithCaptureParams =
       addressCapturePdfs 
     + jobTemplate 
     + [ paymentDetails ] 
-    + [ { tag } ] ;
+    + [ tags ] ;
 
 addressCapturePdfs = 
       addressListPdf + { addressListPdf } ;
@@ -266,11 +270,17 @@ addressListPdf =
       documentSourceIdentifier 
     + addressListRegion 
     + [ delimiter ] 
-    + [ { tag } ] ;
+    + [ tags ] ;
+
 
 addressListRegion = 
       x + y + width + height + pageOffset ;
 
+x = number ; (* New as of 07082025 *)
+y = number ; (* New as of 07082025 *)
+width = number ; (* New as of 07082025 *)
+height = number ; (* New as of 07082025 *)
+pageOffset = integer ; (* New as of 07082025 *)
 delimiter = string ;   (* Character used to separate multiple addresses inside the PDF *)
 
 
@@ -310,7 +320,7 @@ documentClass =
 (*      JOB TEMPLATE BLOCK      *)
 (****************************)
 
-JobTemplate = 
+jobTemplate = 
       jobTemplateId 
     | fullJobTemplate 
     | jobTemplateName ;

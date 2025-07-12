@@ -1,0 +1,20 @@
+{
+  "name": "c2m-api-cli",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "CLI test harness for C2M API",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "echo 'Run Postman/Newman via CLI or other test logic'"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "dotenv": "^16.3.1",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}
