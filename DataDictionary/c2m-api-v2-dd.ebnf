@@ -242,7 +242,7 @@ splitPdfWithCaptureParams =
 
 embeddedExtractionSpecs = { extractionSpec } ;
 
-extractionSpe = startPage + endPage + addressRegion ;
+extractionSpec = startPage + endPage + addressRegion ;
 
 (* Placehoder *)
 addressRegion = x + y + width + height + pageOffset ; (* Not sure how the addesses will be located.  This is a placeholder *)
@@ -272,6 +272,11 @@ addressListPdf =
     + addressListRegion 
     + [ delimiter ] 
     + [ tags ] ;
+
+addressListRegion = tbd
+
+tbd = string
+
 
 (* Not user a delimeter is used *)
 delimiter = string ;   (* Character used to separate multiple addresses inside the PDF *)

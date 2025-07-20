@@ -1,7 +1,8 @@
 {
   "info": {
     "name": "C2M Test Collection",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "item": []
   },
   "item": [
     {
@@ -60,7 +61,8 @@
                             }
                           }
                         },
-                        "auth": null
+                        "auth": null,
+                        "item": []
                       },
                       "response": [
                         {
@@ -120,7 +122,8 @@
                           ],
                           "body": "{\n  \"jobId\": \"<string>\",\n  \"status\": \"<string>\"\n}",
                           "cookie": [],
-                          "_postman_previewlanguage": "json"
+                          "_postman_previewlanguage": "json",
+                          "item": []
                         },
                         {
                           "id": "92ef7f74-d316-4b22-840a-21946da93dbb",
@@ -169,7 +172,8 @@
                           "code": 400,
                           "header": [],
                           "cookie": [],
-                          "_postman_previewlanguage": "text"
+                          "_postman_previewlanguage": "text",
+                          "item": []
                         },
                         {
                           "id": "e37ee229-7f6c-436f-877c-e54c808e7b7a",
@@ -218,7 +222,8 @@
                           "code": 401,
                           "header": [],
                           "cookie": [],
-                          "_postman_previewlanguage": "text"
+                          "_postman_previewlanguage": "text",
+                          "item": []
                         }
                       ],
                       "event": [],
@@ -259,7 +264,7 @@
                             "method": "POST",
                             "body": {
                               "mode": "raw",
-                              "raw": "{\n  \"documentSourceIdentifier\": {\n    \"documentId\": \"<string>\"\n  },\n  \"jobTemplate\": \"<string>\",\n  \"recipientAddresses\": [\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    },\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"businessLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"priorityMail\",\n    \"paperType\": \"letter\",\n    \"printOption\": \"color\",\n    \"envelope\": \"windowedFlat\"\n  },\n  \"paymentDetails\": {\n    \"billingType\": \"invoice\",\n    \"creditCardDetails\": {\n      \"cardType\": \"americanExpress\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"CAD\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                              "raw": "{\n  \"documentSourceIdentifier\": {\n    \"documentId\": \"<string>\"\n  },\n  \"jobTemplate\": \"test_349\",\n  \"recipientAddresses\": [\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    },\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"businessLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"priorityMail\",\n    \"paperType\": \"letter\",\n    \"printOption\": \"color\",\n    \"envelope\": \"windowedFlat\"\n  },\n  \"paymentDetails\": {\n    \"billingType\": \"invoice\",\n    \"creditCardDetails\": {\n      \"cardType\": \"americanExpress\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"CAD\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                               "options": {
                                 "raw": {
                                   "headerFamily": "json",
@@ -267,7 +272,8 @@
                                 }
                               }
                             },
-                            "auth": null
+                            "auth": null,
+                            "item": []
                           },
                           "response": [
                             {
@@ -318,7 +324,8 @@
                               "code": 200,
                               "header": [],
                               "cookie": [],
-                              "_postman_previewlanguage": "text"
+                              "_postman_previewlanguage": "text",
+                              "item": []
                             },
                             {
                               "id": "ca335eec-f104-41c0-8ba7-f4f659bcb14d",
@@ -368,7 +375,8 @@
                               "code": 400,
                               "header": [],
                               "cookie": [],
-                              "_postman_previewlanguage": "text"
+                              "_postman_previewlanguage": "text",
+                              "item": []
                             },
                             {
                               "id": "2a86e6fa-d221-4c1b-bb43-91319c725ee7",
@@ -418,7 +426,8 @@
                               "code": 401,
                               "header": [],
                               "cookie": [],
-                              "_postman_previewlanguage": "text"
+                              "_postman_previewlanguage": "text",
+                              "item": []
                             }
                           ],
                           "event": [],
@@ -475,7 +484,8 @@
                                 }
                               }
                             },
-                            "auth": null
+                            "auth": null,
+                            "item": []
                           },
                           "response": [
                             {
@@ -526,7 +536,8 @@
                               "code": 200,
                               "header": [],
                               "cookie": [],
-                              "_postman_previewlanguage": "text"
+                              "_postman_previewlanguage": "text",
+                              "item": []
                             },
                             {
                               "id": "60c55901-3efd-4d7d-927c-9243ce2ec765",
@@ -576,7 +587,8 @@
                               "code": 400,
                               "header": [],
                               "cookie": [],
-                              "_postman_previewlanguage": "text"
+                              "_postman_previewlanguage": "text",
+                              "item": []
                             },
                             {
                               "id": "1d609867-7c38-4e6f-9d63-4c233d7a098e",
@@ -626,7 +638,8 @@
                               "code": 401,
                               "header": [],
                               "cookie": [],
-                              "_postman_previewlanguage": "text"
+                              "_postman_previewlanguage": "text",
+                              "item": []
                             }
                           ],
                           "event": [],
@@ -676,7 +689,8 @@
                                     }
                                   }
                                 },
-                                "auth": null
+                                "auth": null,
+                                "item": []
                               },
                               "response": [
                                 {
@@ -728,7 +742,8 @@
                                   "code": 200,
                                   "header": [],
                                   "cookie": [],
-                                  "_postman_previewlanguage": "text"
+                                  "_postman_previewlanguage": "text",
+                                  "item": []
                                 },
                                 {
                                   "id": "7527fafc-47cf-4c1a-94af-a1c59ab70cf8",
@@ -779,7 +794,8 @@
                                   "code": 400,
                                   "header": [],
                                   "cookie": [],
-                                  "_postman_previewlanguage": "text"
+                                  "_postman_previewlanguage": "text",
+                                  "item": []
                                 },
                                 {
                                   "id": "2aaab343-221a-4008-94a5-c6dc41cb5aca",
@@ -830,7 +846,8 @@
                                   "code": 401,
                                   "header": [],
                                   "cookie": [],
-                                  "_postman_previewlanguage": "text"
+                                  "_postman_previewlanguage": "text",
+                                  "item": []
                                 }
                               ],
                               "event": [],
@@ -890,7 +907,8 @@
                             }
                           }
                         },
-                        "auth": null
+                        "auth": null,
+                        "item": []
                       },
                       "response": [
                         {
@@ -940,7 +958,8 @@
                           "code": 200,
                           "header": [],
                           "cookie": [],
-                          "_postman_previewlanguage": "text"
+                          "_postman_previewlanguage": "text",
+                          "item": []
                         },
                         {
                           "id": "f73c206d-996b-4f67-ac0a-b98ecd97a9bc",
@@ -989,7 +1008,8 @@
                           "code": 400,
                           "header": [],
                           "cookie": [],
-                          "_postman_previewlanguage": "text"
+                          "_postman_previewlanguage": "text",
+                          "item": []
                         },
                         {
                           "id": "9da24ade-4cb1-4076-8919-49c5ea602591",
@@ -1038,7 +1058,8 @@
                           "code": 401,
                           "header": [],
                           "cookie": [],
-                          "_postman_previewlanguage": "text"
+                          "_postman_previewlanguage": "text",
+                          "item": []
                         }
                       ],
                       "event": [],
@@ -1087,7 +1108,8 @@
                                 }
                               }
                             },
-                            "auth": null
+                            "auth": null,
+                            "item": []
                           },
                           "response": [
                             {
@@ -1138,7 +1160,8 @@
                               "code": 200,
                               "header": [],
                               "cookie": [],
-                              "_postman_previewlanguage": "text"
+                              "_postman_previewlanguage": "text",
+                              "item": []
                             },
                             {
                               "id": "a67cce25-9ca2-4a27-84cd-d719f6b80d1e",
@@ -1188,7 +1211,8 @@
                               "code": 400,
                               "header": [],
                               "cookie": [],
-                              "_postman_previewlanguage": "text"
+                              "_postman_previewlanguage": "text",
+                              "item": []
                             },
                             {
                               "id": "eeca7cb2-cdcf-43c6-aa0c-b94d143d7bb3",
@@ -1238,7 +1262,8 @@
                               "code": 401,
                               "header": [],
                               "cookie": [],
-                              "_postman_previewlanguage": "text"
+                              "_postman_previewlanguage": "text",
+                              "item": []
                             }
                           ],
                           "event": [],
@@ -1280,7 +1305,7 @@
                                 "method": "POST",
                                 "body": {
                                   "mode": "raw",
-                                  "raw": "{\n  \"documentsToMerge\": [\n    {\n      \"documentId\": \"<string>\"\n    },\n    {\n      \"documentId\": \"<string>\"\n    }\n  ],\n  \"recipientAddressSource\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"nickName\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\",\n    \"phoneNumber\": \"<string>\"\n  },\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"billingType\": \"userCredit\",\n    \"creditCardDetails\": {\n      \"cardType\": \"americanExpress\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"EUR\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                                  "raw": "{\n  \"documentsToMerge\": [\n    {\n      \"documentId\": \"<string>\"\n    },\n    {\n      \"documentId\": \"<string>\"\n    }\n  ],\n  \"recipientAddressSource\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"nickName\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\",\n    \"phoneNumber\": \"<string>\"\n  },\n  \"jobTemplate\": \"test_651\",\n  \"paymentDetails\": {\n    \"billingType\": \"userCredit\",\n    \"creditCardDetails\": {\n      \"cardType\": \"americanExpress\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"EUR\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                                   "options": {
                                     "raw": {
                                       "headerFamily": "json",
@@ -1288,7 +1313,8 @@
                                     }
                                   }
                                 },
-                                "auth": null
+                                "auth": null,
+                                "item": []
                               },
                               "response": [
                                 {
@@ -1340,7 +1366,8 @@
                                   "code": 200,
                                   "header": [],
                                   "cookie": [],
-                                  "_postman_previewlanguage": "text"
+                                  "_postman_previewlanguage": "text",
+                                  "item": []
                                 },
                                 {
                                   "id": "c7bb516f-6a12-4563-9627-0c3790686790",
@@ -1391,7 +1418,8 @@
                                   "code": 400,
                                   "header": [],
                                   "cookie": [],
-                                  "_postman_previewlanguage": "text"
+                                  "_postman_previewlanguage": "text",
+                                  "item": []
                                 },
                                 {
                                   "id": "f343df05-4cb3-4be3-bd5a-4b2aaf61cbf3",
@@ -1442,7 +1470,8 @@
                                   "code": 401,
                                   "header": [],
                                   "cookie": [],
-                                  "_postman_previewlanguage": "text"
+                                  "_postman_previewlanguage": "text",
+                                  "item": []
                                 }
                               ],
                               "event": [],
@@ -1493,7 +1522,7 @@
                             "method": "POST",
                             "body": {
                               "mode": "raw",
-                              "raw": "{\n  \"documentRecipientPairs\": [\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"billingType\": \"creditCard\",\n    \"creditCardDetails\": {\n      \"cardType\": \"mastercard\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"CAD\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                              "raw": "{\n  \"documentRecipientPairs\": [\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"jobTemplate\": \"test_665\",\n  \"paymentDetails\": {\n    \"billingType\": \"creditCard\",\n    \"creditCardDetails\": {\n      \"cardType\": \"mastercard\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"CAD\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                               "options": {
                                 "raw": {
                                   "headerFamily": "json",
@@ -1501,7 +1530,8 @@
                                 }
                               }
                             },
-                            "auth": null
+                            "auth": null,
+                            "item": []
                           },
                           "response": [
                             {
@@ -1552,7 +1582,8 @@
                               "code": 200,
                               "header": [],
                               "cookie": [],
-                              "_postman_previewlanguage": "text"
+                              "_postman_previewlanguage": "text",
+                              "item": []
                             },
                             {
                               "id": "de998a77-9f4c-482f-8f4b-6dc6855301bb",
@@ -1602,7 +1633,8 @@
                               "code": 400,
                               "header": [],
                               "cookie": [],
-                              "_postman_previewlanguage": "text"
+                              "_postman_previewlanguage": "text",
+                              "item": []
                             },
                             {
                               "id": "d8df5dc9-70c4-4a7c-a7aa-2b393227b57f",
@@ -1652,7 +1684,8 @@
                               "code": 401,
                               "header": [],
                               "cookie": [],
-                              "_postman_previewlanguage": "text"
+                              "_postman_previewlanguage": "text",
+                              "item": []
                             }
                           ],
                           "event": [],
@@ -1701,7 +1734,7 @@
                             "method": "POST",
                             "body": {
                               "mode": "raw",
-                              "raw": "{\n  \"addressCapturePdfs\": [\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"addressListRegion\": {\n        \"x\": \"<number>\",\n        \"y\": \"<number>\",\n        \"width\": \"<number>\",\n        \"height\": \"<number>\",\n        \"pageOffset\": \"<integer>\"\n      },\n      \"delimiter\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    },\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"addressListRegion\": {\n        \"x\": \"<number>\",\n        \"y\": \"<number>\",\n        \"width\": \"<number>\",\n        \"height\": \"<number>\",\n        \"pageOffset\": \"<integer>\"\n      },\n      \"delimiter\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"billingType\": \"invoice\",\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"EUR\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                              "raw": "{\n  \"addressCapturePdfs\": [\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"addressListRegion\": {\n        \"x\": \"<number>\",\n        \"y\": \"<number>\",\n        \"width\": \"<number>\",\n        \"height\": \"<number>\",\n        \"pageOffset\": \"<integer>\"\n      },\n      \"delimiter\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    },\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"addressListRegion\": {\n        \"x\": \"<number>\",\n        \"y\": \"<number>\",\n        \"width\": \"<number>\",\n        \"height\": \"<number>\",\n        \"pageOffset\": \"<integer>\"\n      },\n      \"delimiter\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    }\n  ],\n  \"jobTemplate\": \"test_434\",\n  \"paymentDetails\": {\n    \"billingType\": \"invoice\",\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"EUR\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                               "options": {
                                 "raw": {
                                   "headerFamily": "json",
@@ -1709,7 +1742,8 @@
                                 }
                               }
                             },
-                            "auth": null
+                            "auth": null,
+                            "item": []
                           },
                           "response": [
                             {
@@ -1760,7 +1794,8 @@
                               "code": 200,
                               "header": [],
                               "cookie": [],
-                              "_postman_previewlanguage": "text"
+                              "_postman_previewlanguage": "text",
+                              "item": []
                             },
                             {
                               "id": "0f03c040-2348-4306-90a9-f613f568da84",
@@ -1810,7 +1845,8 @@
                               "code": 400,
                               "header": [],
                               "cookie": [],
-                              "_postman_previewlanguage": "text"
+                              "_postman_previewlanguage": "text",
+                              "item": []
                             },
                             {
                               "id": "0a92995a-e427-4856-948b-04b77ef86d1d",
@@ -1860,7 +1896,8 @@
                               "code": 401,
                               "header": [],
                               "cookie": [],
-                              "_postman_previewlanguage": "text"
+                              "_postman_previewlanguage": "text",
+                              "item": []
                             }
                           ],
                           "event": [],
@@ -1916,7 +1953,7 @@
                 "method": "POST",
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"jobId\": \"<string>\",\n  \"status\": \"queued\",\n  \"timestamp\": \"<dateTime>\",\n  \"metadata\": {\n    \"minim_d42\": \"<string>\",\n    \"do_644\": \"<string>\"\n  }\n}",
+                  "raw": "{\n  \"jobId\": 5500,\n  \"status\": \"queued\",\n  \"timestamp\": \"<dateTime>\",\n  \"metadata\": {\n    \"minim_d42\": \"<string>\",\n    \"do_644\": \"<string>\"\n  }\n}",
                   "options": {
                     "raw": {
                       "headerFamily": "json",
@@ -1924,7 +1961,8 @@
                     }
                   }
                 },
-                "auth": null
+                "auth": null,
+                "item": []
               },
               "response": [
                 {
@@ -1982,7 +2020,8 @@
                   ],
                   "body": "{\n  \"status\": \"<string>\",\n  \"message\": \"<string>\",\n  \"jobId\": \"<string>\"\n}",
                   "cookie": [],
-                  "_postman_previewlanguage": "json"
+                  "_postman_previewlanguage": "json",
+                  "item": []
                 },
                 {
                   "id": "5b47d406-ed5c-40d2-aa31-fd3b929b40ac",
@@ -2029,7 +2068,8 @@
                   "code": 400,
                   "header": [],
                   "cookie": [],
-                  "_postman_previewlanguage": "text"
+                  "_postman_previewlanguage": "text",
+                  "item": []
                 },
                 {
                   "id": "f1cf27dd-3bad-4f36-bc3b-3ab6393c86db",
@@ -2076,7 +2116,8 @@
                   "code": 401,
                   "header": [],
                   "cookie": [],
-                  "_postman_previewlanguage": "text"
+                  "_postman_previewlanguage": "text",
+                  "item": []
                 }
               ],
               "event": [],
@@ -2101,7 +2142,8 @@
             ]
           }
         }
-      ]
+      ],
+      "item": []
     }
   ],
   "event": [

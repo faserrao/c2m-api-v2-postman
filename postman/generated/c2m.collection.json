@@ -2087,47 +2087,6 @@
           ]
         }
       ]
-    },
-    {
-      "name": "Global test snippet",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
-              "pm.test('Response time < 1s', () => pm.expect(pm.response.responseTime).to.be.below(1000));"
-            ]
-          }
-        }
-      ]
-    }
-  ],
-  "event": [
-    {
-      "listen": "prerequest",
-      "script": {
-        "type": "text/javascript",
-        "exec": [
-          "// Add Authorization header automatically",
-          "if (!pm.request.headers.has('Authorization')) {",
-          "  pm.request.headers.add({ key: 'Authorization', value: 'Bearer {{token}}' });",
-          "}"
-        ]
-      }
-    }
-  ],
-  "variable": [
-    {
-      "key": "token",
-      "value": "eyJhbGciOiJub25lIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTczNjI5MjEyNH0.",
-      "type": "string"
-    },
-    {
-      "key": "baseUrl",
-      "value": "{{baseUrl}}",
-      "type": "string"
     }
   ]
 }
