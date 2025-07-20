@@ -1,0 +1,17 @@
+name: OpenAPI CI
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+jobs:
+  validate-spec:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+    - name: Install Spectral CLI
+      run: npm install -g @stoplight/spectral-cli
+    - name: Lint Spec
+      run: spectral lint openapi/c2m_openapi_spec_final.yaml

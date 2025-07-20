@@ -1,0 +1,84 @@
+name: 🛠️ API Lint + Postman + Newman
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    paths: [ "openapi/**.yaml" ]
+  workflow_dispatch:
+
+jobs:
+  # -------------------------------------------------
+  # 1. Lint with Redocly & Spectral (+ breaking diff)
+  # -------------------------------------------------
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      # 1a. Redocly CLI lint (same as before)
+      - name: Install Redocly CLI
+        run: npm install -g @redocly/cli
+
+      - name: Redocly Lint
+        run: redocly lint openapi/c2m_openapi_spec_final.yaml
+
+      # 1b. Spectral lint
+      - name: Install Spectral CLI
+        run: npm install -g @stoplight/spectral-cli
+
+      - name: Spectral Lint
+        run: spectral lint openapi/c2m_openapi_spec_final.yaml
+
+      # 1c. Breaking-change diff against main (fail PR if breaking)
+      - uses: phoenix-actions/openapi-diff@v2
+        with:
+          base: main
+          head: ${{ github.sha }}
+          spec-path: openapi/c2m_openapi_spec_final.yaml
+          fail-on-breaking: true
+
+  # -------------------------------------------------
+  # 2. Generate Postman collection + run Newman tests
+  #    (runs only if lint passes)
+  # -------------------------------------------------
+  postman-tests:
+    needs: lint
+    runs-on: ubuntu-latest
+    env:
+      jwtToken: ${{ secrets.JWT_TOKEN || 'dummy-jwt' }}   # <-- adjust if you use a real secret
+    steps:
+      - uses: actions/checkout@v3
+
+      # 2a. Convert OpenAPI → Postman collection (Apideck generator)
+      - run: |
+          npx -y @apideck/postman-generator generate \
+            -f openapi/c2m_openapi_spec_final.yaml \
+            -o postman/Click2Mail.collection.json \
+            --postman-compat
+
+      # (Optional) merge overrides if you keep a custom file
+      # - run: node scripts/merge-postman.js postman/Click2Mail.collection.json postman/custom/overrides.json > postman/Click2Mail.collection.merged.json
+      # - name: Set collection path variable
+      #   run: echo "COLL_PATH=postman/Click2Mail.collection.merged.json" >> "$GITHUB_ENV"
+
+      # If you skip the merge step:
+      - run: echo "COLL_PATH=postman/Click2Mail.collection.json" >> "$GITHUB_ENV"
+
+      # 2b. Install Newman & HTML reporter
+      - run: npm install -g newman newman-reporter-html
+
+      # 2c. Run Newman tests
+      - run: |
+          mkdir -p test-reports
+          newman run "$COLL_PATH" \
+            --env-var jwtToken=$jwtToken \
+            --env-var baseUrl=http://localhost:4000 \
+            --reporters cli,html \
+            --reporter-html-export test-reports/newman.html
+
+      # 2d. Upload Newman report as an artifact
+      - uses: actions/upload-artifact@v3
+        with:
+          name: newman-report
+          path: test-reports/newman.html

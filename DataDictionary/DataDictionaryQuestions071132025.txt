@@ -1,0 +1,73 @@
+1) The following fields are used when specifying the recipient(s) of a document.  
+
+   a) newAddress OR
+   b) addressListId OR
+   c) addressId
+
+   I will refer to this component as the recipientAddressSource.
+
+   What is the source of addressId.  Is this actually addressBookId?
+
+2) Is paymentInfo included in every use case.  I assume that if the billingType is
+   userCredit then there is no need for the other payment fields.
+
+3) Can there be more than 1 tag element?
+
+5) When a document(s) is specified in a use case, will it always be specified
+    by the following:
+   
+   a) documentId OR
+   b) externalUrl OR
+   c) (uploadRequestId and documentName) OR
+   d) (uploadRequestId and zipId and documentName) OR
+   e) (zipId and documentName)
+
+   I will refer to this component as documentSourceIdentifier.
+
+4) As understand it, the jobTemplate will include:
+
+   a) templateId
+   b) templateName
+   c) jobOptions
+
+   and optionally:
+
+   d) documentSourceIdentifier (see question #5)
+   e) recipientAddressSource (see question #1)
+   
+   Can the use cases that include a template have both the template and a separate
+   jobOptons component?
+
+6) Is the data required to determine how to locate the embedded recipientAddress(es) in a PDF
+   included in the API request?  If yes what is the method employed in locating the address?
+
+7) Would it be possible for me to look at the actual API v1 code?  This would help me
+   ensure that I have called out the actual elements and components for each of the calls.
+
+8) I understand that the actual API v1 code will not be modified for the first release of V2.
+   But, will the portion of the code that reads the API request be open to modification?
+   Are we assuming that the names used in the v1 code to refer to the various components and
+   elements remain unchanged?  If this is the case, I would need to know which elements and
+   components are being referred to in the code so that I can make sure the element and
+   component names in the request match up with those used in the code.
+
+   Based on the fact that API endpooints are changing quite a bit I am assuming that the code
+   that processes the requests will change.
+
+9) We need to walk through all of the enums in the data dictionary and determine whether they
+   are correct.  Do we need to update these enums?
+
+10) We need to walk through all the data types (int, string, etc.) in the data dictionary and 
+    determine whether they are correct.
+
+11) We need to walk through all of the components in the data dictionary and
+    determine whether they are correct.
+
+12) Rob pointed out to me that the endpoint paths are too long and will will cause more
+    resources than necessary be created.  He suggested that instead of having a long path
+    with slashes between the words - we concatenate the individual words together with
+    dashes.
+
+    So for example: /jobs/submit/multi/doc would become /jobs/submit-multi-doc.
+    This should reduce the number of resources needed considerably.  Also is the word "submit"
+    necessary or is it redundant.  If it is necessary the it would be /jobs/submit/multi-doc.

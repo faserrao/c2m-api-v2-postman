@@ -1,0 +1,758 @@
+openapi: 3.0.3
+info:
+  title: Click2Mail Document Submission API
+  version: 1.0.0
+  license:
+    name: MIT
+    url: 'https://opensource.org/licenses/NONE_YET'
+  description: API for submitting document jobs using the Click2Mail API Version 2
+servers:
+  - url: 'https://api.noname.com'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    DocumentSourceIdentifier:
+      oneOf:
+        - type: object
+          required:
+            - documentId
+          properties:
+            documentId:
+              type: string
+        - type: object
+          required:
+            - externalUrl
+          properties:
+            externalUrl:
+              type: string
+              format: uri
+        - type: object
+          required:
+            - uploadRequestId
+            - documentName
+          properties:
+            uploadRequestId:
+              type: string
+            documentName:
+              type: string
+        - type: object
+          required:
+            - uploadRequestId
+            - zipId
+            - documentName
+          properties:
+            uploadRequestId:
+              type: string
+            zipId:
+              type: string
+            documentName:
+              type: string
+        - type: object
+          required:
+            - zipId
+            - documentName
+          properties:
+            zipId:
+              type: string
+            documentName:
+              type: string
+    RecipientAddress:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - address1
+        - city
+        - state
+        - zip
+        - country
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        nickName:
+          type: string
+        address1:
+          type: string
+        address2:
+          type: string
+        address3:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        zip:
+          type: string
+        country:
+          type: string
+        phoneNumber:
+          type: string
+    RecipientAddressSource:
+      oneOf:
+        - $ref: '#/components/schemas/RecipientAddress'
+        - type: object
+          required:
+            - addressListId
+          properties:
+            addressListId:
+              type: string
+        - type: object
+          required:
+            - addressId
+          properties:
+            addressId:
+              type: string
+    JobOptions:
+      type: object
+      required:
+        - documentClass
+        - layout
+        - mailclass
+        - paperType
+        - printOption
+        - envelope
+      properties:
+        documentClass:
+          type: string
+          enum:
+            - businessLetter
+            - personalLetter
+        layout:
+          type: string
+          enum:
+            - portrait
+            - landscape
+        mailclass:
+          type: string
+          enum:
+            - firstClassMail
+            - priorityMail
+            - largeEnvelope
+        paperType:
+          type: string
+          enum:
+            - letter
+            - legal
+            - postcard
+        printOption:
+          type: string
+          enum:
+            - none
+            - color
+            - grayscale
+        envelope:
+          type: string
+          enum:
+            - flat
+            - windowedFlat
+            - letter
+            - legal
+            - postcard
+    CreditCardDetails:
+      type: object
+      required:
+        - cardType
+        - cardNumber
+        - expirationDate
+        - cvv
+      properties:
+        cardType:
+          type: string
+          enum:
+            - visa
+            - mastercard
+            - discover
+            - americanExpress
+        cardNumber:
+          type: string
+        expirationDate:
+          type: object
+          required:
+            - month
+            - year
+          properties:
+            month:
+              type: integer
+              minimum: 1
+              maximum: 12
+            year:
+              type: integer
+              minimum: 2000
+        cvv:
+          type: integer
+    ACHDetails:
+      type: object
+      required:
+        - routingNumber
+        - accountNumber
+        - checkDigit
+      properties:
+        routingNumber:
+          type: string
+        accountNumber:
+          type: string
+        checkDigit:
+          type: integer
+    CreditAmount:
+      type: object
+      required:
+        - amount
+        - currency
+      properties:
+        amount:
+          type: number
+        currency:
+          type: string
+          enum:
+            - USD
+            - EUR
+            - GBP
+            - CAD
+            - AUD
+    PaymentDetails:
+      type: object
+      required:
+        - billingType
+      properties:
+        billingType:
+          type: string
+          enum:
+            - creditCard
+            - invoice
+            - ach
+            - userCredit
+        creditCardDetails:
+          $ref: '#/components/schemas/CreditCardDetails'
+        invoiceDetails:
+          type: object
+          properties:
+            invoiceNumber:
+              type: string
+            amountDue:
+              type: number
+        achDetails:
+          $ref: '#/components/schemas/ACHDetails'
+        creditAmount:
+          $ref: '#/components/schemas/CreditAmount'
+    StandardResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+        jobId:
+          type: string
+  parameters: {}
+security:
+  - bearerAuth: []
+paths:
+  /jobs/submit/single/doc:
+    post:
+      summary: Submit a single document to multiple recipients
+      operationId: submitSingleDoc
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - documentSourceIdentifier
+                - jobOptions
+              properties:
+                documentSourceIdentifier:
+                  $ref: '#/components/schemas/DocumentSourceIdentifier'
+                recipientAddresses:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/RecipientAddressSource'
+                jobOptions:
+                  $ref: '#/components/schemas/JobOptions'
+                paymentDetails:
+                  $ref: '#/components/schemas/PaymentDetails'
+                tags:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Job submission accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jobId:
+                    type: string
+                  status:
+                    type: string
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+      tags:
+        - jobs
+      security:
+        - bearerAuth: []
+      description: Submit a single document to multiple recipients
+  /jobs/submit/multi/doc:
+    post:
+      summary: 'Submit multiple documents, each to a different recipient'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - documentRecipientPairs
+                - jobOptions
+              properties:
+                documentRecipientPairs:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - documentSourceIdentifier
+                      - recipientAddressSource
+                    properties:
+                      documentSourceIdentifier:
+                        $ref: '#/components/schemas/DocumentSourceIdentifier'
+                      recipientAddressSource:
+                        $ref: '#/components/schemas/RecipientAddressSource'
+                jobOptions:
+                  $ref: '#/components/schemas/JobOptions'
+                paymentDetails:
+                  $ref: '#/components/schemas/PaymentDetails'
+                tags:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+      operationId: post_jobs_submit_multi_doc
+      tags:
+        - jobs
+      security:
+        - bearerAuth: []
+      description: 'Submit multiple documents, each to a different recipient'
+  /jobs/submit/multi/doc/merge:
+    post:
+      summary: Merge multiple documents and send to a single recipient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - documentsToMerge
+                - recipientAddressSource
+              properties:
+                documentsToMerge:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/DocumentSourceIdentifier'
+                recipientAddressSource:
+                  $ref: '#/components/schemas/RecipientAddressSource'
+                tags:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+      operationId: post_jobs_submit_multi_doc_merge
+      tags:
+        - jobs
+      security:
+        - bearerAuth: []
+      description: Merge multiple documents and send to a single recipient
+  /jobs/submit/single/doc/jobTemplate:
+    post:
+      summary: Submit a document using a job template
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - documentSourceIdentifier
+                - jobTemplate
+              properties:
+                documentSourceIdentifier:
+                  $ref: '#/components/schemas/DocumentSourceIdentifier'
+                recipientAddresses:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/RecipientAddressSource'
+                jobTemplate:
+                  type: string
+                jobOptions:
+                  $ref: '#/components/schemas/JobOptions'
+                paymentDetails:
+                  $ref: '#/components/schemas/PaymentDetails'
+                tags:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+      operationId: post_jobs_submit_single_doc_jobTemplate
+      tags:
+        - jobs
+      security:
+        - bearerAuth: []
+      description: Submit a document using a job template
+  /jobs/submit/multi/docs/jobtemplate:
+    post:
+      summary: Submit multiple documents with recipient addresses and job template
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - documentRecipientPairs
+                - jobTemplate
+                - paymentDetails
+              properties:
+                documentRecipientPairs:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - documentSourceIdentifier
+                      - recipientAddressSource
+                    properties:
+                      documentSourceIdentifier:
+                        $ref: '#/components/schemas/DocumentSourceIdentifier'
+                      recipientAddressSource:
+                        $ref: '#/components/schemas/RecipientAddressSource'
+                jobTemplate:
+                  type: string
+                paymentDetails:
+                  $ref: '#/components/schemas/PaymentDetails'
+                tags:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+      operationId: post_jobs_submit_multi_docs_jobtemplate
+      tags:
+        - jobs
+      security:
+        - bearerAuth: []
+      description: Submit multiple documents with recipient addresses and job template
+  /jobs/submit/multi/doc/merge/jobTemplate:
+    post:
+      summary: 'Merge documents, send to recipient using job template'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - documentsToMerge
+                - recipientAddressSource
+                - jobTemplate
+              properties:
+                documentsToMerge:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/DocumentSourceIdentifier'
+                recipientAddressSource:
+                  $ref: '#/components/schemas/RecipientAddressSource'
+                jobTemplate:
+                  type: string
+                paymentDetails:
+                  $ref: '#/components/schemas/PaymentDetails'
+                tags:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+      operationId: post_jobs_submit_multi_doc_merge_jobTemplate
+      tags:
+        - jobs
+      security:
+        - bearerAuth: []
+      description: 'Merge documents, send to recipient using job template'
+  /jobs/submit/single/pdf/split:
+    post:
+      summary: Split a PDF into page ranges and send to different recipients
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - documentSourceIdentifier
+                - pageRanges
+              properties:
+                documentSourceIdentifier:
+                  $ref: '#/components/schemas/DocumentSourceIdentifier'
+                pageRanges:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - startPage
+                      - endPage
+                      - recipientAddressSource
+                    properties:
+                      startPage:
+                        type: integer
+                      endPage:
+                        type: integer
+                      recipientAddressSource:
+                        $ref: '#/components/schemas/RecipientAddressSource'
+                paymentDetails:
+                  $ref: '#/components/schemas/PaymentDetails'
+                tags:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+      operationId: post_jobs_submit_single_pdf_split
+      tags:
+        - jobs
+      security:
+        - bearerAuth: []
+      description: Split a PDF into page ranges and send to different recipients
+  /jobs/submit/single/pdf/split/addressCapture:
+    post:
+      summary: Split PDF and extract embedded recipient addresses
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - documentSourceIdentifier
+                - embeddedExtractionSpecs
+              properties:
+                documentSourceIdentifier:
+                  $ref: '#/components/schemas/DocumentSourceIdentifier'
+                embeddedExtractionSpecs:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - startPage
+                      - endPage
+                      - addressRegion
+                    properties:
+                      startPage:
+                        type: integer
+                      endPage:
+                        type: integer
+                      addressRegion:
+                        type: object
+                        required:
+                          - x
+                          - 'y'
+                          - width
+                          - height
+                          - pageOffset
+                        properties:
+                          x:
+                            type: number
+                          'y':
+                            type: number
+                          width:
+                            type: number
+                          height:
+                            type: number
+                          pageOffset:
+                            type: integer
+                paymentDetails:
+                  $ref: '#/components/schemas/PaymentDetails'
+                tags:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+      operationId: post_jobs_submit_single_pdf_split_addressCapture
+      tags:
+        - jobs
+      security:
+        - bearerAuth: []
+      description: Split PDF and extract embedded recipient addresses
+  /jobs/submit/multi/pdf/addressCapture:
+    post:
+      summary: Submit multiple PDFs with embedded address regions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - addressCapturePdfs
+                - jobTemplate
+              properties:
+                addressCapturePdfs:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - documentSourceIdentifier
+                      - addressListRegion
+                    properties:
+                      documentSourceIdentifier:
+                        $ref: '#/components/schemas/DocumentSourceIdentifier'
+                      addressListRegion:
+                        type: object
+                        required:
+                          - x
+                          - 'y'
+                          - width
+                          - height
+                          - pageOffset
+                        properties:
+                          x:
+                            type: number
+                          'y':
+                            type: number
+                          width:
+                            type: number
+                          height:
+                            type: number
+                          pageOffset:
+                            type: integer
+                      delimiter:
+                        type: string
+                      tags:
+                        type: array
+                        items:
+                          type: string
+                jobTemplate:
+                  type: string
+                paymentDetails:
+                  $ref: '#/components/schemas/PaymentDetails'
+                tags:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+      operationId: post_jobs_submit_multi_pdf_addressCapture
+      tags:
+        - jobs
+      security:
+        - bearerAuth: []
+      description: Submit multiple PDFs with embedded address regions
+  /webhooks/jobStatusUpdate:
+    post:
+      summary: Webhook endpoint to receive job status updates
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - jobId
+                - status
+                - timestamp
+              properties:
+                jobId:
+                  type: string
+                  example: job_123456789
+                status:
+                  type: string
+                  enum:
+                    - queued
+                    - processing
+                    - completed
+                    - failed
+                  example: completed
+                timestamp:
+                  type: string
+                  format: date-time
+                  example: '2025-07-07T12:34:56Z'
+                metadata:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  example:
+                    source: PrintCenterA
+                    batch: B20250707
+      responses:
+        '200':
+          description: Webhook received successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+        '400':
+          description: Invalid payload
+        '401':
+          description: Unauthorized
+      operationId: post_webhooks_jobStatusUpdate
+      tags:
+        - webhooks
+      security:
+        - bearerAuth: []
+      description: Webhook endpoint to receive job status updates
+tags:
+  - name: jobs
+    description: Operations related to jobs
+  - name: webhooks
+    description: Operations related to webhooks

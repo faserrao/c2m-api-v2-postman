@@ -1,62 +1,244 @@
-# Makefile for C2M API Testing Toolkit
+# === VARIABLES ===
 
-# Environment variables
-ENV_FILE = .env
-SWAGGER_JSON = swagger.yaml
-REDOC_HTML = redoc.html
-TESTS_DIR = tests
+## OpenAPI Variables
+SPEC := openapi/c2m-api-v2-openapi-spec.yaml
+PREVIOUS_SPEC := openapi/tmp-previous-spec.yaml
+MAIN_SPEC_PATH := origin/main:$(SPEC)
 
-# Tasks
-.PHONY: install test build docs clean
+## Postman Variables
+COLLECTION_RAW := postman/generated/c2m-api-v2-collection.json
+COLLECTION_FINAL := postman/generated/c2m-api-v2-collection-merged.json
+COLLECTION_UID_FILE := postman/postman_collection_uid.txt
+TEST_COLLECTION_UID_FILE := postman/postman_test_collection_uid.txt
+MOCK_UID_FILE := postman/postman_mock_uid.txt
+POSTMAN_API_UID_FILE := postman/postman_api_uid.txt
+MOCK_ENV_FILE := postman/mock-env.json
+MOCK_URL_FILE := postman/mock-url.txt
+MOCK_URL := $(shell cat $(MOCK_URL_FILE) 2>/dev/null || echo "https://mock.api")
+REPORT_HTML := postman/newman-report.html
 
-# Install dependencies for all components
+## Environment Variables
+ENV_FILE := $(MOCK_ENV_FILE)
+ENV_UID_FILE := postman/postman_env_uid.txt
+
+## Token & Base URL Extraction
+TOKEN_RAW := $(shell jq -r '.values[] | select(.key=="token") | .value' $(ENV_FILE) 2>/dev/null)
+TOKEN := $(if $(TOKEN_RAW),$(TOKEN_RAW),dummy-token)
+BASE_URL_RAW := $(shell jq -r '.values[] | select(.key=="baseUrl") | .value' $(ENV_FILE) 2>/dev/null)
+BASE_URL := $(if $(BASE_URL_RAW),$(BASE_URL_RAW),https://mock.api)
+
+## Debug & Overrides
+IMPORT_DEBUG_FILE := postman/import-debug.json
+ENV_UPLOAD_DEBUG_FILE := postman/env-upload-debug.json
+LINK_PAYLOAD_FILE := postman/link-payload.json
+LINK_DEBUG_FILE := postman/link-debug.json
+MOCK_PAYLOAD_FILE := postman/mock-payload.json
+MOCK_DEBUG_FILE := postman/mock-debug.json
+OVERRIDES_JSON := postman/overrides.json
+
+## Tools
+POSTMAN := postman
+GENERATOR_OFFICIAL := npx openapi-to-postmanv2
+MERGER := node scripts/merge-postman.js
+PRISM := npx @stoplight/prism-cli
+NEWMAN := npx newman
+REDOCLY := npx @redocly/cli
+SPECTRAL := npx @stoplight/spectral-cli
+SWAGGER := npx swagger-cli
+WIDDERSHINS := npx widdershins
+
+## Miscellaneous
+DOCS_DIR := docs
+TEMPLATES_DIR := docs/templates
+PRISM_PORT := 4010
+
+POSTMAN_WS_ID := 2399f915-90e9-4492-aa66-a693ebd83011
+POSTMAN_WS_NAME := c2m-api-v2-ws
+POSTMAN_API_KEY := PMAK-68778f2760d869000141987d-fe4d4842815d4d344574d436976367fd10
+POSTMAN_API_NAME := C2mApiV2
+MONITOR_NAME := C2mApiMonitor
+
+
+
+
+
+
+# === INSTALL DEPS ===
+.PHONY: install
 install:
-	@echo "Installing dependencies..."
-	@pip install -r tests/python-cli/requirements.txt
-	@npm install --prefix tests/typescript-cli
-	@echo "Dependencies installed!"
+	npm install \
+		openapi-to-postmanv2 \
+		@redocly/cli \
+		@stoplight/spectral-cli \
+		@stoplight/prism-cli \
+		newman newman-reporter-html \
+		swagger-ui-dist \
+		swagger-cli widdershins lodash || echo "✅ npm packages installed or already available"
 
-# Run tests using the Python CLI
-test:
-	@echo "Running Python CLI tests..."
-	@python tests/python-cli/cli.py --env dev
-	@echo "Python tests complete."
 
-	@echo "Running TypeScript CLI tests..."
-	@npm run start --prefix tests/typescript-cli -- --env dev
-	@echo "TypeScript tests complete."
+# === OPENAPI TASKS ===
+.PHONY: generate-openapi-spec-from-dd
+generate-openapi-spec-from-dd:
+	@echo "📤 Converting the EBNF Data Dictionary to an OpenAPI YAML Specification." 
+	[ -f scripts/python_env/e2o.venv/bin/activate ] && source scripts/python_env/e2o.venv/bin/activate; \
+	pip install -r scripts/python_env/requirements.txt; \
+	python scripts/ebnf_to_openapi_grammer_based.py ./DataDictionary/c2m-api-v2-dd.ebnf $(SPEC)
 
-# Build documentation for Swagger UI and ReDoc
-docs:
-	@echo "Building Swagger UI docs..."
-	@npm run build --prefix github-template
-	@echo "Swagger docs built."
 
-	@echo "Building ReDoc docs..."
-	@cp github-template/dist/swagger.json $(REDOC_HTML)
-	@echo "ReDoc docs built."
+# === LINT & DIFF ===
+.PHONY: lint
+lint:
+	@echo "🔍 Running Spectral lint on $(SPEC)..."
+	npx @stoplight/spectral-cli lint $(SPEC)
+	@echo "🔍 Running Redocly lint on $(SPEC)..."
+	npx @redocly/cli lint $(SPEC)
 
-# Clean generated files
-clean:
-	@echo "Cleaning generated files..."
-	@rm -rf node_modules
-	@rm -rf tests/python-cli/__pycache__
-	@rm -rf tests/typescript-cli/node_modules
-	@rm -f $(REDOC_HTML)
-	@echo "Clean complete."
 
-# SDK generation (requires openapi-generator-cli installed)
-sdk-python:
-	npx @openapitools/openapi-generator-cli generate -i ./docs/c2m_openapi_spec_final.yaml -g python -o sdk/python
+.PHONY: diff
+diff:
+	@echo "📤 Fetching latest from origin/main…"
+	git fetch origin
+	@echo "🧾 Checking out previous version of spec for diff comparison…"
+	git show $(MAIN_SPEC_PATH) > $(PREVIOUS_SPEC)
+	openapi-diff $(PREVIOUS_SPEC) $(SPEC) || echo "⚠️ Diff check completed with warnings."
 
-sdk-typescript:
-	npx @openapitools/openapi-generator-cli generate -i ./docs/c2m_openapi_spec_final.yaml -g typescript-axios -o sdk/typescript
 
-sdk-all: sdk-python sdk-typescript
+.PHONY: clean-diff
+clean-diff:
+	rm -f $(PREVIOUS_SPEC)
 
-docs-deploy:
-	git add ./docs
-	git commit -m "Update docs"
-	git push
 
-deploy-all: sdk-all docs-deploy
+# === POSTMAN TASKS ===
+.PHONY: postman-login
+postman-login:
+	@echo "🔐 Logging in to Postman..."
+	$(POSTMAN) login --with-api-key $(POSTMAN_API_KEY)
+
+# --- Import OpenAPI definition into Postman ---
+.PHONY: postman-api-import
+postman-api-import:
+	@echo "📥 Importing OpenAPI definition $(SPEC) into Postman workspace $(POSTMAN_WS_ID)..."
+	API_RESPONSE=$$(curl --silent --location --request POST "https://api.getpostman.com/apis?workspace=$(POSTMAN_WS_ID)" \
+		--header "X-Api-Key: $(POSTMAN_API_KEY)" \
+		--header "Accept: application/vnd.api.v10+json" \
+		--header "Content-Type: application/json" \
+		--data "$$(jq -Rs --arg name '$(POSTMAN_API_NAME)' '{ api: { name: $name, schema: { type: "openapi3", language: "yaml", schema: . }}}' < $(SPEC))"); \
+	API_ID=$$(echo "$$API_RESPONSE" | jq -r '.api.id // empty'); \
+	if [ -z "$$API_ID" ]; then \
+		echo "❌ Failed to import API. Check $(IMPORT_DEBUG_FILE)"; echo "$$API_RESPONSE" > $(IMPORT_DEBUG_FILE); exit 1; \
+	else \
+		echo "$$API_ID" > $(POSTMAN_API_UID_FILE); echo "✅ Imported API with ID: $$API_ID"; \
+	fi
+
+
+
+# --- Generate Postman collection from OpenAPI spec ---
+.PHONY: postman-collection-generate
+postman-collection-generate:
+	@echo "📦 Generating Postman collection from $(SPEC)..."
+	$(GENERATOR_OFFICIAL) -s $(SPEC) -o $(COLLECTION_RAW) -p
+	@echo "✅ Collection written to $(COLLECTION_RAW)"
+
+
+
+# --- Merge Overrides into Postman collection ---
+.PHONY: postman-collection-merge-overrides
+postman-collection-merge-overrides:
+	@echo "🔀 Merging overrides from $(OVERRIDES_JSON) into collection..."
+	@jq -s '.[0] * .[1] | .item = (.[0].item + (.[1].item // [])) | .event = (.[0].event + (.[1].event // []))' $(COLLECTION_RAW) $(OVERRIDES_JSON) > $(COLLECTION_FINAL)
+	@echo "✅ Overrides merged and saved to $(COLLECTION_FINAL)"
+
+
+
+# --- Add Examples/Test Data ---
+.PHONY: postman-collection-add-examples
+postman-collection-add-examples:
+	@echo "🧩 Adding smart example data to Postman collection..."
+	@python3 scripts/generate_test_data.py $(COLLECTION_FINAL) $(COLLECTION_FINAL)
+	@echo "✅ Examples added and saved to $(COLLECTION_FINAL)"
+
+
+# --- Upload Postman collection ---
+.PHONY: postman-collection-upload
+postman-collection-upload:
+	@echo "📤 Uploading Postman collection $(COLLECTION_FINAL) to workspace $(POSTMAN_WS_ID)..."
+	COLLECTION_UID=$$(curl --silent --location --request POST "https://api.getpostman.com/collections?workspace=$(POSTMAN_WS_ID)" \
+		--header "X-Api-Key: $(POSTMAN_API_KEY)" \
+		--header "Accept: application/vnd.api.v10+json" \
+		--header "Content-Type: application/json" \
+		--data-binary @$(COLLECTION_FINAL) | jq -r '.collection.uid // empty'); \
+	if [ -z "$$COLLECTION_UID" ] || [ "$$COLLECTION_UID" = "null" ]; then \
+		echo "❌ Failed to upload collection"; exit 1; \
+	else \
+		echo "$$COLLECTION_UID" > $(COLLECTION_UID_FILE); echo "✅ Collection uploaded with UID: $$COLLECTION_UID"; \
+	fi
+
+# --- Link collection to API ---
+.PHONY: postman-collection-link
+postman-collection-link:
+	@echo "🔗 Linking collection to API $(POSTMAN_API_NAME)..."
+	COLLECTION_UID=$$(cat $(COLLECTION_UID_FILE)); API_ID=$$(cat $(POSTMAN_API_UID_FILE)); \
+	if [ -z "$$COLLECTION_UID" ] || [ -z "$$API_ID" ]; then \
+		echo "❌ Missing collection or API UID."; exit 1; \
+	fi; \
+	RESPONSE=$$(curl --silent --location --request POST "https://api.getpostman.com/apis/$$API_ID/collections" \
+		--header "X-Api-Key: $(POSTMAN_API_KEY)" \
+		--header "Accept: application/vnd.api.v10+json" \
+		--header "Content-Type: application/json" \
+		--data '{ "operationType": "COPY_COLLECTION", "data": { "collectionId": "'$$COLLECTION_UID'" }}'); \
+	if [ -z "$$RESPONSE" ]; then \
+		echo "❌ Failed to link collection."; exit 1; \
+	else \
+		echo "✅ Collection linked to API."; \
+	fi
+
+
+
+# === DOCUMENTATION TARGETS ===
+.PHONY: docs-build
+docs-build:
+	@echo "📚 Building Swagger and Redoc docs..."
+	npx swagger-cli bundle $(OPENAPI_FINAL_SPEC) --outfile $(DOCS_DIR)/swagger.yaml --type yaml
+	npx @redocly/cli build-docs $(OPENAPI_FINAL_SPEC) -o $(DOCS_DIR)/redoc.html
+	cp $(TEMPLATES_DIR)/swagger.html.template $(DOCS_DIR)/index.html
+	@echo "✅ Docs generated at $(DOCS_DIR)"
+
+
+
+.PHONY: docs-serve
+docs-serve:
+	@echo "🚀 Serving docs locally at http://localhost:8080..."
+	python3 -m http.server 8080 --directory $(DOCS_DIR)
+
+
+
+# === CONTRACT TEST TARGETS ===
+.PHONY: postman-contract-test
+postman-contract-test: postman-env-create postman-collection-generate postman-collection-merge-overrides postman-collection-add-examples
+	@echo "🧪 Running Contract Test Generator..."
+	@if [ ! -f $(ENV_FILE) ]; then echo '⚠️ Environment file missing. Run make postman-env-create first.'; exit 1; fi
+	npx newman run $(COLLECTION_FINAL) -e $(ENV_FILE) --reporters cli,html --reporter-html-export $(REPORT_HTML)
+	@echo "✅ Contract test report available at $(REPORT_HTML)"
+
+
+
+# === DEFAULT TARGETS ===
+.PHONY: all
+all: install lint diff postman-api-import postman-collection-generate postman-collection-merge-overrides postman-collection-add-examples postman-collection-upload postman-collection-link docs-build
+
+
+
+# === HELP ===
+.PHONY: help
+help:
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+
+
+
+# --- FULL PIPELINE (Optional) ---
+# .PHONY: postman-pipeline
+# postman-pipeline: install lint diff postman-api-import postman-collection-generate \
+# 	postman-collection-merge-overrides postman-collection-add-examples \
+# 	postman-collection-upload postman-collection-link postman-env-create \
+# 	postman-env-upload docs-build
+# 	@echo "🚀 Full Postman pipeline executed successfully."

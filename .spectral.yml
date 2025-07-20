@@ -1,6 +1,18 @@
 extends: spectral:oas
 
 rules:
+  # ----- Style / naming tweaks -----
+  paths-kebab-case:
+    description: "Path segments should be kebab-case"
+    message: "{{property}} '{{value}}' is not kebab-case"
+    recommended: false
+    given: "$.paths[*]~"
+    type: style
+    then:
+      function: pattern
+      functionOptions:
+        match: "^[a-z0-9]+(-[a-z0-9]+)*$"
+
   # Require 'description' field in all operations
   operation-description:
     description: "Every operation should have a description."
@@ -19,6 +31,14 @@ rules:
       field: summary
       function: truthy
 
+  operation-summary:
+    description: "Every operation must have a short summary"
+    given: "$.paths[*][*]"
+    severity: warn
+    then:
+      field: summary
+      function: truthy
+
   # Ensure info object has a description
   info-description:
     description: "API info block must include a description."
@@ -33,3 +53,6 @@ rules:
   info-license: off
   openapi-tags: off
 
+  # ----- Turn OFF things you don’t care about in early dev -----
+  oas3-valid-schema-example: off
+  info-description: off   # allow empty description until later
