@@ -17,7 +17,6 @@ def add_tests:
 walk(
   if type == "object" and has("request") then
     . + add_tests
-  else
-    .
+  else .
   end
 )

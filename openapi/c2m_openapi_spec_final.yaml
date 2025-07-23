@@ -1,11 +1,11 @@
 openapi: 3.0.3
 info:
-  title: LOB-Style Document Submission API
+  title: C2M Document Submission API
   version: 1.0.0
-  description: API for submitting document jobs using LOB-style document and address
+  description: API for submitting document jobs document and address
     structures.
 servers:
-- url: https://api.example.com
+  - url: http://localhost:4010
 components:
   securitySchemes:
     bearerAuth:

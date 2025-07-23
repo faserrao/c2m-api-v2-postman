@@ -1,0 +1,80 @@
+🚀 Starting Postman build and test...
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-collection-generate
+📦 Generating Postman collection from openapi/c2m_openapi_spec_final.yaml...
+npx openapi-to-postmanv2 -s openapi/c2m_openapi_spec_final.yaml -o postman/generated/c2m.collection.json -p
+Input file:  /Users/frankserrao/Dropbox/Customers/c2m/projects/c2m-api/C2M_API_v3/c2m-api-repo/openapi/c2m_openapi_spec_final.yaml
+Writing to file:  true /Users/frankserrao/Dropbox/Customers/c2m/projects/c2m-api/C2M_API_v3/c2m-api-repo/postman/generated/c2m.collection.json {
+  result: true,
+  output: [ { type: 'collection', data: [Object] } ],
+  analytics: {}
+}
+[32mConversion successful, collection written to file[0m
+🛠 Adding 'info' block to collection...
+✅ Collection generated with 'info' block at postman/generated/c2m.collection.json
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-collection-upload
+📤 Uploading Postman collection postman/generated/c2m.collection.json to workspace d8a1f479-a2aa-4471-869e-b12feea0a98c...
+✅ Collection uploaded with UID: 46321051-c12dd9aa-d434-4b07-b808-e9218f76e46c
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-collection-link
+🔗 Linking collection to API C2M API...
+🔗 Copying and linking collection 46321051-c12dd9aa-d434-4b07-b808-e9218f76e46c to API 970d1015-97cb-4643-b87b-883328aeef65...
+ {"title":"We could not find the API you are looking for","detail":"We could not find the API you are looking for.","type":"instanceNotFoundError"}/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-collection-generate
+📦 Generating Postman collection from openapi/c2m_openapi_spec_final.yaml...
+npx openapi-to-postmanv2 -s openapi/c2m_openapi_spec_final.yaml -o postman/generated/c2m.collection.json -p
+Input file:  /Users/frankserrao/Dropbox/Customers/c2m/projects/c2m-api/C2M_API_v3/c2m-api-repo/openapi/c2m_openapi_spec_final.yaml
+Writing to file:  true /Users/frankserrao/Dropbox/Customers/c2m/projects/c2m-api/C2M_API_v3/c2m-api-repo/postman/generated/c2m.collection.json {
+  result: true,
+  output: [ { type: 'collection', data: [Object] } ],
+  analytics: {}
+}
+[32mConversion successful, collection written to file[0m
+🛠 Adding 'info' block to collection...
+✅ Collection generated with 'info' block at postman/generated/c2m.collection.json
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-collection-merge-overrides
+🔀 Safely merging overrides from postman/custom/overrides.json into postman/generated/c2m.collection.json...
+✅ Safe deep merge completed. Output written to postman/generated/c2m.collection.merged.json
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-collection-add-examples || echo "⚠️  Skipping examples (optional step)."
+🧩 Adding smart example data to Postman collection...
+✅ Example data added. Updated collection saved to postman/generated/c2m.collection.with.examples.json
+✅ Examples added and saved to postman/generated/c2m.collection.with.examples.json
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-collection-auto-fix || echo "⚠️  Skipping auto-fix (optional step)."
+🛠 Auto-fixing invalid items in postman/generated/c2m.collection.with.examples.json...
+✅ Auto-fix complete. Fixed collection saved to postman/generated/c2m.collection.fixed.json
+🔍 Validating fixed collection...
+✅ Collection is valid.
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-collection-url-hardfix
+🔧 Applying combined path + URL hard fix...
+jq -f scripts/url_hardfix_with_paths.jq postman/generated/c2m.collection.fixed.json > postman/generated/c2m.collection.fixed.json.tmp \
+			&& mv postman/generated/c2m.collection.fixed.json.tmp postman/generated/c2m.collection.fixed.json
+✅ Combined path and URL hard fix applied: postman/generated/c2m.collection.fixed.json
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-collection-repair-urls
+🔧 Repairing URLs based on folder hierarchy...
+python3 scripts/repair_urls.py postman/generated/c2m.collection.fixed.json
+✅ URLs repaired and saved to postman/generated/c2m.collection.fixed.fixed_urls.json
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-collection-patch
+🔧 Patching Postman collection to ensure {{baseUrl}} is used for all hosts...
+jq 'walk(if type == "object" and has("url") and (.url.host[0] | tostring | test("undefined")) then .url.host = ["{{baseUrl}}"] else . end)' postman/generated/c2m.collection.fixed.json > postman/generated/c2m.collection.fixed.json.patched
+mv postman/generated/c2m.collection.fixed.json.patched postman/generated/c2m.collection.fixed.json
+✅ Patched postman/generated/c2m.collection.fixed.json to replace undefined hosts with {{baseUrl}}
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-collection-validate
+🔍 Validating Postman collection postman/generated/c2m.collection.merged.json...
+✅ Collection postman/generated/c2m.collection.merged.json is valid.
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-collection-upload-test
+===== DEBUG: Postman Collection Upload Test Variables =====
+POSTMAN_API_KEY: PMAK-REDACTED-REDACTED
+POSTMAN_WS: d8a1f479-a2aa-4471-869e-b12feea0a98c
+COLLECTION_FIXED: postman/generated/c2m.collection.fixed.json
+===========================================================
+📦 Using collection: postman/generated/c2m.collection.fixed.json
+✅ TEST Collection uploaded with UID: 46321051-3e416bc9-c5dc-43af-be61-5ea0ee94f768
+📄 UID saved to postman/postman_test_collection_uid.txt
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-mock-create
+🛠 Creating Postman mock server for collection...
+📤 Creating mock server via Postman API...
+✅ Mock server created at: 
+📄 Saving mock URL and UID...
+📄 Mock server URL saved to postman/mock_url.txt
+📄 Mock UID saved to postman/postman_mock_uid.txt
+🔍 Validating mock configuration...
+✅ Postman mock validated successfully.
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-env-create
+🧪 Generating Postman environment file …
