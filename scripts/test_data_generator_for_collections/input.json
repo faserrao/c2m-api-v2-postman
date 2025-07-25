@@ -1,0 +1,2093 @@
+{
+  "info": {
+    "name": "C2M Testing Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "jobs",
+      "description": "",
+      "item": [
+        {
+          "name": "submit",
+          "description": "",
+          "item": [
+            {
+              "name": "single",
+              "description": "",
+              "item": [
+                {
+                  "name": "doc",
+                  "description": "",
+                  "item": [
+                    {
+                      "id": "72426c61-38b1-418c-9aee-5ae71112e83c",
+                      "name": "Submit a single document to multiple recipients",
+                      "request": {
+                        "name": "Submit a single document to multiple recipients",
+                        "description": {},
+                        "url": {
+                          "path": [
+                            "jobs",
+                            "submit",
+                            "single",
+                            "doc"
+                          ],
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "query": [],
+                          "variable": []
+                        },
+                        "header": [
+                          {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                          },
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "method": "POST",
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"documentSourceIdentifier\": {\n    \"documentId\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"businessLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"largeEnvelope\",\n    \"paperType\": \"letter\",\n    \"printOption\": \"color\",\n    \"envelope\": \"flat\"\n  },\n  \"recipientAddresses\": [\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    },\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    }\n  ],\n  \"paymentDetails\": {\n    \"billingType\": \"invoice\",\n    \"creditCardDetails\": {\n      \"cardType\": \"discover\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"CAD\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
+                        "auth": null
+                      },
+                      "response": [
+                        {
+                          "id": "c75de882-bad1-4bc8-b181-db96cfecdfa9",
+                          "name": "Job submission accepted",
+                          "originalRequest": {
+                            "url": {
+                              "path": [
+                                "jobs",
+                                "submit",
+                                "single",
+                                "doc"
+                              ],
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "query": [],
+                              "variable": []
+                            },
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              },
+                              {
+                                "key": "Accept",
+                                "value": "application/json"
+                              },
+                              {
+                                "description": {
+                                  "content": "Added as a part of security scheme: bearer",
+                                  "type": "text/plain"
+                                },
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "method": "POST",
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"documentSourceIdentifier\": {\n    \"documentId\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"businessLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"largeEnvelope\",\n    \"paperType\": \"letter\",\n    \"printOption\": \"color\",\n    \"envelope\": \"flat\"\n  },\n  \"recipientAddresses\": [\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    },\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    }\n  ],\n  \"paymentDetails\": {\n    \"billingType\": \"invoice\",\n    \"creditCardDetails\": {\n      \"cardType\": \"discover\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"CAD\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "body": "{\n  \"jobId\": \"<string>\",\n  \"status\": \"<string>\"\n}",
+                          "cookie": [],
+                          "_postman_previewlanguage": "json"
+                        },
+                        {
+                          "id": "0f0cdd33-2fe4-4be5-aa48-3510f580dce0",
+                          "name": "Invalid request",
+                          "originalRequest": {
+                            "url": {
+                              "path": [
+                                "jobs",
+                                "submit",
+                                "single",
+                                "doc"
+                              ],
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "query": [],
+                              "variable": []
+                            },
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              },
+                              {
+                                "description": {
+                                  "content": "Added as a part of security scheme: bearer",
+                                  "type": "text/plain"
+                                },
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "method": "POST",
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"documentSourceIdentifier\": {\n    \"documentId\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"businessLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"largeEnvelope\",\n    \"paperType\": \"letter\",\n    \"printOption\": \"color\",\n    \"envelope\": \"flat\"\n  },\n  \"recipientAddresses\": [\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    },\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    }\n  ],\n  \"paymentDetails\": {\n    \"billingType\": \"invoice\",\n    \"creditCardDetails\": {\n      \"cardType\": \"discover\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"CAD\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            }
+                          },
+                          "status": "Bad Request",
+                          "code": 400,
+                          "header": [],
+                          "cookie": [],
+                          "_postman_previewlanguage": "text"
+                        },
+                        {
+                          "id": "36bd10fe-c455-40b4-bef0-391a0eb8dddb",
+                          "name": "Unauthorized",
+                          "originalRequest": {
+                            "url": {
+                              "path": [
+                                "jobs",
+                                "submit",
+                                "single",
+                                "doc"
+                              ],
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "query": [],
+                              "variable": []
+                            },
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              },
+                              {
+                                "description": {
+                                  "content": "Added as a part of security scheme: bearer",
+                                  "type": "text/plain"
+                                },
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "method": "POST",
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"documentSourceIdentifier\": {\n    \"documentId\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"businessLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"largeEnvelope\",\n    \"paperType\": \"letter\",\n    \"printOption\": \"color\",\n    \"envelope\": \"flat\"\n  },\n  \"recipientAddresses\": [\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    },\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    }\n  ],\n  \"paymentDetails\": {\n    \"billingType\": \"invoice\",\n    \"creditCardDetails\": {\n      \"cardType\": \"discover\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"CAD\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            }
+                          },
+                          "status": "Unauthorized",
+                          "code": 401,
+                          "header": [],
+                          "cookie": [],
+                          "_postman_previewlanguage": "text"
+                        }
+                      ],
+                      "event": [],
+                      "protocolProfileBehavior": {
+                        "disableBodyPruning": true
+                      }
+                    },
+                    {
+                      "name": "jobTemplate",
+                      "description": "",
+                      "item": [
+                        {
+                          "id": "da8c2514-24f3-4b99-b212-4a3eac840a7d",
+                          "name": "Submit a document using a job template",
+                          "request": {
+                            "name": "Submit a document using a job template",
+                            "description": {},
+                            "url": {
+                              "path": [
+                                "jobs",
+                                "submit",
+                                "single",
+                                "doc",
+                                "jobTemplate"
+                              ],
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "query": [],
+                              "variable": []
+                            },
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              }
+                            ],
+                            "method": "POST",
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"documentSourceIdentifier\": {\n    \"documentId\": \"<string>\"\n  },\n  \"jobTemplate\": \"<string>\",\n  \"recipientAddresses\": [\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    },\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"businessLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"priorityMail\",\n    \"paperType\": \"letter\",\n    \"printOption\": \"grayscale\",\n    \"envelope\": \"postcard\"\n  },\n  \"paymentDetails\": {\n    \"billingType\": \"ach\",\n    \"creditCardDetails\": {\n      \"cardType\": \"mastercard\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"USD\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            },
+                            "auth": null
+                          },
+                          "response": [
+                            {
+                              "id": "71812c92-f1a2-4273-8ce5-2464e99dcc38",
+                              "name": "OK",
+                              "originalRequest": {
+                                "url": {
+                                  "path": [
+                                    "jobs",
+                                    "submit",
+                                    "single",
+                                    "doc",
+                                    "jobTemplate"
+                                  ],
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "query": [],
+                                  "variable": []
+                                },
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": {
+                                      "content": "Added as a part of security scheme: bearer",
+                                      "type": "text/plain"
+                                    },
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "method": "POST",
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"documentSourceIdentifier\": {\n    \"documentId\": \"<string>\"\n  },\n  \"jobTemplate\": \"<string>\",\n  \"recipientAddresses\": [\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    },\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"businessLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"priorityMail\",\n    \"paperType\": \"letter\",\n    \"printOption\": \"grayscale\",\n    \"envelope\": \"postcard\"\n  },\n  \"paymentDetails\": {\n    \"billingType\": \"ach\",\n    \"creditCardDetails\": {\n      \"cardType\": \"mastercard\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"USD\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                }
+                              },
+                              "status": "OK",
+                              "code": 200,
+                              "header": [],
+                              "cookie": [],
+                              "_postman_previewlanguage": "text"
+                            },
+                            {
+                              "id": "31dd8713-41f1-4a32-b62f-ded51036419e",
+                              "name": "Invalid request",
+                              "originalRequest": {
+                                "url": {
+                                  "path": [
+                                    "jobs",
+                                    "submit",
+                                    "single",
+                                    "doc",
+                                    "jobTemplate"
+                                  ],
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "query": [],
+                                  "variable": []
+                                },
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": {
+                                      "content": "Added as a part of security scheme: bearer",
+                                      "type": "text/plain"
+                                    },
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "method": "POST",
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"documentSourceIdentifier\": {\n    \"documentId\": \"<string>\"\n  },\n  \"jobTemplate\": \"<string>\",\n  \"recipientAddresses\": [\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    },\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"businessLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"priorityMail\",\n    \"paperType\": \"letter\",\n    \"printOption\": \"grayscale\",\n    \"envelope\": \"postcard\"\n  },\n  \"paymentDetails\": {\n    \"billingType\": \"ach\",\n    \"creditCardDetails\": {\n      \"cardType\": \"mastercard\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"USD\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                }
+                              },
+                              "status": "Bad Request",
+                              "code": 400,
+                              "header": [],
+                              "cookie": [],
+                              "_postman_previewlanguage": "text"
+                            },
+                            {
+                              "id": "a614f134-d900-4eac-bc3e-efb643413d1d",
+                              "name": "Unauthorized",
+                              "originalRequest": {
+                                "url": {
+                                  "path": [
+                                    "jobs",
+                                    "submit",
+                                    "single",
+                                    "doc",
+                                    "jobTemplate"
+                                  ],
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "query": [],
+                                  "variable": []
+                                },
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": {
+                                      "content": "Added as a part of security scheme: bearer",
+                                      "type": "text/plain"
+                                    },
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "method": "POST",
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"documentSourceIdentifier\": {\n    \"documentId\": \"<string>\"\n  },\n  \"jobTemplate\": \"<string>\",\n  \"recipientAddresses\": [\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    },\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"businessLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"priorityMail\",\n    \"paperType\": \"letter\",\n    \"printOption\": \"grayscale\",\n    \"envelope\": \"postcard\"\n  },\n  \"paymentDetails\": {\n    \"billingType\": \"ach\",\n    \"creditCardDetails\": {\n      \"cardType\": \"mastercard\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"USD\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                }
+                              },
+                              "status": "Unauthorized",
+                              "code": 401,
+                              "header": [],
+                              "cookie": [],
+                              "_postman_previewlanguage": "text"
+                            }
+                          ],
+                          "event": [],
+                          "protocolProfileBehavior": {
+                            "disableBodyPruning": true
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "pdf",
+                  "description": "",
+                  "item": [
+                    {
+                      "name": "split",
+                      "description": "",
+                      "item": [
+                        {
+                          "id": "688155c3-b3e4-4195-b3d4-dd74ac300784",
+                          "name": "Split a PDF into page ranges and send to different recipients",
+                          "request": {
+                            "name": "Split a PDF into page ranges and send to different recipients",
+                            "description": {},
+                            "url": {
+                              "path": [
+                                "jobs",
+                                "submit",
+                                "single",
+                                "pdf",
+                                "split"
+                              ],
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "query": [],
+                              "variable": []
+                            },
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              }
+                            ],
+                            "method": "POST",
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"documentSourceIdentifier\": {\n    \"documentId\": \"<string>\"\n  },\n  \"pageRanges\": [\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"paymentDetails\": {\n    \"billingType\": \"ach\",\n    \"creditCardDetails\": {\n      \"cardType\": \"americanExpress\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"GBP\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            },
+                            "auth": null
+                          },
+                          "response": [
+                            {
+                              "id": "20190bc1-1f50-4367-b88d-ca2dc174ac69",
+                              "name": "OK",
+                              "originalRequest": {
+                                "url": {
+                                  "path": [
+                                    "jobs",
+                                    "submit",
+                                    "single",
+                                    "pdf",
+                                    "split"
+                                  ],
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "query": [],
+                                  "variable": []
+                                },
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": {
+                                      "content": "Added as a part of security scheme: bearer",
+                                      "type": "text/plain"
+                                    },
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "method": "POST",
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"documentSourceIdentifier\": {\n    \"documentId\": \"<string>\"\n  },\n  \"pageRanges\": [\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"paymentDetails\": {\n    \"billingType\": \"ach\",\n    \"creditCardDetails\": {\n      \"cardType\": \"americanExpress\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"GBP\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                }
+                              },
+                              "status": "OK",
+                              "code": 200,
+                              "header": [],
+                              "cookie": [],
+                              "_postman_previewlanguage": "text"
+                            },
+                            {
+                              "id": "ff47bb1c-a357-49dc-a8e7-8c268bd42db8",
+                              "name": "Invalid request",
+                              "originalRequest": {
+                                "url": {
+                                  "path": [
+                                    "jobs",
+                                    "submit",
+                                    "single",
+                                    "pdf",
+                                    "split"
+                                  ],
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "query": [],
+                                  "variable": []
+                                },
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": {
+                                      "content": "Added as a part of security scheme: bearer",
+                                      "type": "text/plain"
+                                    },
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "method": "POST",
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"documentSourceIdentifier\": {\n    \"documentId\": \"<string>\"\n  },\n  \"pageRanges\": [\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"paymentDetails\": {\n    \"billingType\": \"ach\",\n    \"creditCardDetails\": {\n      \"cardType\": \"americanExpress\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"GBP\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                }
+                              },
+                              "status": "Bad Request",
+                              "code": 400,
+                              "header": [],
+                              "cookie": [],
+                              "_postman_previewlanguage": "text"
+                            },
+                            {
+                              "id": "c5b6a06e-a039-4fa9-a966-774fc6f6dbf5",
+                              "name": "Unauthorized",
+                              "originalRequest": {
+                                "url": {
+                                  "path": [
+                                    "jobs",
+                                    "submit",
+                                    "single",
+                                    "pdf",
+                                    "split"
+                                  ],
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "query": [],
+                                  "variable": []
+                                },
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": {
+                                      "content": "Added as a part of security scheme: bearer",
+                                      "type": "text/plain"
+                                    },
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "method": "POST",
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"documentSourceIdentifier\": {\n    \"documentId\": \"<string>\"\n  },\n  \"pageRanges\": [\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"paymentDetails\": {\n    \"billingType\": \"ach\",\n    \"creditCardDetails\": {\n      \"cardType\": \"americanExpress\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"GBP\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                }
+                              },
+                              "status": "Unauthorized",
+                              "code": 401,
+                              "header": [],
+                              "cookie": [],
+                              "_postman_previewlanguage": "text"
+                            }
+                          ],
+                          "event": [],
+                          "protocolProfileBehavior": {
+                            "disableBodyPruning": true
+                          }
+                        },
+                        {
+                          "name": "addressCapture",
+                          "description": "",
+                          "item": [
+                            {
+                              "id": "8c21c1eb-0f22-4c71-a871-b2cb2e941ad3",
+                              "name": "Split PDF and extract embedded recipient addresses",
+                              "request": {
+                                "name": "Split PDF and extract embedded recipient addresses",
+                                "description": {},
+                                "url": {
+                                  "path": [
+                                    "jobs",
+                                    "submit",
+                                    "single",
+                                    "pdf",
+                                    "split",
+                                    "addressCapture"
+                                  ],
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "query": [],
+                                  "variable": []
+                                },
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  }
+                                ],
+                                "method": "POST",
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"documentSourceIdentifier\": {\n    \"documentId\": \"<string>\"\n  },\n  \"embeddedExtractionSpecs\": [\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"addressRegion\": {\n        \"x\": \"<number>\",\n        \"y\": \"<number>\",\n        \"width\": \"<number>\",\n        \"height\": \"<number>\",\n        \"pageOffset\": \"<integer>\"\n      }\n    },\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"addressRegion\": {\n        \"x\": \"<number>\",\n        \"y\": \"<number>\",\n        \"width\": \"<number>\",\n        \"height\": \"<number>\",\n        \"pageOffset\": \"<integer>\"\n      }\n    }\n  ],\n  \"paymentDetails\": {\n    \"billingType\": \"invoice\",\n    \"creditCardDetails\": {\n      \"cardType\": \"americanExpress\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"GBP\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                },
+                                "auth": null
+                              },
+                              "response": [
+                                {
+                                  "id": "94e56638-0f2c-4dc4-9a9d-bae4d780af9d",
+                                  "name": "OK",
+                                  "originalRequest": {
+                                    "url": {
+                                      "path": [
+                                        "jobs",
+                                        "submit",
+                                        "single",
+                                        "pdf",
+                                        "split",
+                                        "addressCapture"
+                                      ],
+                                      "host": [
+                                        "{{baseUrl}}"
+                                      ],
+                                      "query": [],
+                                      "variable": []
+                                    },
+                                    "header": [
+                                      {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                      },
+                                      {
+                                        "description": {
+                                          "content": "Added as a part of security scheme: bearer",
+                                          "type": "text/plain"
+                                        },
+                                        "key": "Authorization",
+                                        "value": "Bearer <token>"
+                                      }
+                                    ],
+                                    "method": "POST",
+                                    "body": {
+                                      "mode": "raw",
+                                      "raw": "{\n  \"documentSourceIdentifier\": {\n    \"documentId\": \"<string>\"\n  },\n  \"embeddedExtractionSpecs\": [\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"addressRegion\": {\n        \"x\": \"<number>\",\n        \"y\": \"<number>\",\n        \"width\": \"<number>\",\n        \"height\": \"<number>\",\n        \"pageOffset\": \"<integer>\"\n      }\n    },\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"addressRegion\": {\n        \"x\": \"<number>\",\n        \"y\": \"<number>\",\n        \"width\": \"<number>\",\n        \"height\": \"<number>\",\n        \"pageOffset\": \"<integer>\"\n      }\n    }\n  ],\n  \"paymentDetails\": {\n    \"billingType\": \"invoice\",\n    \"creditCardDetails\": {\n      \"cardType\": \"americanExpress\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"GBP\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                                      "options": {
+                                        "raw": {
+                                          "headerFamily": "json",
+                                          "language": "json"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "status": "OK",
+                                  "code": 200,
+                                  "header": [],
+                                  "cookie": [],
+                                  "_postman_previewlanguage": "text"
+                                },
+                                {
+                                  "id": "f98364ba-1486-4a6f-915b-09ffbda61b98",
+                                  "name": "Invalid request",
+                                  "originalRequest": {
+                                    "url": {
+                                      "path": [
+                                        "jobs",
+                                        "submit",
+                                        "single",
+                                        "pdf",
+                                        "split",
+                                        "addressCapture"
+                                      ],
+                                      "host": [
+                                        "{{baseUrl}}"
+                                      ],
+                                      "query": [],
+                                      "variable": []
+                                    },
+                                    "header": [
+                                      {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                      },
+                                      {
+                                        "description": {
+                                          "content": "Added as a part of security scheme: bearer",
+                                          "type": "text/plain"
+                                        },
+                                        "key": "Authorization",
+                                        "value": "Bearer <token>"
+                                      }
+                                    ],
+                                    "method": "POST",
+                                    "body": {
+                                      "mode": "raw",
+                                      "raw": "{\n  \"documentSourceIdentifier\": {\n    \"documentId\": \"<string>\"\n  },\n  \"embeddedExtractionSpecs\": [\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"addressRegion\": {\n        \"x\": \"<number>\",\n        \"y\": \"<number>\",\n        \"width\": \"<number>\",\n        \"height\": \"<number>\",\n        \"pageOffset\": \"<integer>\"\n      }\n    },\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"addressRegion\": {\n        \"x\": \"<number>\",\n        \"y\": \"<number>\",\n        \"width\": \"<number>\",\n        \"height\": \"<number>\",\n        \"pageOffset\": \"<integer>\"\n      }\n    }\n  ],\n  \"paymentDetails\": {\n    \"billingType\": \"invoice\",\n    \"creditCardDetails\": {\n      \"cardType\": \"americanExpress\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"GBP\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                                      "options": {
+                                        "raw": {
+                                          "headerFamily": "json",
+                                          "language": "json"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "status": "Bad Request",
+                                  "code": 400,
+                                  "header": [],
+                                  "cookie": [],
+                                  "_postman_previewlanguage": "text"
+                                },
+                                {
+                                  "id": "4a8bdf19-7929-44ac-abed-1e4227da5c5c",
+                                  "name": "Unauthorized",
+                                  "originalRequest": {
+                                    "url": {
+                                      "path": [
+                                        "jobs",
+                                        "submit",
+                                        "single",
+                                        "pdf",
+                                        "split",
+                                        "addressCapture"
+                                      ],
+                                      "host": [
+                                        "{{baseUrl}}"
+                                      ],
+                                      "query": [],
+                                      "variable": []
+                                    },
+                                    "header": [
+                                      {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                      },
+                                      {
+                                        "description": {
+                                          "content": "Added as a part of security scheme: bearer",
+                                          "type": "text/plain"
+                                        },
+                                        "key": "Authorization",
+                                        "value": "Bearer <token>"
+                                      }
+                                    ],
+                                    "method": "POST",
+                                    "body": {
+                                      "mode": "raw",
+                                      "raw": "{\n  \"documentSourceIdentifier\": {\n    \"documentId\": \"<string>\"\n  },\n  \"embeddedExtractionSpecs\": [\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"addressRegion\": {\n        \"x\": \"<number>\",\n        \"y\": \"<number>\",\n        \"width\": \"<number>\",\n        \"height\": \"<number>\",\n        \"pageOffset\": \"<integer>\"\n      }\n    },\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"addressRegion\": {\n        \"x\": \"<number>\",\n        \"y\": \"<number>\",\n        \"width\": \"<number>\",\n        \"height\": \"<number>\",\n        \"pageOffset\": \"<integer>\"\n      }\n    }\n  ],\n  \"paymentDetails\": {\n    \"billingType\": \"invoice\",\n    \"creditCardDetails\": {\n      \"cardType\": \"americanExpress\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"GBP\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                                      "options": {
+                                        "raw": {
+                                          "headerFamily": "json",
+                                          "language": "json"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "status": "Unauthorized",
+                                  "code": 401,
+                                  "header": [],
+                                  "cookie": [],
+                                  "_postman_previewlanguage": "text"
+                                }
+                              ],
+                              "event": [],
+                              "protocolProfileBehavior": {
+                                "disableBodyPruning": true
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "multi",
+              "description": "",
+              "item": [
+                {
+                  "name": "doc",
+                  "description": "",
+                  "item": [
+                    {
+                      "id": "d9ed79a6-9852-4167-b594-36b872c46524",
+                      "name": "Submit multiple documents, each to a different recipient",
+                      "request": {
+                        "name": "Submit multiple documents, each to a different recipient",
+                        "description": {},
+                        "url": {
+                          "path": [
+                            "jobs",
+                            "submit",
+                            "multi",
+                            "doc"
+                          ],
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "query": [],
+                          "variable": []
+                        },
+                        "header": [
+                          {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                          }
+                        ],
+                        "method": "POST",
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"documentRecipientPairs\": [\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"personalLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"firstClassMail\",\n    \"paperType\": \"legal\",\n    \"printOption\": \"color\",\n    \"envelope\": \"postcard\"\n  },\n  \"paymentDetails\": {\n    \"billingType\": \"ach\",\n    \"creditCardDetails\": {\n      \"cardType\": \"discover\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"AUD\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
+                        "auth": null
+                      },
+                      "response": [
+                        {
+                          "id": "64a3a702-9c35-4689-8d3e-1ea07835352d",
+                          "name": "OK",
+                          "originalRequest": {
+                            "url": {
+                              "path": [
+                                "jobs",
+                                "submit",
+                                "multi",
+                                "doc"
+                              ],
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "query": [],
+                              "variable": []
+                            },
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              },
+                              {
+                                "description": {
+                                  "content": "Added as a part of security scheme: bearer",
+                                  "type": "text/plain"
+                                },
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "method": "POST",
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"documentRecipientPairs\": [\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"personalLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"firstClassMail\",\n    \"paperType\": \"legal\",\n    \"printOption\": \"color\",\n    \"envelope\": \"postcard\"\n  },\n  \"paymentDetails\": {\n    \"billingType\": \"ach\",\n    \"creditCardDetails\": {\n      \"cardType\": \"discover\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"AUD\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "header": [],
+                          "cookie": [],
+                          "_postman_previewlanguage": "text"
+                        },
+                        {
+                          "id": "184d43da-3e62-494d-88bd-10adb89f30c9",
+                          "name": "Invalid request",
+                          "originalRequest": {
+                            "url": {
+                              "path": [
+                                "jobs",
+                                "submit",
+                                "multi",
+                                "doc"
+                              ],
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "query": [],
+                              "variable": []
+                            },
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              },
+                              {
+                                "description": {
+                                  "content": "Added as a part of security scheme: bearer",
+                                  "type": "text/plain"
+                                },
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "method": "POST",
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"documentRecipientPairs\": [\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"personalLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"firstClassMail\",\n    \"paperType\": \"legal\",\n    \"printOption\": \"color\",\n    \"envelope\": \"postcard\"\n  },\n  \"paymentDetails\": {\n    \"billingType\": \"ach\",\n    \"creditCardDetails\": {\n      \"cardType\": \"discover\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"AUD\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            }
+                          },
+                          "status": "Bad Request",
+                          "code": 400,
+                          "header": [],
+                          "cookie": [],
+                          "_postman_previewlanguage": "text"
+                        },
+                        {
+                          "id": "d181c4f2-f2fc-47b9-bfd3-582e8fc3931c",
+                          "name": "Unauthorized",
+                          "originalRequest": {
+                            "url": {
+                              "path": [
+                                "jobs",
+                                "submit",
+                                "multi",
+                                "doc"
+                              ],
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "query": [],
+                              "variable": []
+                            },
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              },
+                              {
+                                "description": {
+                                  "content": "Added as a part of security scheme: bearer",
+                                  "type": "text/plain"
+                                },
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "method": "POST",
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"documentRecipientPairs\": [\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"personalLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"firstClassMail\",\n    \"paperType\": \"legal\",\n    \"printOption\": \"color\",\n    \"envelope\": \"postcard\"\n  },\n  \"paymentDetails\": {\n    \"billingType\": \"ach\",\n    \"creditCardDetails\": {\n      \"cardType\": \"discover\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"AUD\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            }
+                          },
+                          "status": "Unauthorized",
+                          "code": 401,
+                          "header": [],
+                          "cookie": [],
+                          "_postman_previewlanguage": "text"
+                        }
+                      ],
+                      "event": [],
+                      "protocolProfileBehavior": {
+                        "disableBodyPruning": true
+                      }
+                    },
+                    {
+                      "name": "merge",
+                      "description": "",
+                      "item": [
+                        {
+                          "id": "ec648532-6e3f-4c17-87cc-31483ad4b9df",
+                          "name": "Merge multiple documents and send to a single recipient",
+                          "request": {
+                            "name": "Merge multiple documents and send to a single recipient",
+                            "description": {},
+                            "url": {
+                              "path": [
+                                "jobs",
+                                "submit",
+                                "multi",
+                                "doc",
+                                "merge"
+                              ],
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "query": [],
+                              "variable": []
+                            },
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              }
+                            ],
+                            "method": "POST",
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"documentsToMerge\": [\n    {\n      \"documentId\": \"<string>\"\n    },\n    {\n      \"documentId\": \"<string>\"\n    }\n  ],\n  \"recipientAddressSource\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"nickName\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\",\n    \"phoneNumber\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            },
+                            "auth": null
+                          },
+                          "response": [
+                            {
+                              "id": "766de78d-7e71-42df-a0f0-723f6f00156b",
+                              "name": "OK",
+                              "originalRequest": {
+                                "url": {
+                                  "path": [
+                                    "jobs",
+                                    "submit",
+                                    "multi",
+                                    "doc",
+                                    "merge"
+                                  ],
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "query": [],
+                                  "variable": []
+                                },
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": {
+                                      "content": "Added as a part of security scheme: bearer",
+                                      "type": "text/plain"
+                                    },
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "method": "POST",
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"documentsToMerge\": [\n    {\n      \"documentId\": \"<string>\"\n    },\n    {\n      \"documentId\": \"<string>\"\n    }\n  ],\n  \"recipientAddressSource\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"nickName\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\",\n    \"phoneNumber\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                }
+                              },
+                              "status": "OK",
+                              "code": 200,
+                              "header": [],
+                              "cookie": [],
+                              "_postman_previewlanguage": "text"
+                            },
+                            {
+                              "id": "3d32bc8e-abfc-47aa-bb03-524b9a16234d",
+                              "name": "Invalid request",
+                              "originalRequest": {
+                                "url": {
+                                  "path": [
+                                    "jobs",
+                                    "submit",
+                                    "multi",
+                                    "doc",
+                                    "merge"
+                                  ],
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "query": [],
+                                  "variable": []
+                                },
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": {
+                                      "content": "Added as a part of security scheme: bearer",
+                                      "type": "text/plain"
+                                    },
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "method": "POST",
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"documentsToMerge\": [\n    {\n      \"documentId\": \"<string>\"\n    },\n    {\n      \"documentId\": \"<string>\"\n    }\n  ],\n  \"recipientAddressSource\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"nickName\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\",\n    \"phoneNumber\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                }
+                              },
+                              "status": "Bad Request",
+                              "code": 400,
+                              "header": [],
+                              "cookie": [],
+                              "_postman_previewlanguage": "text"
+                            },
+                            {
+                              "id": "b4789fe6-73e1-480a-8cde-3fedae99d59d",
+                              "name": "Unauthorized",
+                              "originalRequest": {
+                                "url": {
+                                  "path": [
+                                    "jobs",
+                                    "submit",
+                                    "multi",
+                                    "doc",
+                                    "merge"
+                                  ],
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "query": [],
+                                  "variable": []
+                                },
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": {
+                                      "content": "Added as a part of security scheme: bearer",
+                                      "type": "text/plain"
+                                    },
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "method": "POST",
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"documentsToMerge\": [\n    {\n      \"documentId\": \"<string>\"\n    },\n    {\n      \"documentId\": \"<string>\"\n    }\n  ],\n  \"recipientAddressSource\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"nickName\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\",\n    \"phoneNumber\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                }
+                              },
+                              "status": "Unauthorized",
+                              "code": 401,
+                              "header": [],
+                              "cookie": [],
+                              "_postman_previewlanguage": "text"
+                            }
+                          ],
+                          "event": [],
+                          "protocolProfileBehavior": {
+                            "disableBodyPruning": true
+                          }
+                        },
+                        {
+                          "name": "jobTemplate",
+                          "description": "",
+                          "item": [
+                            {
+                              "id": "ba71fc58-41c4-4c77-8262-c2affbf4463a",
+                              "name": "Merge documents, send to recipient using job template",
+                              "request": {
+                                "name": "Merge documents, send to recipient using job template",
+                                "description": {},
+                                "url": {
+                                  "path": [
+                                    "jobs",
+                                    "submit",
+                                    "multi",
+                                    "doc",
+                                    "merge",
+                                    "jobTemplate"
+                                  ],
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "query": [],
+                                  "variable": []
+                                },
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  }
+                                ],
+                                "method": "POST",
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"documentsToMerge\": [\n    {\n      \"documentId\": \"<string>\"\n    },\n    {\n      \"documentId\": \"<string>\"\n    }\n  ],\n  \"recipientAddressSource\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"nickName\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\",\n    \"phoneNumber\": \"<string>\"\n  },\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"billingType\": \"ach\",\n    \"creditCardDetails\": {\n      \"cardType\": \"americanExpress\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"AUD\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                },
+                                "auth": null
+                              },
+                              "response": [
+                                {
+                                  "id": "ba18aa35-ea13-4a43-b81b-02f0cbbb27c8",
+                                  "name": "OK",
+                                  "originalRequest": {
+                                    "url": {
+                                      "path": [
+                                        "jobs",
+                                        "submit",
+                                        "multi",
+                                        "doc",
+                                        "merge",
+                                        "jobTemplate"
+                                      ],
+                                      "host": [
+                                        "{{baseUrl}}"
+                                      ],
+                                      "query": [],
+                                      "variable": []
+                                    },
+                                    "header": [
+                                      {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                      },
+                                      {
+                                        "description": {
+                                          "content": "Added as a part of security scheme: bearer",
+                                          "type": "text/plain"
+                                        },
+                                        "key": "Authorization",
+                                        "value": "Bearer <token>"
+                                      }
+                                    ],
+                                    "method": "POST",
+                                    "body": {
+                                      "mode": "raw",
+                                      "raw": "{\n  \"documentsToMerge\": [\n    {\n      \"documentId\": \"<string>\"\n    },\n    {\n      \"documentId\": \"<string>\"\n    }\n  ],\n  \"recipientAddressSource\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"nickName\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\",\n    \"phoneNumber\": \"<string>\"\n  },\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"billingType\": \"ach\",\n    \"creditCardDetails\": {\n      \"cardType\": \"americanExpress\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"AUD\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                                      "options": {
+                                        "raw": {
+                                          "headerFamily": "json",
+                                          "language": "json"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "status": "OK",
+                                  "code": 200,
+                                  "header": [],
+                                  "cookie": [],
+                                  "_postman_previewlanguage": "text"
+                                },
+                                {
+                                  "id": "de50e1fd-f2ca-4c86-a67c-1a44f8cea87a",
+                                  "name": "Invalid request",
+                                  "originalRequest": {
+                                    "url": {
+                                      "path": [
+                                        "jobs",
+                                        "submit",
+                                        "multi",
+                                        "doc",
+                                        "merge",
+                                        "jobTemplate"
+                                      ],
+                                      "host": [
+                                        "{{baseUrl}}"
+                                      ],
+                                      "query": [],
+                                      "variable": []
+                                    },
+                                    "header": [
+                                      {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                      },
+                                      {
+                                        "description": {
+                                          "content": "Added as a part of security scheme: bearer",
+                                          "type": "text/plain"
+                                        },
+                                        "key": "Authorization",
+                                        "value": "Bearer <token>"
+                                      }
+                                    ],
+                                    "method": "POST",
+                                    "body": {
+                                      "mode": "raw",
+                                      "raw": "{\n  \"documentsToMerge\": [\n    {\n      \"documentId\": \"<string>\"\n    },\n    {\n      \"documentId\": \"<string>\"\n    }\n  ],\n  \"recipientAddressSource\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"nickName\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\",\n    \"phoneNumber\": \"<string>\"\n  },\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"billingType\": \"ach\",\n    \"creditCardDetails\": {\n      \"cardType\": \"americanExpress\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"AUD\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                                      "options": {
+                                        "raw": {
+                                          "headerFamily": "json",
+                                          "language": "json"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "status": "Bad Request",
+                                  "code": 400,
+                                  "header": [],
+                                  "cookie": [],
+                                  "_postman_previewlanguage": "text"
+                                },
+                                {
+                                  "id": "8822befd-b086-45e9-9eb6-687a5203e81b",
+                                  "name": "Unauthorized",
+                                  "originalRequest": {
+                                    "url": {
+                                      "path": [
+                                        "jobs",
+                                        "submit",
+                                        "multi",
+                                        "doc",
+                                        "merge",
+                                        "jobTemplate"
+                                      ],
+                                      "host": [
+                                        "{{baseUrl}}"
+                                      ],
+                                      "query": [],
+                                      "variable": []
+                                    },
+                                    "header": [
+                                      {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                      },
+                                      {
+                                        "description": {
+                                          "content": "Added as a part of security scheme: bearer",
+                                          "type": "text/plain"
+                                        },
+                                        "key": "Authorization",
+                                        "value": "Bearer <token>"
+                                      }
+                                    ],
+                                    "method": "POST",
+                                    "body": {
+                                      "mode": "raw",
+                                      "raw": "{\n  \"documentsToMerge\": [\n    {\n      \"documentId\": \"<string>\"\n    },\n    {\n      \"documentId\": \"<string>\"\n    }\n  ],\n  \"recipientAddressSource\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"nickName\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\",\n    \"phoneNumber\": \"<string>\"\n  },\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"billingType\": \"ach\",\n    \"creditCardDetails\": {\n      \"cardType\": \"americanExpress\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"AUD\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                                      "options": {
+                                        "raw": {
+                                          "headerFamily": "json",
+                                          "language": "json"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "status": "Unauthorized",
+                                  "code": 401,
+                                  "header": [],
+                                  "cookie": [],
+                                  "_postman_previewlanguage": "text"
+                                }
+                              ],
+                              "event": [],
+                              "protocolProfileBehavior": {
+                                "disableBodyPruning": true
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "docs",
+                  "description": "",
+                  "item": [
+                    {
+                      "name": "jobtemplate",
+                      "description": "",
+                      "item": [
+                        {
+                          "id": "3166cf52-3a87-4aac-bd43-27a81c61793a",
+                          "name": "Submit multiple documents with recipient addresses and job template",
+                          "request": {
+                            "name": "Submit multiple documents with recipient addresses and job template",
+                            "description": {},
+                            "url": {
+                              "path": [
+                                "jobs",
+                                "submit",
+                                "multi",
+                                "docs",
+                                "jobtemplate"
+                              ],
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "query": [],
+                              "variable": []
+                            },
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              }
+                            ],
+                            "method": "POST",
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"documentRecipientPairs\": [\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"billingType\": \"creditCard\",\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"CAD\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            },
+                            "auth": null
+                          },
+                          "response": [
+                            {
+                              "id": "969b37f5-0ee2-4553-bb87-c1cc175ac9db",
+                              "name": "OK",
+                              "originalRequest": {
+                                "url": {
+                                  "path": [
+                                    "jobs",
+                                    "submit",
+                                    "multi",
+                                    "docs",
+                                    "jobtemplate"
+                                  ],
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "query": [],
+                                  "variable": []
+                                },
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": {
+                                      "content": "Added as a part of security scheme: bearer",
+                                      "type": "text/plain"
+                                    },
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "method": "POST",
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"documentRecipientPairs\": [\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"billingType\": \"creditCard\",\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"CAD\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                }
+                              },
+                              "status": "OK",
+                              "code": 200,
+                              "header": [],
+                              "cookie": [],
+                              "_postman_previewlanguage": "text"
+                            },
+                            {
+                              "id": "a8d75cb7-31e7-44de-908e-f08b39d41eda",
+                              "name": "Invalid request",
+                              "originalRequest": {
+                                "url": {
+                                  "path": [
+                                    "jobs",
+                                    "submit",
+                                    "multi",
+                                    "docs",
+                                    "jobtemplate"
+                                  ],
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "query": [],
+                                  "variable": []
+                                },
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": {
+                                      "content": "Added as a part of security scheme: bearer",
+                                      "type": "text/plain"
+                                    },
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "method": "POST",
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"documentRecipientPairs\": [\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"billingType\": \"creditCard\",\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"CAD\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                }
+                              },
+                              "status": "Bad Request",
+                              "code": 400,
+                              "header": [],
+                              "cookie": [],
+                              "_postman_previewlanguage": "text"
+                            },
+                            {
+                              "id": "562ba2bd-be76-4a5a-98e6-ef552704f279",
+                              "name": "Unauthorized",
+                              "originalRequest": {
+                                "url": {
+                                  "path": [
+                                    "jobs",
+                                    "submit",
+                                    "multi",
+                                    "docs",
+                                    "jobtemplate"
+                                  ],
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "query": [],
+                                  "variable": []
+                                },
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": {
+                                      "content": "Added as a part of security scheme: bearer",
+                                      "type": "text/plain"
+                                    },
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "method": "POST",
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"documentRecipientPairs\": [\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"billingType\": \"creditCard\",\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"CAD\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                }
+                              },
+                              "status": "Unauthorized",
+                              "code": 401,
+                              "header": [],
+                              "cookie": [],
+                              "_postman_previewlanguage": "text"
+                            }
+                          ],
+                          "event": [],
+                          "protocolProfileBehavior": {
+                            "disableBodyPruning": true
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "pdf",
+                  "description": "",
+                  "item": [
+                    {
+                      "name": "addressCapture",
+                      "description": "",
+                      "item": [
+                        {
+                          "id": "e78f62e1-181e-49b3-8394-190febd1d377",
+                          "name": "Submit multiple PDFs with embedded address regions",
+                          "request": {
+                            "name": "Submit multiple PDFs with embedded address regions",
+                            "description": {},
+                            "url": {
+                              "path": [
+                                "jobs",
+                                "submit",
+                                "multi",
+                                "pdf",
+                                "addressCapture"
+                              ],
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "query": [],
+                              "variable": []
+                            },
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              }
+                            ],
+                            "method": "POST",
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"addressCapturePdfs\": [\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"addressListRegion\": {\n        \"x\": \"<number>\",\n        \"y\": \"<number>\",\n        \"width\": \"<number>\",\n        \"height\": \"<number>\",\n        \"pageOffset\": \"<integer>\"\n      },\n      \"delimiter\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    },\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"addressListRegion\": {\n        \"x\": \"<number>\",\n        \"y\": \"<number>\",\n        \"width\": \"<number>\",\n        \"height\": \"<number>\",\n        \"pageOffset\": \"<integer>\"\n      },\n      \"delimiter\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"billingType\": \"ach\",\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"EUR\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            },
+                            "auth": null
+                          },
+                          "response": [
+                            {
+                              "id": "44f0f070-678d-4e44-b225-1fa1824cbd63",
+                              "name": "OK",
+                              "originalRequest": {
+                                "url": {
+                                  "path": [
+                                    "jobs",
+                                    "submit",
+                                    "multi",
+                                    "pdf",
+                                    "addressCapture"
+                                  ],
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "query": [],
+                                  "variable": []
+                                },
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": {
+                                      "content": "Added as a part of security scheme: bearer",
+                                      "type": "text/plain"
+                                    },
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "method": "POST",
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"addressCapturePdfs\": [\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"addressListRegion\": {\n        \"x\": \"<number>\",\n        \"y\": \"<number>\",\n        \"width\": \"<number>\",\n        \"height\": \"<number>\",\n        \"pageOffset\": \"<integer>\"\n      },\n      \"delimiter\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    },\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"addressListRegion\": {\n        \"x\": \"<number>\",\n        \"y\": \"<number>\",\n        \"width\": \"<number>\",\n        \"height\": \"<number>\",\n        \"pageOffset\": \"<integer>\"\n      },\n      \"delimiter\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"billingType\": \"ach\",\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"EUR\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                }
+                              },
+                              "status": "OK",
+                              "code": 200,
+                              "header": [],
+                              "cookie": [],
+                              "_postman_previewlanguage": "text"
+                            },
+                            {
+                              "id": "74db05b5-cb46-46fe-88c2-4c8d5256bb0d",
+                              "name": "Invalid request",
+                              "originalRequest": {
+                                "url": {
+                                  "path": [
+                                    "jobs",
+                                    "submit",
+                                    "multi",
+                                    "pdf",
+                                    "addressCapture"
+                                  ],
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "query": [],
+                                  "variable": []
+                                },
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": {
+                                      "content": "Added as a part of security scheme: bearer",
+                                      "type": "text/plain"
+                                    },
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "method": "POST",
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"addressCapturePdfs\": [\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"addressListRegion\": {\n        \"x\": \"<number>\",\n        \"y\": \"<number>\",\n        \"width\": \"<number>\",\n        \"height\": \"<number>\",\n        \"pageOffset\": \"<integer>\"\n      },\n      \"delimiter\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    },\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"addressListRegion\": {\n        \"x\": \"<number>\",\n        \"y\": \"<number>\",\n        \"width\": \"<number>\",\n        \"height\": \"<number>\",\n        \"pageOffset\": \"<integer>\"\n      },\n      \"delimiter\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"billingType\": \"ach\",\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"EUR\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                }
+                              },
+                              "status": "Bad Request",
+                              "code": 400,
+                              "header": [],
+                              "cookie": [],
+                              "_postman_previewlanguage": "text"
+                            },
+                            {
+                              "id": "f5121ba2-376f-4500-a6c3-a6d6a4aaa55f",
+                              "name": "Unauthorized",
+                              "originalRequest": {
+                                "url": {
+                                  "path": [
+                                    "jobs",
+                                    "submit",
+                                    "multi",
+                                    "pdf",
+                                    "addressCapture"
+                                  ],
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "query": [],
+                                  "variable": []
+                                },
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": {
+                                      "content": "Added as a part of security scheme: bearer",
+                                      "type": "text/plain"
+                                    },
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "method": "POST",
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"addressCapturePdfs\": [\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"addressListRegion\": {\n        \"x\": \"<number>\",\n        \"y\": \"<number>\",\n        \"width\": \"<number>\",\n        \"height\": \"<number>\",\n        \"pageOffset\": \"<integer>\"\n      },\n      \"delimiter\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    },\n    {\n      \"documentSourceIdentifier\": {\n        \"documentId\": \"<string>\"\n      },\n      \"addressListRegion\": {\n        \"x\": \"<number>\",\n        \"y\": \"<number>\",\n        \"width\": \"<number>\",\n        \"height\": \"<number>\",\n        \"pageOffset\": \"<integer>\"\n      },\n      \"delimiter\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"billingType\": \"ach\",\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    },\n    \"invoiceDetails\": {\n      \"invoiceNumber\": \"<string>\",\n      \"amountDue\": \"<number>\"\n    },\n    \"achDetails\": {\n      \"routingNumber\": \"<string>\",\n      \"accountNumber\": \"<string>\",\n      \"checkDigit\": \"<integer>\"\n    },\n    \"creditAmount\": {\n      \"amount\": \"<number>\",\n      \"currency\": \"EUR\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                }
+                              },
+                              "status": "Unauthorized",
+                              "code": 401,
+                              "header": [],
+                              "cookie": [],
+                              "_postman_previewlanguage": "text"
+                            }
+                          ],
+                          "event": [],
+                          "protocolProfileBehavior": {
+                            "disableBodyPruning": true
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "webhooks",
+      "description": "",
+      "item": [
+        {
+          "name": "jobStatusUpdate",
+          "description": "",
+          "item": [
+            {
+              "id": "36bbd848-2d70-4128-b6fe-5f5ed2d6afc3",
+              "name": "Webhook endpoint to receive job status updates",
+              "request": {
+                "name": "Webhook endpoint to receive job status updates",
+                "description": {},
+                "url": {
+                  "path": [
+                    "webhooks",
+                    "jobStatusUpdate"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"jobId\": \"<string>\",\n  \"status\": \"processing\",\n  \"timestamp\": \"<dateTime>\",\n  \"metadata\": {\n    \"id_552\": \"<string>\",\n    \"Excepteurd\": \"<string>\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "auth": null
+              },
+              "response": [
+                {
+                  "id": "e2341090-ad01-4ddb-882d-9a7d9be3f418",
+                  "name": "Webhook received successfully",
+                  "originalRequest": {
+                    "url": {
+                      "path": [
+                        "webhooks",
+                        "jobStatusUpdate"
+                      ],
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "query": [],
+                      "variable": []
+                    },
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": {
+                          "content": "Added as a part of security scheme: bearer",
+                          "type": "text/plain"
+                        },
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "method": "POST",
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"jobId\": \"<string>\",\n  \"status\": \"processing\",\n  \"timestamp\": \"<dateTime>\",\n  \"metadata\": {\n    \"id_552\": \"<string>\",\n    \"Excepteurd\": \"<string>\"\n  }\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"status\": \"<string>\",\n  \"message\": \"<string>\",\n  \"jobId\": \"<string>\"\n}",
+                  "cookie": [],
+                  "_postman_previewlanguage": "json"
+                },
+                {
+                  "id": "a6f2c7bd-42a8-4994-8847-a8431ffa0ca1",
+                  "name": "Invalid payload",
+                  "originalRequest": {
+                    "url": {
+                      "path": [
+                        "webhooks",
+                        "jobStatusUpdate"
+                      ],
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "query": [],
+                      "variable": []
+                    },
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": {
+                          "content": "Added as a part of security scheme: bearer",
+                          "type": "text/plain"
+                        },
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "method": "POST",
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"jobId\": \"<string>\",\n  \"status\": \"processing\",\n  \"timestamp\": \"<dateTime>\",\n  \"metadata\": {\n    \"id_552\": \"<string>\",\n    \"Excepteurd\": \"<string>\"\n  }\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    }
+                  },
+                  "status": "Bad Request",
+                  "code": 400,
+                  "header": [],
+                  "cookie": [],
+                  "_postman_previewlanguage": "text"
+                },
+                {
+                  "id": "a8182afc-6fe8-467b-9c7a-968ccc6a3c24",
+                  "name": "Unauthorized",
+                  "originalRequest": {
+                    "url": {
+                      "path": [
+                        "webhooks",
+                        "jobStatusUpdate"
+                      ],
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "query": [],
+                      "variable": []
+                    },
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "description": {
+                          "content": "Added as a part of security scheme: bearer",
+                          "type": "text/plain"
+                        },
+                        "key": "Authorization",
+                        "value": "Bearer <token>"
+                      }
+                    ],
+                    "method": "POST",
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"jobId\": \"<string>\",\n  \"status\": \"processing\",\n  \"timestamp\": \"<dateTime>\",\n  \"metadata\": {\n    \"id_552\": \"<string>\",\n    \"Excepteurd\": \"<string>\"\n  }\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    }
+                  },
+                  "status": "Unauthorized",
+                  "code": 401,
+                  "header": [],
+                  "cookie": [],
+                  "_postman_previewlanguage": "text"
+                }
+              ],
+              "event": [],
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+

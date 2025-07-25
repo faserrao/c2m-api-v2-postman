@@ -1,0 +1,236 @@
+🚀 Starting Postman build and test...
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-login
+🔐 Logging in to Postman...
+Logged in using api key of user: stellario2021 
+Logged in successfully.
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-api-import
+📥 Importing OpenAPI definition openapi/c2m_openapi_spec_final.yaml into Postman workspace d8a1f479-a2aa-4471-869e-b12feea0a98c...
+✅ Imported API with ID: dd6bcf7c-07b7-46c6-9411-272554557ec5
+📄 API ID saved to postman/postman_api_uid.txt
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-api-linked-collection-generate
+📦 Generating Postman collection from openapi/c2m_openapi_spec_final.yaml...
+npx openapi-to-postmanv2 -s openapi/c2m_openapi_spec_final.yaml -o postman/generated/c2mapiv2-c2m-collection.json -p
+Input file:  /Users/frankserrao/Dropbox/Customers/c2m/projects/c2m-api/C2M_API_v3/c2m-api-repo/openapi/c2m_openapi_spec_final.yaml
+Writing to file:  true /Users/frankserrao/Dropbox/Customers/c2m/projects/c2m-api/C2M_API_v3/c2m-api-repo/postman/generated/c2mapiv2-c2m-collection.json {
+  result: true,
+  output: [ { type: 'collection', data: [Object] } ],
+  analytics: {}
+}
+[32mConversion successful, collection written to file[0m
+🛠 Adding 'info' block to collection...
+✅ Collection generated with 'info' block at postman/generated/c2mapiv2-c2m-collection.json
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-collection-upload
+📤 Uploading Postman collection postman/generated/c2mapiv2-c2m-collection.json to workspace d8a1f479-a2aa-4471-869e-b12feea0a98c...
+✅ Collection uploaded with UID: 46321051-d8b9c432-5ea8-46e9-9341-02ab7247da0f
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-collection-link
+🔗 Linking collection to API C2mApi...
+🔗 Copying and linking collection 46321051-d8b9c432-5ea8-46e9-9341-02ab7247da0f to API dd6bcf7c-07b7-46c6-9411-272554557ec5...
+ {"id":"46321051-01071091-c502-4bc8-9d5c-4bdc847037bb"}/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-api-full-publish
+🚀 Starting full Postman Spec publish...
+ℹ️ No existing specs found. Skipping deletion.
+🆕 Creating a fresh Postman Spec with openapi/c2m_openapi_spec_final.yaml...
+{
+  "createdBy": 46321051,
+  "updatedBy": 46321051,
+  "createdAt": "2025-07-24T20:36:09.365Z",
+  "name": "C2M Document Submission API",
+  "updatedAt": "2025-07-24T20:36:09.365Z",
+  "type": "OPENAPI:3.0",
+  "id": "be376406-996b-4ac1-a583-d9536c15b4cb"
+}
+✅ Fresh spec created with ID: be376406-996b-4ac1-a583-d9536c15b4cb
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-testing-collection-generate
+📦 Generating Postman collection from openapi/c2m_openapi_spec_final.yaml...
+echo "🛠 Adding 'info' block to collection..."
+🛠 Adding 'info' block to collection...
+✅ Collection generated with 'info' block at postman/generated/c2mapiv2-c2m-collection.json
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-collection-merge-overrides
+🔀 Safely merging overrides from postman/custom/overrides.json into postman/generated/c2mapiv2-c2m-collection.json...
+✅ Safe deep merge completed. Output written to postman/generated/c2mapiv2-collection-merged.json
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-collection-add-examples || echo "⚠️  Skipping examples (optional step)."
+🔧 Fixing PyYAML installation...
+🧹 Removing any rogue 'yaml' package...
+📦 Force reinstalling PyYAML...
+Collecting PyYAML
+  Using cached PyYAML-6.0.2-cp313-cp313-macosx_11_0_arm64.whl.metadata (2.1 kB)
+Using cached PyYAML-6.0.2-cp313-cp313-macosx_11_0_arm64.whl (171 kB)
+Installing collected packages: PyYAML
+  Attempting uninstall: PyYAML
+    Found existing installation: PyYAML 6.0.2
+    Uninstalling PyYAML-6.0.2:
+      Successfully uninstalled PyYAML-6.0.2
+Successfully installed PyYAML-6.0.2
+🔍 Verifying PyYAML installation...
+✅ PyYAML import successful: 6.0.2
+📤 Installing required Python modules...
+🧩 Adding smart example data to Postman collection...
+Successfully created: postman/generated/c2mapiv2-collection-merged-with-examples.json
+✅ Examples added and saved to postman/generated/c2mapiv2-collection-merged-with-examples.json
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-collection-add-tests || echo "⚠️  Skipping adding tests (optional step)."
+🧪 Adding default Postman tests to collection with examples...
+✅ Tests added to postman/generated/c2mapiv2-collection-with-tests.json
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-collection-auto-fix || echo "⚠️  Skipping auto-fix (optional step)."
+🛠 Auto-fixing invalid items in postman/generated/c2mapiv2-collection-with-tests.json...
+✅ Auto-fix complete. Fixed collection saved to postman/generated/c2mapiv2-collection-fixed.json
+🔍 Validating fixed collection...
+✅ Collection is valid.
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-collection-url-hardfix
+🔧 Applying combined path + URL hard fix...
+jq -f scripts/url_hardfix_with_paths.jq postman/generated/c2mapiv2-collection-fixed.json > postman/generated/c2mapiv2-collection-fixed.json.tmp \
+			&& mv postman/generated/c2mapiv2-collection-fixed.json.tmp postman/generated/c2mapiv2-collection-fixed.json
+✅ Combined path and URL hard fix applied: postman/generated/c2mapiv2-collection-fixed.json
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-collection-repair-urls
+🔧 Repairing URLs based on folder hierarchy...
+python3 scripts/repair_urls.py postman/generated/c2mapiv2-collection-fixed.json
+✅ URLs repaired and saved to postman/generated/c2mapiv2-collection-fixed.fixed_urls.json
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-collection-patch
+🔧 Patching Postman collection to ensure {{baseUrl}} is used for all hosts...
+jq 'walk(if type == "object" and has("url") and (.url.host[0] | tostring | test("undefined")) then .url.host = ["{{baseUrl}}"] else . end)' postman/generated/c2mapiv2-collection-fixed.json > postman/generated/c2mapiv2-collection-fixed.json.patched
+mv postman/generated/c2mapiv2-collection-fixed.json.patched postman/generated/c2mapiv2-collection-fixed.json
+✅ Patched postman/generated/c2mapiv2-collection-fixed.json to replace undefined hosts with {{baseUrl}}
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-collection-validate
+🔍 Validating Postman collection postman/generated/c2mapiv2-collection-merged.json...
+✅ Collection postman/generated/c2mapiv2-collection-merged.json is valid.
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-collection-upload-test
+===== DEBUG: Postman Collection Upload Test Variables =====
+POSTMAN_API_KEY: PMAK-REDACTED-REDACTED
+POSTMAN_WS: d8a1f479-a2aa-4471-869e-b12feea0a98c
+COLLECTION_FIXED: postman/generated/c2mapiv2-collection-fixed.json
+===========================================================
+📦 Using collection: postman/generated/c2mapiv2-collection-fixed.json
+✅ TEST Collection uploaded with UID: 46321051-8c1b0656-1bf7-404e-b8ee-c7e03683bf78
+📄 UID saved to postman/postman_test_collection_uid.txt
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-mock-create
+🛠 Creating Postman mock server for collection...
+📤 Creating mock server via Postman API...
+✅ Mock server created at: https://9a7cb531-85e5-4d7f-920c-751d33ab035f.mock.pstmn.io
+📄 Saving mock URL and UID...
+📄 Mock server URL saved to postman/mock_url.txt
+📄 Mock UID saved to postman/postman_mock_uid.txt
+🔍 Validating mock configuration...
+✅ Postman mock validated successfully.
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-env-create
+🧪 Generating Postman environment file …
+Using mock URL: https://9a7cb531-85e5-4d7f-920c-751d33ab035f.mock.pstmn.io
+✅ Wrote postman/mock-env.json with baseUrl=https://9a7cb531-85e5-4d7f-920c-751d33ab035f.mock.pstmn.io
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-env-upload
+📤 Uploading Postman environment file to workspace d8a1f479-a2aa-4471-869e-b12feea0a98c...
+✅ Environment uploaded with UID: 46321051-e423f056-5734-4d57-8412-223b997533d7
+/Applications/Xcode.app/Contents/Developer/usr/bin/make update-mock-env 
+🔄 Updating Postman mock server environment...
+curl --location --request PUT "https://api.getpostman.com/mocks/" \
+		--header "x-api-key: PMAK-REDACTED-REDACTED" \
+		--header "Content-Type: application/json" \
+		--data-raw "{\"mock\": { \
+			\"name\": \"C2M API Mock - Test Collection\", \
+			\"collection\": \"46321051-d8b9c432-5ea8-46e9-9341-02ab7247da0f\", \
+			\"environment\": \"46321051-e423f056-5734-4d57-8412-223b997533d7\", \
+			\"description\": \"Mock server environment updated via Makefile.\", \
+			\"private\": false \
+		}}"
+{"detail":"No Route matched with those values","instance":"/","type":"https://api.postman.com/problems/not-found","title":"Not Found","status":404}✅ Mock server environment updated.
+/Applications/Xcode.app/Contents/Developer/usr/bin/make prism-start
+🚀 Starting Prism mock server on port 4010...
+✅ Prism started at http://localhost:4010
+/Applications/Xcode.app/Contents/Developer/usr/bin/make postman-mock
+🔬 Running Newman tests against Postman mock...
+npx newman run postman/generated/c2mapiv2-collection-fixed.json \
+		--env-var baseUrl=https://9a7cb531-85e5-4d7f-920c-751d33ab035f.mock.pstmn.io \
+		--env-var token=dummy-token \
+		--reporters cli,html \
+		--reporter-html-export postman/newman-report.html
+newman
+
+C2M Testing Collection
+
+❏ jobs / submit / single / doc
+↳ Submit a single document to multiple recipients
+  POST https://9a7cb531-85e5-4d7f-920c-751d33ab035f.mock.pstmn.io/jobs/submit/single/doc [200 OK, 881B, 733ms]
+  ✓  Status code is 200
+  ✓  Response time < 1s
+
+❏ jobs / submit / single / doc / jobTemplate
+↳ Submit a document using a job template
+  POST https://9a7cb531-85e5-4d7f-920c-751d33ab035f.mock.pstmn.io/jobs/submit/single/doc/jobTemplate [200 OK, 783B, 308ms]
+  ✓  Status code is 200
+  ✓  Response time < 1s
+
+❏ jobs / submit / single / pdf / split
+↳ Split a PDF into page ranges and send to different recipients
+  POST https://9a7cb531-85e5-4d7f-920c-751d33ab035f.mock.pstmn.io/jobs/submit/single/pdf/split [200 OK, 783B, 253ms]
+  ✓  Status code is 200
+  ✓  Response time < 1s
+
+❏ jobs / submit / single / pdf / split / addressCapture
+↳ Split PDF and extract embedded recipient addresses
+  POST https://9a7cb531-85e5-4d7f-920c-751d33ab035f.mock.pstmn.io/jobs/submit/single/pdf/split/addressCapture [200 OK, 783B, 255ms]
+  ✓  Status code is 200
+  ✓  Response time < 1s
+
+❏ jobs / submit / multi / doc
+↳ Submit multiple documents, each to a different recipient
+  POST https://9a7cb531-85e5-4d7f-920c-751d33ab035f.mock.pstmn.io/jobs/submit/multi/doc [200 OK, 783B, 269ms]
+  ✓  Status code is 200
+  ✓  Response time < 1s
+
+❏ jobs / submit / multi / doc / merge
+↳ Merge multiple documents and send to a single recipient
+  POST https://9a7cb531-85e5-4d7f-920c-751d33ab035f.mock.pstmn.io/jobs/submit/multi/doc/merge [200 OK, 783B, 248ms]
+  ✓  Status code is 200
+  ✓  Response time < 1s
+
+❏ jobs / submit / multi / doc / merge / jobTemplate
+↳ Merge documents, send to recipient using job template
+  POST https://9a7cb531-85e5-4d7f-920c-751d33ab035f.mock.pstmn.io/jobs/submit/multi/doc/merge/jobTemplate [200 OK, 783B, 265ms]
+  ✓  Status code is 200
+  ✓  Response time < 1s
+
+❏ jobs / submit / multi / docs / jobtemplate
+↳ Submit multiple documents with recipient addresses and job template
+  POST https://9a7cb531-85e5-4d7f-920c-751d33ab035f.mock.pstmn.io/jobs/submit/multi/docs/jobTemplate [200 OK, 783B, 296ms]
+  ✓  Status code is 200
+  ✓  Response time < 1s
+
+❏ jobs / submit / multi / pdf / addressCapture
+↳ Submit multiple PDFs with embedded address regions
+  POST https://9a7cb531-85e5-4d7f-920c-751d33ab035f.mock.pstmn.io/jobs/submit/multi/pdf/addressCapture [200 OK, 783B, 252ms]
+  ✓  Status code is 200
+  ✓  Response time < 1s
+
+❏ webhooks / jobStatusUpdate
+↳ Webhook endpoint to receive job status updates
+  POST https://9a7cb531-85e5-4d7f-920c-751d33ab035f.mock.pstmn.io/webhooks/jobStatusUpdate [200 OK, 906B, 266ms]
+  ✓  Status code is 200
+  ✓  Response time < 1s
+
+┌─────────────────────────┬─────────────────────┬────────────────────┐
+│                         │            executed │             failed │
+├─────────────────────────┼─────────────────────┼────────────────────┤
+│              iterations │                   1 │                  0 │
+├─────────────────────────┼─────────────────────┼────────────────────┤
+│                requests │                  10 │                  0 │
+├─────────────────────────┼─────────────────────┼────────────────────┤
+│            test-scripts │                  10 │                  0 │
+├─────────────────────────┼─────────────────────┼────────────────────┤
+│      prerequest-scripts │                  10 │                  0 │
+├─────────────────────────┼─────────────────────┼────────────────────┤
+│              assertions │                  20 │                  0 │
+├─────────────────────────┴─────────────────────┴────────────────────┤
+│ total run duration: 3.3s                                           │
+├────────────────────────────────────────────────────────────────────┤
+│ total data received: 123B (approx)                                 │
+├────────────────────────────────────────────────────────────────────┤
+│ average response time: 314ms [min: 248ms, max: 733ms, s.d.: 140ms] │
+└────────────────────────────────────────────────────────────────────┘
+📄 Newman test report generated at postman/newman-report.html
+/Applications/Xcode.app/Contents/Developer/usr/bin/make docs-build
+📚 Building API documentation with Redoc...
+npx @redocly/cli build-docs openapi/c2m_openapi_spec_final.yaml -o docs/index.html
+Found .redocly.yaml and using theme.openapi options
+Prerendering docs
+
+🎉 bundled successfully in: docs/index.html (383 KiB) [⏱ 1ms].
+npx swagger-cli bundle openapi/c2m_openapi_spec_final.yaml --outfile openapi/bundled.yaml --type yaml
+Created openapi/bundled.yaml from openapi/c2m_openapi_spec_final.yaml
+/Applications/Xcode.app/Contents/Developer/usr/bin/make docs
+make[1]: Nothing to be done for `docs'.
