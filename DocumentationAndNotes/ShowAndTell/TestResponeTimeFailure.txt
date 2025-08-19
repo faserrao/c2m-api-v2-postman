@@ -1,0 +1,89 @@
+
+C2M Testing Collection
+
+❏ jobs / submit / single / doc
+↳ Submit a single document to multiple recipients
+  POST https://e65be66e-58ea-4948-88eb-1bb609ae4704.mock.pstmn.io/jobs/submit/single/doc [200 OK, 842B, 335ms]
+  ✓  Status code is 200
+  ✓  Response time < 1s
+
+❏ jobs / submit / single / doc / jobTemplate
+↳ Submit a document using a job template
+  POST https://e65be66e-58ea-4948-88eb-1bb609ae4704.mock.pstmn.io/jobs/submit/single/doc/jobTemplate [200 OK, 783B, 181ms]
+  ✓  Status code is 200
+  ✓  Response time < 1s
+
+❏ jobs / submit / single / pdf / split
+↳ Split a PDF into page ranges and send to different recipients
+  POST https://e65be66e-58ea-4948-88eb-1bb609ae4704.mock.pstmn.io/jobs/submit/single/pdf/split [200 OK, 783B, 265ms]
+  ✓  Status code is 200
+  ✓  Response time < 1s
+
+❏ jobs / submit / single / pdf / split / addressCapture
+↳ Split PDF and extract embedded recipient addresses
+  POST https://e65be66e-58ea-4948-88eb-1bb609ae4704.mock.pstmn.io/jobs/submit/single/pdf/split/addressCapture [200 OK, 783B, 197ms]
+  ✓  Status code is 200
+  ✓  Response time < 1s
+
+❏ jobs / submit / multi / doc
+↳ Submit multiple documents, each to a different recipient
+  POST https://e65be66e-58ea-4948-88eb-1bb609ae4704.mock.pstmn.io/jobs/submit/multi/doc [200 OK, 783B, 171ms]
+  ✓  Status code is 200
+  ✓  Response time < 1s
+
+❏ jobs / submit / multi / doc / merge
+↳ Merge multiple documents and send to a single recipient
+  POST https://e65be66e-58ea-4948-88eb-1bb609ae4704.mock.pstmn.io/jobs/submit/multi/doc/merge [200 OK, 783B, 174ms]
+  ✓  Status code is 200
+  ✓  Response time < 1s
+
+❏ jobs / submit / multi / doc / merge / jobTemplate
+↳ Merge documents, send to recipient using job template
+  POST https://e65be66e-58ea-4948-88eb-1bb609ae4704.mock.pstmn.io/jobs/submit/multi/doc/merge/jobTemplate [200 OK, 784B, 1170ms]
+  ✓  Status code is 200
+  1. Response time < 1s
+
+❏ jobs / submit / multi / docs / jobtemplate
+↳ Submit multiple documents with recipient addresses and job template
+  POST https://e65be66e-58ea-4948-88eb-1bb609ae4704.mock.pstmn.io/jobs/submit/multi/docs/jobtemplate [200 OK, 783B, 182ms]
+  ✓  Status code is 200
+  ✓  Response time < 1s
+
+❏ jobs / submit / multi / pdf / addressCapture
+↳ Submit multiple PDFs with embedded address regions
+  POST https://e65be66e-58ea-4948-88eb-1bb609ae4704.mock.pstmn.io/jobs/submit/multi/pdf/addressCapture [200 OK, 783B, 208ms]
+  ✓  Status code is 200
+  ✓  Response time < 1s
+
+❏ webhooks / jobStatusUpdate
+↳ Webhook endpoint to receive job status updates
+  POST https://e65be66e-58ea-4948-88eb-1bb609ae4704.mock.pstmn.io/webhooks/jobStatusUpdate [200 OK, 898B, 211ms]
+  ✓  Status code is 200
+  ✓  Response time < 1s
+
+┌─────────────────────────┬─────────────────────┬─────────────────────┐
+│                         │            executed │              failed │
+├─────────────────────────┼─────────────────────┼─────────────────────┤
+│              iterations │                   1 │                   0 │
+├─────────────────────────┼─────────────────────┼─────────────────────┤
+│                requests │                  10 │                   0 │
+├─────────────────────────┼─────────────────────┼─────────────────────┤
+│            test-scripts │                  10 │                   0 │
+├─────────────────────────┼─────────────────────┼─────────────────────┤
+│      prerequest-scripts │                  10 │                   0 │
+├─────────────────────────┼─────────────────────┼─────────────────────┤
+│              assertions │                  20 │                   1 │
+├─────────────────────────┴─────────────────────┴─────────────────────┤
+│ total run duration: 3.3s                                            │
+├─────────────────────────────────────────────────────────────────────┤
+│ total data received: 108B (approx)                                  │
+├─────────────────────────────────────────────────────────────────────┤
+│ average response time: 309ms [min: 171ms, max: 1170ms, s.d.: 290ms] │
+└─────────────────────────────────────────────────────────────────────┘
+
+  #  failure                                        detail
+
+ 1.  AssertionError                                 Response time < 1s
+                                                    expected 1170 to be below 1000
+                                                    at assertion:1 in test-script
+                                                    inside "jobs / submit / multi / doc / merge / jobTemplate / Merge documents, send to recipient using job template"

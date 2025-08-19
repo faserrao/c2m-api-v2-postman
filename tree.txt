@@ -1,0 +1,268 @@
+.
+├── CONTRIBUTING.md
+├── LICENSE
+├── Makefile
+├── README.md
+├── click2mail-header-logo.webp
+├── data_dictionary
+│   ├── DataDictionaryQuestions071132025.txt
+│   ├── c2mapiv2-dd.ebnf
+│   ├── c2mapiv2-dd.ebnf.08092212
+│   ├── c2mapiv2-dd.ebnf.08142025
+│   └── paymentDataUpdate.ebnf
+├── docs
+│   ├── LICENSE
+│   ├── NOTICE
+│   ├── README.md
+│   ├── absolute-path.js
+│   ├── api.md
+│   ├── apiTestingReadme.md
+│   ├── favicon-16x16.png
+│   ├── favicon-32x32.png
+│   ├── index.css
+│   ├── index.html
+│   ├── index.js
+│   ├── log.bundle-sizes.swagger-ui.txt
+│   ├── log.es-bundle-core-sizes.swagger-ui.txt
+│   ├── log.es-bundle-sizes.swagger-ui.txt
+│   ├── oauth2-redirect.html
+│   ├── package.json
+│   ├── redoc.html
+│   ├── swagger-initializer.js
+│   ├── swagger-ui-bundle.js
+│   ├── swagger-ui-bundle.js.LICENSE.txt
+│   ├── swagger-ui-bundle.js.map
+│   ├── swagger-ui-es-bundle-core.js
+│   ├── swagger-ui-es-bundle-core.js.LICENSE.txt
+│   ├── swagger-ui-es-bundle-core.js.map
+│   ├── swagger-ui-es-bundle.js
+│   ├── swagger-ui-es-bundle.js.LICENSE.txt
+│   ├── swagger-ui-es-bundle.js.map
+│   ├── swagger-ui-standalone-preset.js
+│   ├── swagger-ui-standalone-preset.js.LICENSE.txt
+│   ├── swagger-ui-standalone-preset.js.map
+│   ├── swagger-ui.css
+│   ├── swagger-ui.css.map
+│   ├── swagger-ui.js
+│   ├── swagger-ui.js.map
+│   ├── swagger.html
+│   ├── swagger.yaml
+│   └── templates
+│       ├── swagger-initializer.js.template
+│       └── swagger.html.template
+├── gen
+│   └── postman
+│       ├── c2mapiv2-c2m-collection-randomized.json
+│       ├── c2mapiv2-c2m-collection.json
+│       ├── c2mapiv2-collection-merged.json
+│       ├── c2mapiv2-collection-tmp.json
+│       ├── c2mapiv2-collection-with-examples.json
+│       ├── c2mapiv2-collection-with-tests.json
+│       ├── c2mapiv2-linked-collection-tmp.json
+│       ├── c2mapiv2-test-collection-final.json
+│       ├── c2mapiv2-test-collection-fixed.json
+│       └── c2mapiv2-test-collection-merged.json
+├── openapi
+│   ├── Backups
+│   │   ├── bundled.yaml
+│   │   ├── c2m-api-v2-openapi-spec.json
+│   │   ├── c2m_openapi_spec_final copy.yaml
+│   │   ├── c2m_openapi_spec_final-with-examples.yaml
+│   │   ├── tmp-previous-spec.yaml
+│   │   └── tmp_previous_spec.yaml
+│   ├── bundled.yaml
+│   ├── c2mapiv2-openapi-spec-final-with-examples.yaml
+│   ├── c2mapiv2-openapi-spec-final.yaml
+│   └── tmp-previous-spec.yaml
+├── package-lock.json
+├── package.json
+├── postman
+│   ├── README.md
+│   ├── api-full-publish-response.json
+│   ├── api-update-response.json
+│   ├── apis-debug.json
+│   ├── collections-debug.json
+│   ├── custom
+│   │   ├── overrides.json
+│   │   └── overrides.json.old
+│   ├── debug-apis.json
+│   ├── debug-me.json
+│   ├── debug-specs.json
+│   ├── env-debug.json
+│   ├── env-upload-debug.json
+│   ├── environments-debug.json
+│   ├── envs-debug.json
+│   ├── full-publish-payload.json
+│   ├── generated
+│   │   ├── c2mapiv2-c2m-collection-randomized.json
+│   │   ├── c2mapiv2-c2m-collection.json
+│   │   ├── c2mapiv2-collection-fixed-with-tests.json
+│   │   ├── c2mapiv2-collection-fixed.json
+│   │   ├── c2mapiv2-collection-merged.json
+│   │   ├── c2mapiv2-collection-merged.with.tests.json
+│   │   ├── c2mapiv2-collection-randomized.json
+│   │   ├── c2mapiv2-collection-with-examples.json
+│   │   ├── c2mapiv2-collection-with-tests.json
+│   │   ├── c2mapiv2-collection.json
+│   │   ├── c2mapiv2-test-collection-fixed.json
+│   │   ├── c2mapiv2-test-collection-merged.json
+│   │   ├── c2mapiv2-test-collection-with-examples.json
+│   │   └── c2mapiv2-test-collection-with-tests.json
+│   ├── import-debug.json
+│   ├── link-debug.json
+│   ├── link-payload.json
+│   ├── mock-debug.json
+│   ├── mock-env-new.json
+│   ├── mock-env-temp.json
+│   ├── mock-env.json
+│   ├── mock-link-debug.json
+│   ├── mock-payload.json
+│   ├── mock-url-prism.txt
+│   ├── mock-validate.json
+│   ├── mock_url.txt
+│   ├── mocks-debug.json
+│   ├── monk_link_debug.json
+│   ├── newman-report.html
+│   ├── postman-monk-link-debug.json
+│   ├── postman_api-uid.txt
+│   ├── postman_api_uid.txt
+│   ├── postman_api_version.txt
+│   ├── postman_collection_uid.txt
+│   ├── postman_env_uid.txt
+│   ├── postman_linked_collection_uid.txt
+│   ├── postman_mock_create.json
+│   ├── postman_mock_id.txt
+│   ├── postman_mock_uid.txt
+│   ├── postman_mock_url.txt
+│   ├── postman_spec_uid.txt
+│   ├── postman_test_collection_uid.txt
+│   ├── prism-mock-test-report.html
+│   ├── prism-mock-test-results.json
+│   ├── prism.log
+│   ├── prism_mock_url.txt
+│   ├── prism_pid.txt
+│   ├── schema_uid.txt
+│   ├── specs-debug.json
+│   ├── test_collection_uid.txt
+│   ├── update-payload.json
+│   ├── upload-test-debug.json
+│   ├── version-debug.json
+│   └── version-payload.json
+├── prism.log
+├── resources
+│   ├── example_requests
+│   │   └── example_request.json
+│   └── example_responses
+│       └── example_response.json
+├── scripts
+│   ├── add_testing_info_block.jq
+│   ├── add_tests.jq
+│   ├── add_tests.js
+│   ├── add_tests.js.old
+│   ├── auto_fix_collection.jq
+│   ├── create_env_payload.jq
+│   ├── create_mock_payload.jq
+│   ├── deploy-docs.sh
+│   ├── ebnf_to_openapi_class_based.py
+│   ├── ebnf_to_openapi_grammer_based.py
+│   ├── env_template (Unicode Encoding Conflict).jq
+│   ├── env_template.jq
+│   ├── fix_collection_urls.py
+│   ├── fix_collection_urls_v2.py
+│   ├── fix_paths.jq
+│   ├── fix_urls.jq
+│   ├── full_publish_payload.jq
+│   ├── generate-postman.sh
+│   ├── generate-sdk.sh
+│   ├── generate_test_data.py
+│   ├── git-pull-rebase.sh
+│   ├── git-push.sh
+│   ├── init-directory-structure.sh
+│   ├── jq
+│   │   ├── add_info.jq
+│   │   ├── auto_fix.jq
+│   │   ├── fix_urls.jq
+│   │   ├── sanitize_collection.jq
+│   │   └── verify_urls.jq
+│   ├── link_env_to_mock_payload.jq
+│   ├── link_payload.jq
+│   ├── makefile-scripts
+│   │   ├── add-force-rebuild.sh
+│   │   ├── backup-makefile.sh
+│   │   ├── check_and_create_makefile_files.sh
+│   │   ├── fix-orchestrator-v2.sh
+│   │   ├── fix-orchestrator.sh
+│   │   ├── fix-orchestrator_v2.sh
+│   │   ├── make-force-rebuild-change.sh
+│   │   ├── mod-force-rebuild.sh
+│   │   ├── normalize.sh
+│   │   ├── refactor-orchestrator.patch
+│   │   ├── undo-make-force-rebuild-change.sh
+│   │   └── var-name.mak
+│   ├── merge-postman.js
+│   ├── merge.jq
+│   ├── merge_overrides.jq
+│   ├── postman_import_payload.jq
+│   ├── prism_test.sh
+│   ├── python_env
+│   │   └── requirements.txt
+│   ├── quick-validate.sh
+│   ├── repair_urls.py
+│   ├── sanitize_collection.jq
+│   ├── sanitize_collection.jq copy
+│   ├── temp
+│   ├── test_data_generator_for_collections
+│   │   ├── README-addRandomDataToRaw.md
+│   │   ├── addRandomDataToRaw.js
+│   │   ├── package-lock.json
+│   │   ├── package.json
+│   │   ├── test-collection-randomized.json
+│   │   └── test-collection.json
+│   ├── test_data_generator_for_openapi_specs
+│   │   ├── add_examples_to_spec copy.py
+│   │   ├── add_examples_to_spec.py
+│   │   ├── c2m-api-public.yml
+│   │   ├── c2m.collection.merged-with-examples.json
+│   │   ├── c2m.collection.merged.json
+│   │   ├── c2m_openapi_spec_final-with-examples.yaml
+│   │   ├── c2m_openapi_spec_final.yaml
+│   │   ├── claude-code-spec_generating-openapi-with-examples.md
+│   │   ├── requirements.txt
+│   │   ├── test_example.py
+│   │   ├── test_spec-with-examples.yaml
+│   │   ├── test_spec.yaml
+│   │   └── testing-generator.json
+│   ├── update_mock_env_payload.jq
+│   ├── update_mock_payload.jq
+│   ├── update_payload.jq
+│   ├── url_hardfix.jq
+│   ├── url_hardfix_with_paths.jq
+│   ├── validate_collection.js
+│   ├── verify_mock.jq
+│   ├── verify_urls.jq
+│   └── verify_urls.py
+├── sdk-clients
+│   ├── README.md
+│   ├── javascript
+│   │   └── README.md
+│   └── python
+│       └── README.md
+├── tests
+│   ├── README.md
+│   ├── contract
+│   │   └── validate_against_spec.js
+│   ├── integration
+│   │   └── postman_tests.json
+│   ├── python-cli
+│   │   ├── cli.py
+│   │   └── requirements.txt
+│   └── typescript-cli
+│       ├── package.json
+│       ├── src
+│       │   └── index.ts
+│       └── tsconfig.json
+├── tree.txt
+└── vscode-setup
+    └── extensions.json
+
+30 directories, 236 files

@@ -1,0 +1,362 @@
+(* In this version need to change all PascalCase to camelCase. *)
+
+
+(********************************)
+(*        CORE FIELD DEFINITIONS         *)
+(********************************)
+
+(* 
+  DocumentSourceIdentifier determines the origin of a document being submitted to the system.
+  Supports various methods depending on upload workflows:
+  - Direct reference to a previously uploaded document
+  - External URLs for remote-hosted documents
+  - Complex identifiers for zip archives and multipart uploads
+*)
+documentSourceIdentifier = 
+      documentId                          (* Unique ID for a document previously uploaded and stored in the system *)
+    | externalUrl                         (* Full HTTP/HTTPS URL pointing to a downloadable document file *)
+    | (uploadRequestId + documentName)    (* Refers to a document uploaded in a session identified by uploadRequestId *)
+    | (uploadRequestId + zipId + documentName) (* Used for zip bundles submitted within a session; identifies file inside zip *)
+    | (zipId + documentName) ;            (* Points to a specific document inside an archived zip, without session context *)
+
+(* 
+  Defines a mutually exclusive source for recipient addresses:
+  - Either a fully inline address
+  - A reference to a preloaded address list
+  - Or a reference to a saved address
+*)
+recipientAddressSource = 
+    exactlyOneNewAddress
+    | exactlyOneListId
+    | exactlyOneId ;
+
+exactlyOneNewAddress = recipientAddress ;
+exactlyOneListId     = addressListId ;
+exactlyOneId         = addressId ;        (* ??? Where is this field from *)
+
+(* 
+  Comprehensive recipient address block.
+  Required fields ensure mailable accuracy; optional fields enhance personalization or flexibility.
+*)
+recipientAddress = 
+      firstName + lastName                (* Full recipient name, split into first and last *)
+    + address1                            (* Primary delivery line (e.g., 123 Main St) *)
+    + city + state + zip + country        (* Required to resolve destination geography *)
+    + [ nickName ]                        (* Optional informal salutation or identifier *)
+    + [ address2 ] + [ address3 ]         (* Secondary address lines, often used for Apt/Suite/Bldg *)
+    + [ phoneNumber ] ;                   (* Optional—may support SMS fallback or multi-channel routing *)
+
+(* 
+  Represents the physical presentation and mailing behavior of the job.
+  This block directly affects pricing, rendering style, and postage.
+*)
+jobOptions = 
+      documentClass                       (* BusinessLetter or PersonalLetter classification *)
+    + layout                              (* Portrait or Landscape document orientation *)
+    + mailclass                           (* Postal service level (e.g., First Class, Priority) *)
+    + paperType                           (* Size or media type, such as "letter" or "postcard" *)
+    + printOption                         (* Print output mode: full-color, grayscale, or none *)
+    + envelope ;                          (* Envelope format or whether one is used at all *)
+
+(* 
+  Payment options allow flexibility across B2B, B2C, and credit-based platforms.
+  Some methods require additional nested structures.
+*)
+paymentDetails = 
+      billingType                         (* Determines how the job will be paid for *)
+    + [ optionalPaymentFields ] ;         (* Optional payment data required depending on billing type *)
+
+billingType = 
+      "creditCard"                        (* Immediate payment using a credit card *)
+    | "invoice"                           (* Billed after fulfillment using invoice number *)
+    | "ach"                               (* Automated Clearing House for direct debit *)
+    | "userCredit" ;                      (* Deduct from user account balance *)
+
+(* 
+  Credit card structure required for "creditCard" billing.
+  Must be PCI-compliant if implemented in production.
+*)
+creditCardDetails = 
+      cardType + cardNumber + expirationDate + cvv ;
+
+invoiceDetails = 
+      invoiceNumber + amountDue ;         (* For "invoice" billing; amountDue should match quoted job total *)
+
+achDetails = 
+      routingNumber + accountNumber + checkDigit ;  (* Used for direct bank transfers *)
+
+creditAmount = 
+      amount + currency ;                 (* Relevant for internal billing systems or chargebacks *)
+
+(* Value field types *)
+currency = "USD" | "EUR" | "GBP" | "CAD" | "AUD" ;  (* ISO 4217 codes *)
+amount = number ;  (* Floating-point or fixed-point monetary value *)
+
+(* Leaf fields used across various structures *)
+cardNumber       = string ;
+expirationDate   = month + year ;
+month            = integer ;             (* Integer between 1–12 *)
+year             = integer ;             (* Full four-digit year *)
+cvv              = integer ;             (* Typically 3–4 digits *)
+routingNumber    = string ;
+accountNumber    = string ;
+checkDigit       = integer ;
+invoiceNumber    = string ;
+amountDue        = number ;
+
+(* Optional fields based on payment method *)
+optionalPaymentFields = 
+      [ creditCardDetails ] 
+    + [ invoiceDetails ] 
+    + [ achDetails ] 
+    + [ creditAmount ] ;
+
+addressListId        = string ; (* New as of 07082025 *)
+addressId            = string ;
+documentName         = string ;
+documentId           = string ; (* New as of 07082025 *)
+externalUrl          = string ; (* New as of 07082025 *)
+uploadRequestId      = string ;
+zipId                = string ;
+firstName            = string ;
+lastName             = string ;
+nickName             = string ;
+address1             = string ;
+address2             = string ;
+address3             = string ;
+city                 = string ;
+state                = string ;
+country              = string ;
+zip                  = string ;
+phoneNumber          = string ;
+tags                 = { tags } ; (* New as of 07102025 *)
+tag                  = string ;  (* Optional metadata tags for analytics or categorization *)
+
+(* Basic lexical types *)
+integer = number ;                          (* Any whole number *)
+string  = { character } ; (* any printable ASCII character except double quote or backslash *)
+number  = {digit} ;
+digit   = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+
+
+(***********************************)
+(*        USE CASE DEFINITIONS        *)
+(***********************************)
+
+(* 
+  Use Case 1: I have a document and multiple recipient addresses.
+  Endpoint: POST /jobs/submit/single/doc
+  Sends one document to multiple recipients. Common for bulk messaging, newsletters, or notices.
+*)
+singleDocJobParams = 
+      documentSourceIdentifier 
+    + { recipientAddressSource }            (* One or more recipients, each defined or referenced *)
+    + jobOptions                            (* Layout, print, delivery preferences *)
+    + [ paymentDetails ]                    (* Optional billing info, depending on configuration *)
+    + [ tags ] ;                         (* Optional metadata tags, e.g., campaign identifiers *)
+
+(* 
+  Use Case 2: I have multiple documents; each goes to a different recipient address.
+  Endpoint: POST /jobs/submit/multi/doc
+  Perfect for personalized mailing, where each recipient gets a different file.
+*)
+submitMultiDocParams = 
+      { documentSourceIdentifier + recipientAddressSource } 
+    + jobOptions 
+    + [ paymentDetails ] 
+    + [ tags ] ;
+
+(*
+  Use Case 3: I want to merge multiple documents into one document and send it to a single recipient.
+  Endpoint: POST /jobs/submit/multi/doc/merge
+  Ideal for assembling packets (e.g., onboarding kits) before delivery.
+*)
+mergeMultiDocParams = 
+      documentsToMerge 
+    + recipientAddressSource 
+    + [ tags ] ;
+
+documentsToMerge = documentSourceIdentifier;        (* One or more documents to be merged in order *)
+
+(* 
+  Use Case 4: I have a document, recipient addresses & a job template.
+  Endpoint: POST /jobs/submit/single/doc/jobTemplate
+  Combines templating for layout/routing with basic content and address override.
+*)
+submitSingleDocWithTemplateParams = 
+      documentSourceIdentifier 
+    + [ { recipientAddressSource } ] 
+    + jobTemplate 
+    + [ jobOptions ] 
+    + [ paymentDetails ] 
+    + [ tags ] ;
+
+(* 
+  Use Case 5: I have multiple documents each to different recipient addresses & a job template.
+  Endpoint: POST /jobs/submit/multi/docs/jobtemplate
+  Allows personalized delivery at scale while applying a shared template.
+*)
+submitMultiDocWithTemplateParams = 
+      { documentSourceIdentifier + recipientAddressSource } 
+    + jobTemplate 
+    + paymentDetails 
+    + [ tags ] ;
+
+(* 
+  Use Case 6: I want to merge multiple documents, send them to a single recipient, and use a job template.
+  Endpoint: POST /jobs/submit/multi/doc/merge/jobTemplate
+  Use this for templated packet assembly with one output per job.
+*)
+mergeMultiDocWithTemplateParams = 
+      documentsToMerge 
+    + recipientAddressSource 
+    + jobTemplate 
+    + [ paymentDetails ] 
+    + [ tags ] ;
+
+(* 
+  Use Case 7: I have a big PDF to send to different recipients.
+  Endpoint: POST /jobs/submit/single/pdf/split
+  Splits a multi-page PDF and assigns different recipients to each range.
+*)
+splitPdfParams = 
+      documentSourceIdentifier 
+    + { pageRange + { recipientAddressSource } } (* Multiple ranges and recipients.  Mulitple recipients allowed per pdf. *) 
+    + [ paymentDetails ] 
+    + [ tags ] ;
+
+pageRange = startPage + endPage ;
+startPage = integer ;
+endPage   = integer ;
+
+(* 
+  Use Case 8: I have a big PDF with serialized documents and the related recipient addresses are in the PDF.
+  Endpoint: POST /jobs/submit/single/pdf/split/addressCapture
+  Enables automated address extraction from fixed regions inside PDF pages.
+*)
+splitPdfWithCaptureParams = 
+      documentSourceIdentifier 
+    + embeddedExtractionSpecs 
+    + [ paymentDetails ] 
+    + [ tags ] ;
+
+embeddedExtractionSpecs = { extractionSpec } ;
+
+extractionSpec = startPage + endPage + addressRegion ;
+
+(* Placehoder *)
+addressRegion = x + y + width + height + pageOffset ; (* Not sure how the addesses will be located.  This is a placeholder *)
+
+(* Placeholders *)
+x = number ; (* New as of 07082025 *)
+y = number ; (* New as of 07082025 *)
+width = number ; (* New as of 07082025 *)
+height = number ; (* New as of 07082025 *)
+pageOffset = integer ; (* New as of 07082025 *)
+
+(* 
+  Use Case 9: I have multiple PDFs and the addresses are in each PDF.
+  Endpoint: POST /jobs/submit/multi/pdf/addressCapture
+  Suitable for cases where PDFs are pre-batched and each file contains its own embedded address block.
+*)
+multiPdfWithCaptureParams = 
+      addressCapturePdfs 
+    + jobTemplate 
+    + [ paymentDetails ] 
+    + [ tags ] ;
+
+addressCapturePdfs = { addressListPdf } ;
+
+addressListPdf = 
+      documentSourceIdentifier 
+    + addressListRegion 
+    + [ delimiter ] 
+    + [ tags ] ;
+
+addressListRegion = tbd
+
+tbd = string
+
+
+(* Not user a delimeter is used *)
+delimiter = string ;   (* Character used to separate multiple addresses inside the PDF *)
+
+
+(*************************)
+(*       ENUM DEFINITIONS     *)
+(*************************)
+
+cardType = 
+      "visa" 
+    | "mastercard" 
+    | "discover" 
+    | "americanExpress" ;
+
+documentFormat = 
+      "pdf" | "doc" | "docx" | "pub" | "ppt" | "pptx" | "png" | "jpeg" | "odt" ;
+
+printOption = 
+      "none" | "color" | "grayscale" ;
+
+envelope = 
+      "flat" | "windowedFlat" | "letter" | "legal" | "postcard" ;
+
+paperType = 
+      "letter" | "legal" | "postcard" ;
+
+layout = 
+      "portrait" | "landscape" ;
+
+mailclass = 
+      "firstClassMail" | "priorityMail" | "largeEnvelope" ;
+
+documentClass = 
+      "businessLetter" | "personalLetter" ;
+
+
+(****************************)
+(*      JOB TEMPLATE BLOCK      *)
+(****************************)
+
+jobTemplate = 
+      jobTemplateId 
+    | fullJobTemplate 
+    | jobTemplateName ;
+
+jobTemplateId = string ;
+jobTemplateName = string ;
+
+(* 
+  Full inlined template with config and optional doc/recipient info.
+  Supports overrides and repeatable use.
+*)
+fullJobTemplate = 
+      jobTemplateId + jobTemplateName + jobOptions 
+    + [ { documentSourceIdentifier } ] 
+    + [ { recipientAddressSource } ] ;
+
+
+
+(*
+      Maybe make this change?
+      multiDocRecipientPair = documentSourceIdentifier + recipientAddressSource ;
+      submitMultiDocParams = { multiDocRecipientPair } + jobOptions ...
+*)
+
+(*
+      TODO: Does jobTemplate really inlcude addressList
+      If addressList is passed within the template (rather than externally provided during submission), 
+      it implies tight coupling of content + recipients, which may be limiting. Might consider
+      breaking this apart:
+
+      jobTemplate = jobTemplateId + name + jobOptions + document
+      jobTemplateWithAddressList = jobTemplate + addressList
+
+      TODO: Note that jobOptions are in both jobSpecs and jobTemplate.
+      Also, is document contains documentId and documentSource 
+      can be a docoumentId.
+
+      In separate document we should analyze jobTemplate, jobSpecs, jobSpecsTemplate
+      and where they are referenced, because of possibility of the duplication of
+      some elements.
+*)

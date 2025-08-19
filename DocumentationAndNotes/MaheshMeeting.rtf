@@ -1,0 +1,45 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2761
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\froman\fcharset0 Times-Roman;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs24 \cf0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Mahesh Lavannis, Mon 3:23\uc0\u8239 PM\
+\
+\
+So, Frank, to summarize, this is what we are trying to achieve:\
+\
+New User \
+--> Looks at documentation \
+--> Identifies his Use Case \
+--> Finds the /jobs/submit/.. API version he has to call with appropriate parameters\
+--> Calls a pre-created sample API \
+--> receives a request ID \
+--> time passes \
+-> receives a webhook call with the job IDs\
+\
+Internals:\
+His requests goes to a queue \
+--> a processor processes it \
+--> loads jobs into C2M \
+--> calls webhook with the jobIDs\
+\
+If we can achieve this, it will be a giant leap forward\
+\
+Also, please note that this will work with JWT tokens. So we need to have an API call that takes a API key and returns a JWT token.\
+\
+\
+You, Mon 3:26\uc0\u8239 PM\
+\
+\
+Thanks!!\
+\
+\
+Mahesh Lavannis, Mon 4:47\uc0\u8239 PM, Edited\
+\
+\
+And again, most users give us actual addresses of recipients, some re-use address lists (addressListId) and very few reuse individual addresses (addressId). It is more efficient if people reused addressIds, but for developers, it is usually simpler to get the address from their DB and send it to C2M each time. Optimizing their code is extra work for them.\
+}

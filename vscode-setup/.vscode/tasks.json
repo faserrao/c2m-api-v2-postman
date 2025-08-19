@@ -1,0 +1,15 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Spectral Lint",
+      "type": "shell",
+      "command": "npx @stoplight/spectral lint openapi/**/*.yaml",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    }
+  ]
+}

@@ -20,9 +20,9 @@ components:
         properties:
           documentId:
             type: string
-            example: documentId-4u78k5zq
+            example: documentId-1uocgrq8
         example:
-          documentId: documentId-4u78k5zq
+          documentId: documentId-1uocgrq8
       - type: object
         required:
         - externalUrl
@@ -40,13 +40,13 @@ components:
         properties:
           uploadRequestId:
             type: string
-            example: uploadRequestId-qfumhtc4
+            example: uploadRequestId-vr0k7fwf
           documentName:
             type: string
-            example: Grace Davis
+            example: Diana Rodriguez
         example:
-          uploadRequestId: uploadRequestId-qfumhtc4
-          documentName: Grace Davis
+          uploadRequestId: uploadRequestId-vr0k7fwf
+          documentName: Diana Rodriguez
       - type: object
         required:
         - uploadRequestId
@@ -55,17 +55,17 @@ components:
         properties:
           uploadRequestId:
             type: string
-            example: uploadRequestId-g9u0573g
+            example: uploadRequestId-geauwcio
           zipId:
             type: string
-            example: zipId-xbsjih6r
+            example: zipId-rqfagqbq
           documentName:
             type: string
-            example: Frank Brown
+            example: Grace Smith
         example:
-          uploadRequestId: uploadRequestId-g9u0573g
-          zipId: zipId-xbsjih6r
-          documentName: Frank Brown
+          uploadRequestId: uploadRequestId-geauwcio
+          zipId: zipId-rqfagqbq
+          documentName: Grace Smith
       - type: object
         required:
         - zipId
@@ -73,13 +73,13 @@ components:
         properties:
           zipId:
             type: string
-            example: zipId-5lagz6ko
+            example: zipId-dlwyrm5f
           documentName:
             type: string
-            example: Diana Jones
+            example: Henry Garcia
         example:
-          zipId: zipId-5lagz6ko
-          documentName: Diana Jones
+          zipId: zipId-dlwyrm5f
+          documentName: Henry Garcia
     recipientAddress:
       type: object
       required:
@@ -93,49 +93,49 @@ components:
       properties:
         firstName:
           type: string
-          example: Frank
+          example: Alice
         lastName:
           type: string
-          example: Brown
+          example: Johnson
         nickName:
           type: string
-          example: Diana Williams
+          example: Charlie Jones
         address1:
           type: string
-          example: 1435 Second Street
+          example: 8020 First Street
         address2:
           type: string
-          example: 2761 Oak Street
+          example: 5754 First Street
         address3:
           type: string
-          example: 2032 Main Street
+          example: 5398 Main Street
         city:
           type: string
-          example: San Diego
+          example: Chicago
         state:
           type: string
-          example: FL
+          example: PA
         zip:
           type: string
-          example: '73768'
+          example: '24932'
         country:
           type: string
-          example: Germany
+          example: USA
         phoneNumber:
           type: string
-          example: +1-555-427-8747
+          example: +1-555-853-8935
       example:
-        firstName: Frank
-        lastName: Brown
-        nickName: Diana Williams
-        address1: 1435 Second Street
-        address2: 2761 Oak Street
-        address3: 2032 Main Street
-        city: San Diego
-        state: FL
-        zip: '73768'
-        country: Germany
-        phoneNumber: +1-555-427-8747
+        firstName: Alice
+        lastName: Johnson
+        nickName: Charlie Jones
+        address1: 8020 First Street
+        address2: 5754 First Street
+        address3: 5398 Main Street
+        city: Chicago
+        state: PA
+        zip: '24932'
+        country: USA
+        phoneNumber: +1-555-853-8935
     recipientAddressSource:
       oneOf:
       - $ref: '#/components/schemas/recipientAddress'
@@ -145,18 +145,18 @@ components:
         properties:
           addressListId:
             type: string
-            example: addressListId-h4eueiqy
+            example: addressListId-03e2nnlb
         example:
-          addressListId: addressListId-h4eueiqy
+          addressListId: addressListId-03e2nnlb
       - type: object
         required:
         - addressId
         properties:
           addressId:
             type: string
-            example: addressId-d2yfbno3
+            example: addressId-06frduxh
         example:
-          addressId: addressId-d2yfbno3
+          addressId: addressId-06frduxh
     jobOptions:
       type: object
       required:
@@ -172,34 +172,34 @@ components:
           enum:
           - businessLetter
           - personalLetter
-          example: documentClass-53
+          example: documentClass-54
         layout:
           type: string
           enum:
           - portrait
           - landscape
-          example: layout-54
+          example: layout-55
         mailclass:
           type: string
           enum:
           - firstClassMail
           - priorityMail
           - largeEnvelope
-          example: mailclass-55
+          example: mailclass-56
         paperType:
           type: string
           enum:
           - letter
           - legal
           - postcard
-          example: paperType-56
+          example: paperType-57
         printOption:
           type: string
           enum:
           - none
           - color
           - grayscale
-          example: printOption-57
+          example: printOption-58
         envelope:
           type: string
           enum:
@@ -208,14 +208,14 @@ components:
           - letter
           - legal
           - postcard
-          example: envelope-58
+          example: envelope-59
       example:
-        documentClass: documentClass-53
-        layout: layout-54
-        mailclass: mailclass-55
-        paperType: paperType-56
-        printOption: printOption-57
-        envelope: envelope-58
+        documentClass: documentClass-54
+        layout: layout-55
+        mailclass: mailclass-56
+        paperType: paperType-57
+        printOption: printOption-58
+        envelope: envelope-59
     creditCardDetails:
       type: object
       required:
@@ -231,10 +231,10 @@ components:
           - mastercard
           - discover
           - americanExpress
-          example: cardType-59
+          example: cardType-60
         cardNumber:
           type: string
-          example: cardNumber-60
+          example: cardNumber-61
         expirationDate:
           type: object
           required:
@@ -245,22 +245,22 @@ components:
               type: integer
               minimum: 1
               maximum: 12
-              example: 10
+              example: 4
             year:
               type: integer
               minimum: 2000
-              example: 2023
+              example: 2013
           example: &id001
-            month: 10
-            year: 2023
+            month: 4
+            year: 2013
         cvv:
           type: integer
-          example: 2260
+          example: 2696
       example:
-        cardType: cardType-59
-        cardNumber: cardNumber-60
+        cardType: cardType-60
+        cardNumber: cardNumber-61
         expirationDate: *id001
-        cvv: 2260
+        cvv: 2696
     achDetails:
       type: object
       required:
@@ -270,17 +270,17 @@ components:
       properties:
         routingNumber:
           type: string
-          example: routingNumber-61
+          example: routingNumber-62
         accountNumber:
           type: string
-          example: accountNumber-62
+          example: accountNumber-63
         checkDigit:
           type: integer
-          example: 927
+          example: 1470
       example:
-        routingNumber: routingNumber-61
-        accountNumber: accountNumber-62
-        checkDigit: 927
+        routingNumber: routingNumber-62
+        accountNumber: accountNumber-63
+        checkDigit: 1470
     creditAmount:
       type: object
       required:
@@ -289,7 +289,7 @@ components:
       properties:
         amount:
           type: number
-          example: 892.76
+          example: 774.41
         currency:
           type: string
           enum:
@@ -298,10 +298,10 @@ components:
           - GBP
           - CAD
           - AUD
-          example: currency-63
+          example: currency-64
       example:
-        amount: 892.76
-        currency: currency-63
+        amount: 774.41
+        currency: currency-64
     paymentDetails:
       type: object
       required:
@@ -314,7 +314,7 @@ components:
           - invoice
           - ach
           - userCredit
-          example: billingType-64
+          example: billingType-65
         creditCardDetails:
           $ref: '#/components/schemas/creditCardDetails'
         invoiceDetails:
@@ -322,36 +322,36 @@ components:
           properties:
             invoiceNumber:
               type: string
-              example: invoiceNumber-65
+              example: invoiceNumber-66
             amountDue:
               type: number
-              example: 869.06
+              example: 174.33
           example: &id002
-            invoiceNumber: invoiceNumber-65
-            amountDue: 869.06
+            invoiceNumber: invoiceNumber-66
+            amountDue: 174.33
         achDetails:
           $ref: '#/components/schemas/achDetails'
         creditAmount:
           $ref: '#/components/schemas/creditAmount'
       example:
-        billingType: billingType-64
+        billingType: billingType-65
         invoiceDetails: *id002
     StandardResponse:
       type: object
       properties:
         status:
           type: string
-          example: status-66
+          example: status-67
         message:
           type: string
-          example: message-67
+          example: message-68
         jobId:
           type: string
-          example: jobId-98psxtrr
+          example: jobId-ug1ycc45
       example:
-        status: status-66
-        message: message-67
-        jobId: jobId-98psxtrr
+        status: status-67
+        message: message-68
+        jobId: jobId-ug1ycc45
   parameters:
     Authorization:
       name: Authorization
@@ -418,12 +418,12 @@ paths:
                 properties:
                   jobId:
                     type: string
-                    example: jobId-o12fw9a3
+                    example: jobId-rzaf3fo1
                   status:
                     type: string
                     example: status-1
                 example:
-                  jobId: jobId-o12fw9a3
+                  jobId: jobId-rzaf3fo1
                   status: status-1
         '400':
           description: Invalid request
@@ -464,11 +464,10 @@ paths:
                   type: array
                   items:
                     type: string
-                    example: tags-9
+                    example: tags-8
                   example: &id006
                   - tags-6
                   - tags-7
-                  - tags-8
               example:
                 documentRecipientPairs: *id005
                 tags: *id006
@@ -506,6 +505,7 @@ paths:
                     type: string
                     example: tags-12
                   example: &id008
+                  - tags-9
                   - tags-10
                   - tags-11
               example:
@@ -550,11 +550,10 @@ paths:
                   type: array
                   items:
                     type: string
-                    example: tags-17
+                    example: tags-16
                   example: &id010
                   - tags-14
                   - tags-15
-                  - tags-16
               example:
                 recipientAddresses: *id009
                 jobTemplate: jobTemplate-13
@@ -596,21 +595,20 @@ paths:
                   example: &id011 []
                 jobTemplate:
                   type: string
-                  example: jobTemplate-18
+                  example: jobTemplate-17
                 paymentDetails:
                   $ref: '#/components/schemas/paymentDetails'
                 tags:
                   type: array
                   items:
                     type: string
-                    example: tags-22
+                    example: tags-20
                   example: &id012
+                  - tags-18
                   - tags-19
-                  - tags-20
-                  - tags-21
               example:
                 documentRecipientPairs: *id011
-                jobTemplate: jobTemplate-18
+                jobTemplate: jobTemplate-17
                 tags: *id012
       responses:
         '200':
@@ -643,21 +641,20 @@ paths:
                   $ref: '#/components/schemas/recipientAddressSource'
                 jobTemplate:
                   type: string
-                  example: jobTemplate-23
+                  example: jobTemplate-21
                 paymentDetails:
                   $ref: '#/components/schemas/paymentDetails'
                 tags:
                   type: array
                   items:
                     type: string
-                    example: tags-27
+                    example: tags-24
                   example: &id014
-                  - tags-24
-                  - tags-25
-                  - tags-26
+                  - tags-22
+                  - tags-23
               example:
                 documentsToMerge: *id013
-                jobTemplate: jobTemplate-23
+                jobTemplate: jobTemplate-21
                 tags: *id014
       responses:
         '200':
@@ -693,30 +690,33 @@ paths:
                     properties:
                       startPage:
                         type: integer
-                        example: 80
+                        example: 31
                       endPage:
                         type: integer
-                        example: 54
+                        example: 45
                       recipientAddressSource:
                         $ref: '#/components/schemas/recipientAddressSource'
                     example:
-                      startPage: 80
-                      endPage: 54
+                      startPage: 31
+                      endPage: 45
                   example: &id015
-                  - startPage: 26
-                    endPage: 38
-                  - startPage: 38
-                    endPage: 44
+                  - startPage: 52
+                    endPage: 57
+                  - startPage: 55
+                    endPage: 28
+                  - startPage: 35
+                    endPage: 54
                 paymentDetails:
                   $ref: '#/components/schemas/paymentDetails'
                 tags:
                   type: array
                   items:
                     type: string
-                    example: tags-30
+                    example: tags-28
                   example: &id016
-                  - tags-28
-                  - tags-29
+                  - tags-25
+                  - tags-26
+                  - tags-27
               example:
                 pageRanges: *id015
                 tags: *id016
@@ -754,10 +754,10 @@ paths:
                     properties:
                       startPage:
                         type: integer
-                        example: 72
+                        example: 24
                       endPage:
                         type: integer
-                        example: 61
+                        example: 35
                       addressRegion:
                         type: object
                         required:
@@ -769,64 +769,56 @@ paths:
                         properties:
                           x:
                             type: number
-                            example: 300.57
+                            example: 204.06
                           y:
                             type: number
-                            example: 930.79
+                            example: 265.13
                           width:
                             type: number
-                            example: 974.96
+                            example: 183.05
                           height:
                             type: number
-                            example: 520.5
+                            example: 434.14
                           pageOffset:
                             type: integer
-                            example: 54
+                            example: 39
                         example: &id017
-                          x: 300.57
-                          y: 930.79
-                          width: 974.96
-                          height: 520.5
-                          pageOffset: 54
+                          x: 204.06
+                          y: 265.13
+                          width: 183.05
+                          height: 434.14
+                          pageOffset: 39
                     example:
-                      startPage: 72
-                      endPage: 61
+                      startPage: 24
+                      endPage: 35
                       addressRegion: *id017
                   example: &id018
-                  - startPage: 23
+                  - startPage: 73
+                    endPage: 21
+                    addressRegion:
+                      x: 524.21
+                      y: 290.91
+                      width: 387.49
+                      height: 912.69
+                      pageOffset: 45
+                  - startPage: 77
                     endPage: 30
                     addressRegion:
-                      x: 353.69
-                      y: 711.81
-                      width: 39.22
-                      height: 315.29
-                      pageOffset: 31
-                  - startPage: 39
-                    endPage: 55
-                    addressRegion:
-                      x: 884.86
-                      y: 958.11
-                      width: 777.79
-                      height: 202.24
-                      pageOffset: 59
-                  - startPage: 31
-                    endPage: 74
-                    addressRegion:
-                      x: 141.29
-                      y: 640.35
-                      width: 812.49
-                      height: 744.55
-                      pageOffset: 63
+                      x: 114.31
+                      y: 499.31
+                      width: 773.15
+                      height: 77.32
+                      pageOffset: 45
                 paymentDetails:
                   $ref: '#/components/schemas/paymentDetails'
                 tags:
                   type: array
                   items:
                     type: string
-                    example: tags-33
+                    example: tags-31
                   example: &id019
-                  - tags-31
-                  - tags-32
+                  - tags-29
+                  - tags-30
               example:
                 embeddedExtractionSpecs: *id018
                 tags: *id019
@@ -872,61 +864,63 @@ paths:
                         properties:
                           x:
                             type: number
-                            example: 539.85
+                            example: 338.63
                           y:
                             type: number
-                            example: 906.15
+                            example: 520.14
                           width:
                             type: number
-                            example: 47.45
+                            example: 553.94
                           height:
                             type: number
-                            example: 500.16
+                            example: 993.24
                           pageOffset:
                             type: integer
-                            example: 80
+                            example: 21
                         example: &id020
-                          x: 539.85
-                          y: 906.15
-                          width: 47.45
-                          height: 500.16
-                          pageOffset: 80
+                          x: 338.63
+                          y: 520.14
+                          width: 553.94
+                          height: 993.24
+                          pageOffset: 21
                       delimiter:
                         type: string
-                        example: delimiter-42
+                        example: delimiter-41
                       tags:
                         type: array
                         items:
                           type: string
                           example: tags-45
                         example: &id021
+                        - tags-42
                         - tags-43
                         - tags-44
                     example:
                       addressListRegion: *id020
-                      delimiter: delimiter-42
+                      delimiter: delimiter-41
                       tags: *id021
                   example: &id022
                   - addressListRegion:
-                      x: 513.77
-                      y: 537.79
-                      width: 375.0
-                      height: 872.28
-                      pageOffset: 74
-                    delimiter: delimiter-34
+                      x: 783.51
+                      y: 282.15
+                      width: 434.8
+                      height: 623.92
+                      pageOffset: 34
+                    delimiter: delimiter-32
                     tags:
-                    - tags-35
-                    - tags-36
+                    - tags-33
+                    - tags-34
                   - addressListRegion:
-                      x: 736.19
-                      y: 993.73
-                      width: 692.1
-                      height: 392.61
-                      pageOffset: 60
-                    delimiter: delimiter-38
+                      x: 26.84
+                      y: 586.62
+                      width: 37.63
+                      height: 548.51
+                      pageOffset: 72
+                    delimiter: delimiter-36
                     tags:
+                    - tags-37
+                    - tags-38
                     - tags-39
-                    - tags-40
                 jobTemplate:
                   type: string
                   example: jobTemplate-46
@@ -936,10 +930,11 @@ paths:
                   type: array
                   items:
                     type: string
-                    example: tags-49
+                    example: tags-50
                   example: &id023
                   - tags-47
                   - tags-48
+                  - tags-49
               example:
                 addressCapturePdfs: *id022
                 jobTemplate: jobTemplate-46

@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+
+create_if_missing() {
+    local varname="$1"
+    local filepath="$2"
+
+    if [ -f "$filepath" ]; then
+        echo "OK       : $varname → $filepath"
+    else
+        echo "MISSING  : $varname → $filepath  (created empty file)"
+        mkdir -p "$(dirname "$filepath")"   # ensure parent directory exists
+        touch "$filepath"                   # create empty file
+    fi
+}
+
+create_if_missing DD_EBNF_FILE "data_dictionary/c2mapiv2-dd.ebnf"
+create_if_missing REDOC_HTML_OUTPUT "docs/index.html"
+create_if_missing POSTMAN_IMPORT_DEBUG "postman/import-debug.json"
+create_if_missing POSTMAN_LINK_PAYLOAD "postman/link-payload.json"
+create_if_missing POSTMAN_LINK_DEBUG "postman/link-debug.json"
+create_if_missing POSTMAN_VERSION_PAYLOAD "postman/version-payload.json"
+create_if_missing POSTMAN_VERSION_DEBUG "postman/version-debug.json"
+create_if_missing POSTMAN_FULL_PAYLOAD "postman/full-publish-payload.json"
+create_if_missing POSTMAN_FULL_RESPONSE "postman/api-full-publish-response.json"
+create_if_missing POSTMAN_API_UID_FILE "postman/postman_api_uid.txt"
+create_if_missing POSTMAN_API_VERSION_FILE "postman/postman_api_version.txt"
+create_if_missing POSTMAN_SPEC_ID_FILE "postman/postman_spec_uid.txt"
+create_if_missing C2MAPIV2_OPENAPI_SPEC "openapi/c2mapiv2-openapi-spec-final.yaml"
+create_if_missing C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES "openapi/c2mapiv2-with-examples.yaml"
+create_if_missing C2MAPIV2_PREVIOUS_OPENAPI_SPEC "openapi/tmp-previous-spec.yaml"
+create_if_missing POSTMAN_SCHEMA_UID_FILE "postman/schema_uid.txt"
+create_if_missing OPENAPI_BUNDLED_FILE "openapi/bundled.yaml"
+create_if_missing POSTMAN_COLLECTION_RAW "gen/postman/c2mapiv2-c2m-collection.json"
+create_if_missing POSTMAN_COLLECTION_TMP "gen/postman/c2mapiv2-collection-tmp.json"
+create_if_missing POSTMAN_COLLECTION_UID_FILE "postman/postman_collection_uid.txt"
+create_if_missing POSTMAN_TEST_COLLECTION_TMP "gen/postman/c2mapiv2-test-collection-tmp.json"
+create_if_missing POSTMAN_TEST_COLLECTION_FIXED "gen/postman/c2mapiv2-test-collection-fixed.json"
+create_if_missing POSTMAN_TEST_COLLECTION_MERGED "gen/postman/c2mapiv2-test-collection-merged.json"
+create_if_missing POSTMAN_TEST_COLLECTION_FINAL "gen/postman/c2mapiv2-test-collection-final.json"
+create_if_missing POSTMAN_TEST_COLLECTION_UID_FILE "postman/postman_test_collection_uid.txt"
+create_if_missing POSTMAN_TEST_COLLECTION_WITH_EXAMPLES "gen/postman/c2mapiv2-collection-with-examples.json"
+create_if_missing POSTMAN_TEST_COLLECTION_WITH_TESTS "gen/postman/c2mapiv2-collection-with-tests.json"
+create_if_missing POSTMAN_LINKED_COLLECTION_TMP "gen/postman/c2mapiv2-linked-collection-tmp.json"
+create_if_missing POSTMAN_ENV_FILE "postman/mock-env.json"
+create_if_missing POSTMAN_ENV_FILE_TEMP "postman/mock-env-temp.json"
+create_if_missing POSTMAN_ENV_FILE_NEW "postman/mock-env-new.json"
+create_if_missing POSTMAN_ENV_UPLOAD_DEBUG "postman/env-upload-debug.json"
+create_if_missing POSTMAN_MOCK_PAYLOAD "postman/mock-payload.json"
+create_if_missing POSTMAN_MOCK_DEBUG "postman/mock-debug.json"
+create_if_missing POSTMAN_MOCK_VALIDATE "postman/mock-validate.json"
+create_if_missing POSTMAN_MOCK_UID_FILE "postman/postman_mock_uid.txt"
+create_if_missing POSTMAN_MOCK_LINK_DEBUG_FILE "postman/postman-monk-link-debug.json"
+create_if_missing POSTMAN_MOCK_URL_FILE "postman/postman_mock_url.txt"
+create_if_missing PRISM_LOG "postman/prism.log"
+create_if_missing PRISM_PID_FILE "postman/prism_pid.txt"
+create_if_missing PRISM_MOCK_TEST "postman/prism-mock-test-results.json"
+create_if_missing PRISM_MOCK_TEST_REPORT "postman/prism-mock-test-report.html"
+create_if_missing PRISM_MOCK_URL_FILE "postman/prism_mock_url.txt"
+create_if_missing POSTMAN_OVERRIDES_FILE "postman/custom/overrides.json"
+create_if_missing POSTMAN_UPLOAD_TEST_DEBUG "postman/upload-test-debug.json"
+create_if_missing REPORT_HTML "postman/newman-report.html"
+create_if_missing URL_HARDFIX_SCRIPT "scripts/url_hardfix.jq"

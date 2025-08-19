@@ -1,0 +1,9 @@
+extends: ["spectral:oas"]
+rules:
+  operation-summary:
+    description: Operation summaries should not be empty.
+    severity: warn
+    given: $.paths[*][*]
+    then:
+      field: summary
+      function: truthy

@@ -1,0 +1,51 @@
+paymentDetails =
+      creditCardPayment
+    | invoicePayment
+    | achPayment
+    | userCreditPayment ;
+
+creditCardPayment =
+      "creditCard"
+    + creditCardDetails ;
+
+invoicePayment =
+      "invoice"
+    + invoiceDetails ;
+
+achPayment =
+      "ach"
+    + achDetails ;
+
+userCreditPayment =
+      "userCredit"
+    + creditAmount ;
+
+(* Credit card structure required for "creditCard" billing *)
+creditCardDetails =
+      cardType + cardNumber + expirationDate + cvv ;
+
+invoiceDetails =
+      invoiceNumber + amountDue ;
+
+achDetails =
+      routingNumber + accountNumber + checkDigit ;
+
+creditAmount =
+      amount + currency ;
+
+(* Value field types *)
+currency = "USD" | "EUR" | "GBP" | "CAD" | "AUD" ;
+amount = number ;
+
+(* Leaf fields *)
+cardNumber       = string ;
+cardType         = string ;
+expirationDate   = month + year ;
+month            = integer ;
+year             = integer ;
+cvv              = integer ;
+routingNumber    = string ;
+accountNumber    = string ;
+checkDigit       = integer ;
+invoiceNumber    = string ;
+amountDue        = number ;
