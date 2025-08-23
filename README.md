@@ -3,10 +3,13 @@
 ## Table of Contents
 - [Overview](#overview)
 - [Architecture](#architecture)
+- [🎯 RECOMMENDED: Template Endpoints](#-recommended-template-endpoints-use-these-first)
+- [Template Endpoints Quick Start](#template-endpoints-quick-start)
 - [Directory Structure](#directory-structure)
 - [Prerequisites](#prerequisites)
 - [Quick Start](#quick-start)
-- [Detailed Directory Documentation](#detailed-directory-documentation)
+- [What's New](#whats-new)
+- [Postman Integration Guide](#postman-integration-guide)
 - [Core Workflows](#core-workflows)
 - [Configuration](#configuration)
 - [Development Guide](#development-guide)
@@ -14,8 +17,8 @@
 - [Testing](#testing)
 - [Deployment](#deployment)
 - [Makefile Documentation](#makefile-documentation)
-- [Script Usage Analysis](#script-usage-analysis)
 - [Troubleshooting](#troubleshooting)
+- [Debugging Playbook](#debugging-playbook)
 - [Contributing](#contributing)
 
 ---
@@ -27,6 +30,7 @@ The C2M API V3 is a comprehensive document submission and mail processing API th
 ### Key Features
 
 - **Automated API Specification Generation**: Converts EBNF data models to OpenAPI 3.0 specifications
+- **Template-First Design**: Pre-configured endpoints for 90% of use cases
 - **Comprehensive Testing Framework**: Automated testing with Newman and Postman collections
 - **Mock Server Support**: Both Postman cloud mock and local Prism mock servers
 - **Interactive Documentation**: Auto-generated documentation using Redoc and Swagger UI
@@ -47,21 +51,118 @@ EBNF Data Dictionary → OpenAPI Spec → Postman Collection → Mock Server →
 
 The C2M API follows a document submission architecture supporting multiple input sources and processing options:
 
-### Document Sources
-- **File Uploads**: Direct file uploads to the API
-- **URLs**: Documents fetched from external URLs
-- **Document IDs**: References to pre-uploaded documents
+### Document Flow
+1. **Input**: Documents from URLs, S3, or direct upload
+2. **Processing**: Validation, formatting, and preparation
+3. **Output**: Print and mail via integrated services
 
-### Processing Options
-- **Printing**: Various print options including color, duplex, paper types
-- **Mailing**: Address validation, return addresses, mail classes
-- **Payment**: Multiple payment methods including credit cards and invoicing
+### Integration Points
+- RESTful API with OpenAPI 3.0 specification
+- Webhook notifications for job status
+- Batch processing support
+- Real-time tracking
 
-### API Design Principles
-- RESTful architecture with JSON payloads
-- JWT-based authentication
-- Comprehensive validation and error handling
-- Idempotent operations where applicable
+---
+
+## 🎯 RECOMMENDED: Template Endpoints (Use These First!)
+
+### Why Use Template Endpoints?
+
+The C2M API provides **template endpoints** that are **strongly recommended** for most use cases. These endpoints offer:
+
+- ✅ **Pre-configured settings** - Optimal defaults for print quality, paper type, and mailing options
+- ✅ **Simplified integration** - Less parameters to manage
+- ✅ **Cost optimization** - Templates are configured for best pricing
+- ✅ **Consistent output** - Standardized formatting and processing
+- ✅ **Faster implementation** - Get up and running quickly
+
+### 🚀 Template Endpoints Overview
+
+| Endpoint | Use Case | Benefits |
+|----------|----------|----------|
+| **`/jobs/single-doc-job-template`** | Send one document to multiple recipients | • Simplest integration<br>• Best for newsletters, notices |
+| **`/jobs/multi-docs-job-template`** | Send different documents to different recipients | • Batch processing<br>• Ideal for personalized mail |
+| **`/jobs/multi-doc-merge-job-template`** | Merge multiple documents into one mailing | • Combine documents<br>• Perfect for packets |
+
+### Decision Guide
+
+| Use Case | Recommended Endpoint | Notes |
+|----------|----------------------|-------|
+| Single doc + template | `POST /jobs/single-doc-job-template` | Default for 1-off jobs |
+| Multi-docs + template | `POST /jobs/multi-docs-job-template` | Default for batch jobs |
+| Need full control | `/jobs/single-doc` (custom endpoints) | Only when bypassing templates is necessary |
+
+👉 **Start with the `*-template` endpoints**. Only use custom endpoints when you require advanced overrides not supported by templates.
+
+---
+
+## Template Endpoints Quick Start
+
+### Available Job Templates
+
+- **`standard-letter`** - First-class mail, black & white, standard paper
+- **`color-marketing`** - Marketing mail, full color, glossy paper
+- **`certified-mail`** - Certified mail with tracking
+- **`priority-express`** - Express mail, next-day delivery
+
+### Quick Examples
+
+#### 1. Send a Single Document
+
+```bash
+curl -X POST https://api.c2m.com/v1/jobs/single-doc-job-template \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "documentSourceIdentifier": "https://yoursite.com/invoice.pdf",
+    "jobTemplate": "standard-letter",
+    "paymentDetails": {
+      "paymentMethod": "purchase-order",
+      "purchaseOrderNumber": "PO-2024-001"
+    }
+  }'
+```
+
+#### 2. Send Multiple Documents
+
+```bash
+curl -X POST https://api.c2m.com/v1/jobs/multi-docs-job-template \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "items": [
+      {
+        "documentSourceIdentifier": "https://yoursite.com/statement1.pdf",
+        "recipientAddressSource": {
+          "firstName": "John",
+          "lastName": "Doe",
+          "address1": "123 Main St",
+          "city": "Anytown",
+          "state": "CA",
+          "zip": "90210"
+        }
+      }
+    ],
+    "jobTemplate": "standard-letter",
+    "paymentDetails": {
+      "paymentMethod": "purchase-order",
+      "purchaseOrderNumber": "PO-2024-002"
+    }
+  }'
+```
+
+### Template vs Custom Endpoints
+
+| Feature | Template Endpoints ✅ | Custom Endpoints |
+|---------|---------------------|------------------|
+| Setup complexity | Simple (3 parameters) | Complex (10+ parameters) |
+| Configuration | Pre-optimized | Manual configuration |
+| Best for | 90% of use cases | Special requirements |
+| Time to implement | Minutes | Hours |
+
+> **💡 Pro Tip**: Start with template endpoints. Only use custom endpoints if you have specific requirements not covered by templates.
+
+> **📚 Full Template Guide**: See [TEMPLATE_ENDPOINTS_QUICKSTART.md](TEMPLATE_ENDPOINTS_QUICKSTART.md) for comprehensive examples and migration guides.
 
 ---
 
@@ -69,22 +170,28 @@ The C2M API follows a document submission architecture supporting multiple input
 
 ```
 c2m-api-repo/
-├── data_dictionary/           # EBNF data model definitions
-├── docs/                      # Generated API documentation
-├── gen/                       # Generated files (gitignored)
-├── node_modules/              # Node.js dependencies
-├── Old/                       # Legacy files and backups
-├── openapi/                   # OpenAPI specifications
-├── postman/                   # Postman collections and tests
-├── project_management/        # Project documentation
-├── resources/                 # Example requests/responses
-├── scripts/                   # Build and utility scripts
-├── sdk-clients/               # Generated SDK clients
-├── tests/                     # Test suites
-├── vscode-setup/              # VS Code configuration
-├── Makefile                   # Build orchestration
-├── package.json               # Node.js configuration
-└── README.md                  # This file
+├── data_dictionary/          # EBNF data definitions (source of truth)
+│   ├── c2mapiv2-dd.ebnf     # Main data dictionary
+│   └── modules/             # Modular EBNF definitions
+├── openapi/                 # OpenAPI specifications
+│   ├── c2mapiv2-openapi-spec-final.yaml
+│   └── examples/            # Request/response examples
+├── postman/                 # Postman collections and artifacts
+│   ├── generated/           # Auto-generated collections
+│   ├── custom/              # User customizations
+│   └── *.txt, *.json        # IDs, payloads, debug outputs
+├── scripts/                 # Automation scripts
+│   ├── ebnf_to_openapi_*.py # EBNF to OpenAPI converters
+│   ├── add_tests.js         # Test injection
+│   └── fix_collection_*.py  # Collection fixers
+├── docs/                    # Generated documentation
+│   ├── templates/           # Doc templates
+│   └── index.html          # Redoc output
+├── tests/                   # Test suites
+├── .env.example            # Environment template
+├── Makefile                # Main automation
+├── CLAUDE.md               # AI assistant guide
+└── README.md               # This file
 ```
 
 ---
@@ -92,18 +199,19 @@ c2m-api-repo/
 ## Prerequisites
 
 ### Required Software
-- **macOS/Linux** with bash and make
-- **Node.js** (v14+) and npm
-- **Python 3** (3.8+)
-- **Homebrew** (for macOS users)
-- **Postman API Key** (free account required)
 
-### Required Tools
-- `jq` - JSON processor
-- `curl` - HTTP client
-- `git` - Version control
-- `diff` - File comparison
-- `openapi-diff` - OpenAPI comparison tool
+- **Operating System**: macOS or Linux
+- **Make**: GNU Make 3.81+
+- **Node.js**: v16+ with npm
+- **Python**: 3.8+ with pip
+- **Git**: For version control
+- **curl**: For API interactions
+- **jq**: For JSON processing
+
+### Required Accounts
+
+- **Postman Account**: With API key
+- **C2M API Access**: For production testing
 
 ### Installation
 
@@ -112,9 +220,9 @@ c2m-api-repo/
 brew install jq openapi-diff
 
 # Install Node.js dependencies
-make install
+npm install
 
-# Create Python virtual environment
+# Set up Python environment
 make venv
 ```
 
@@ -139,14 +247,20 @@ POSTMAN_WS=d8a1f479-a2aa-4471-869e-b12feea0a98c
 TOKEN=dummy-token
 ```
 
-### 2. Generate OpenAPI from Data Dictionary
+### 2. Install Dependencies
+
+```bash
+make install
+```
+
+### 3. Generate OpenAPI from Data Dictionary
 
 ```bash
 # Convert EBNF to OpenAPI and validate
 make postman-dd-to-openapi
 ```
 
-### 3. Run Complete Pipeline
+### 4. Run Complete Pipeline
 
 ```bash
 # Build, test, and deploy everything
@@ -161,338 +275,195 @@ This command will:
 5. Run automated tests
 6. Build and serve documentation
 
-### 4. Access Documentation
+### 5. Test with Template Endpoint
+
+Quick test using the recommended template endpoint:
+
+```bash
+# Using template endpoint (recommended approach)
+curl -X POST http://localhost:4010/jobs/single-doc-job-template \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your-token" \
+  -d '{
+    "documentSourceIdentifier": "https://example.com/document.pdf",
+    "jobTemplate": "standard-letter",
+    "paymentDetails": {
+      "paymentMethod": "purchase-order",
+      "purchaseOrderNumber": "PO-12345"
+    }
+  }'
+```
+
+### 6. Access Documentation
 
 Once complete, access the interactive API documentation at:
 - http://localhost:8080 - Redoc documentation
 
 ---
 
-## Detailed Directory Documentation
+## What's New
 
-### `/data_dictionary` - Data Model Definitions
+### Recent Updates (August 2025)
 
-This directory contains the formal data model definitions in EBNF (Extended Backus-Naur Form) notation.
+#### 1. Template Endpoints Featured Prominently
+- Template endpoints now appear first in all documentation
+- Added visual indicators (⭐) and "RECOMMENDED" badges
+- Created dedicated quick start guide for templates
 
-#### Key Files:
-- **`c2mapiv2-dd.ebnf`** - Main data dictionary defining:
-  - Document source structures (upload, URL, ID)
-  - Recipient address formats
-  - Job options (printing, mailing)
-  - Payment method definitions
-  
-- **`paymentDataUpdate.ebnf`** - Payment-specific definitions:
-  - Credit card structures
-  - Invoice options
-  - Payment validation rules
+#### 2. Simplified API Endpoints
+The API endpoints have been simplified to use a two-level structure:
+- **Old**: `/jobs/submit/single/doc`
+- **New**: `/jobs/single-doc`
 
-- **`DataDictionaryQuestions071132025.txt`** - Important clarifications:
-  - Business rule documentation
-  - Data model decisions
-  - Integration requirements
+All endpoints now follow the pattern `/jobs/<dash-separated-job-type>`.
 
-#### Purpose:
-The EBNF files serve as the single source of truth for the API's data structures. They are automatically converted to OpenAPI schemas, ensuring consistency across documentation, validation, and client generation.
+#### 3. New Standalone Spec Creation
+Added `postman-spec-create-standalone` target that creates specs in Postman's Specs tab:
+- Automatically deletes existing specs before creating new ones
+- Prevents duplicate specs from accumulating
+- Integrated into main workflow
 
-### `/docs` - API Documentation
+#### 4. Dynamic EBNF to OpenAPI Translator
+- **New**: `ebnf_to_openapi_dynamic_v2.py` replaces the hardcoded translator
+- Dynamically reads type definitions from EBNF data dictionary
+- Properly resolves type chains (e.g., `documentId → id → integer`)
+- Generates clean YAML without Python object notation
 
-Contains the generated API documentation and Swagger UI distribution.
+#### 5. Enhanced Import Options
+Multiple import strategies are now available:
+- **`make postman-import-openapi-flat-native`** - Native Postman flattening (default)
+- **`make postman-import-openapi-as-api`** - Creates API definition
+- **`make postman-spec-create`** - Creates spec in Specs tab
 
-#### Key Files:
-- **`swagger.yaml`** - OpenAPI specification file
-- **`api.md`** - Markdown API documentation
-- **`index.html`** - Main documentation entry point
-- **`swagger.html`** - Swagger UI interface
-- **`redoc.html`** - Redoc documentation interface
-- **`apiTestingReadme.md`** - API testing guidelines
+---
 
-#### Swagger UI Files:
-- `swagger-ui-bundle.js` - Core Swagger UI functionality
-- `swagger-ui-standalone-preset.js` - Standalone configuration
-- `swagger-ui.css` - UI styling
-- `oauth2-redirect.html` - OAuth flow handler
+## Postman Integration Guide
 
-#### Purpose:
-Provides interactive API documentation for developers, allowing them to explore endpoints, view schemas, and test API calls directly from the browser.
+### Overview of Postman Options
 
-### `/openapi` - OpenAPI Specifications
+The project provides multiple ways to import OpenAPI specifications and manage collections in Postman. Understanding these options helps you choose the right approach for your workflow.
 
-Contains the OpenAPI 3.0 specifications that define the API contract.
+### Understanding Linked Collections
 
-#### Key Files:
-- **`c2mapiv2-openapi-spec-final.yaml`** - Production API specification
-- **`c2mapiv2-openapi-spec-final-with-examples.yaml`** - Specification with request/response examples
-- **`bundled.yaml`** - Single-file bundled specification
-- **`tmp-previous-spec.yaml`** - Previous version for diff comparison
+#### What is a Linked Collection?
 
-#### Subdirectories:
-- **`Backups/`** - Historical specification versions
-- **`Old/`** - Legacy specification files
+A linked collection is a Postman collection that is connected to an API definition. This creates a relationship between your API specification (OpenAPI) and the collection used for testing and development.
 
-#### Purpose:
-The OpenAPI specifications are the source of truth for the API contract. They define:
-- All API endpoints and operations
-- Request/response schemas
-- Authentication requirements
-- Validation rules
-- Example payloads
+**Benefits of Linked Collections:**
+- Automatic synchronization with API changes
+- Version tracking between spec and tests
+- Integrated documentation
+- Consistent request/response validation
 
-### `/postman` - Postman Integration
+### Import Strategies
 
-Central hub for Postman collections, environments, and test configurations.
-
-#### Subdirectories:
-- **`generated/`** - Auto-generated Postman collections:
-  - Raw collections from OpenAPI
-  - Test collections with examples
-  - Fixed and validated collections
-  
-- **`custom/`** - User customizations:
-  - `overrides.json` - Custom test overrides
-
-#### Key Files:
-- **`*_uid.txt`** - Postman resource identifiers
-- **`mock-env.json`** - Mock server environment
-- **`*-debug.json`** - API response debugging
-- **`newman-report.html`** - Test execution reports
-- **`prism.log`** - Local mock server logs
-
-#### Purpose:
-Facilitates API testing through:
-- Automated collection generation
-- Mock server configuration
-- Environment management
-- Test execution and reporting
-
-### `/project_management` - Project Documentation
-
-Contains project planning, documentation, and management resources.
-
-#### Key Files:
-- **`Makefile-Documentation.md`** - Comprehensive build system documentation
-- **`IssuesQuestionsRisksAndToDo.xlsx`** - Project tracking spreadsheet
-- **`c2mApiWorkFlow.drawio`** - Visual workflow diagrams
-- **`DocumentedMakefile`** - Annotated Makefile reference
-
-#### Subdirectories:
-- **`c2m_todo/`** - Task tracking and todo items
-- **`PostmanNotesAndIssues/`** - Postman-specific documentation
-- **`ShowAndTell/`** - Demo materials
-- **`Github/`** - GitHub integration scripts
-
-#### Purpose:
-Provides comprehensive project documentation including:
-- Technical architecture decisions
-- Workflow documentation
-- Issue tracking
-- Meeting notes and decisions
-
-### `/resources` - Example Data
-
-Contains sample requests and responses for testing and documentation.
-
-#### Structure:
+#### 1. Standard Import (Default)
+```bash
+make postman-import-openapi-flat-native
 ```
-resources/
-├── example_requests/
-│   └── example_request.json
-└── example_responses/
-    └── example_response.json
+- Creates a flattened collection structure
+- All endpoints at root level
+- Best for simple testing workflows
+
+#### 2. API Definition Import
+```bash
+make postman-import-openapi-as-api
 ```
+- Creates a full API definition in Postman
+- Maintains folder hierarchy
+- Includes schemas and examples
+- Best for API-first development
 
-#### Purpose:
-Provides reference examples for:
-- API request formatting
-- Expected response structures
-- Test data templates
-- Integration examples
-
-### `/scripts` - Build and Utility Scripts
-
-Contains all automation scripts used by the build system.
-
-#### Subdirectories:
-
-##### `/scripts/jq/` - JSON Query Filters
-- `add_info.jq` - Adds collection metadata
-- `auto_fix.jq` - Auto-repairs collections
-- `fix_urls.jq` - Corrects URL placeholders
-- `sanitize_collection.jq` - Cleans collections
-- `verify_urls.jq` - Validates URLs
-
-##### `/scripts/makefile-scripts/` - Makefile Utilities
-- Various backup and modification scripts
-- Refactoring tools
-- Variable management
-
-##### `/scripts/test_data_generator_for_collections/` - Collection Test Data
-- `addRandomDataToRaw.js` - Generates random test data
-- `README-addRandomDataToRaw.md` - Generator documentation
-
-##### `/scripts/test_data_generator_for_openapi_specs/` - Spec Test Data
-- `add_examples_to_spec.py` - Adds examples to OpenAPI
-- `test_data_generator.venv/` - Python environment
-
-#### Key Scripts in Use:
-1. **Python Scripts**:
-   - `ebnf_to_openapi_class_based.py` - EBNF to OpenAPI converter
-   - `fix_collection_urls_v2.py` - URL correction utility
-   - `generate_test_data.py` - Test data generator
-
-2. **JavaScript Scripts**:
-   - `add_tests.js` - Test injection
-   - `validate_collection.js` - Collection validator
-   - `merge-postman.js` - Collection merger
-
-3. **Shell Scripts**:
-   - `deploy-docs.sh` - Documentation deployment
-   - `generate-postman.sh` - Collection generation
-   - `git-*.sh` - Git automation
-
-#### Purpose:
-Provides modular, reusable components for:
-- Data transformation
-- Validation
-- Test generation
-- Build automation
-
-### `/sdk-clients` - Client SDKs
-
-Framework for auto-generated client libraries.
-
-#### Structure:
+#### 3. Spec Tab Import
+```bash
+make postman-spec-create-standalone
 ```
-sdk-clients/
-├── README.md
-├── javascript/
-│   └── README.md
-└── python/
-    └── README.md
-```
-
-#### Purpose:
-Placeholder structure for:
-- Auto-generated client SDKs
-- Language-specific implementations
-- SDK documentation
-- Usage examples
-
-### `/tests` - Test Suites
-
-Comprehensive testing infrastructure for the API.
-
-#### Components:
-
-##### `/tests/contract/` - Contract Testing
-- `validate_against_spec.js` - Validates API responses against OpenAPI spec
-
-##### `/tests/integration/` - Integration Tests
-- `postman_tests.json` - Postman test collections
-
-##### `/tests/python-cli/` - Python CLI Testing
-- `cli.py` - Command-line testing tool
-- `requirements.txt` - Python dependencies
-- Features:
-  - JWT authentication
-  - All HTTP methods
-  - File upload support
-  - Response validation
-
-##### `/tests/typescript-cli/` - TypeScript CLI
-- `src/index.ts` - TypeScript implementation
-- `tsconfig.json` - TypeScript configuration
-- `package.json` - Node.js dependencies
-
-#### Purpose:
-Ensures API quality through:
-- Contract validation
-- Integration testing
-- Manual testing tools
-- Automated test execution
-
-### `/vscode-setup` - VS Code Configuration
-
-Contains Visual Studio Code workspace settings.
-
-#### Files:
-- `extensions.json` - Recommended VS Code extensions
-
-#### Recommended Extensions:
-- API development tools
-- YAML/JSON validators
-- Markdown editors
-- Git integration
+- Creates documentation in Postman's Specs tab
+- Separate from collections
+- Best for documentation sharing
 
 ---
 
 ## Core Workflows
 
-### 1. Data Dictionary to OpenAPI
+### Main Pipeline
+
+The primary workflow is executed with:
 
 ```bash
-# Generate OpenAPI from EBNF
-make generate-openapi-spec-from-dd
-
-# Validate the generated spec
-make lint
-
-# Compare with previous version
-make diff
+make postman-collection-build-and-test
 ```
 
-### 2. Postman Collection Generation
+This runs the complete pipeline:
 
-```bash
-# Generate collection from OpenAPI
-make postman-api-linked-collection-generate
+```
+Data Dictionary (EBNF)
+       │
+       ├─(scripts/ebnf_to_openapi_*.py)──▶ OpenAPI YAML
+       │                                    ├─ lint/diff (redocly/spectral/openapi-diff)
+       │                                    └─ Postman import (/apis?workspaceId=...)
+       │                                                 │
+       │                        ┌────────── linked collection (COPY_COLLECTION)
+       │                        ▼
+       └────► openapi-to-postmanv2 ──▶ collection.json ──▶ upload (/collections?workspace=...)
+                                      │
+                                      ├─ make testing collection (+examples +tests +fix)
+                                      └─ upload test collection
 
-# Add test data
-make postman-test-collection-add-examples
+Postman Environment JSON ──▶ upload (/environments?workspace=...)
+Postman Mock Server      ──▶ create (/mocks?workspace=...) → update with collection+env
 
-# Add automated tests
-make postman-test-collection-add-tests
+Prism (local) ◀────────── run tests (Newman) ───────────▶ Postman Mock
 
-# Validate collection
-make postman-test-collection-validate
+Redoc build/serve → http://localhost:8080
 ```
 
-### 3. Mock Server Setup
+### Detailed Pipeline Flow:
+
+1. **OpenAPI Generation**
+   - `generate-openapi-spec-from-dd` - Convert EBNF to OpenAPI
+   - `lint` - Validate with Redocly & Spectral
+
+2. **Postman Setup**
+   - `postman-login` - Authenticate with API key
+   - `postman-api-import` - Import OpenAPI spec
+   - `postman-api-linked-collection-generate` - Create collection from spec
+   - `postman-collection-upload` - Upload to workspace
+   - `postman-collection-link` - Link collection to API
+
+3. **Testing Collection**
+   - `postman-testing-collection-generate` - Create test collection
+   - `postman-collection-add-examples` - Add request examples
+   - `postman-collection-merge-overrides` - Apply custom overrides
+   - `postman-collection-add-tests` - Inject test scripts
+   - `postman-collection-auto-fix` - Fix formatting issues
+   - `postman-collection-fix-v2` - Apply v2 fixes
+   - `postman-collection-validate` - Validate structure
+   - `postman-collection-upload-test` - Upload test collection
+
+4. **Mock Server Setup**
+   - `postman-mock-create` - Create cloud mock
+   - `postman-env-create` - Generate environment
+   - `postman-env-upload` - Upload environment
+   - `update-mock-env` - Link mock to collection/env
+
+### Common Development Tasks
 
 ```bash
-# Start local Prism mock
+# Start local mock server
 make prism-start
 
-# Create Postman cloud mock
-make postman-mock-create
-
-# Update mock environment
-make update-mock-env
-```
-
-### 4. Testing
-
-```bash
-# Test against local mock
+# Run tests against local mock
 make prism-mock-test
 
-# Test against Postman mock
+# Run tests against Postman mock
 make postman-mock
 
-# View test results
-open postman/newman-report.html
-```
+# Clean up all Postman resources
+make postman-cleanup-all
 
-### 5. Documentation
-
-```bash
-# Build documentation
-make docs-build
-
-# Serve documentation
-make docs-serve
-
-# Or serve in background
-make docs-serve-bg
+# Debug Postman API issues
+make postman-api-debug-B
 ```
 
 ---
@@ -523,7 +494,7 @@ DOCS_PORT=8080
 
 ### Makefile Variables
 
-Key configuration variables in the Makefile:
+Key configuration variables:
 
 ```makefile
 # API Naming Conventions
@@ -531,15 +502,13 @@ C2MAPIV2_POSTMAN_API_NAME_PC := C2mApiV2      # PascalCase
 C2MAPIV2_POSTMAN_API_NAME_CC := c2mApiV2      # camelCase
 C2MAPIV2_POSTMAN_API_NAME_SC := c2mapiv2      # snake_case
 
-# Directories
-POSTMAN_DIR := postman
-OPENAPI_DIR := openapi
-SCRIPTS_DIR := scripts
-DOCS_DIR := docs
-
 # Testing Configuration
 POSTMAN_ALLOWED_CODES := 200,400,401
 ```
+
+The Makefile handles different query parameter formats:
+- `POSTMAN_Q_ID := ?workspaceId=$(POSTMAN_WS)` for `/apis` and `/specs`
+- `POSTMAN_Q := ?workspace=$(POSTMAN_WS)` for `/collections`, `/mocks`, `/environments`
 
 ---
 
@@ -606,53 +575,64 @@ NODE_OPTIONS=--no-deprecation newman run postman/generated/collection.json
 
 ## API Endpoints
 
-### Document Submission
+### Current Endpoints (v3)
 
-**POST** `/api/v1/documents`
+All endpoints now use a simplified two-level structure:
 
-Submit documents for processing with various source options:
+#### 🎯 **RECOMMENDED: Template Endpoints** (Start Here!)
+
+These endpoints use pre-configured job templates for optimal results:
+
+1. **POST** `/jobs/single-doc-job-template` ⭐ - Submit document using a job template
+2. **POST** `/jobs/multi-docs-job-template` ⭐ - Submit multiple documents with job template
+3. **POST** `/jobs/multi-doc-merge-job-template` ⭐ - Merge documents using job template
+
+> **Why use template endpoints?** They provide pre-configured settings for paper type, print quality, and mailing options. Perfect for 90% of use cases!
+
+#### Custom Configuration Endpoints
+
+Use these only if you need specific control over individual parameters:
+
+4. **POST** `/jobs/single-doc` - Submit a single document to multiple recipients
+5. **POST** `/jobs/multi-doc` - Submit multiple documents, each to different recipients
+6. **POST** `/jobs/multi-doc-merge` - Merge multiple documents and send to a single recipient
+
+#### Specialized Endpoints
+
+For advanced document processing:
+
+7. **POST** `/jobs/single-pdf-split` - Split PDF and send ranges to different recipients
+8. **POST** `/jobs/single-pdf-split-addressCapture` - Split PDF with address extraction
+9. **POST** `/jobs/multi-pdf-address-capture` - Process multiple PDFs with embedded addresses
+
+### Example: Single Document Submission
+
+**Using Template Endpoint (Recommended):**
 
 ```json
+POST /jobs/single-doc-job-template
 {
-  "documentSource": {
-    "type": "upload",
-    "fileData": "base64-encoded-content"
-  },
-  "recipients": [
-    {
-      "name": "John Doe",
-      "address": {
-        "line1": "123 Main St",
-        "city": "Boston",
-        "state": "MA",
-        "zip": "02101"
-      }
-    }
-  ],
-  "jobOptions": {
-    "print": {
-      "color": true,
-      "duplex": "DUPLEX_LONG_EDGE"
-    },
-    "mail": {
-      "mailClass": "FIRST_CLASS"
-    }
+  "documentSourceIdentifier": "https://example.com/document.pdf",
+  "jobTemplate": "standard-letter",
+  "paymentDetails": {
+    "paymentMethod": "purchase-order",
+    "purchaseOrderNumber": "PO-12345"
   }
 }
 ```
 
-### Status Check
-
-**GET** `/api/v1/jobs/{jobId}`
-
-Check the status of a submitted job:
+**Using Custom Endpoint:**
 
 ```json
+POST /jobs/single-doc
 {
-  "jobId": "12345",
-  "status": "COMPLETED",
-  "createdAt": "2024-01-01T00:00:00Z",
-  "completedAt": "2024-01-01T00:15:00Z"
+  "documentSourceIdentifier": "https://example.com/document.pdf",
+  "recipientAddressSources": [...],
+  "jobOptions": {
+    "paperType": "standard",
+    "printColor": "bw",
+    "mailClass": "first"
+  }
 }
 ```
 
@@ -660,40 +640,39 @@ Check the status of a submitted job:
 
 ## Testing
 
-### Unit Tests
+### Test Strategy
+
+The project uses a multi-layered testing approach:
+
+1. **Unit Tests**: Individual component validation
+2. **Integration Tests**: API endpoint testing
+3. **Mock Tests**: Testing against Prism and Postman mocks
+4. **Contract Tests**: OpenAPI specification compliance
+
+### Running Tests
 
 ```bash
-# Run JavaScript tests
-npm test
+# Run all tests
+make test
 
-# Run Python tests
-cd tests/python-cli
-python -m pytest
-```
-
-### Integration Tests
-
-```bash
-# Full integration test suite
-make postman-collection-build-and-test
-
-# Quick smoke test
-make prism-start
+# Run tests against local mock (Prism)
 make prism-mock-test
+
+# Run tests against Postman cloud mock
+make postman-mock
+
+# Run specific endpoint test
+make prism-test-select PRISM_TEST_ENDPOINT=/jobs/single-doc-job-template
 ```
 
-### Manual Testing
+### Test Configuration
 
-Using the Python CLI:
+Tests are configured to accept the following response codes by default:
+- 200 (Success)
+- 400 (Bad Request)
+- 401 (Unauthorized)
 
-```bash
-cd tests/python-cli
-python cli.py --base-url http://localhost:4010 \
-              --auth your-jwt-token \
-              --method POST \
-              --endpoint /api/v1/documents \
-              --body '{"test": "data"}'
-```
+Modify `POSTMAN_ALLOWED_CODES` in the Makefile to change accepted codes.
 
 ---
 
@@ -702,477 +681,189 @@ python cli.py --base-url http://localhost:4010 \
 ### Local Development
 
 ```bash
-# Start all services
+# Start local services
 make prism-start
-make docs-serve-bg
+make docs-serve
 
-# Your services are now available at:
-# - API Mock: http://localhost:4010
-# - Documentation: http://localhost:8080
+# Stop local services
+make prism-stop
+make docs-stop
 ```
 
 ### Production Deployment
 
-1. **Generate Production Spec**:
-   ```bash
-   make postman-api-full-publish RUN_FULL_PUBLISH=1
-   ```
-
-2. **Deploy Documentation**:
-   ```bash
-   make docs-build
-   # Upload docs/ directory to your web server
-   ```
-
-3. **Generate SDKs**:
-   ```bash
-   # Use OpenAPI Generator or similar tool
-   openapi-generator generate -i openapi/c2mapiv2-openapi-spec-final.yaml
-   ```
+1. **API Deployment**: Deploy the OpenAPI spec to your API gateway
+2. **Documentation**: Host the generated docs on your documentation platform
+3. **Monitoring**: Set up webhooks for job status monitoring
+4. **Testing**: Run the Postman collection in your CI/CD pipeline
 
 ---
 
 ## Makefile Documentation
 
-The Makefile is the heart of the build system, orchestrating the entire workflow from data dictionary to deployed API.
+### Core Targets
 
-### Architecture
+- `install` - Install all dependencies
+- `venv` - Set up Python virtual environment
+- `lint` - Validate OpenAPI specification
+- `diff` - Compare spec changes
 
-The Makefile implements a sophisticated build pipeline with the following characteristics:
+### Build & Publish Targets
 
-#### Shell Configuration
-```makefile
-SHELL := bash
-.ONESHELL:
-.SHELLFLAGS := -eu -o pipefail -c
-.DELETE_ON_ERROR:
-```
-- Uses bash with strict error handling
-- Exits on errors (-e)
-- Errors on undefined variables (-u)
-- Fails on pipe errors (-o pipefail)
-- Deletes output files on error
+- `postman-collection-build-and-test` - Main pipeline
+- `postman-api-full-publish` - Full API publication
+- `postman-spec-create-standalone` - Create standalone spec
 
-#### Logging System
-```makefile
-say = @printf "%b\n" "$(1)"
-ok  = $(call say,✅ $(1))
-err = $(call say,❌ $(1))
-```
-Provides consistent, emoji-enhanced logging throughout the build process.
+### Collection Management
 
-#### Guard Functions
-```makefile
-guard-file = test -f "$(1)" || { echo "❌ Missing file: $(1)"; exit 1; }
-guard-var  = test -n "$($(1))" || { echo "❌ Missing var: $(1)"; exit 1; }
-```
-Ensures required files and variables exist before proceeding.
+- `postman-api-linked-collection-generate` - Generate from OpenAPI
+- `postman-collection-upload` - Upload to Postman
+- `postman-collection-add-tests` - Add automated tests
+- `postman-collection-validate` - Validate collection
 
-### Core Components
+### Mock Server Management
 
-#### 1. Environment Management
-The Makefile automatically loads `.env` files and manages environment variables:
-- Postman API keys
-- Workspace IDs
-- Authentication tokens
-- Service URLs and ports
+- `postman-mock-create` - Create Postman mock
+- `prism-start` - Start local Prism mock
+- `update-mock-env` - Update mock environment
 
-#### 2. Path Management
-Centralizes all file paths and directories:
-```makefile
-POSTMAN_DIR := postman
-OPENAPI_DIR := openapi
-SCRIPTS_DIR := scripts
-DOCS_DIR := docs
-```
+### Documentation
 
-#### 3. HTTP Communication
-Provides standardized curl wrappers for API calls:
-```makefile
-define curl_json
-curl --silent --show-error --fail --location \
-    $(POSTMAN_CURL_HEADERS_XC) $(1) $(2)
-endef
-```
+- `docs-build` - Build Redoc documentation
+- `docs-serve` - Serve documentation locally
+- `docs-stop` - Stop documentation server
 
-#### 4. JSON Processing
-Integrates jq for JSON manipulation:
-```makefile
-jqf = jq -f $(1) $(2)
-jqx = jq $(1) $(2)
-```
+### Cleanup
 
-### Primary Targets
-
-#### Installation and Setup
-- **`make install`** - Installs all required dependencies
-- **`make venv`** - Creates Python virtual environment
-- **`make fix-yaml`** - Fixes common PyYAML issues
-
-#### OpenAPI Generation
-- **`make postman-dd-to-openapi`** - Complete EBNF to OpenAPI conversion
-- **`make generate-openapi-spec-from-dd`** - Core conversion process
-- **`make lint`** - Validates OpenAPI with multiple linters
-- **`make diff`** - Compares with previous version
-
-#### Postman Integration
-- **`make postman-collection-build-and-test`** - Main pipeline
-- **`make postman-login`** - Authenticates with Postman
-- **`make postman-api-import`** - Imports OpenAPI to Postman
-- **`make postman-linked-collection-generate`** - Creates collection
-- **`make postman-linked-collection-upload`** - Uploads collection
-
-#### Testing Collections
-- **`make postman-test-collection-generate`** - Prepares test collection
-- **`make postman-test-collection-add-examples`** - Adds test data
-- **`make postman-test-collection-add-tests`** - Injects test scripts
-- **`make postman-test-collection-validate`** - Validates structure
-
-#### Mock Servers
-- **`make prism-start`** - Starts local mock (port 4010)
-- **`make prism-stop`** - Stops local mock
-- **`make prism-status`** - Checks mock status
-- **`make postman-mock-create`** - Creates cloud mock
-- **`make update-mock-env`** - Updates mock configuration
-
-#### Testing Execution
-- **`make prism-mock-test`** - Tests against local mock
-- **`make postman-mock`** - Tests against cloud mock
-- **`make run-postman-and-prism-tests`** - Runs all tests
-
-#### Documentation
-- **`make docs-build`** - Generates HTML documentation
-- **`make docs-serve`** - Serves docs (blocking)
-- **`make docs-serve-bg`** - Serves docs (background)
-- **`make docs-stop`** - Stops doc server
-
-#### Cleanup
-- **`make postman-cleanup-all`** - Removes all Postman resources
-- **`make postman-delete-mock-servers`** - Deletes mocks
-- **`make postman-delete-collections`** - Deletes collections
-- **`make postman-delete-apis`** - Deletes APIs
-- **`make postman-delete-environments`** - Deletes environments
-
-#### Debugging
-- **`make postman-api-debug-B`** - Comprehensive API debugging
-- **`make print-vars`** - Displays all Makefile variables
-- **`make help`** - Shows available targets
-
-### Advanced Features
-
-#### Conditional Execution
-```makefile
-RUN_FULL_PUBLISH ?= 0
-@if [ "$(RUN_FULL_PUBLISH)" = "1" ]; then \
-    $(MAKE) postman-api-full-publish; \
-fi
-```
-
-#### State Management
-The Makefile maintains state through various files:
-- `postman_api_uid.txt` - API identifier
-- `postman_mock_uid.txt` - Mock server ID
-- `postman_env_uid.txt` - Environment ID
-- `prism_pid.txt` - Local mock process ID
-
-#### Error Recovery
-- Automatic retry logic for network operations
-- Graceful fallbacks for optional steps
-- Comprehensive error messages with debugging hints
-
-#### Parallel Execution
-Where possible, independent targets can be run in parallel:
-```bash
-make -j4 target1 target2 target3 target4
-```
-
-### Best Practices
-
-1. **Always run `make venv` before Python operations**
-2. **Use `make postman-cleanup-all` to reset state**
-3. **Check `.env` for required API keys**
-4. **Run `make postman-api-debug-B` when encountering issues**
-5. **Use `make print-vars` to inspect variable values**
-
-### Troubleshooting Common Issues
-
-#### PyYAML Import Errors
-```bash
-make fix-yaml
-```
-
-#### Postman Authentication Failures
-```bash
-# Verify API key
-make postman-api-debug-B
-
-# Check workspace access
-curl -s "https://api.getpostman.com/me" -H "X-Api-Key: $POSTMAN_API_KEY" | jq .
-```
-
-#### Port Conflicts
-```makefile
-# Change in Makefile or environment
-PRISM_PORT ?= 4011  # Different port
-```
-
-#### Missing Dependencies
-```bash
-make install
-make venv
-```
-
----
-
-## Script Usage Analysis
-
-### Scripts Currently in Use (17 total)
-
-#### Essential Python Scripts
-1. **`ebnf_to_openapi_class_based.py`** - Core EBNF to OpenAPI converter
-2. **`fix_collection_urls_v2.py`** - URL correction for collections
-3. **`add_examples_to_spec.py`** - Adds examples to OpenAPI specs
-
-#### Critical JavaScript Scripts
-1. **`add_tests.js`** - Injects automated tests into collections
-2. **`addRandomDataToRaw.js`** - Generates realistic test data
-3. **`validate_collection.js`** - Validates Postman collection structure
-
-#### Active JQ Filters
-1. **`env_template.jq`** - Environment template generator
-2. **`add_info.jq`** - Adds metadata to collections
-3. **`auto_fix.jq`** - Auto-repairs invalid collections
-4. **`fix_urls.jq`** - Corrects URL placeholders
-5. **`sanitize_collection.jq`** - Cleans collection data
-6. **`verify_urls.jq`** - Validates all URLs
-7. **`merge_overrides.jq`** - Merges custom configurations
-
-### Unused Scripts Analysis (43 total)
-
-A detailed analysis has been performed on all unused scripts. See `UNUSED_SCRIPTS_ANALYSIS.md` for complete recommendations.
-
-#### High-Value Scripts to Integrate (8 scripts)
-These provide valuable functionality that should be added to the Makefile:
-- **`deploy-docs.sh`** - Documentation deployment automation
-- **`generate-sdk.sh`** - SDK generation for multiple languages
-- **`git-pull-rebase.sh`** - Standardized git workflow
-- **`init-directory-structure.sh`** - Project initialization
-- **`generate_test_data.py`** - Enhanced test data generation
-- **`verify_urls.py`** - Advanced URL validation
-- **`merge-postman.js`** - Complex collection merging
-
-#### Utility Scripts for Manual Use (7 scripts)
-Useful for debugging and special operations:
-- **`git-push.sh`** - CI/CD pipeline integration
-- **`prism_test.sh`** - Advanced Prism testing
-- **`makefile-scripts/backup-makefile.sh`** - Makefile version control
-- **`makefile-scripts/check_and_create_makefile_files.sh`** - Makefile validation
-
-#### Scripts to Archive or Remove (28 scripts)
-- **15 Legacy Scripts**: Replaced by newer versions (e.g., `fix_collection_urls.py` → `fix_collection_urls_v2.py`)
-- **13 Experimental Scripts**: Unclear purpose or temporary fixes
-- **Duplicates**: JQ scripts existing in multiple locations
-
-### Recommended Actions
-
-1. **Immediate**: Create structured directories:
-   ```
-   scripts/
-   ├── active/      # Currently used scripts
-   ├── utilities/   # Manual-use scripts
-   ├── archived/    # Legacy reference scripts
-   └── README.md    # Script documentation
-   ```
-
-2. **Integration**: Add high-value scripts as Makefile targets:
-   ```makefile
-   make docs-deploy      # Deploy documentation
-   make generate-sdks    # Generate client SDKs
-   make git-sync        # Sync with upstream
-   ```
-
-3. **Cleanup**: Remove duplicates and corrupted files (e.g., files with "Unicode Encoding Conflict")
-
-4. **Documentation**: Add headers to all active scripts with purpose, usage, and dependencies
-
-For complete details and implementation plan, see `UNUSED_SCRIPTS_ANALYSIS.md`.
+- `postman-cleanup-all` - Remove all Postman resources
+- `postman-delete-specs` - Delete OpenAPI specs
+- `clean-diff` - Clean temporary diff files
 
 ---
 
 ## Troubleshooting
 
-### Common Issues and Solutions
+### Common Issues
 
-#### 1. "URL rejected: Malformed input"
-**Cause**: Trailing spaces in environment variables
-**Solution**: 
+| Symptom | Likely Cause | Fix |
+|---------|--------------|-----|
+| `curl: (3) URL rejected` | Trailing spaces in .env | Remove trailing spaces from .env file |
+| `404` when creating mock | Wrong workspace ID | Verify POSTMAN_WS in .env |
+| Env upload fails | Missing mock-env.json | Run `make postman-env-create` |
+| Prism won't start | Port in use | Check port 4010 or set PRISM_PORT |
+| Newman tests fail | Wrong base URL | Check POSTMAN_MOCK_URL is set |
+| Specs not being deleted | API response format changed | Check `.specs` vs `.data` in jq queries |
+
+### Quick Fixes
+
 ```bash
-# Check for trailing spaces in .env
-cat -A .env  # Shows all special characters
-
-# Remove trailing spaces
-sed -i '' 's/[[:space:]]*$//' .env
-```
-
-#### 2. "Missing file" errors
-**Cause**: Build dependencies not met
-**Solution**:
-```bash
-# Ensure all directories exist
-mkdir -p postman/generated postman/custom
-
-# Run the full pipeline
-make postman-collection-build-and-test
-```
-
-#### 3. Prism won't start
-**Cause**: Port already in use or missing dependencies
-**Solution**:
-```bash
-# Check what's using the port
-lsof -i :4010
-
-# Kill existing process
-make prism-stop
-
-# Use different port
-PRISM_PORT=4011 make prism-start
-```
-
-#### 4. Newman tests fail
-**Cause**: Mock server not running or wrong URL
-**Solution**:
-```bash
-# Verify mock is running
-make prism-status
-
-# Check mock URL
-cat postman/prism_mock_url.txt
-
-# Restart mock
-make prism-stop
-make prism-start
-```
-
-#### 5. Postman API errors
-**Cause**: Invalid API key or workspace permissions
-**Solution**:
-```bash
-# Debug API access
+# Debug Postman API connection
 make postman-api-debug-B
 
-# Verify workspace membership
-curl -s "https://api.getpostman.com/workspaces" \
-  -H "X-Api-Key: $POSTMAN_API_KEY" | jq '.workspaces[] | {id, name}'
+# Check workspace configuration
+make postman-workspace-debug
+
+# Verify API key
+curl -s "https://api.getpostman.com/me" \
+  -H "X-Api-Key: $POSTMAN_API_KEY" | jq .
+
+# List all resources in workspace
+make postman-api-list-specs
 ```
 
-### Debug Workflow
+---
 
-When encountering issues:
+## Debugging Playbook
 
-1. **Enable verbose output**:
+### Built-in Debugging
+
+If any step fails, run the debug bundle first:
+
+```bash
+make postman-api-debug-B
+```
+
+This saves:
+- `/me → postman/debug-me.json`
+- `/apis?workspaceId=... → postman/debug-apis.json`
+- `/specs?workspaceId=... → postman/debug-specs.json`
+
+### Manual Debugging Steps
+
+1. **Verify API key & workspace**
    ```bash
-   V=1 make target-name
+   curl -s "https://api.getpostman.com/me" \
+     -H "X-Api-Key: $POSTMAN_API_KEY" | jq .
    ```
 
-2. **Check debug files**:
+2. **Check APIs in workspace**
    ```bash
-   ls -la postman/*debug*.json
-   cat postman/import-debug.json | jq .
+   curl -s "https://api.getpostman.com/apis?workspaceId=$POSTMAN_WS" \
+     -H "X-Api-Key: $POSTMAN_API_KEY" | jq '.apis[] | {id,name}'
    ```
 
-3. **Verify environment**:
+3. **Check collections**
    ```bash
-   make print-vars | grep POSTMAN
+   curl -s "https://api.getpostman.com/collections?workspace=$POSTMAN_WS" \
+     -H "X-Api-Key: $POSTMAN_API_KEY" | jq '.collections[] | {uid,name}'
    ```
 
-4. **Clean and retry**:
+4. **Check mocks**
    ```bash
-   make postman-cleanup-all
-   make postman-collection-build-and-test
+   curl -s "https://api.getpostman.com/mocks?workspace=$POSTMAN_WS" \
+     -H "X-Api-Key: $POSTMAN_API_KEY" | jq '.mocks[] | {id,name,mockUrl}'
    ```
+
+### Common Fix Patterns
+
+- **Malformed URL**: Check for trailing spaces in .env
+- **404 Not Found**: Ensure resource exists in correct workspace
+- **Empty responses**: Resource might not exist yet
+- **Auth errors**: Verify API key is valid
 
 ---
 
 ## Contributing
 
-### Development Setup
+### Development Process
 
 1. Fork the repository
 2. Create a feature branch
-3. Set up development environment:
-   ```bash
-   make install
-   make venv
-   cp .env.example .env  # Edit with your API key
-   ```
-
-### Making Changes
-
-#### Adding New Endpoints
-1. Update EBNF in `data_dictionary/`
-2. Regenerate OpenAPI: `make generate-openapi-spec-from-dd`
-3. Test changes: `make postman-collection-build-and-test`
-
-#### Improving Scripts
-1. Add script to appropriate directory
-2. Update Makefile to use the script
-3. Document usage in script header
-4. Add to this README if significant
-
-#### Updating Documentation
-1. Edit relevant markdown files
-2. Regenerate docs: `make docs-build`
-3. Preview locally: `make docs-serve`
-
-### Testing Your Changes
-
-```bash
-# Run full test suite
-make postman-collection-build-and-test
-
-# Test specific components
-make lint                    # Validate OpenAPI
-make postman-test-collection-validate  # Validate collections
-make prism-mock-test        # Test with local mock
-```
-
-### Submitting Changes
-
-1. Ensure all tests pass
-2. Update documentation
-3. Create descriptive commit messages
-4. Submit pull request with:
-   - Description of changes
-   - Testing performed
-   - Any breaking changes
+3. Make your changes
+4. Run tests: `make test`
+5. Submit a pull request
 
 ### Code Style
 
-- **Shell Scripts**: Follow Google Shell Style Guide
-- **Python**: PEP 8 compliance
-- **JavaScript**: Standard.js style
-- **YAML**: 2-space indentation
-- **Makefile**: Tabs for recipes, spaces for continuation
+- Python: Follow PEP 8
+- JavaScript: Use ESLint configuration
+- YAML: 2-space indentation
+- Makefile: Use tabs, not spaces
+
+### Commit Messages
+
+Follow conventional commits:
+- `feat:` New features
+- `fix:` Bug fixes
+- `docs:` Documentation changes
+- `test:` Test additions/changes
+- `chore:` Maintenance tasks
 
 ---
 
 ## License
 
-See LICENSE file in the repository root.
+MIT License - see LICENSE file for details
 
 ---
 
 ## Support
 
-For issues and questions:
-1. Check the [Troubleshooting](#troubleshooting) section
-2. Review debug output files in `postman/`
-3. Run `make postman-api-debug-B` for diagnostics
-4. Create an issue with debug output attached
+- 📧 Email: support@c2m.com
+- 📚 Documentation: https://docs.c2m.com
+- 💬 Slack: c2m-api.slack.com
+- 🐛 Issues: GitHub Issues
 
 ---
 
-## Changelog
-
-See CHANGELOG.md for version history and migration guides.
+**Remember:** Always start with template endpoints for the fastest integration. They're designed to handle 90% of use cases with minimal configuration.

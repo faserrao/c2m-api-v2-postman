@@ -4,10 +4,10 @@ info:
   version: V2.0.0
   description: API for submitting documents with various routing options
 servers:
-- url: https://api.example.com/v1
-  description: Production server
-- url: http://localhost:4010
-  description: Mock server
+  - url: 'https://api.example.com/v1'
+    description: Production server
+  - url: 'http://localhost:4010'
+    description: Mock server
 components:
   schemas:
     documentName:
@@ -89,7 +89,7 @@ components:
       type: number
     x:
       type: number
-    y:
+    'y':
       type: number
     width:
       type: number
@@ -107,8 +107,8 @@ components:
         tags:
           $ref: '#/components/schemas/tags'
       required:
-      - documentSourceIdentifier
-      - jobTemplate
+        - documentSourceIdentifier
+        - jobTemplate
     submitMultiDocWithTemplateParams:
       type: object
       properties:
@@ -122,8 +122,8 @@ components:
               recipientAddressSource:
                 $ref: '#/components/schemas/recipientAddressSource'
             required:
-            - documentSourceIdentifier
-            - recipientAddressSource
+              - documentSourceIdentifier
+              - recipientAddressSource
         jobTemplate:
           $ref: '#/components/schemas/jobTemplate'
         paymentDetails:
@@ -131,9 +131,9 @@ components:
         tags:
           $ref: '#/components/schemas/tags'
       required:
-      - items
-      - jobTemplate
-      - paymentDetails
+        - items
+        - jobTemplate
+        - paymentDetails
     mergeMultiDocWithTemplateParams:
       type: object
       properties:
@@ -148,9 +148,9 @@ components:
         tags:
           $ref: '#/components/schemas/tags'
       required:
-      - documentsToMerge
-      - recipientAddressSource
-      - jobTemplate
+        - documentsToMerge
+        - recipientAddressSource
+        - jobTemplate
     singleDocJobParams:
       type: object
       properties:
@@ -167,9 +167,9 @@ components:
         tags:
           $ref: '#/components/schemas/tags'
       required:
-      - documentSourceIdentifier
-      - recipientAddressSources
-      - jobOptions
+        - documentSourceIdentifier
+        - recipientAddressSources
+        - jobOptions
     submitMultiDocParams:
       type: object
       properties:
@@ -183,8 +183,8 @@ components:
               recipientAddressSource:
                 $ref: '#/components/schemas/recipientAddressSource'
             required:
-            - documentSourceIdentifier
-            - recipientAddressSource
+              - documentSourceIdentifier
+              - recipientAddressSource
         jobOptions:
           $ref: '#/components/schemas/jobOptions'
         paymentDetails:
@@ -192,8 +192,8 @@ components:
         tags:
           $ref: '#/components/schemas/tags'
       required:
-      - items
-      - jobOptions
+        - items
+        - jobOptions
     mergeMultiDocParams:
       type: object
       properties:
@@ -204,8 +204,8 @@ components:
         tags:
           $ref: '#/components/schemas/tags'
       required:
-      - documentsToMerge
-      - recipientAddressSource
+        - documentsToMerge
+        - recipientAddressSource
     documentsToMerge:
       type: array
       items:
@@ -227,15 +227,15 @@ components:
                 items:
                   $ref: '#/components/schemas/recipientAddressSource'
             required:
-            - pageRange
-            - recipientAddressSources
+              - pageRange
+              - recipientAddressSources
         paymentDetails:
           $ref: '#/components/schemas/paymentDetails'
         tags:
           $ref: '#/components/schemas/tags'
       required:
-      - documentSourceIdentifier
-      - items
+        - documentSourceIdentifier
+        - items
     pageRange:
       type: object
       properties:
@@ -244,8 +244,8 @@ components:
         endPage:
           $ref: '#/components/schemas/endPage'
       required:
-      - startPage
-      - endPage
+        - startPage
+        - endPage
     splitPdfWithCaptureParams:
       type: object
       properties:
@@ -258,8 +258,8 @@ components:
         tags:
           $ref: '#/components/schemas/tags'
       required:
-      - documentSourceIdentifier
-      - embeddedExtractionSpecs
+        - documentSourceIdentifier
+        - embeddedExtractionSpecs
     embeddedExtractionSpecs:
       type: array
       items:
@@ -274,15 +274,15 @@ components:
         addressRegion:
           $ref: '#/components/schemas/addressRegion'
       required:
-      - startPage
-      - endPage
-      - addressRegion
+        - startPage
+        - endPage
+        - addressRegion
     addressRegion:
       type: object
       properties:
         x:
           $ref: '#/components/schemas/x'
-        y:
+        'y':
           $ref: '#/components/schemas/y'
         width:
           $ref: '#/components/schemas/width'
@@ -291,11 +291,11 @@ components:
         pageOffset:
           $ref: '#/components/schemas/pageOffset'
       required:
-      - x
-      - y
-      - width
-      - height
-      - pageOffset
+        - x
+        - 'y'
+        - width
+        - height
+        - pageOffset
     multiPdfWithCaptureParams:
       type: object
       properties:
@@ -308,8 +308,8 @@ components:
         tags:
           $ref: '#/components/schemas/tags'
       required:
-      - addressCapturePdfs
-      - jobTemplate
+        - addressCapturePdfs
+        - jobTemplate
     addressCapturePdfs:
       type: array
       items:
@@ -320,55 +320,55 @@ components:
         documentSourceIdentifier:
           $ref: '#/components/schemas/documentSourceIdentifier'
         addressListRegion:
-          $ref: '#/components/schemas/addressListRegion'
+          $ref: '#/components/schemas/tbd'
         delimiter:
           $ref: '#/components/schemas/delimiter'
         tags:
           $ref: '#/components/schemas/tags'
       required:
-      - documentSourceIdentifier
-      - addressListRegion
+        - documentSourceIdentifier
+        - addressListRegion
     addressListRegion:
       $ref: '#/components/schemas/tbd'
     documentSourceIdentifier:
       oneOf:
-      - $ref: '#/components/schemas/documentId'
-      - $ref: '#/components/schemas/externalUrl'
-      - type: object
-        properties:
-          uploadRequestId:
-            $ref: '#/components/schemas/uploadRequestId'
-          documentName:
-            $ref: '#/components/schemas/documentName'
-        required:
-        - uploadRequestId
-        - documentName
-      - type: object
-        properties:
-          uploadRequestId:
-            $ref: '#/components/schemas/uploadRequestId'
-          zipId:
-            $ref: '#/components/schemas/zipId'
-          documentName:
-            $ref: '#/components/schemas/documentName'
-        required:
-        - uploadRequestId
-        - zipId
-        - documentName
-      - type: object
-        properties:
-          zipId:
-            $ref: '#/components/schemas/zipId'
-          documentName:
-            $ref: '#/components/schemas/documentName'
-        required:
-        - zipId
-        - documentName
+        - $ref: '#/components/schemas/documentId'
+        - $ref: '#/components/schemas/externalUrl'
+        - type: object
+          properties:
+            uploadRequestId:
+              $ref: '#/components/schemas/uploadRequestId'
+            documentName:
+              $ref: '#/components/schemas/documentName'
+          required:
+            - uploadRequestId
+            - documentName
+        - type: object
+          properties:
+            uploadRequestId:
+              $ref: '#/components/schemas/uploadRequestId'
+            zipId:
+              $ref: '#/components/schemas/zipId'
+            documentName:
+              $ref: '#/components/schemas/documentName'
+          required:
+            - uploadRequestId
+            - zipId
+            - documentName
+        - type: object
+          properties:
+            zipId:
+              $ref: '#/components/schemas/zipId'
+            documentName:
+              $ref: '#/components/schemas/documentName'
+          required:
+            - zipId
+            - documentName
     recipientAddressSource:
       oneOf:
-      - $ref: '#/components/schemas/exactlyOneNewAddress'
-      - $ref: '#/components/schemas/exactlyOneListId'
-      - $ref: '#/components/schemas/exactlyOneId'
+        - $ref: '#/components/schemas/recipientAddress'
+        - $ref: '#/components/schemas/addressListId'
+        - $ref: '#/components/schemas/addressId'
     exactlyOneNewAddress:
       $ref: '#/components/schemas/recipientAddress'
     exactlyOneListId:
@@ -401,13 +401,13 @@ components:
         phoneNumber:
           $ref: '#/components/schemas/phoneNumber'
       required:
-      - firstName
-      - lastName
-      - address1
-      - city
-      - state
-      - zip
-      - country
+        - firstName
+        - lastName
+        - address1
+        - city
+        - state
+        - zip
+        - country
     jobOptions:
       type: object
       properties:
@@ -424,12 +424,12 @@ components:
         envelope:
           $ref: '#/components/schemas/envelope'
       required:
-      - documentClass
-      - layout
-      - mailclass
-      - paperType
-      - printOption
-      - envelope
+        - documentClass
+        - layout
+        - mailclass
+        - paperType
+        - printOption
+        - envelope
     paymentDetails:
       type: object
       properties:
@@ -438,14 +438,14 @@ components:
         optionalPaymentFields:
           $ref: '#/components/schemas/optionalPaymentFields'
       required:
-      - billingType
+        - billingType
     billingType:
       type: string
       enum:
-      - creditCard
-      - invoice
-      - ach
-      - userCredit
+        - creditCard
+        - invoice
+        - ach
+        - userCredit
     creditCardDetails:
       type: object
       properties:
@@ -458,10 +458,10 @@ components:
         cvv:
           $ref: '#/components/schemas/cvv'
       required:
-      - cardType
-      - cardNumber
-      - expirationDate
-      - cvv
+        - cardType
+        - cardNumber
+        - expirationDate
+        - cvv
     invoiceDetails:
       type: object
       properties:
@@ -470,8 +470,8 @@ components:
         amountDue:
           $ref: '#/components/schemas/amountDue'
       required:
-      - invoiceNumber
-      - amountDue
+        - invoiceNumber
+        - amountDue
     achDetails:
       type: object
       properties:
@@ -482,9 +482,9 @@ components:
         checkDigit:
           $ref: '#/components/schemas/checkDigit'
       required:
-      - routingNumber
-      - accountNumber
-      - checkDigit
+        - routingNumber
+        - accountNumber
+        - checkDigit
     creditAmount:
       type: object
       properties:
@@ -493,16 +493,16 @@ components:
         currency:
           $ref: '#/components/schemas/currency'
       required:
-      - amount
-      - currency
+        - amount
+        - currency
     currency:
       type: string
       enum:
-      - USD
-      - EUR
-      - GBP
-      - CAD
-      - AUD
+        - USD
+        - EUR
+        - GBP
+        - CAD
+        - AUD
     expirationDate:
       type: object
       properties:
@@ -511,8 +511,8 @@ components:
         year:
           $ref: '#/components/schemas/year'
       required:
-      - month
-      - year
+        - month
+        - year
     optionalPaymentFields:
       type: object
       properties:
@@ -527,71 +527,71 @@ components:
     digit:
       type: string
       enum:
-      - '0'
-      - '1'
-      - '2'
-      - '3'
-      - '4'
-      - '5'
-      - '6'
-      - '7'
-      - '8'
-      - '9'
+        - '0'
+        - '1'
+        - '2'
+        - '3'
+        - '4'
+        - '5'
+        - '6'
+        - '7'
+        - '8'
+        - '9'
     cardType:
       type: string
       enum:
-      - visa
-      - mastercard
-      - discover
-      - americanExpress
+        - visa
+        - mastercard
+        - discover
+        - americanExpress
     documentFormat:
       type: string
       enum:
-      - pdf
-      - doc
-      - docx
-      - pub
-      - ppt
-      - pptx
-      - png
-      - jpeg
-      - odt
+        - pdf
+        - doc
+        - docx
+        - pub
+        - ppt
+        - pptx
+        - png
+        - jpeg
+        - odt
     printOption:
       type: string
       enum:
-      - none
-      - color
-      - grayscale
+        - none
+        - color
+        - grayscale
     envelope:
       type: string
       enum:
-      - flat
-      - windowedFlat
-      - letter
-      - legal
-      - postcard
+        - flat
+        - windowedFlat
+        - letter
+        - legal
+        - postcard
     paperType:
       type: string
       enum:
-      - letter
-      - legal
-      - postcard
+        - letter
+        - legal
+        - postcard
     layout:
       type: string
       enum:
-      - portrait
-      - landscape
+        - portrait
+        - landscape
     mailclass:
       type: string
       enum:
-      - firstClassMail
-      - priorityMail
-      - largeEnvelope
+        - firstClassMail
+        - priorityMail
+        - largeEnvelope
     documentClass:
       type: string
       enum:
-      - businessLetter
-      - personalLetter
+        - businessLetter
+        - personalLetter
     StandardResponse:
       type: object
       properties:
@@ -622,7 +622,7 @@ components:
       scheme: bearer
       bearerFormat: JWT
 security:
-- bearerAuth: []
+  - bearerAuth: []
 paths:
   /jobs/single-doc-job-template:
     post:
@@ -644,8 +644,8 @@ paths:
                 tags:
                   $ref: '#/components/schemas/tags'
               required:
-              - documentSourceIdentifier
-              - jobTemplate
+                - documentSourceIdentifier
+                - jobTemplate
       responses:
         '200':
           description: Success
@@ -678,8 +678,8 @@ paths:
                       recipientAddressSource:
                         $ref: '#/components/schemas/recipientAddressSource'
                     required:
-                    - documentSourceIdentifier
-                    - recipientAddressSource
+                      - documentSourceIdentifier
+                      - recipientAddressSource
                 jobTemplate:
                   $ref: '#/components/schemas/jobTemplate'
                 paymentDetails:
@@ -687,9 +687,9 @@ paths:
                 tags:
                   $ref: '#/components/schemas/tags'
               required:
-              - items
-              - jobTemplate
-              - paymentDetails
+                - items
+                - jobTemplate
+                - paymentDetails
       responses:
         '200':
           description: Success
@@ -723,9 +723,9 @@ paths:
                 tags:
                   $ref: '#/components/schemas/tags'
               required:
-              - documentsToMerge
-              - recipientAddressSource
-              - jobTemplate
+                - documentsToMerge
+                - recipientAddressSource
+                - jobTemplate
       responses:
         '200':
           description: Success
@@ -761,9 +761,9 @@ paths:
                 tags:
                   $ref: '#/components/schemas/tags'
               required:
-              - documentSourceIdentifier
-              - recipientAddressSources
-              - jobOptions
+                - documentSourceIdentifier
+                - recipientAddressSources
+                - jobOptions
       responses:
         '200':
           description: Success
@@ -796,8 +796,8 @@ paths:
                       recipientAddressSource:
                         $ref: '#/components/schemas/recipientAddressSource'
                     required:
-                    - documentSourceIdentifier
-                    - recipientAddressSource
+                      - documentSourceIdentifier
+                      - recipientAddressSource
                 jobOptions:
                   $ref: '#/components/schemas/jobOptions'
                 paymentDetails:
@@ -805,8 +805,8 @@ paths:
                 tags:
                   $ref: '#/components/schemas/tags'
               required:
-              - items
-              - jobOptions
+                - items
+                - jobOptions
       responses:
         '200':
           description: Success
@@ -836,8 +836,8 @@ paths:
                 tags:
                   $ref: '#/components/schemas/tags'
               required:
-              - documentsToMerge
-              - recipientAddressSource
+                - documentsToMerge
+                - recipientAddressSource
       responses:
         '200':
           description: Success
@@ -874,15 +874,15 @@ paths:
                         items:
                           $ref: '#/components/schemas/recipientAddressSource'
                     required:
-                    - pageRange
-                    - recipientAddressSources
+                      - pageRange
+                      - recipientAddressSources
                 paymentDetails:
                   $ref: '#/components/schemas/paymentDetails'
                 tags:
                   $ref: '#/components/schemas/tags'
               required:
-              - documentSourceIdentifier
-              - items
+                - documentSourceIdentifier
+                - items
       responses:
         '200':
           description: Success
@@ -914,8 +914,8 @@ paths:
                 tags:
                   $ref: '#/components/schemas/tags'
               required:
-              - documentSourceIdentifier
-              - embeddedExtractionSpecs
+                - documentSourceIdentifier
+                - embeddedExtractionSpecs
       responses:
         '200':
           description: Success
@@ -947,8 +947,8 @@ paths:
                 tags:
                   $ref: '#/components/schemas/tags'
               required:
-              - addressCapturePdfs
-              - jobTemplate
+                - addressCapturePdfs
+                - jobTemplate
       responses:
         '200':
           description: Success

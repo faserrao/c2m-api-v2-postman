@@ -337,8 +337,8 @@ class CleanOpenAPIGenerator:
         self.openapi_spec = OrderedDict([
             ("openapi", "3.0.3"),
             ("info", OrderedDict([
-                ("title", "LOB-Style Document Submission API"),
-                ("version", "1.0.0"),
+                ("title", "C2M Job Submission API"),
+                ("version", "V2.0.0"),
                 ("description", "API for submitting document jobs using LOB-style document and address structures.")
             ])),
             ("servers", [
@@ -389,7 +389,7 @@ class CleanOpenAPIGenerator:
                     "type": "object",
                     "required": ["documentId"],
                     "properties": {
-                        "documentId": {"type": "string"}
+                        "documentId": {"type": "integer"}
                     }
                 },
                 {
@@ -611,8 +611,8 @@ class CleanOpenAPIGenerator:
         """Generate API paths based on the provided spec"""
         paths = OrderedDict()
         
-        # /jobs/submit/single/doc
-        paths["/jobs/submit/single/doc"] = {
+        # /jobs/single-doc
+        paths["/jobs/single-doc"] = {
             "post": {
                 "summary": "Submit a single document to multiple recipients",
                 "operationId": "submitSingleDoc",
@@ -658,8 +658,8 @@ class CleanOpenAPIGenerator:
             }
         }
         
-        # /jobs/submit/multi/doc
-        paths["/jobs/submit/multi/doc"] = {
+        # /jobs/multi-doc
+        paths["/jobs/multi-doc"] = {
             "post": {
                 "summary": "Submit multiple documents, each to a different recipient",
                 "operationId": "submitMultiDoc",
@@ -698,8 +698,8 @@ class CleanOpenAPIGenerator:
             }
         }
         
-        # /jobs/submit/multi/doc/merge
-        paths["/jobs/submit/multi/doc/merge"] = {
+        # /jobs/multi-doc-merge
+        paths["/jobs/multi-doc-merge"] = {
             "post": {
                 "summary": "Merge multiple documents and send to a single recipient",
                 "operationId": "submitMultiDocMerge",
@@ -730,8 +730,8 @@ class CleanOpenAPIGenerator:
             }
         }
         
-        # /jobs/submit/single/doc/jobTemplate
-        paths["/jobs/submit/single/doc/jobTemplate"] = {
+        # /jobs/single-doc-job-template
+        paths["/jobs/single-doc-job-template"] = {
             "post": {
                 "summary": "Submit a document using a job template",
                 "operationId": "submitSingleDocJobTemplate",
@@ -765,8 +765,8 @@ class CleanOpenAPIGenerator:
             }
         }
         
-        # /jobs/submit/multi/docs/jobtemplate
-        paths["/jobs/submit/multi/docs/jobtemplate"] = {
+        # /jobs/multi-docs-job-template
+        paths["/jobs/multi-docs-job-template"] = {
             "post": {
                 "summary": "Submit multiple documents with recipient addresses and job template",
                 "operationId": "submitMultiDocsJobTemplate",
@@ -805,8 +805,8 @@ class CleanOpenAPIGenerator:
             }
         }
         
-        # /jobs/submit/multi/doc/merge/jobTemplate
-        paths["/jobs/submit/multi/doc/merge/jobTemplate"] = {
+        # /jobs/multi-doc-merge-job-template
+        paths["/jobs/multi-doc-merge-job-template"] = {
             "post": {
                 "summary": "Merge documents, send to recipient using job template", 
                 "operationId": "submitMultiDocMergeJobTemplate",
@@ -839,8 +839,8 @@ class CleanOpenAPIGenerator:
             }
         }
         
-        # /jobs/submit/single/pdf/split
-        paths["/jobs/submit/single/pdf/split"] = {
+        # /jobs/single-pdf-split
+        paths["/jobs/single-pdf-split"] = {
             "post": {
                 "summary": "Split a PDF into page ranges and send to different recipients",
                 "operationId": "submitSinglePdfSplit",
@@ -880,8 +880,8 @@ class CleanOpenAPIGenerator:
             }
         }
         
-        # /jobs/submit/single/pdf/split/addressCapture
-        paths["/jobs/submit/single/pdf/split/addressCapture"] = {
+        # /jobs/single-pdf-split-addressCapture
+        paths["/jobs/single-pdf-split-addressCapture"] = {
             "post": {
                 "summary": "Split PDF and extract embedded recipient addresses",
                 "operationId": "submitSinglePdfSplitAddressCapture",
@@ -931,8 +931,8 @@ class CleanOpenAPIGenerator:
             }
         }
         
-        # /jobs/submit/multi/pdf/addressCapture
-        paths["/jobs/submit/multi/pdf/addressCapture"] = {
+        # /jobs/multi-pdf-address-capture
+        paths["/jobs/multi-pdf-address-capture"] = {
             "post": {
                 "summary": "Submit multiple PDFs with embedded address regions",
                 "operationId": "submitMultiPdfAddressCapture",

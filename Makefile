@@ -14,7 +14,7 @@
 #
 # Usage:
 #   make help                          # Show all available targets
-#   make postman-collection-build-and-test  # Run complete pipeline
+#   make postman-instance-build-and-test  # Run complete pipeline
 #   make postman-cleanup-all           # Clean all Postman resources
 #
 # Prerequisites:
@@ -63,16 +63,20 @@ err = $(call say,❌ $(1))
 
 # Guard helpers to ensure files and variables exist before use
 guard-file    = test -f "$(1)" || { echo "❌ Missing file: $(1)"; exit 1; }
-guard-var        = test -n "$($(1))" || { echo "❌ Missing var: $(1)"; exit 1; }
+guard-var        = test -n "$$($(1))" || { echo "❌ Missing var: $(1)"; exit 1; }
 
 # ========================================================================
 # API NAMING CONVENTIONS
 # ========================================================================
 # Different case conventions for various contexts:
-C2MAPIV2_POSTMAN_API_NAME_PC    := C2mApiV2      # PascalCase
-C2MAPIV2_POSTMAN_API_NAME_CC    := c2mApiV2      # camelCase
-C2MAPIV2_POSTMAN_API_NAME_SC    := c2mapiv2      # snake_case
-C2MAPIV2_POSTMAN_API_NAME_KC    := c2mapiv2      # kebab-case
+# PascalCase
+C2MAPIV2_POSTMAN_API_NAME_PC    := C2mApiV2
+# camelCase
+C2MAPIV2_POSTMAN_API_NAME_CC    := c2mApiV2
+# snake_case
+C2MAPIV2_POSTMAN_API_NAME_SC    := c2mapiv2
+# kebab-case
+C2MAPIV2_POSTMAN_API_NAME_KC    := c2mapiv2
 POSTMAN_API_NAME                 := $(C2MAPIV2_POSTMAN_API_NAME_PC)
 
 # ========================================================================
@@ -85,13 +89,20 @@ POSTMAN_BASE_URL                 := https://api.getpostman.com
 LOCALHOST_URL                    := http://127.0.0.1
 
 #--- Directories ---
-POSTMAN_CUSTOM_DIR               := $(POSTMAN_DIR)/custom      # User customizations
-POSTMAN_GENERATED_DIR            := $(POSTMAN_DIR)/generated   # Auto-generated files
-SDKS_DIR                         := sdks                        # Generated SDKs
-SCRIPTS_DIR                      := scripts                     # Helper scripts
-DOCS_DIR                         := docs                        # Documentation output
-DATA_DICT_DIR                    := data_dictionary             # EBNF source files
-TEMPLATES_DIR                    := $(DOCS_DIR)/templates       # Doc templates
+# User customizations
+POSTMAN_CUSTOM_DIR               := $(POSTMAN_DIR)/custom
+# Auto-generated files
+POSTMAN_GENERATED_DIR            := $(POSTMAN_DIR)/generated
+# Generated SDKs
+SDKS_DIR                         := sdks
+# Helper scripts
+SCRIPTS_DIR                      := scripts
+# Documentation output
+DOCS_DIR                         := docs
+# EBNF source files
+DATA_DICT_DIR                    := data_dictionary
+# Doc templates
+TEMPLATES_DIR                    := $(DOCS_DIR)/templates
 
 # --- Files ---
 DD_EBNF_FILE                     := $(DATA_DICT_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_SC)-dd.ebnf
@@ -108,8 +119,8 @@ POSTMAN_APIS_URL                 := $(POSTMAN_BASE_URL)/apis
 
 #--- OpenAPI Specification Variables ---
 OPENAPI_DIR                      := openapi
-C2MAPIV2_OPENAPI_SPEC            = $(OPENAPI_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-openapi-spec-final.yaml
-C2MAPIV2_MAIN_SPEC_PATH          = origin/main:$(C2MAPIV2_OPENAPI_SPEC)
+C2MAPIV2_OPENAPI_SPEC            := $(OPENAPI_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-openapi-spec-final.yaml
+C2MAPIV2_MAIN_SPEC_PATH          := origin/main:$(C2MAPIV2_OPENAPI_SPEC)
 POSTMAN_SPEC_ID_FILE             := $(POSTMAN_DIR)/postman_spec_uid.txt
 C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES := $(basename $(C2MAPIV2_OPENAPI_SPEC))-with-examples$(suffix $(C2MAPIV2_OPENAPI_SPEC))
 PREVIOUS_C2MAPIV2_OPENAPI_SPEC   := $(OPENAPI_DIR)/tmp-previous-spec.yaml
@@ -152,8 +163,7 @@ POSTMAN_LINK_PAYLOAD             := $(POSTMAN_DIR)/link-payload.json
 POSTMAN_LINK_DEBUG               := $(POSTMAN_DIR)/link-debug.json
 POSTMAN_VERSION_PAYLOAD          := $(POSTMAN_DIR)/version-payload.json
 POSTMAN_VERSION_DEBUG            := $(POSTMAN_DIR)/version-debug.json
-POSTMAN_IMPORT_PAYLOAD           := $(shell jq -Rs --arg name '$(POSTMAN_API_NAME)' \
-'{ name: $name, schema: { type: "openapi3", language: "yaml", schema: . }}' $(C2MAPIV2_OPENAPI_SPEC))
+POSTMAN_IMPORT_PAYLOAD           := $(POSTMAN_DIR)/import-payload.json
 POSTMAN_FULL_PAYLOAD             := $(POSTMAN_DIR)/full-publish-payload.json
 POSTMAN_FULL_RESPONSE            := $(POSTMAN_DIR)/api-full-publish-response.json
 
@@ -251,10 +261,10 @@ endef
 #--- SCRIPTS ---
 ADD_EXAMPLES_TO_OPENAPI_SPEC     := $(SCRIPTS_DIR)/test_data_genertor_for_openapi_specs/add_examples_to_spec.py $(C2MAPIV2_OPENAPI_SPEC)
 ADD_TESTS_SCRIPT                 := $(SCRIPTS_DIR)/add_tests.js
-EBNF_TO_OPENAPI_SCRIPT           := $(SCRIPTS_DIR)/ebnf_to_openapi_class_based.py
+EBNF_TO_OPENAPI_SCRIPT           := $(SCRIPTS_DIR)/ebnf_to_openapi_dynamic_v3.py
 FIX_COLLECTION_URLS              := $(SCRIPTS_DIR)/fix_collection_urls_v2.py
 FIX_PATHS_SCRIPT                 := $(SCRIPTS_DIR)/fix_paths.jq
-JQ_ADD_INFO                      := --arg name "$(POSTMAN_LINKED_COLLECTION_NAME)" '. as $c | {info: {name: $name, schema: "$(POSTMAN_SCHEMA_V2)"}, item: $c.item}'
+JQ_ADD_INFO                      := --arg name "$$(POSTMAN_LINKED_COLLECTION_NAME)" '. as $$c | {info: {name: $$name, schema: "$$(POSTMAN_SCHEMA_V2)"}, item: $$c.item}'
 JQ_AUTO_FIX                      := jq 'walk(if type == "object" and (has("name") and (has("request") | not) and (has("item") | not)) then . + { "item": [] } else . end)'
 JQ_FIX_URLS                      := jq 'walk(if type == "object" and has("url") and (.url | type) == "object" and .url.raw then .url.raw |= sub("http://localhost"; "{{baseUrl}}") else . end)'
 JQ_VERIFY_URLS                   := jq -r '.. | objects | select(has("url")) | .url.raw? // empty'
@@ -275,7 +285,7 @@ ADD_EXAMPLES_TO_COLLECTION       := $(ADD_EXAMPLES_TO_COLLECTION_SCRIPT) $(ADD_E
 # Isolated Python environment for conversion scripts
 PYTHON_ENV_DIR                   := $(SCRIPTS_DIR)/python_env
 VENV_DIR                         := $(PYTHON_ENV_DIR)/e2o.venv
-VENV_PIP                         := $(VENV_DIR)/bin/pip
+VENV_PIP                         := $(VENV_DIR)/bin/pip3.13
 VENV_PYTHON                      := $(VENV_DIR)/bin/python
 PYTHON3                          := python3
 PYTHON                           := $(PYTHON3)
@@ -309,7 +319,7 @@ POSTMAN_API_KEY                  :=REDACTED $(POSTMAN_SERRAO_API_KEY)
 
 #--- TOKENS ---
 # Extract token from environment file if it exists
-TOKEN_RAW                        := $(shell [ -f $(POSTMAN_ENV_FILE) ] && jq -r '.environment.values[] | select(.key=="token") | .value' $(POSTMAN_ENV_FILE))
+TOKEN_RAW                        := $(shell [ -f $(POSTMAN_ENV_FILE) ] && jq -r '.environment.values[] | select(.key=="token") | .value' $(POSTMAN_ENV_FILE) 2>/dev/null || echo "")
 TOKEN                            := $(if $(TOKEN_RAW),$(TOKEN_RAW),dummy-token)
 
 # ========================================================================
@@ -347,16 +357,103 @@ empty-test:
 # TEST TARGETS
 # ========================================================================
 # Test target to verify mock environment update calls work correctly
+.PHONY: test-update-mock-env-call
 test-update-mock-env-call:
-	curl -s --location "$(POSTMAN_MOCKS_URL)?workspace=$(POSTMAN_WS)" \
+	curl -s --location "$$(POSTMAN_MOCKS_URL)?workspace=$$(POSTMAN_WS)" \
 		$(POSTMAN_HEADER_API_KEY) | jq '.mocks[] | {id, uid, name, mockUrl}'
 
 # ========================================================================
 # COMPOSITE TARGETS
 # ========================================================================
+
+###### NEED ########
+
+#
+# 1) A complete build starting from delete all and starting from dd conversion
+# 2) Delete all but dd conversion but rebuild as well.
+# 3) Just test collection?  If adding examples becomes part of this.
+# 4) Have to look into Install in detail
+# 	a) All the node_modules and what dir they are in.
+# 	b) All the venvs and what dir they are in.
+# 	c) Where the requirements.txt for each venv is.
+# 	d) Do we need multiple node_modules
+# 	e) Do we need multiple venvs.
+# 5) Echo start and stop of all composite targets.
+# 6) Clean up naming (e.g. postman prefix)
+# 
+
+# ========================================================================
+# DATA DICTIONARY TO OPENAPI CONVERSION
+# ========================================================================
+# Convert EBNF data dictionary to OpenAPI specification
+.PHONY: ebnf-dd-to-openapi-spec
+ebnf-dd-to-openapi-spec: venv
+	$(MAKE) install
+	$(MAKE) generate-and-validate-openapi-spec
+
+# Generate and Upload the Postman Linked Collection
+# Using post-process flattening approach
+.PHONY: postman-create-linked-collection
+postman-create-linked-collection:
+	$(MAKE) postman-api-linked-collection-generate
+	$(MAKE) postman-linked-collection-flatten
+	$(MAKE) postman-linked-collection-upload
+	$(MAKE) postman-linked-collection-link
+
+# Legacy workflow with post-process flattening (if needed)
+.PHONY: postman-create-linked-collection-legacy
+postman-create-linked-collection-legacy:
+	$(MAKE) postman-api-linked-collection-generate
+	$(MAKE) postman-linked-collection-flatten
+	$(MAKE) postman-linked-collection-upload
+	$(MAKE) postman-linked-collection-link
+
+# Generate, Add Tests, Validate, Fix, and Upload the Test Collection
+# Using post-process flattening
+.PHONY: postman-create-test-collection
+postman-create-test-collection:
+	$(MAKE) postman-test-collection-generate
+	$(MAKE) postman-test-collection-add-examples || echo "⚠️  Skipping examples (optional step)."
+	$(MAKE) postman-test-collection-merge-overrides
+	$(MAKE) postman-test-collection-add-tests || echo "⚠️  Skipping adding tests (optional step)."
+	$(MAKE) postman-test-collection-diff-tests
+	$(MAKE) postman-test-collection-auto-fix
+	$(MAKE) postman-test-collection-fix-v2
+	$(MAKE) postman-test-collection-validate
+	$(MAKE) verify-urls
+	$(MAKE) fix-urls
+	$(MAKE) postman-test-collection-validate
+	$(MAKE) postman-test-collection-flatten-rename
+	$(MAKE) postman-test-collection-upload
+
+# Legacy test collection workflow with post-process flattening
+.PHONY: postman-create-test-collection-legacy
+postman-create-test-collection-legacy:
+	$(MAKE) postman-test-collection-generate
+	$(MAKE) postman-test-collection-add-examples || echo "⚠️  Skipping examples (optional step)."
+	$(MAKE) postman-test-collection-merge-overrides
+	$(MAKE) postman-test-collection-add-tests || echo "⚠️  Skipping adding tests (optional step)."
+	$(MAKE) postman-test-collection-diff-tests
+	$(MAKE) postman-test-collection-auto-fix
+	$(MAKE) postman-test-collection-fix-v2
+	$(MAKE) postman-test-collection-validate
+	$(MAKE) verify-urls
+	$(MAKE) fix-urls
+	$(MAKE) postman-test-collection-validate
+	$(MAKE) postman-test-collection-flatten-rename
+	$(MAKE) postman-test-collection-upload
+
+# TODO: Ask Claude if this makes sense without install and venv like below.
+.PHONY: generate-and-validate-openapi-spec
+generate-and-validate-openapi-spec:
+	$(MAKE) generate-openapi-spec-from-ebnf-dd
+	$(MAKE) open-api-spec-lint
+	$(MAKE) open-api-spec-diff
+	$(MAKE) clean-openapi-spec-diff
+
 # Create both environment and mock server in sequence
-.PHONY: env-and-mock
-env-and-mock:
+.PHONY: postman-create-mock-and-env
+postman-create-mock-and-env:
 	$(MAKE) postman-mock-create
 	$(MAKE) postman-env-create
 	$(MAKE) postman-env-upload
@@ -369,17 +466,56 @@ run-postman-and-prism-tests:
 	$(MAKE) prism-mock-test
 	$(MAKE) postman-mock
 
-# Rebuild everything without deleting existing resources
-.PHONY: rebuild-all-no-delete
-rebuild-all-no-delete:
-	$(MAKE) install
-	$(MAKE) generate-openapi-spec-from-dd
-	$(MAKE) lint
-	$(MAKE) postman-collection-build-and-test
+.PHONY: postman-docs-build-and serve-up
+postman-docs-build-and-serve-up:
+	# Generate and serve documentation
+	$(MAKE) docs-build
+	# use docs-serve-bg if you don't want blocking here
+	$(MAKE) docs-serve
 
 # ========================================================================
-# CLEANUP TARGETS
+# MAIN BUILD AND TEST PIPELINE
+# Complete pipeline from OpenAPI spec to
+#	deployed mock server and documentation.
+# Note that the data dictionary to OpenAPI conversion is done separately.
+# This is because it is not done every time we recreate the Postman
+#	instance.
 # ========================================================================
+
+.PHONY: postman-instance-build-and-test
+postman-instance-build-and-test:
+	@echo "🚀 Starting Postman build and test..."
+	# Authentication
+	$(MAKE) postman-login
+	# Import OpenAPI spec into Postman
+	$(MAKE) postman-import-openapi-spec
+	# Create standalone spec in Specs tab
+	$(MAKE) postman-spec-create-standalone
+	# Generate and link standard collection
+	$(MAKE) postman-create-linked-collection
+	$(MAKE) postman-create-test-collection
+	$(MAKE) postman-create-mock-and-env
+	# Start local mock and run tests
+	$(MAKE) prism-start
+	$(MAKE) postman-mock
+	# Generate and serve documentation
+	$(MAKE) postman-docs-build-and-serve-up
+
+# ---
+# TODO: Need to determine if there is a need for this.
+# Control variable for optional full publish
+# RUN_FULL_PUBLISH ?= 0
+# ---
+# ---
+# TODO: Need to determine if there is a need for this.
+# Optional full publish to Postman
+#	@if [ "$$(RUN_FULL_PUBLISH)" = "1" ]; then \
+#		$(MAKE) postman-api-full-publish; \
+#	else \
+#		echo "🔕 Skipping postman-api-full-publish (RUN_FULL_PUBLISH=$$(RUN_FULL_PUBLISH))"; \
+#	fi
+# ---
+
 # Complete cleanup of all Postman resources in the workspace
 .PHONY: postman-cleanup-all
 postman-cleanup-all:
@@ -390,87 +526,41 @@ postman-cleanup-all:
 	$(MAKE) postman-delete-environments
 	$(MAKE) postman-api-clean-trash
 	$(MAKE) postman-delete-specs
-
-# ========================================================================
-# DATA DICTIONARY TO OPENAPI CONVERSION
-# ========================================================================
-# Convert EBNF data dictionary to OpenAPI specification
-.PHONY: postman-dd-to-openapi
-postman-dd-to-openapi: venv
-	$(MAKE) install
-	$(MAKE) generate-openapi-spec-from-dd
-	$(MAKE) lint
-
-# ========================================================================
-# POSTMAN LOGIN AND LINKING
-# ========================================================================
-# Authenticate and set up Postman API connections
-.PHONY: postman-login-to-link
-postman-login-to-link:
-	@echo "🚀 Starting Postman build and test..."
-	$(MAKE) postman-login
-	$(MAKE) postman-api-import
-	$(MAKE) postman-api-linked-collection-generate
-	$(MAKE) postman-linked-collection-upload
-	$(MAKE) postman-linked-collection-link
-
-# ========================================================================
-# MAIN BUILD AND TEST PIPELINE
-# ========================================================================
-# Control variable for optional full publish
-RUN_FULL_PUBLISH ?= 0
-
-# Complete pipeline from OpenAPI spec to deployed mock server and documentation
-.PHONY: postman-collection-build-and-test
-postman-collection-build-and-test:
-	@echo "🚀 Starting Postman build and test..."
-	# Authentication and initial setup
-	$(MAKE) postman-login
-	$(MAKE) postman-api-import
-	
-	# Generate and link collection
-	$(MAKE) postman-api-linked-collection-generate
-	$(MAKE) postman-linked-collection-upload
-	$(MAKE) postman-linked-collection-link
-	
-	# Optional full publish to Postman
-	@if [ "$(RUN_FULL_PUBLISH)" = "1" ]; then \
-		$(MAKE) postman-api-full-publish; \
-	else \
-		echo "🔕 Skipping postman-api-full-publish (RUN_FULL_PUBLISH=$(RUN_FULL_PUBLISH))"; \
-	fi
-	
-	# Generate test collection with examples and tests
-	$(MAKE) postman-test-collection-generate
-	$(MAKE) postman-test-collection-add-examples || echo "⚠️  Skipping examples (optional step)."
-	$(MAKE) postman-test-collection-merge-overrides
-	$(MAKE) postman-test-collection-add-tests || echo "⚠️  Skipping adding tests (optional step)."
-	
-	# Validate and fix collection
-	$(MAKE) postman-test-collection-diff-tests
-	$(MAKE) postman-test-collection-auto-fix
-	$(MAKE) postman-test-collection-fix-v2
-	$(MAKE) postman-test-collection-validate
-	$(MAKE) verify-urls
-	$(MAKE) fix-urls
-	$(MAKE) postman-test-collection-validate
-	
-	# Upload and configure mock server
-	$(MAKE) postman-test-collection-upload
-	$(MAKE) postman-mock-create
-	$(MAKE) postman-env-create
-	$(MAKE) postman-env-upload
-	$(MAKE) update-mock-env
-	
-	# Start local mock and run tests
-	$(MAKE) prism-start
-	$(MAKE) postman-mock
-	
-	# Generate and serve documentation
-	$(MAKE) docs-build
-	# use docs-serve-bg if you don't want blocking here
-	$(MAKE) docs-serve
 	@echo "✅ Postman cleanup complete for workspace $(POSTMAN_WS)."
+
+
+# Rebuild Postman instance without deleting existing resources
+.PHONY: rebuild-postman-instance-no-delete
+rebuild-postman-instance-no-delete:
+	$(MAKE) postman-instance-build-and-test
+
+# Rebuild Postman instance after deleting existing resources
+.PHONY: rebuild-postman-instance-with-delete
+rebuild-postman-instance-with-delete:
+	$(MAKE) postman-cleanup-all
+	$(MAKE) rebuild-postman-instance-no-delete
+
+# Rebuild everything without deleting existing resources
+.PHONY: rebuild-all-no-delete
+rebuild-all-no-delete:
+	$(MAKE) install
+	$(MAKE) generate-and-validate-openapi-spec
+	$(MAKE) rebuild-postman-instance-no-delete
+
+# Delete existing resources and rebuild everything.
+.PHONY: rebuild-all-with-delete
+rebuild-all-with-delete:
+	$(MAKE) postman-cleanup-all
+	$(MAKE) rebuild-all-no-delete
+
+# Delete and rebuild with flattened collections
+.PHONY: rebuild-all-with-delete-flat
+rebuild-all-with-delete-flat:
+	@echo "🏗️  Starting full rebuild with FLATTENED collections..."
+	$(MAKE) postman-cleanup-all
+	$(MAKE) rebuild-all-no-delete
+	@echo "✅ Rebuild complete with flattened collections!"
+
 
 # ========================================================================
 # PYTHON VIRTUAL ENVIRONMENT
@@ -488,10 +578,10 @@ venv:
 # Print OpenAPI-related variables for debugging
 .PHONY: print-openapi-vars
 print-openapi-vars:
-	@echo "OPENAPI_DIR                         = $(OPENAPI_DIR)"
-	@echo "C2MAPIV2_OPENAPI_SPEC              = $(C2MAPIV2_OPENAPI_SPEC)"
-	@echo "C2MAPIV2_MAIN_SPEC_PATH            = $(C2MAPIV2_MAIN_SPEC_PATH)"
-	@echo "C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES= $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES)"
+	@echo "OPENAPI_DIR                         	= $(OPENAPI_DIR)"
+	@echo "C2MAPIV2_OPENAPI_SPEC              	= $(C2MAPIV2_OPENAPI_SPEC)"
+	@echo "C2MAPIV2_MAIN_SPEC_PATH            	= $(C2MAPIV2_MAIN_SPEC_PATH)"
+	@echo "C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES	= $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES)"
 
 # ========================================================================
 # INSTALLATION
@@ -505,6 +595,7 @@ postman-apis: ## List all Postman APIs
 	"https://api.getpostman.com/apis" | jq .
 
 # Check mock server URL configuration
+.PHONY: check-mock
 check-mock:
 	echo $(PRISM_MOCK_URL)
 
@@ -525,8 +616,8 @@ install:
 # OPENAPI SPECIFICATION GENERATION
 # ========================================================================
 # Convert EBNF data dictionary to OpenAPI specification
-.PHONY: generate-openapi-spec-from-dd
-generate-openapi-spec-from-dd:
+.PHONY: generate-openapi-spec-from-ebnf-dd
+generate-openapi-spec-from-ebnf-dd:
 	@echo "📤 Converting the EBNF Data Dictionary to an OpenAPI YAML Specification."
 
 	# --- Validate required files and script ---
@@ -549,24 +640,24 @@ generate-openapi-spec-from-dd:
 # OPENAPI VALIDATION AND LINTING
 # ========================================================================
 # Validate OpenAPI specification with multiple linters
-.PHONY: lint
-lint:
+.PHONY: openapi-spec-lint
+open-api-spec-lint:
 	$(REDOCLY) lint $(C2MAPIV2_OPENAPI_SPEC)
 	$(SPECTRAL) lint $(C2MAPIV2_OPENAPI_SPEC)
 
 # Compare current spec with main branch version
-.PHONY: diff
-diff:
+.PHONY: openapi-spec-diff
+open-api-spec-diff:
 	@echo "📤 Fetching latest from origin/main…"
 	git fetch origin
 	@echo "🧾 Checking out previous version of spec for diff comparison…"
 	git show $(C2MAPIV2_MAIN_SPEC_PATH) > $(PREVIOUS_C2MAPIV2_OPENAPI_SPEC)
 	@echo "🔍 Running openapi-diff…"
-	openapi-diff $(PREVIOUS_C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC) --fail-on-incompatible
+	-openapi-diff $(PREVIOUS_C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC) --fail-on-incompatible
 
 # Clean up diff temporary files
-.PHONY: clean-diff
-clean-diff:
+.PHONY: clean-openapi-spec-diff
+clean-openapi-spec-diff:
 	rm -f $(PREVIOUS_C2MAPIV2_OPENAPI_SPEC)
 
 # ========================================================================
@@ -593,46 +684,179 @@ fix-yaml:
 	@$(VENV_PYTHON) -c "import yaml; print('✅ PyYAML import successful:', yaml.__version__)"
 
 # ========================================================================
-# POSTMAN API IMPORT
+# POSTMAN API IMPORT OPTIONS
 # ========================================================================
-# Import OpenAPI specification into Postman workspace
-.PHONY: postman-api-import
-postman-api-import:
-	@echo "📥 Importing OpenAPI definition $(C2MAPIV2_OPENAPI_SPEC) into Postman workspace $(POSTMAN_WS)..."
-	@CONTENT=$(jq -Rs . < "$(C2MAPIV2_OPENAPI_SPEC)"); \
-	PAYLOAD=$(jq -n \
-		--arg name "$(POSTMAN_API_NAME)" \
-		--arg schema "$CONTENT" \
-		'{ name: $name, schema: { type: "openapi3", language: "yaml", schema: $schema } }'); \
-	API_RESPONSE=$( $(call curl_json_xcaa,\
-		--request POST "$(POSTMAN_APIS_URL)?workspaceId=$(POSTMAN_WS)",\
-		--data "$PAYLOAD" \
-	); ); \
-	echo "$API_RESPONSE" | jq . > postman/import-debug.json || echo "$API_RESPONSE" > postman/import-debug.json; \
-	API_ID=$(echo "$API_RESPONSE" | jq -r '.id // empty'); \
-	if [ -z "$API_ID" ]; then \
-		echo "❌ Failed to import API. Check postman/import-debug.json for details."; \
+
+# OPTION A1: Import OpenAPI with folderStrategy=none (native Postman flattening)
+.PHONY: postman-import-openapi-flat-native
+postman-import-openapi-flat-native:
+	@echo "📥 Importing OpenAPI from file $(C2MAPIV2_OPENAPI_SPEC) with native flattening (folderStrategy=none)..."
+	@mkdir -p $(POSTMAN_DIR)
+	@curl --silent --location --request POST "$(POSTMAN_BASE_URL)/import/openapi?workspace=$(POSTMAN_WS)" \
+		-H "X-Api-Key: $(POSTMAN_API_KEY)" \
+		--form "type=file" \
+		--form "input=@$(C2MAPIV2_OPENAPI_SPEC)" \
+		--form 'parameters={"folderStrategy":"none"}' \
+	| tee $(POSTMAN_DIR)/import-flat-native.json >/dev/null
+	@COLLECTION_UID=$$(jq -r '.collections[0].uid // empty' $(POSTMAN_DIR)/import-flat-native.json); \
+	if [ -z "$$COLLECTION_UID" ]; then \
+		echo "❌ Import failed. Response:"; \
+		cat $(POSTMAN_DIR)/import-flat-native.json | jq . || cat $(POSTMAN_DIR)/import-flat-native.json; \
 		exit 1; \
 	else \
-		echo "✅ Imported API with ID: $API_ID"; \
-		echo "$API_ID" > "$(POSTMAN_API_UID_FILE)"; \
-		echo "📄 API ID saved to $(POSTMAN_API_UID_FILE)"; \
+		echo "✅ Imported flat collection UID: $$COLLECTION_UID"; \
+		echo $$COLLECTION_UID > $(POSTMAN_DIR)/native-flat-collection-uid.txt; \
 	fi
+
+# OPTION A2: Import and create API definition (shows under APIs, not Specs)
+.PHONY: postman-import-openapi-as-api
+postman-import-openapi-as-api:
+	@echo "📥 Importing OpenAPI as API definition (shows under APIs)..."
+	@CONTENT=$$(jq -Rs . < "$(C2MAPIV2_OPENAPI_SPEC)"); \
+	PAYLOAD=$$(jq -n \
+		--arg name "$(POSTMAN_API_NAME)" \
+		--arg schema "$$CONTENT" \
+		'{ name: $$name, schema: { type: "openapi3", language: "yaml", schema: $$schema } }'); \
+	API_RESPONSE=$$( $(call curl_json_xcaa,\
+		--request POST "$(POSTMAN_APIS_URL)?workspaceId=$(POSTMAN_WS)",\
+		--data "$$PAYLOAD" \
+	); ); \
+	echo "$$API_RESPONSE" | jq . > postman/import-api-debug.json || echo "$$API_RESPONSE" > postman/import-api-debug.json; \
+	API_ID=$$(echo "$$API_RESPONSE" | jq -r '.id // empty'); \
+	if [ -z "$$API_ID" ]; then \
+		echo "❌ Failed to import API. Check postman/import-api-debug.json for details."; \
+		exit 1; \
+	else \
+		echo "✅ Imported API with ID: $$API_ID"; \
+		echo $$API_ID > $(POSTMAN_API_UID_FILE); \
+	fi
+
+# OPTION B: Current implementation - post-process flattening
+.PHONY: postman-import-openapi-then-flatten
+postman-import-openapi-then-flatten:
+	@echo "📥 Using current implementation: Generate collection then flatten (Option B)..."
+	$(MAKE) postman-api-linked-collection-generate
+	$(MAKE) postman-linked-collection-flatten
+	$(MAKE) postman-linked-collection-upload
+
+# Show all import options
+.PHONY: postman-import-help
+postman-import-help:
+	@echo "=========================================="
+	@echo "POSTMAN IMPORT OPTIONS:"
+	@echo "=========================================="
+	@echo ""
+	@echo "🔸 postman-import-openapi-flat-native"
+	@echo "   Import OpenAPI with native Postman flattening (folderStrategy=none)"
+	@echo "   Creates a flat collection directly from OpenAPI"
+	@echo ""
+	@echo "🔸 postman-import-openapi-as-api"
+	@echo "   Import OpenAPI as API definition (shows under APIs tab)"
+	@echo "   This is the current default behavior"
+	@echo ""
+	@echo "🔸 postman-import-openapi-then-flatten"
+	@echo "   Generate collection then flatten using jq (Option B)"
+	@echo "   Current implementation for test collections"
+	@echo ""
+	@echo "🔸 postman-spec-create"
+	@echo "   Create/update spec that shows under Specs tab"
+	@echo "   Requires API to exist first"
+	@echo ""
+	@echo "🔸 postman-api-full-publish"
+	@echo "   Full publish that deletes existing specs first"
+	@echo "   Creates fresh spec under Specs tab"
+	@echo "==========================================="
+
+# Default import - create API and use post-process flattening for now
+.PHONY: postman-import-openapi-spec
+postman-import-openapi-spec:
+	@echo "📥 Importing OpenAPI and creating API definition..."
+	# Create the API definition
+	$(MAKE) postman-import-openapi-as-api
+
+# ========================================================================
+# POSTMAN SPEC MANAGEMENT (Shows under "Specs" tab)
+# ========================================================================
+
+# Create or update spec (shows under Specs tab, not APIs tab)
+.PHONY: postman-spec-create
+postman-spec-create:
+	@echo "📄 Creating/updating OpenAPI spec under Specs tab..."
+	@CONTENT=$$(jq -Rs . < "$(C2MAPIV2_OPENAPI_SPEC)"); \
+	jq -n \
+		--arg name "$(C2MAPIV2_POSTMAN_API_NAME_PC)" \
+		--arg type "openapi3" \
+		--arg path "openapi.yaml" \
+		--arg content "$$CONTENT" \
+		'{ type: $$type, files: [{ path: $$path, content: $$content }] }' \
+		> "$(POSTMAN_DIR)/spec-payload.json"
+	@RESPONSE=$$(curl --silent --location --request POST "$(POSTMAN_BASE_URL)/apis/$(shell cat $(POSTMAN_API_UID_FILE))/versions/1.0.0/schemas" \
+		$(POSTMAN_CURL_HEADERS_XC) \
+		--data-binary "@$(POSTMAN_DIR)/spec-payload.json"); \
+	echo "$$RESPONSE" | jq . > $(POSTMAN_DIR)/spec-create-response.json || echo "$$RESPONSE" > $(POSTMAN_DIR)/spec-create-response.json; \
+	SPEC_ID=$$(echo "$$RESPONSE" | jq -r '.id // empty'); \
+	if [ -n "$$SPEC_ID" ]; then \
+		echo "✅ Spec created/updated with ID: $$SPEC_ID"; \
+		echo $$SPEC_ID > $(POSTMAN_DIR)/spec-id.txt; \
+	else \
+		echo "❌ Failed to create spec. Check $(POSTMAN_DIR)/spec-create-response.json"; \
+	fi
+
+# Create standalone spec in Specs tab (without deleting existing)
+.PHONY: postman-spec-create-standalone
+postman-spec-create-standalone:
+	@echo "🧹 Deleting existing specs with the same name before creating new one..."
+	$(MAKE) postman-delete-specs-by-name NAME="$(C2MAPIV2_POSTMAN_API_NAME_PC)"
+	@echo "📄 Creating standalone spec in Specs tab..."
+	@CONTENT=$$(cat "$(C2MAPIV2_OPENAPI_SPEC)"); \
+	jq -n \
+		--arg name "$(C2MAPIV2_POSTMAN_API_NAME_PC)" \
+		--arg type "OPENAPI:3.0" \
+		--arg content "$$CONTENT" \
+		'{ \
+			name: $$name, \
+			type: $$type, \
+			files: [{ \
+				path: "openapi.yaml", \
+				content: $$content \
+			}] \
+		}' > "$(POSTMAN_DIR)/spec-standalone-payload.json"
+	@RESPONSE=$$(curl --silent --location --request POST "$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS)" \
+		$(POSTMAN_CURL_HEADERS_XC) \
+		--data-binary "@$(POSTMAN_DIR)/spec-standalone-payload.json"); \
+	echo "$$RESPONSE" | jq . > $(POSTMAN_DIR)/spec-standalone-response.json || echo "$$RESPONSE" > $(POSTMAN_DIR)/spec-standalone-response.json; \
+	SPEC_ID=$$(echo "$$RESPONSE" | jq -r '.id // empty'); \
+	if [ -n "$$SPEC_ID" ]; then \
+		echo "✅ Standalone spec created with ID: $$SPEC_ID"; \
+		echo "📍 View in Postman: Specs tab → $(C2MAPIV2_POSTMAN_API_NAME_PC)"; \
+		echo $$SPEC_ID > $(POSTMAN_DIR)/spec-standalone-id.txt; \
+	else \
+		echo "❌ Failed to create standalone spec. Check $(POSTMAN_DIR)/spec-standalone-response.json"; \
+		cat $(POSTMAN_DIR)/spec-standalone-response.json | jq . || cat $(POSTMAN_DIR)/spec-standalone-response.json; \
+	fi
+
+# List all specs in workspace
+.PHONY: postman-spec-list
+postman-spec-list:
+	@echo "📋 Listing all specs in workspace..."
+	@curl --silent --location "$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS)" \
+		$(POSTMAN_CURL_HEADERS_XC) | jq '.specs // [] | .[] | {id: .id, name: .name, type: .type}'
 
 # ========================================================================
 # POSTMAN FULL PUBLISH
 # ========================================================================
 # Publish complete specification to Postman (deletes existing specs first)
+.PHONY: postman-api-full-publish
 postman-api-full-publish:
 	@echo "🚀 Starting full Postman Spec publish..."
 
 	# Fetch all existing specs in the workspace
-	@SPECS=$( $(call curl_json,"$(POSTMAN_SPECS_URL)$(POSTMAN_Q_ID)","") | jq -r '.data[].id' ); \
-	if [ -n "$SPECS" ]; then \
+	@SPECS=$$( $(call curl_json,"$(POSTMAN_SPECS_URL)$(POSTMAN_Q_ID)","") | jq -r '.specs[].id' ); \
+	if [ -n "$$SPECS" ]; then \
 		echo "🧹 Deleting all existing specs in workspace $(POSTMAN_WS)..."; \
-		for ID in $SPECS; do \
-			echo "   ➡️ Deleting spec $ID..."; \
-			$(call curl_json,--request DELETE "$(POSTMAN_SPECS_URL)/$ID","") | jq .; \
+		for ID in $$SPECS; do \
+			echo "   ➡️ Deleting spec $$ID..."; \
+			$(call curl_json,--request DELETE "$(POSTMAN_SPECS_URL)/$$ID","") | jq .; \
 		done; \
 	else \
 		echo "ℹ️ No existing specs found. Skipping deletion."; \
@@ -640,13 +864,13 @@ postman-api-full-publish:
 
 	# Build payload JSON for new spec (YAML as raw string; no fromjson)
 	@echo "🆕 Creating a fresh Postman Spec with $(C2MAPIV2_OPENAPI_SPEC)..."
-	@CONTENT=$(jq -Rs . < "$(C2MAPIV2_OPENAPI_SPEC)"); \
+	@CONTENT=$$(jq -Rs . < "$(C2MAPIV2_OPENAPI_SPEC)"); \
 	jq -n \
 		--arg name "$(C2MAPIV2_POSTMAN_API_NAME_PC)" \
 		--arg type "OPENAPI:3.0" \
 		--arg path "index.yaml" \
-		--arg content "$CONTENT" \
-		'{ name: $name, type: $type, files: [ { path: $path, content: $content } ] }' \
+		--arg content "$$CONTENT" \
+		'{ name: $$name, type: $$type, files: [ { path: $$path, content: $$content } ] }' \
 		> "$(POSTMAN_FULL_PAYLOAD)"
 
 	# Create a new spec
@@ -654,19 +878,21 @@ postman-api-full-publish:
 		| tee "$(POSTMAN_FULL_RESPONSE)" > /dev/null
 
 	# Extract and save SPEC_ID
-	@SPEC_ID=$(jq -r '.id // empty' "$(POSTMAN_FULL_RESPONSE)"); \
-	if [ -z "$SPEC_ID" ]; then \
+	@SPEC_ID=$$(jq -r '.id // empty' "$(POSTMAN_FULL_RESPONSE)"); \
+	if [ -z "$$SPEC_ID" ]; then \
 		echo "❌ Failed to create a fresh spec. See $(POSTMAN_FULL_RESPONSE)."; \
 		exit 1; \
 	else \
-		echo "✅ Fresh spec created with ID: $SPEC_ID"; \
-		echo "$SPEC_ID" > "$(POSTMAN_SPEC_ID_FILE)"; \
+		echo "✅ Fresh spec created with ID: $$SPEC_ID"; \
+		echo "$$SPEC_ID" > "$(POSTMAN_SPEC_ID_FILE)"; \
 	fi
 
 # ========================================================================
 # POSTMAN COLLECTION GENERATION
 # ========================================================================
+
 # Generate Postman collection from OpenAPI spec and add metadata
+.PHONY: postman-api-linked-collection-generate
 postman-api-linked-collection-generate: | $(POSTMAN_DIR) $(POSTMAN_GENERATED_DIR)
 	@echo "📦 Generating Postman collection from $(C2MAPIV2_OPENAPI_SPEC)..."
 	$(GENERATOR_OFFICIAL) -s $(C2MAPIV2_OPENAPI_SPEC) -o $(POSTMAN_COLLECTION_RAW) -p
@@ -678,21 +904,51 @@ postman-api-linked-collection-generate: | $(POSTMAN_DIR) $(POSTMAN_GENERATED_DIR
 	@echo "✅ Collection generated with 'info' block at $(POSTMAN_COLLECTION_RAW)"
 
 # ========================================================================
+# LINKED COLLECTION FLATTENING
+# ========================================================================
+# Flatten linked collection structure
+POSTMAN_LINKED_COLLECTION_FLAT := $(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-linked-collection-flat.json
+
+.PHONY: postman-linked-collection-flatten
+postman-linked-collection-flatten:
+	@echo "🧹 Flattening linked collection from $(POSTMAN_COLLECTION_RAW)..."
+	@$(call guard-file,$(POSTMAN_COLLECTION_RAW))
+	@jq '\
+	  def all_items(i): \
+	    (i // []) as $$a \
+	    | [ $$a[] | if has("item") then all_items(.item)[] else . end ]; \
+	  def req_name(r): \
+	    (r.request.method // "REQ") as $$m \
+	    | (r.request.url.path // []) as $$p \
+	    | ($$p | join("/")) as $$path \
+	    | if $$path == "" then $$m else ($$m + " /" + $$path) end; \
+	  .item = (all_items(.item) | map( .name = req_name(.) )) \
+	' $(POSTMAN_COLLECTION_RAW) > $(POSTMAN_LINKED_COLLECTION_FLAT)
+	@echo "✅ Linked collection flattened with renamed requests"
+
+# ========================================================================
 # POSTMAN COLLECTION UPLOAD
 # ========================================================================
-# Upload generated collection to Postman workspace
+# Upload generated collection to Postman workspace (with optional flattening)
 .PHONY: postman-linked-collection-upload
 postman-linked-collection-upload:
-	@echo "📤 Uploading Postman collection $(POSTMAN_COLLECTION_RAW) to workspace $(POSTMAN_WS)..."
-	@COLLECTION_UID=$(jq -c '{collection: .}' $(POSTMAN_COLLECTION_RAW) | \
+	@# Check if we should use flattened version
+	@if [ -f "$(POSTMAN_LINKED_COLLECTION_FLAT)" ]; then \
+		UPLOAD_FILE="$(POSTMAN_LINKED_COLLECTION_FLAT)"; \
+		echo "📤 Uploading FLATTENED linked collection $$UPLOAD_FILE to workspace $(POSTMAN_WS)..."; \
+	else \
+		UPLOAD_FILE="$(POSTMAN_COLLECTION_RAW)"; \
+		echo "📤 Uploading Postman collection $$UPLOAD_FILE to workspace $(POSTMAN_WS)..."; \
+	fi; \
+	COLLECTION_UID=$$(jq -c '{collection: .}' "$$UPLOAD_FILE" | \
 		curl --silent --location --request POST "$(POSTMAN_COLLECTIONS_URL)?workspace=$(POSTMAN_WS)" \
 			$(POSTMAN_CURL_HEADERS_XC) \
 			--data-binary @- | jq -r '.collection.uid'); \
-	if [ "$COLLECTION_UID" = "null" ] || [ -z "$COLLECTION_UID" ]; then \
+	if [ "$$COLLECTION_UID" = "null" ] || [ -z "$$COLLECTION_UID" ]; then \
 		echo "❌ Failed to upload collection"; exit 1; \
 	else \
-		echo "✅ Collection uploaded with UID: $COLLECTION_UID"; \
-		echo $COLLECTION_UID > $(POSTMAN_LINKED_COLLECTION_UID_FILE); \
+		echo "✅ Collection uploaded with UID: $$COLLECTION_UID"; \
+		echo $$COLLECTION_UID > $(POSTMAN_LINKED_COLLECTION_UID_FILE); \
 	fi
 	@echo " "
 	@echo " "
@@ -707,16 +963,16 @@ postman-linked-collection-upload:
 postman-linked-collection-link:
 	@echo "🔗 Linking collection to API $(POSTMAN_API_NAME)..."
 	@if [ ! -f $(POSTMAN_API_UID_FILE) ]; then \
-		echo "❌ Missing API UID file: $(POSTMAN_API_UID_FILE). Run postman-api-import first."; exit 1; \
+		echo "❌ Missing API UID file: $(POSTMAN_API_UID_FILE). Run postman-import-openapi-spec first."; exit 1; \
 	fi
 	@if [ ! -f $(POSTMAN_LINKED_COLLECTION_UID_FILE) ]; then \
 		echo "❌ Missing collection UID file: $(POSTMAN_LINKED_COLLECTION_UID_FILE). Run postman-collection-upload first."; exit 1; \
 	fi
-	@API_ID=$(cat $(POSTMAN_API_UID_FILE)); \
-	COLLECTION_UID=$(cat $(POSTMAN_LINKED_COLLECTION_UID_FILE)); \
-	echo "🔗 Copying and linking collection $COLLECTION_UID to API $API_ID..."; \
-	jq -n --arg coll "$COLLECTION_UID" '{operationType: "COPY_COLLECTION", data: {collectionId: $coll}}' > $(POSTMAN_LINK_PAYLOAD); \
-	curl --silent --location --request POST "$(POSTMAN_APIS_URL)/$API_ID/collections" \
+	@API_ID=$$(cat $(POSTMAN_API_UID_FILE)); \
+	COLLECTION_UID=$$(cat $(POSTMAN_LINKED_COLLECTION_UID_FILE)); \
+	echo "🔗 Copying and linking collection $$COLLECTION_UID to API $$API_ID..."; \
+	jq -n --arg coll "$$COLLECTION_UID" '{operationType: "COPY_COLLECTION", data: {collectionId: $$coll}}' > $(POSTMAN_LINK_PAYLOAD); \
+	curl --silent --location --request POST "$(POSTMAN_APIS_URL)/$$API_ID/collections" \
 		$(POSTMAN_CURL_HEADERS_XC) \
 		$(POSTMAN_CURL_HEADERS_AA) \
 		--data-binary "@$(POSTMAN_LINK_PAYLOAD)" | tee $(POSTMAN_LINK_DEBUG)
@@ -728,7 +984,24 @@ postman-linked-collection-link:
 # ========================================================================
 # TEST COLLECTION GENERATION
 # ========================================================================
-# Generate test collection with appropriate metadata
+
+# Generate test collection from native flattened import
+.PHONY: postman-test-collection-generate-from-flat
+postman-test-collection-generate-from-flat: | $(POSTMAN_GENERATED_DIR)
+	@echo "📦 Preparing test collection from native flattened import..."
+	@if [ ! -f $(POSTMAN_DIR)/import-flat-native.json ]; then \
+		echo "❌ Native flat import not found. Run postman-import-openapi-spec first."; \
+		exit 1; \
+	fi
+	# Extract the collection from import response and update metadata
+	@jq '.collections[0]' $(POSTMAN_DIR)/import-flat-native.json | \
+	JQ_INFO_NAME="$(POSTMAN_TEST_COLLECTION_NAME)" \
+	JQ_INFO_SCHEMA="$(POSTMAN_SCHEMA_V2)" \
+	$(call jqf,$(JQ_ADD_INFO_FILE),.) > $(POSTMAN_COLLECTION_RAW)
+	@echo "✅ Test collection prepared from native flat import at $(POSTMAN_COLLECTION_RAW)"
+
+# Legacy: Generate test collection with appropriate metadata
+.PHONY: postman-test-collection-generate
 postman-test-collection-generate: | $(POSTMAN_GENERATED_DIR)
 	@echo "📦 Preparing testing collection from $(POSTMAN_COLLECTION_RAW)..."
 	@JQ_INFO_NAME="$(POSTMAN_TEST_COLLECTION_NAME)" \
@@ -827,6 +1100,7 @@ postman-test-collection-diff-tests-vscode:
 # COLLECTION AUTO-FIX
 # ========================================================================
 # Fix invalid collection items automatically
+.PHONY: postman-test-collection-auto-fix
 postman-test-collection-auto-fix: | $(POSTMAN_GENERATED_DIR)
 	@echo "🛠 Auto-fixing invalid items in $(POSTMAN_TEST_COLLECTION_WITH_TESTS)..."
 	$(call guard-file,$(POSTMAN_TEST_COLLECTION_WITH_TESTS))
@@ -861,11 +1135,13 @@ postman-test-collection-fix-v2:
 	@echo "✅ Collection URLs fixed: $(POSTMAN_TEST_COLLECTION_FIXED)"
 
 # Verify URLs in collection
+.PHONY: verify-urls
 verify-urls:
 	@echo "🔍 Verifying URLs in $(POSTMAN_TEST_COLLECTION_FIXED)..."
 	$(call jqf,$(JQ_VERIFY_URLS_FILE),$(POSTMAN_TEST_COLLECTION_FIXED))
 
 # Fix URLs using jq filter
+.PHONY: fix-urls
 fix-urls:
 	@echo "🔧 Fixing URLs in $(POSTMAN_TEST_COLLECTION_FIXED)..."
 	$(call jqf,$(JQ_FIX_URLS_FILE),$(POSTMAN_TEST_COLLECTION_FIXED)) > $(POSTMAN_TEST_COLLECTION_FIXED).tmp
@@ -876,34 +1152,81 @@ fix-urls:
 # COLLECTION VALIDATION
 # ========================================================================
 # Validate Postman collection structure
+.PHONY: postman-test-collection-validate
 postman-test-collection-validate:
 	@echo "🔍 Validating Postman collection $(POSTMAN_TEST_COLLECTION_FIXED)..."
 	@node $(POSTMAN_VALIDATOR) "$(POSTMAN_TEST_COLLECTION_FIXED)"
 
 # ========================================================================
+# COLLECTION FLATTENING
+# ========================================================================
+# Flatten collection structure (remove folder hierarchy)
+POSTMAN_TEST_COLLECTION_FLAT := $(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-test-collection-flat.json
+
+.PHONY: postman-test-collection-flatten
+postman-test-collection-flatten:
+	@echo "🧹 Flattening collection (removing folder hierarchy) from $(POSTMAN_TEST_COLLECTION_FIXED)..."
+	@$(call guard-file,$(POSTMAN_TEST_COLLECTION_FIXED))
+	@jq '\
+	  def all_items(i): \
+	    (i // []) as $$a \
+	    | [ $$a[] | if has("item") then all_items(.item)[] else . end ]; \
+	  .item = all_items(.item) \
+	' $(POSTMAN_TEST_COLLECTION_FIXED) > $(POSTMAN_TEST_COLLECTION_FLAT)
+	@echo "✅ Collection flattened to $(POSTMAN_TEST_COLLECTION_FLAT)"
+	@echo "📊 Original items: $$(jq '[.. | .item? // empty] | add | length' $(POSTMAN_TEST_COLLECTION_FIXED))"
+	@echo "📊 Flattened items: $$(jq '.item | length' $(POSTMAN_TEST_COLLECTION_FLAT))"
+
+# Flatten with renamed requests (METHOD /path format)
+.PHONY: postman-test-collection-flatten-rename
+postman-test-collection-flatten-rename:
+	@echo "🧹 Flattening and renaming requests to 'METHOD /path' format..."
+	@$(call guard-file,$(POSTMAN_TEST_COLLECTION_FIXED))
+	@jq '\
+	  def all_items(i): \
+	    (i // []) as $$a \
+	    | [ $$a[] | if has("item") then all_items(.item)[] else . end ]; \
+	  def req_name(r): \
+	    (r.request.method // "REQ") as $$m \
+	    | (r.request.url.path // []) as $$p \
+	    | ($$p | join("/")) as $$path \
+	    | if $$path == "" then $$m else ($$m + " /" + $$path) end; \
+	  .item = (all_items(.item) | map( .name = req_name(.) )) \
+	' $(POSTMAN_TEST_COLLECTION_FIXED) > $(POSTMAN_TEST_COLLECTION_FLAT)
+	@echo "✅ Collection flattened with renamed requests"
+
+# ========================================================================
 # TEST COLLECTION UPLOAD
 # ========================================================================
-# Upload test collection to Postman
+# Upload test collection to Postman (with optional flattening)
+.PHONY: postman-test-collection-upload
 postman-test-collection-upload:
 	@echo "===== DEBUG: Postman Collection Upload Test Variables ====="
 	@echo "POSTMAN_API_KEY: $(POSTMAN_API_KEY)"
 	@echo "POSTMAN_WS: $(POSTMAN_WS)"
 	@echo "(POSTMAN_TEST_COLLECTION_FIXED): $(POSTMAN_TEST_COLLECTION_FIXED)"
 	@echo "==========================================================="
-	@$(call guard-file,$(POSTMAN_TEST_COLLECTION_FIXED))
-	@echo "📦 Using collection: $(POSTMAN_TEST_COLLECTION_FIXED)"
-	@RESPONSE=$(jq -c '{collection: .}' $(POSTMAN_TEST_COLLECTION_FIXED) | \
+	@# Check if we should use flattened version
+	@if [ -f "$(POSTMAN_TEST_COLLECTION_FLAT)" ]; then \
+		UPLOAD_FILE="$(POSTMAN_TEST_COLLECTION_FLAT)"; \
+		echo "📦 Using FLATTENED collection: $$UPLOAD_FILE"; \
+	else \
+		UPLOAD_FILE="$(POSTMAN_TEST_COLLECTION_FIXED)"; \
+		echo "📦 Using collection: $$UPLOAD_FILE"; \
+	fi; \
+	$(call guard-file,$$UPLOAD_FILE); \
+	RESPONSE=$$(jq -c '{collection: .}' "$$UPLOAD_FILE" | \
 		curl --silent --location --request POST "$(POSTMAN_COLLECTIONS_URL)?workspace=$(POSTMAN_WS)" \
 			$(POSTMAN_CURL_HEADERS_XC) \
 			--data-binary @-); \
-	echo "$RESPONSE" | jq . > "$(POSTMAN_UPLOAD_TEST_DEBUG)" || echo "$RESPONSE" > "$(POSTMAN_UPLOAD_TEST_DEBUG)"; \
-	COLLECTION_UID=$(echo "$RESPONSE" | jq -r '.collection.uid // empty'); \
-	if [ -z "$COLLECTION_UID" ] || [ "$COLLECTION_UID" = "null" ]; then \
+	echo "$$RESPONSE" | jq . > "$(POSTMAN_UPLOAD_TEST_DEBUG)" || echo "$$RESPONSE" > "$(POSTMAN_UPLOAD_TEST_DEBUG)"; \
+	COLLECTION_UID=$$(echo "$$RESPONSE" | jq -r '.collection.uid // empty'); \
+	if [ -z "$$COLLECTION_UID" ] || [ "$$COLLECTION_UID" = "null" ]; then \
 		echo "❌ Failed to upload test collection. See $(POSTMAN_UPLOAD_TEST_DEBUG)."; \
 		exit 1; \
 	else \
-		echo "✅ TEST Collection uploaded with UID: $COLLECTION_UID"; \
-		echo "$COLLECTION_UID" > "$(POSTMAN_TEST_COLLECTION_UID_FILE)"; \
+		echo "✅ TEST Collection uploaded with UID: $$COLLECTION_UID"; \
+		echo "$$COLLECTION_UID" > "$(POSTMAN_TEST_COLLECTION_UID_FILE)"; \
 		echo "📄 UID saved to $(POSTMAN_TEST_COLLECTION_UID_FILE)"; \
 	fi
 
@@ -919,14 +1242,14 @@ postman-env-create:
 			echo "⚠️  Missing mock URL file: $(POSTMAN_MOCK_URL_FILE)"; \
 			exit 1; \
 	fi
-	@MOCK_URL=$(cat $(POSTMAN_MOCK_URL_FILE)); \
-	echo "🌐 Using mock URL: $MOCK_URL"; \
+	@MOCK_URL=$$(cat $(POSTMAN_MOCK_URL_FILE)); \
+	echo "🌐 Using mock URL: $$MOCK_URL"; \
 	jq -n \
-		--arg baseUrl "$MOCK_URL" \
+		--arg baseUrl "$$MOCK_URL" \
 		--arg token "$(TOKEN)" \
 		-f scripts/env_template.jq \
 		> $(POSTMAN_ENV_FILE); \
-	echo "✅ Environment file written to $(POSTMAN_ENV_FILE) with baseUrl=$MOCK_URL"
+	echo "✅ Environment file written to $(POSTMAN_ENV_FILE) with baseUrl=$$MOCK_URL"
 
 # ========================================================================
 # ENVIRONMENT UPLOAD
@@ -935,35 +1258,19 @@ postman-env-create:
 .PHONY: postman-env-upload
 postman-env-upload:
 	@echo "📤 Uploading Postman environment file to workspace $(POSTMAN_WS)..."
-	@set -eu -o pipefail; \
-	ENV_URL="$(POSTMAN_ENVIRONMENTS_URL)"; \
-	Q="$(POSTMAN_Q)"; \
-	WS="$(POSTMAN_WS)"; \
-	printf '🔎 ENV_URL="%s"\n' "$ENV_URL"; \
-	printf '🔎 Q="%s"\n' "$Q"; \
-	printf '🔎 WS="%s"\n' "$WS"; \
-	printf '🔎 ENV_URL(len)=%s  Q(len)=%s  WS(len)=%s\n' "${#ENV_URL}" "${#Q}" "${#WS}"; \
-	echo "� Hex of Q:"; printf '%s' "$Q" | hexdump -C; \
-	test -n "$ENV_URL" || { echo "❌ POSTMAN_ENVIRONMENTS_URL empty"; exit 1; }; \
-	test -n "$Q" || { echo "❌ POSTMAN_Q empty"; exit 1; }; \
-	URL_RAW="$ENV_URL$Q"; \
-	# strip CRs and trailing spaces just in case
-	URL=$(printf '%s' "$URL_RAW" | tr -d '\r' | sed 's/[[:space:]]\+$//'); \
-	printf '�👉 URL: %s\n' "$URL"; \
-	test -n "$URL" || { echo "❌ URL computed empty"; exit 1; }; \
-	$(call guard-file,$(POSTMAN_ENV_FILE)); \
-	RESPONSE=$(curl --silent --show-error --fail --location \
-		--request POST "$URL" \
+	@$(call guard-file,$(POSTMAN_ENV_FILE))
+	@RESPONSE=$$(curl --silent --show-error --fail --location \
+		--request POST "$(POSTMAN_ENVIRONMENTS_URL)$(POSTMAN_Q)" \
 		$(POSTMAN_CURL_HEADERS_XC) \
 		--data-binary '@$(POSTMAN_ENV_FILE)' || true); \
-	echo "$RESPONSE" | jq . > $(POSTMAN_ENV_UPLOAD_DEBUG) || echo "$RESPONSE" > $(POSTMAN_ENV_UPLOAD_DEBUG); \
-	POSTMAN_ENV_UID=$(echo "$RESPONSE" | jq -r '.environment.uid // empty'); \
-	if [ -z "$POSTMAN_ENV_UID" ]; then \
+	echo "$$RESPONSE" | jq . > $(POSTMAN_ENV_UPLOAD_DEBUG) || echo "$$RESPONSE" > $(POSTMAN_ENV_UPLOAD_DEBUG); \
+	POSTMAN_ENV_UID=$$(echo "$$RESPONSE" | jq -r '.environment.uid // empty'); \
+	if [ -z "$$POSTMAN_ENV_UID" ]; then \
 		echo "❌ Failed to upload environment. See $(POSTMAN_ENV_UPLOAD_DEBUG)."; \
 		exit 1; \
 	else \
-		echo "✅ Environment uploaded with UID: $POSTMAN_ENV_UID"; \
-		echo $POSTMAN_ENV_UID > $(POSTMAN_ENV_UID_FILE); \
+		echo "✅ Environment uploaded with UID: $$POSTMAN_ENV_UID"; \
+		echo $$POSTMAN_ENV_UID > $(POSTMAN_ENV_UID_FILE); \
 	fi
 
 # ========================================================================
@@ -975,26 +1282,28 @@ postman-mock-create:
 	@echo "🆕 Creating Postman mock server..."
 	@if [ -z "$(POSTMAN_WS)" ]; then echo "❌ POSTMAN_WS (workspace ID) is not set. Aborting."; exit 1; fi
 	@if [ -z "$(POSTMAN_TEST_COLLECTION_UID)" ]; then echo "❌ POSTMAN_TEST_COLLECTION_UID not set. Aborting."; exit 1; fi
-	@if [ -z "$(POSTMAN_ENV_UID)" ]; then echo "❌ POSTMAN_ENV_UID not set. Aborting."; exit 1; fi
-
-	@PAYLOAD=$(jq -n --arg coll "$(POSTMAN_TEST_COLLECTION_UID)" --arg name "$(POSTMAN_MOCK_NAME)" --arg env "$(POSTMAN_ENV_UID)" \
-	  '{ mock: { collection: $coll, name: $name, environment: $env, private: false } }'); \
-	RESP=$(curl --silent --show-error --fail --location \
+	@PAYLOAD=$$(jq -n --arg coll "$(POSTMAN_TEST_COLLECTION_UID)" --arg name "$(POSTMAN_MOCK_NAME)" \
+	  '{ mock: { collection: $$coll, name: $$name, private: false } }'); \
+	echo "Debug: Creating mock with payload: $$PAYLOAD" >&2; \
+	echo "Debug: URL: $(POSTMAN_MOCKS_URL)$(POSTMAN_Q)" >&2; \
+	RESP=$$(curl --silent --show-error --location \
 	  --request POST "$(POSTMAN_MOCKS_URL)$(POSTMAN_Q)" \
 	  $(POSTMAN_CURL_HEADERS_XC) \
-	  --data-raw "$PAYLOAD"); \
-	echo "$RESP" | jq . > $(POSTMAN_DIR)/postman_mock_create.json || echo "$RESP" > $(POSTMAN_DIR)/postman_mock_create.json; \
+	  --data-raw "$$PAYLOAD"); \
+	echo "$$RESP" | jq . > $(POSTMAN_DIR)/postman_mock_create.json || echo "$$RESP" > $(POSTMAN_DIR)/postman_mock_create.json; \
 	jq -r '.mock.uid // empty' $(POSTMAN_DIR)/postman_mock_create.json > "$(POSTMAN_MOCK_UID_FILE)"; \
 	jq -r '.mock.id  // empty' $(POSTMAN_DIR)/postman_mock_create.json > "$(POSTMAN_MOCK_ID_FILE)"; \
+	jq -r '.mock.mockUrl // empty' $(POSTMAN_DIR)/postman_mock_create.json > "$(POSTMAN_MOCK_URL_FILE)"; \
 	if [ ! -s "$(POSTMAN_MOCK_UID_FILE)" ] || [ ! -s "$(POSTMAN_MOCK_ID_FILE)" ]; then \
 		echo "❌ Failed to create mock server. See $(POSTMAN_DIR)/postman_mock_create.json"; exit 1; \
 	fi; \
-	echo "✅ Mock server created. UID=$(cat $(POSTMAN_MOCK_UID_FILE))  ID=$(cat $(POSTMAN_MOCK_ID_FILE))"
+	echo "✅ Mock server created. UID=$$(cat $(POSTMAN_MOCK_UID_FILE))  ID=$$(cat $(POSTMAN_MOCK_ID_FILE))"
 
 # ========================================================================
 # MOCK SERVER UPDATE
 # ========================================================================
 # Update mock server with new environment configuration
+.PHONY: update-mock-env
 update-mock-env:
 	@echo "🔄 Updating Postman mock server environment..."
 	@if [ -z "$(POSTMAN_MOCK_ID)" ]; then \
@@ -1018,6 +1327,7 @@ update-mock-env:
 		|| (echo "❌ Failed to update mock server. Check UID/ID values and API key." && exit 1)
 
 # Verify mock server configuration
+.PHONY: verify-mock
 verify-mock:
 	@echo "🔍 Fetching mock server details..."
 	@curl --silent --location --request GET "$(POSTMAN_MOCKS_URL)/$(POSTMAN_MOCK_ID)" \
@@ -1044,25 +1354,25 @@ prism-start:
 	# Preflight: spec exists?
 	@test -f "$(PRISM_SPEC)" || { echo "❌ Spec not found: $(PRISM_SPEC)"; exit 1; }
 	# If something is already on the port, stop it first
-	@EXISTING=$(lsof -ti :$(PRISM_PORT)) ; \
-	if [ -n "$EXISTING" ]; then \
-		echo "ℹ️ Port $(PRISM_PORT) is in use (PID $EXISTING). Stopping it..."; \
-		kill $EXISTING || true; sleep 1; \
+	@EXISTING=$$(lsof -ti :$(PRISM_PORT)) ; \
+	if [ -n "$$EXISTING" ]; then \
+		echo "ℹ️ Port $(PRISM_PORT) is in use (PID $$EXISTING). Stopping it..."; \
+		kill $$EXISTING || true; sleep 1; \
 	fi
 	# Start Prism
 	@echo "$(PRISM_HOST):$(PRISM_PORT)" > "$(PRISM_MOCK_URL_FILE)"
-	@echo "=== $(shell date) ===" >> "$(PRISM_LOG)"
+	@echo "=== $$(date) ===" >> "$(PRISM_LOG)"
 	@nohup npx @stoplight/prism-cli mock "$(PRISM_SPEC)" -p $(PRISM_PORT) >> "$(PRISM_LOG)" 2>&1 &
 	# Wait up to 15s for the port to bind
 	@i=0; \
-	while [ $i -lt 30 ]; do \
+	while [ $$i -lt 30 ]; do \
 		if lsof -ti :$(PRISM_PORT) >/dev/null; then break; fi; \
-		sleep 0.5; i=$((i+1)); \
+		sleep 0.5; i=$$((i+1)); \
 	done; \
 	if lsof -ti :$(PRISM_PORT) >/dev/null; then \
-		PID=$(lsof -ti :$(PRISM_PORT) | head -n1); \
-		echo "$PID" > "$(PRISM_PID_FILE)"; \
-		echo "✅ Prism started at $(PRISM_MOCK_URL) (PID: $PID)"; \
+		PID=$$(lsof -ti :$(PRISM_PORT) | head -n1); \
+		echo "$$PID" > "$(PRISM_PID_FILE)"; \
+		echo "✅ Prism started at $(PRISM_MOCK_URL) (PID: $$PID)"; \
 	else \
 		echo "❌ Failed to start Prism."; \
 		echo "─── Last 60 log lines ───"; \
@@ -1074,10 +1384,10 @@ prism-start:
 .PHONY: prism-stop
 prism-stop:
 	@if [ -f $(PRISM_PID_FILE) ]; then \
-		PID=$(cat $(PRISM_PID_FILE) | xargs); \
-		if [ -n "$PID" ]; then \
-			echo "🔪 Killing Prism PID: $PID"; \
-			kill -9 "$PID" 2>/dev/null && echo "🛑 Prism stopped." || echo "⚠️  Failed to kill Prism (PID $PID)"; \
+		PID=$$(cat $(PRISM_PID_FILE) | xargs); \
+		if [ -n "$$PID" ]; then \
+			echo "🔪 Killing Prism PID: $$PID"; \
+			kill -9 "$$PID" 2>/dev/null && echo "🛑 Prism stopped." || echo "⚠️  Failed to kill Prism (PID $$PID)"; \
 			rm -f $(PRISM_PID_FILE) $(PRISM_MOCK_URL_FILE); \
 		else \
 			echo "⚠️  PID file is empty. Skipping kill."; \
@@ -1091,7 +1401,7 @@ prism-stop:
 prism-status:
 	@echo "🔍 Checking Prism mock server status on port $(PRISM_PORT)..."
 	@if lsof -i :$(PRISM_PORT) -t >/dev/null; then \
-		echo "✅ Prism is running on port $(PRISM_PORT) (PID: $(lsof -ti :$(PRISM_PORT)))"; \
+		echo "✅ Prism is running on port $(PRISM_PORT) (PID: $$(lsof -ti :$(PRISM_PORT)))"; \
 	else \
 		echo "❌ Prism is not running."; \
 	fi
@@ -1126,6 +1436,7 @@ prism-test-select:
 	@$(PRISM_TEST_SCRIPT) $(PRISM_TEST_ENDPOINT) --select $(PRISM_BODY_INDEX)
 
 # Sanitize collection placeholders
+.PHONY: postman-test-collection-fix-examples
 postman-test-collection-fix-examples:
 	@echo "🧹 Sanitizing Postman collection placeholders..."
 	$(call guard-file,$(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES))
@@ -1158,20 +1469,20 @@ postman-link-env-to-mock-server:
 	@if [ ! -f $(POSTMAN_ENV_UID_FILE) ]; then echo "❌ Missing environment UID file: $(POSTMAN_ENV_UID_FILE). Run postman-env-upload first."; exit 1; fi
 	@if [ ! -f $(POSTMAN_MOCK_UID_FILE) ]; then echo "❌ Missing mock UID file: $(POSTMAN_MOCK_UID_FILE). Run postman-mock-create first."; exit 1; fi
 	@if [ ! -f $(POSTMAN_TEST_COLLECTION_UID_FILE) ]; then echo "❌ Missing collection UID file: $(POSTMAN_TEST_COLLECTION_UID_FILE). Run postman-collection-upload-test first."; exit 1; fi
-	@POSTMAN_ENV_UID=$(cat $(POSTMAN_ENV_UID_FILE)); \
-	POSTMAN_MOCK_UID=$(cat $(POSTMAN_MOCK_UID_FILE)); \
-	COLLECTION_UID=$(cat $(POSTMAN_TEST_COLLECTION_UID_FILE)); \
+	@POSTMAN_ENV_UID=$$(cat $(POSTMAN_ENV_UID_FILE)); \
+	POSTMAN_MOCK_UID=$$(cat $(POSTMAN_MOCK_UID_FILE)); \
+	COLLECTION_UID=$$(cat $(POSTMAN_TEST_COLLECTION_UID_FILE)); \
 	LINK_DEBUG="$(POSTMAN_MOCK_LINK_DEBUG_FILE)"; \
-	echo "📦 Linking Environment $POSTMAN_ENV_UID with Collection $COLLECTION_UID (Mock $POSTMAN_MOCK_UID)..."; \
-	curl --silent --location --request PUT "$(POSTMAN_MOCKS_URL)/$POSTMAN_MOCK_UID" \
+	echo "📦 Linking Environment $$POSTMAN_ENV_UID with Collection $$COLLECTION_UID (Mock $$POSTMAN_MOCK_UID)..."; \
+	curl --silent --location --request PUT "$(POSTMAN_MOCKS_URL)/$$POSTMAN_MOCK_UID" \
 		$(POSTMAN_CURL_HEADERS_XC) \
-		--data-raw "$(jq -n --arg coll $COLLECTION_UID --arg env $POSTMAN_ENV_UID \
-			'{ mock: { name: "Linked Mock Server", collection: $coll, environment: $env, private: false } }')" \
-		-o "$LINK_DEBUG"; \
-	if jq -e '.mock' "$LINK_DEBUG" >/dev/null; then \
+		--data-raw "$$(jq -n --arg coll $$COLLECTION_UID --arg env $$POSTMAN_ENV_UID \
+			'{ mock: { name: "Linked Mock Server", collection: $$coll, environment: $$env, private: false } }')" \
+		-o "$$LINK_DEBUG"; \
+	if jq -e '.mock' "$$LINK_DEBUG" >/dev/null; then \
 		echo "✅ Environment linked to mock server successfully."; \
 	else \
-		echo "❌ Failed to link environment. See $LINK_DEBUG"; \
+		echo "❌ Failed to link environment. See $$LINK_DEBUG"; \
 		exit 1; \
 	fi
 
@@ -1189,14 +1500,14 @@ docs-build:
 .PHONY: docs-serve-bg
 docs-serve-bg:
 	@mkdir -p "$(DOCS_DIR)"
-	@nohup python3 -m http.server 8080 --directory "$(DOCS_DIR)" >/dev/null 2>&1 & echo $! > "$(DOCS_PID_FILE)"
-	@echo "🌐 Docs served in background on http://localhost:8080 (PID: $(cat $(DOCS_PID_FILE)))"
+	@nohup python3 -m http.server 8080 --directory "$(DOCS_DIR)" >/dev/null 2>&1 & echo $$! > "$(DOCS_PID_FILE)"
+	@echo "🌐 Docs served in background on http://localhost:8080 (PID: $$(cat $(DOCS_PID_FILE)))"
 
 # Stop documentation server
 .PHONY: docs-stop
 docs-stop:
 	@if [ -f "$(DOCS_PID_FILE)" ]; then \
-		kill $(cat "$(DOCS_PID_FILE)") 2>/dev/null || true; \
+		kill $$(cat "$(DOCS_PID_FILE)") 2>/dev/null || true; \
 		rm -f "$(DOCS_PID_FILE)"; \
 		echo "🛑 Docs server stopped."; \
 	else \
@@ -1219,8 +1530,8 @@ postman-api-list-specs:
 	curl --silent \
 		--header "X-Api-Key: $(POSTMAN_API_KEY)" \
 		"$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS)" \
-		| jq -r '.data[] | "\(.name)\t\(.id)\t\(.type)\t\(.updatedAt)"' \
-		| column -t -s$'\t'
+		| jq -r '.specs[] | "\(.name)\t\(.id)\t\(.type)\t\(.updatedAt)"' \
+		| column -t -s\t'
 
 # ========================================================================
 # CLEANUP OPERATIONS
@@ -1229,73 +1540,73 @@ postman-api-list-specs:
 .PHONY: postman-delete-mock-servers
 postman-delete-mock-servers:
 	@echo "🔍 Fetching mock servers from workspace $(POSTMAN_WS)..."
-	@MOCKS=$(curl --silent --location \
+	@MOCKS=$$(curl --silent --location \
 		--request GET "$(POSTMAN_MOCKS_URL)$(POSTMAN_Q)" \
-		$(POSTMAN_CURL_HEADERS_XC) | jq -r '.mocks[].id'); \
-	for MOCK in $MOCKS; do \
-		echo "🗑 Deleting mock server $MOCK..."; \
+		$(POSTMAN_CURL_HEADERS_XC) | jq -r '.mocks // [] | .[].id'); \
+	for MOCK in $$MOCKS; do \
+		echo "🗑 Deleting mock server $$MOCK..."; \
 		curl --silent --location \
-			--request DELETE "$(POSTMAN_MOCKS_URL)/$MOCK" \
-			$(POSTMAN_CURL_HEADERS_XC) || echo "⚠️ Failed to delete mock server $MOCK"; \
+			--request DELETE "$(POSTMAN_MOCKS_URL)/$$MOCK" \
+			$(POSTMAN_CURL_HEADERS_XC) || echo "⚠️ Failed to delete mock server $$MOCK"; \
 	done
 
 # Delete all collections in workspace
 .PHONY: postman-delete-collections
 postman-delete-collections:
 	@echo "🔍 Fetching collections from workspace $(POSTMAN_WS)..."
-	@COLLECTIONS=$(curl --silent --location \
+	@COLLECTIONS=$$(curl --silent --location \
 		--request GET "$(POSTMAN_COLLECTIONS_URL)$(POSTMAN_Q)" \
-		$(POSTMAN_CURL_HEADERS_XC) | jq -r '.collections[].uid'); \
-	for COL in $COLLECTIONS; do \
-		echo "🗑 Deleting collection $COL..."; \
+		$(POSTMAN_CURL_HEADERS_XC) | jq -r '.collections // [] | .[].uid'); \
+	for COL in $$COLLECTIONS; do \
+		echo "🗑 Deleting collection $$COL..."; \
 		curl --silent --location \
-			--request DELETE "$(POSTMAN_COLLECTIONS_URL)/$COL" \
-			$(POSTMAN_CURL_HEADERS_XC) || echo "⚠️ Failed to delete collection $COL"; \
+			--request DELETE "$(POSTMAN_COLLECTIONS_URL)/$$COL" \
+			$(POSTMAN_CURL_HEADERS_XC) || echo "⚠️ Failed to delete collection $$COL"; \
 	done
 
 # Delete all APIs in workspace
 .PHONY: postman-delete-apis
 postman-delete-apis:
 	@echo "🔍 Fetching APIs from workspace $(POSTMAN_WS)..."
-	@APIS=$(curl --silent --location \
+	@APIS=$$(curl --silent --location \
 		--request GET "$(POSTMAN_APIS_URL)$(POSTMAN_Q_ID)" \
-		$(POSTMAN_CURL_HEADERS_XC) | jq -r '.apis[].id'); \
-	for API in $APIS; do \
-		echo "🗑 Deleting API $API..."; \
+		$(POSTMAN_CURL_HEADERS_XC) | jq -r '.apis // [] | .[].id'); \
+	for API in $$APIS; do \
+		echo "🗑 Deleting API $$API..."; \
 		curl --silent --location \
-			--request DELETE "$(POSTMAN_APIS_URL)/$API" \
-			$(POSTMAN_CURL_HEADERS_XC) || echo "⚠️ Failed to delete API $API"; \
+			--request DELETE "$(POSTMAN_APIS_URL)/$$API" \
+			$(POSTMAN_CURL_HEADERS_XC) || echo "⚠️ Failed to delete API $$API"; \
 	done
 
 # Delete all environments in workspace
 .PHONY: postman-delete-environments
 postman-delete-environments:
 	@echo "🔍 Fetching environments from workspace $(POSTMAN_WS)..."
-	@ENVS=$(curl --silent --location \
+	@ENVS=$$(curl --silent --location \
 		--request GET "$(POSTMAN_ENVIRONMENTS_URL)$(POSTMAN_Q)" \
-		$(POSTMAN_CURL_HEADERS_XC) | jq -r '.environments[].uid'); \
-	for ENV in $ENVS; do \
-		echo "🗑 Deleting environment $ENV..."; \
+		$(POSTMAN_CURL_HEADERS_XC) | jq -r '.environments // [] | .[].uid'); \
+	for ENV in $$ENVS; do \
+		echo "🗑 Deleting environment $$ENV..."; \
 		curl --silent --location \
-			--request DELETE "$(POSTMAN_ENVIRONMENTS_URL)/$ENV" \
-			$(POSTMAN_CURL_HEADERS_XC) || echo "⚠️ Failed to delete environment $ENV"; \
+			--request DELETE "$(POSTMAN_ENVIRONMENTS_URL)/$$ENV" \
+			$(POSTMAN_CURL_HEADERS_XC) || echo "⚠️ Failed to delete environment $$ENV"; \
 	done
 
 # Clean trash in workspace
 .PHONY: postman-api-clean-trash
 postman-api-clean-trash:
 	@echo "🗑️ Checking for trashed specs in workspace $(POSTMAN_WS)..."
-	@TRASH=$(curl --silent \
+	@TRASH=$$(curl --silent \
 		$(POSTMAN_CURL_HEADERS_XC) \
 		"$(POSTMAN_SPECS_URL)$(POSTMAN_Q_ID)&status=trashed" \
-		| jq -r '.data // [] | .[].id'); \
-	if [ -z "$TRASH" ]; then \
+		| jq -r '.specs // [] | .[].id'); \
+	if [ -z "$$TRASH" ]; then \
 		echo "   No trashed specs found in workspace $(POSTMAN_WS)."; \
 	else \
-		for ID in $TRASH; do \
-			echo "   🚮 Permanently deleting trashed spec $ID..."; \
+		for ID in $$TRASH; do \
+			echo "   🚮 Permanently deleting trashed spec $$ID..."; \
 			curl --silent --location \
-				--request DELETE "$(POSTMAN_SPECS_URL)/$ID?permanent=true" \
+				--request DELETE "$(POSTMAN_SPECS_URL)/$$ID?permanent=true" \
 				$(POSTMAN_CURL_HEADERS_XC) | jq .; \
 		done; \
 		echo "   ✅ All trashed specs have been permanently deleted."; \
@@ -1305,51 +1616,74 @@ postman-api-clean-trash:
 .PHONY: postman-api-delete-old-specs
 postman-api-delete-old-specs:
 	@echo "🧹 Deleting old specs in workspace: $(POSTMAN_WS), keeping the most recent one..."
-	@RESPONSE=$(curl --silent $(POSTMAN_CURL_HEADERS_XC) "$(POSTMAN_SPECS_URL)$(POSTMAN_Q_ID)"); \
-	echo "$RESPONSE" > $(POSTMAN_DIR)/specs-debug.json; \
-	SPECS=$(echo "$RESPONSE" | jq -r 'select(.data != null) | .data | sort_by(.updatedAt) | reverse | .[1:] | .[].id'); \
-	if [ -z "$SPECS" ]; then \
+	@RESPONSE=$$(curl --silent $(POSTMAN_CURL_HEADERS_XC) "$(POSTMAN_SPECS_URL)$(POSTMAN_Q_ID)"); \
+	echo "$$RESPONSE" > $(POSTMAN_DIR)/specs-debug.json; \
+	SPECS=$$(echo "$$RESPONSE" | jq -r 'select(.specs != null) | .specs | sort_by(.updatedAt) | reverse | .[1:] | .[].id'); \
+	if [ -z "$$SPECS" ]; then \
 		echo "ℹ️  No old specs to delete."; \
 	else \
-		for ID in $SPECS; do \
-			echo "   ➡️ Deleting spec $ID..."; \
+		for ID in $$SPECS; do \
+			echo "   ➡️ Deleting spec $$ID..."; \
 			curl --silent --location \
-				--request DELETE "$(POSTMAN_SPECS_URL)/$ID" \
+				--request DELETE "$(POSTMAN_SPECS_URL)/$$ID" \
 				$(POSTMAN_CURL_HEADERS_XC) | jq .; \
 		done; \
 		echo "✅ Old specs deleted."; \
+	fi
+
+# Delete specs by name
+.PHONY: postman-delete-specs-by-name
+postman-delete-specs-by-name:
+	@if [ -z "$(NAME)" ]; then \
+		echo "❌ Error: NAME parameter required"; \
+		exit 1; \
+	fi
+	@echo "🔍 Looking for specs named '$(NAME)' in workspace $(POSTMAN_WS)..."
+	@SPECS=$$(curl --silent --location \
+		--request GET "$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS)" \
+		$(POSTMAN_CURL_HEADERS_XC) | jq -r --arg name "$(NAME)" '.specs // [] | .[] | select(.name == $$name) | .id'); \
+	if [ -z "$$SPECS" ]; then \
+		echo "ℹ️  No specs found with name '$(NAME)'"; \
+	else \
+		for SPEC in $$SPECS; do \
+			echo "🗑  Deleting spec $$SPEC..."; \
+			curl --silent --location \
+				--request DELETE "$(POSTMAN_SPECS_URL)/$$SPEC" \
+				$(POSTMAN_CURL_HEADERS_XC) || echo "⚠️ Failed to delete spec $$SPEC"; \
+		done; \
+		echo "✅ Deleted all specs named '$(NAME)'"; \
 	fi
 
 # Delete all specs in workspace
 .PHONY: postman-delete-specs
 postman-delete-specs:
 	@echo "🔍 Fetching specs in workspace $(POSTMAN_WS)..."
-	@SPECS=$(curl --silent --location \
+	@SPECS=$$(curl --silent --location \
 		--request GET "$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS)" \
-		$(POSTMAN_CURL_HEADERS_XC) | jq -r '.data[].id'); \
-	for SPEC in $SPECS; do \
-		echo "🗑 Deleting spec $SPEC..."; \
+		$(POSTMAN_CURL_HEADERS_XC) | jq -r '.specs // [] | .[].id'); \
+	for SPEC in $$SPECS; do \
+		echo "🗑 Deleting spec $$SPEC..."; \
 		curl --silent --location \
-			--request DELETE "$(POSTMAN_SPECS_URL)/$SPEC" \
-			$(POSTMAN_CURL_HEADERS_XC) || echo "⚠️ Failed to delete spec $SPEC"; \
+			--request DELETE "$(POSTMAN_SPECS_URL)/$$SPEC" \
+			$(POSTMAN_CURL_HEADERS_XC) || echo "⚠️ Failed to delete spec $$SPEC"; \
 	done
 
 # Clean all collections in workspace (careful!)
 .PHONY: postman-collections-clean
 postman-collections-clean:
 	@echo "🗑️ Fetching all collections in workspace $(POSTMAN_WS)..."
-	@RESPONSE=$(curl --silent --location \
+	@RESPONSE=$$(curl --silent --location \
 		--request GET "$(POSTMAN_COLLECTIONS_URL)$(POSTMAN_Q)" \
 		$(POSTMAN_CURL_HEADERS_XC); \
-	echo "$RESPONSE" > $(POSTMAN_DIR)/collections-clean-debug.json; \
-	COLLECTIONS=$(echo "$RESPONSE" | jq -r '.collections[]?.uid'); \
-	if [ -z "$COLLECTIONS" ]; then \
+	echo "$$RESPONSE" > $(POSTMAN_DIR)/collections-clean-debug.json; \
+	COLLECTIONS=$$(echo "$$RESPONSE" | jq -r '.collections[]?.uid'); \
+	if [ -z "$$COLLECTIONS" ]; then \
 		echo "   ℹ️ No collections found."; \
 	else \
-		for ID in $COLLECTIONS; do \
-			echo "   🚮 Deleting collection $ID..."; \
+		for ID in $$COLLECTIONS; do \
+			echo "   🚮 Deleting collection $$ID..."; \
 			curl --silent --location \
-				--request DELETE "$(POSTMAN_COLLECTIONS_URL)/$ID" \
+				--request DELETE "$(POSTMAN_COLLECTIONS_URL)/$$ID" \
 				$(POSTMAN_CURL_HEADERS_XC) | jq .; \
 		done; \
 		echo "   ✅ All collections deleted."; \
@@ -1366,8 +1700,8 @@ postman-api-debug-A:
 	@curl --verbose --location --request POST "$(POSTMAN_APIS_URL)$(POSTMAN_Q_ID)" \
 		$(POSTMAN_CURL_HEADERS_XC) \
 		$(POSTMAN_CURL_HEADERS_AA) \
-		--data "$(jq -Rs --arg name '$(POSTMAN_API_NAME)' \
-			'{ api: { name: $name, schema: { type: "openapi3", language: "yaml", schema: . }}}' \
+		--data "$$(jq -Rs --arg name '$(POSTMAN_API_NAME)' \
+			'{ api: { name: $$name, schema: { type: "openapi3", language: "yaml", schema: . }}}' \
 			$(C2MAPIV2_OPENAPI_SPEC)" \
 	| tee $(POSTMAN_IMPORT_DEBUG)
 
@@ -1411,7 +1745,7 @@ postman-workspace-debug:
 # Show all available targets with descriptions
 .PHONY: help
 help:## Show help
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $1, $2}'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
 # ========================================================================
 # LOGGING
@@ -1423,9 +1757,10 @@ LOG-DIR := $(CUR-DIR)/make-logs
 # VARIABLE DEBUGGING
 # ========================================================================
 # Print all variables defined after VARS_OLD
+.PHONY: print-vars
 print-vars:
 	$(foreach v,                                        \
-		$(filter-out $(VARS_OLD) VARS_OLD,$(.VARIABLES)), \
+		$(filter-out $(VARS_OLD) VARS_OLD,$$(.VARIABLES)), \
 		$(info $(v) = $($(v))))
 
 # ========================================================================

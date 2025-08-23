@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .template-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .template-banner h2 {
+            margin: 0 0 10px 0;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .template-banner .emoji {
+            font-size: 28px;
+            margin-right: 10px;
+        }
+        
+        .template-banner p {
+            margin: 10px 0;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        
+        .template-banner .benefits {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .template-banner .benefit {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .template-banner .benefit-icon {
+            font-size: 20px;
+            margin-right: 8px;
+        }
+        
+        .template-banner .cta {
+            background: white;
+            color: #667eea;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        
+        .template-banner .cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .template-endpoints-section {
+            background: #f7fafc;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .template-endpoints-section h3 {
+            color: #2d3748;
+            margin-top: 0;
+        }
+        
+        .endpoint-card {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .endpoint-card h4 {
+            margin: 0 0 5px 0;
+            color: #2d3748;
+        }
+        
+        .endpoint-card .tag {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        
+        .endpoint-card p {
+            margin: 5px 0;
+            color: #4a5568;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="template-banner">
+        <h2><span class="emoji">🎯</span> Start with Template Endpoints!</h2>
+        <p>New to C2M API? We strongly recommend using our <strong>template endpoints</strong> for the fastest integration.</p>
+        
+        <div class="benefits">
+            <div class="benefit">
+                <span class="benefit-icon">⚡</span>
+                <span>5-minute setup</span>
+            </div>
+            <div class="benefit">
+                <span class="benefit-icon">✅</span>
+                <span>Pre-configured settings</span>
+            </div>
+            <div class="benefit">
+                <span class="benefit-icon">💰</span>
+                <span>Optimized pricing</span>
+            </div>
+            <div class="benefit">
+                <span class="benefit-icon">🛡️</span>
+                <span>Best practices built-in</span>
+            </div>
+        </div>
+        
+        <a href="#template-endpoints" class="cta">View Template Endpoints ↓</a>
+    </div>
+    
+    <div class="template-endpoints-section" id="template-endpoints">
+        <h3>🚀 Recommended Template Endpoints</h3>
+        
+        <div class="endpoint-card">
+            <h4>/jobs/single-doc-job-template <span class="tag">RECOMMENDED</span></h4>
+            <p>Perfect for sending a single document to multiple recipients. Ideal for newsletters, statements, and notices.</p>
+            <p><strong>Required parameters:</strong> documentSourceIdentifier, jobTemplate, paymentDetails</p>
+        </div>
+        
+        <div class="endpoint-card">
+            <h4>/jobs/multi-docs-job-template <span class="tag">RECOMMENDED</span></h4>
+            <p>Send different documents to different recipients in one batch. Great for personalized mailings.</p>
+            <p><strong>Required parameters:</strong> items[], jobTemplate, paymentDetails</p>
+        </div>
+        
+        <div class="endpoint-card">
+            <h4>/jobs/multi-doc-merge-job-template <span class="tag">RECOMMENDED</span></h4>
+            <p>Merge multiple documents into one mailing. Perfect for creating document packets.</p>
+            <p><strong>Required parameters:</strong> documentsToMerge[], recipientAddressSource, jobTemplate</p>
+        </div>
+    </div>
+</body>
+</html>

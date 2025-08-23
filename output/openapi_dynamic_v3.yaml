@@ -1,0 +1,611 @@
+openapi: 3.0.3
+info:
+  title: LOB-Style Document Submission API
+  version: 1.0.0
+  description: API for submitting document jobs using LOB-style document and address
+    structures.
+servers:
+- url: https://api.example.com
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    StandardResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+        jobId:
+          type: string
+    submitMultiDocWithTemplateParams:
+      type: object
+      properties:
+        _complexProperty:
+          type: array
+          items:
+            type: object
+            properties:
+              documentSourceIdentifier:
+                $ref: '#/components/schemas/documentSourceIdentifier'
+              recipientAddressSource:
+                $ref: '#/components/schemas/recipientAddressSource'
+            required:
+            - documentSourceIdentifier
+            - recipientAddressSource
+        jobTemplate:
+          $ref: '#/components/schemas/jobTemplate'
+        paymentDetails:
+          $ref: '#/components/schemas/paymentDetails'
+        tags:
+          type: array
+      required:
+      - _complexProperty
+      - jobTemplate
+      - paymentDetails
+    singleDocJobParams:
+      type: object
+      properties:
+        documentSourceIdentifier:
+          $ref: '#/components/schemas/documentSourceIdentifier'
+        recipientAddressSource:
+          type: array
+          items:
+            $ref: '#/components/schemas/recipientAddressSource'
+        jobOptions:
+          $ref: '#/components/schemas/jobOptions'
+        paymentDetails:
+          $ref: '#/components/schemas/paymentDetails'
+        tags:
+          type: array
+      required:
+      - documentSourceIdentifier
+      - recipientAddressSource
+      - jobOptions
+    splitPdfWithCaptureParams:
+      type: object
+      properties:
+        documentSourceIdentifier:
+          $ref: '#/components/schemas/documentSourceIdentifier'
+        embeddedExtractionSpecs:
+          type: array
+        paymentDetails:
+          $ref: '#/components/schemas/paymentDetails'
+        tags:
+          type: array
+      required:
+      - documentSourceIdentifier
+      - embeddedExtractionSpecs
+    mergeMultiDocParams:
+      type: object
+      properties:
+        documentsToMerge:
+          type: string
+        recipientAddressSource:
+          $ref: '#/components/schemas/recipientAddressSource'
+        tags:
+          type: array
+      required:
+      - documentsToMerge
+      - recipientAddressSource
+    submitSingleDocWithTemplateParamsTest:
+      type: object
+      properties:
+        documentSourceIdentifier:
+          $ref: '#/components/schemas/documentSourceIdentifier'
+        recipientAddressSource:
+          type: array
+          items:
+            $ref: '#/components/schemas/recipientAddressSource'
+        jobTemplate:
+          $ref: '#/components/schemas/jobTemplate'
+        paymentDetails:
+          $ref: '#/components/schemas/paymentDetails'
+        tags:
+          type: array
+      required:
+      - documentSourceIdentifier
+      - jobTemplate
+    submitMultiDocParams:
+      type: object
+      properties:
+        _complexProperty:
+          type: array
+          items:
+            type: object
+            properties:
+              documentSourceIdentifier:
+                $ref: '#/components/schemas/documentSourceIdentifier'
+              recipientAddressSource:
+                $ref: '#/components/schemas/recipientAddressSource'
+            required:
+            - documentSourceIdentifier
+            - recipientAddressSource
+        jobOptions:
+          $ref: '#/components/schemas/jobOptions'
+        paymentDetails:
+          $ref: '#/components/schemas/paymentDetails'
+        tags:
+          type: array
+      required:
+      - _complexProperty
+      - jobOptions
+    addressListPdf:
+      type: object
+      properties:
+        documentSourceIdentifier:
+          $ref: '#/components/schemas/documentSourceIdentifier'
+        addressListRegion:
+          type: string
+        delimiter:
+          type: string
+        tags:
+          type: array
+      required:
+      - documentSourceIdentifier
+      - addressListRegion
+    pageRange:
+      type: object
+      properties:
+        startPage:
+          type: integer
+        endPage:
+          type: integer
+      required:
+      - startPage
+      - endPage
+    extractionSpec:
+      type: object
+      properties:
+        startPage:
+          type: integer
+        endPage:
+          type: integer
+        addressRegion:
+          $ref: '#/components/schemas/addressRegion'
+      required:
+      - startPage
+      - endPage
+      - addressRegion
+    recipientAddress:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        address1:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        zip:
+          type: string
+        country:
+          type: string
+        nickName:
+          type: string
+        address2:
+          type: string
+        address3:
+          type: string
+        phoneNumber:
+          type: string
+      required:
+      - firstName
+      - lastName
+      - address1
+      - city
+      - state
+      - zip
+      - country
+    splitPdfParams:
+      type: object
+      properties:
+        documentSourceIdentifier:
+          $ref: '#/components/schemas/documentSourceIdentifier'
+        _complexProperty:
+          type: array
+          items:
+            type: object
+            properties:
+              pageRange:
+                $ref: '#/components/schemas/pageRange'
+              recipientAddressSource:
+                type: array
+                items:
+                  $ref: '#/components/schemas/recipientAddressSource'
+            required:
+            - pageRange
+            - recipientAddressSource
+        paymentDetails:
+          $ref: '#/components/schemas/paymentDetails'
+        tags:
+          type: array
+      required:
+      - documentSourceIdentifier
+      - _complexProperty
+    mergeMultiDocWithTemplateParams:
+      type: object
+      properties:
+        documentsToMerge:
+          type: string
+        recipientAddressSource:
+          $ref: '#/components/schemas/recipientAddressSource'
+        jobTemplate:
+          $ref: '#/components/schemas/jobTemplate'
+        paymentDetails:
+          $ref: '#/components/schemas/paymentDetails'
+        tags:
+          type: array
+      required:
+      - documentsToMerge
+      - recipientAddressSource
+      - jobTemplate
+    multiPdfWithCaptureParams:
+      type: object
+      properties:
+        addressCapturePdfs:
+          type: array
+        jobTemplate:
+          $ref: '#/components/schemas/jobTemplate'
+        paymentDetails:
+          $ref: '#/components/schemas/paymentDetails'
+        tags:
+          type: array
+      required:
+      - addressCapturePdfs
+      - jobTemplate
+  parameters:
+    Authorization:
+      name: Authorization
+      in: header
+      required: true
+      schema:
+        type: string
+        example: Bearer <your-jwt-token>
+      description: JWT Bearer token for authorization
+    Content-Type:
+      name: Content-Type
+      in: header
+      required: true
+      schema:
+        type: string
+        example: application/json
+security:
+- bearerAuth: []
+paths:
+  /jobs/single-doc-job-template:
+    post:
+      summary: I have a document, recipient addresses & a job template.
+      operationId: submitSingleDocWithTemplateParams
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                documentSourceIdentifier:
+                  $ref: '#/components/schemas/documentSourceIdentifier'
+                recipientAddressSource:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/recipientAddressSource'
+                jobTemplate:
+                  $ref: '#/components/schemas/jobTemplate'
+                paymentDetails:
+                  $ref: '#/components/schemas/paymentDetails'
+                tags:
+                  type: array
+              required:
+              - documentSourceIdentifier
+              - jobTemplate
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /jobs/multi-docs-job-template:
+    post:
+      summary: I have multiple documents each to different recipient addresses & a
+        job template.
+      operationId: submitMultiDocWithTemplate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                documentRecipientPairs:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      documentSourceIdentifier:
+                        $ref: '#/components/schemas/documentSourceIdentifier'
+                      recipientAddressSource:
+                        $ref: '#/components/schemas/recipientAddressSource'
+                    required:
+                    - documentSourceIdentifier
+                    - recipientAddressSource
+                jobTemplate:
+                  $ref: '#/components/schemas/jobTemplate'
+                paymentDetails:
+                  $ref: '#/components/schemas/paymentDetails'
+                tags:
+                  type: array
+              required:
+              - documentRecipientPairs
+              - jobTemplate
+              - paymentDetails
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /jobs/multi-doc-merge-job-template:
+    post:
+      summary: I want to merge multiple documents, send them to a single recipient,
+        and use a job template.
+      operationId: mergeMultiDocWithTemplate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                documentsToMerge:
+                  type: string
+                recipientAddressSource:
+                  $ref: '#/components/schemas/recipientAddressSource'
+                jobTemplate:
+                  $ref: '#/components/schemas/jobTemplate'
+                paymentDetails:
+                  $ref: '#/components/schemas/paymentDetails'
+                tags:
+                  type: array
+              required:
+              - documentsToMerge
+              - recipientAddressSource
+              - jobTemplate
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /jobs/single-doc:
+    post:
+      summary: I have a document and multiple recipient addresses.
+      operationId: singleDocJob
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                documentSourceIdentifier:
+                  $ref: '#/components/schemas/documentSourceIdentifier'
+                recipientAddressSource:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/recipientAddressSource'
+                jobOptions:
+                  $ref: '#/components/schemas/jobOptions'
+                paymentDetails:
+                  $ref: '#/components/schemas/paymentDetails'
+                tags:
+                  type: array
+              required:
+              - documentSourceIdentifier
+              - recipientAddressSource
+              - jobOptions
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /jobs/multi-doc:
+    post:
+      summary: I have multiple documents; each goes to a different recipient address.
+      operationId: submitMultiDoc
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                documentRecipientPairs:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      documentSourceIdentifier:
+                        $ref: '#/components/schemas/documentSourceIdentifier'
+                      recipientAddressSource:
+                        $ref: '#/components/schemas/recipientAddressSource'
+                    required:
+                    - documentSourceIdentifier
+                    - recipientAddressSource
+                jobOptions:
+                  $ref: '#/components/schemas/jobOptions'
+                paymentDetails:
+                  $ref: '#/components/schemas/paymentDetails'
+                tags:
+                  type: array
+              required:
+              - documentRecipientPairs
+              - jobOptions
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /jobs/multi-doc-merge:
+    post:
+      summary: I want to merge multiple documents into one document and send it to
+        a single recipient.
+      operationId: mergeMultiDoc
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                documentsToMerge:
+                  type: string
+                recipientAddressSource:
+                  $ref: '#/components/schemas/recipientAddressSource'
+                tags:
+                  type: array
+              required:
+              - documentsToMerge
+              - recipientAddressSource
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /jobs/single-pdf-split:
+    post:
+      summary: I have a big PDF to send to different recipients.
+      operationId: splitPdf
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                documentSourceIdentifier:
+                  $ref: '#/components/schemas/documentSourceIdentifier'
+                paymentDetails:
+                  $ref: '#/components/schemas/paymentDetails'
+                tags:
+                  type: array
+              required:
+              - documentSourceIdentifier
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /jobs/single-pdf-split-addressCapture:
+    post:
+      summary: I have a big PDF with serialized documents and the related recipient
+        addresses are in the PDF.
+      operationId: splitPdfWithCapture
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                documentSourceIdentifier:
+                  $ref: '#/components/schemas/documentSourceIdentifier'
+                embeddedExtractionSpecs:
+                  type: array
+                paymentDetails:
+                  $ref: '#/components/schemas/paymentDetails'
+                tags:
+                  type: array
+              required:
+              - documentSourceIdentifier
+              - embeddedExtractionSpecs
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /jobs/multi-pdf-address-capture:
+    post:
+      summary: I have multiple PDFs and the addresses are in each PDF.
+      operationId: multiPdfWithCapture
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                addressCapturePdfs:
+                  type: array
+                jobTemplate:
+                  $ref: '#/components/schemas/jobTemplate'
+                paymentDetails:
+                  $ref: '#/components/schemas/paymentDetails'
+                tags:
+                  type: array
+              required:
+              - addressCapturePdfs
+              - jobTemplate
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
