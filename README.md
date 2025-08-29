@@ -31,6 +31,7 @@ The C2M API V3 is a comprehensive document submission and mail processing API th
 
 - **Automated API Specification Generation**: Converts EBNF data models to OpenAPI 3.0 specifications
 - **Template-First Design**: Pre-configured endpoints for 90% of use cases
+- **JWT Authentication**: Secure two-token authentication system with automatic refresh
 - **Comprehensive Testing Framework**: Automated testing with Newman and Postman collections
 - **Mock Server Support**: Both Postman cloud mock and local Prism mock servers
 - **Interactive Documentation**: Auto-generated documentation using Redoc and Swagger UI
@@ -43,6 +44,9 @@ The C2M API V3 is a comprehensive document submission and mail processing API th
 EBNF Data Dictionary → OpenAPI Spec → Postman Collection → Mock Server → Documentation
          ↓                    ↓              ↓                  ↓              ↓
    Data Modeling        API Design      Testing          Development    Deployment
+                              │
+                         Auth Overlay
+                         (JWT Support)
 ```
 
 ---
@@ -175,22 +179,38 @@ c2m-api-repo/
 │   └── modules/             # Modular EBNF definitions
 ├── openapi/                 # OpenAPI specifications
 │   ├── c2mapiv2-openapi-spec-final.yaml
+│   ├── overlays/            # OpenAPI overlays (auth, etc.)
+│   │   └── auth.tokens.yaml # JWT authentication overlay
 │   └── examples/            # Request/response examples
 ├── postman/                 # Postman collections and artifacts
 │   ├── generated/           # Auto-generated collections
 │   ├── custom/              # User customizations
+│   ├── scripts/             # Postman scripts
+│   │   └── jwt-pre-request.js # JWT auto-refresh script
 │   └── *.txt, *.json        # IDs, payloads, debug outputs
 ├── scripts/                 # Automation scripts
 │   ├── ebnf_to_openapi_*.py # EBNF to OpenAPI converters
 │   ├── add_tests.js         # Test injection
-│   └── fix_collection_*.py  # Collection fixers
+│   ├── add_tests_jwt.js     # JWT-specific test injection
+│   ├── fix_collection_*.py  # Collection fixers
+│   ├── inject-banner*.js    # Banner injection for docs
+│   ├── replace-enum-values.js # Enum value replacement
+│   └── validate_collection.js # Collection validation
+├── examples/                # Code examples
+│   └── jwt-authentication-examples.md # JWT client examples
 ├── docs/                    # Generated documentation
 │   ├── templates/           # Doc templates
 │   └── index.html          # Redoc output
 ├── tests/                   # Test suites
+│   └── jwt-auth-tests.js    # JWT authentication tests
+├── finspect/               # File inspection tool
+├── test-images/            # Test screenshots
 ├── .env.example            # Environment template
 ├── Makefile                # Main automation
 ├── CLAUDE.md               # AI assistant guide
+├── TEMPLATE_ENDPOINTS_QUICKSTART.md # Template endpoint guide
+├── JWT_AUTHENTICATION_README.md # JWT implementation guide
+├── JWT_IMPLEMENTATION_SUMMARY.md # JWT technical summary
 └── README.md               # This file
 ```
 
@@ -245,6 +265,10 @@ POSTMAN_WS=d8a1f479-a2aa-4471-869e-b12feea0a98c
 
 # API Token for testing
 TOKEN=dummy-token
+
+# JWT Authentication (optional)
+TEST_CLIENT_ID=c2m_test_client
+TEST_CLIENT_SECRET=test_secret
 ```
 
 ### 2. Install Dependencies
@@ -256,15 +280,15 @@ make install
 ### 3. Generate OpenAPI from Data Dictionary
 
 ```bash
-# Convert EBNF to OpenAPI and validate
-make postman-dd-to-openapi
+# Convert EBNF to OpenAPI, merge auth overlay, and validate
+make generate-and-validate-openapi-spec
 ```
 
 ### 4. Run Complete Pipeline
 
 ```bash
 # Build, test, and deploy everything
-make postman-collection-build-and-test
+make postman-instance-build-and-test
 ```
 
 This command will:
@@ -299,11 +323,33 @@ curl -X POST http://localhost:4010/jobs/single-doc-job-template \
 Once complete, access the interactive API documentation at:
 - http://localhost:8080 - Redoc documentation
 
+### 7. JWT Authentication (Optional)
+
+The API supports JWT authentication with a two-token system:
+
+```bash
+# Test JWT authentication
+make jwt-test
+
+# Add JWT tests to Postman collection
+make postman-add-jwt-tests
+```
+
+See [JWT Authentication Guide](JWT_AUTHENTICATION_README.md) for complete details.
+
 ---
 
 ## What's New
 
 ### Recent Updates (August 2025)
+
+#### 🔐 JWT Authentication Implementation
+- Added comprehensive JWT authentication system using OpenAPI overlay architecture
+- Two-token system: long-term tokens (30-90 days) for servers, short-term tokens (15 min) for API calls
+- Multiple authentication methods: client credentials, OTP, JWT assertions
+- Automatic token refresh in Postman with pre-request scripts
+- Complete test suite with 12+ test scenarios
+- Client examples in JavaScript, Python, and cURL
 
 #### 1. Template Endpoints Featured Prominently
 - Template endpoints now appear first in all documentation
@@ -324,16 +370,23 @@ Added `postman-spec-create-standalone` target that creates specs in Postman's Sp
 - Integrated into main workflow
 
 #### 4. Dynamic EBNF to OpenAPI Translator
-- **New**: `ebnf_to_openapi_dynamic_v2.py` replaces the hardcoded translator
+- **New**: `ebnf_to_openapi_dynamic_v3.py` is the latest version
 - Dynamically reads type definitions from EBNF data dictionary
 - Properly resolves type chains (e.g., `documentId → id → integer`)
 - Generates clean YAML without Python object notation
+- Multiple versions available (v2, v3) for compatibility
 
 #### 5. Enhanced Import Options
 Multiple import strategies are now available:
 - **`make postman-import-openapi-flat-native`** - Native Postman flattening (default)
 - **`make postman-import-openapi-as-api`** - Creates API definition
 - **`make postman-spec-create`** - Creates spec in Specs tab
+
+#### 6. New Tools and Scripts
+- **finspect** - File inspection tool for analyzing project structure
+- **Banner Injection Scripts** - Add custom banners to API documentation
+- **Enum Value Replacement** - Dynamic enum value processing in specifications
+- **Collection Validation** - Automated validation of Postman collections
 
 ---
 
@@ -391,7 +444,7 @@ make postman-spec-create-standalone
 The primary workflow is executed with:
 
 ```bash
-make postman-collection-build-and-test
+make postman-instance-build-and-test
 ```
 
 This runs the complete pipeline:
@@ -421,8 +474,8 @@ Redoc build/serve → http://localhost:8080
 ### Detailed Pipeline Flow:
 
 1. **OpenAPI Generation**
-   - `generate-openapi-spec-from-dd` - Convert EBNF to OpenAPI
-   - `lint` - Validate with Redocly & Spectral
+   - `ebnf-dd-to-openapi-spec` - Convert EBNF to OpenAPI
+   - `open-api-spec-lint` - Validate with Redocly & Spectral
 
 2. **Postman Setup**
    - `postman-login` - Authenticate with API key
@@ -487,6 +540,10 @@ POSTMAN_WS=d8a1f479-a2aa-4471-869e-b12feea0a98c
 # Testing Token
 TOKEN=your-test-token
 
+# JWT Authentication (optional)
+TEST_CLIENT_ID=c2m_test_client
+TEST_CLIENT_SECRET=test_secret
+
 # Mock Server Ports (optional)
 PRISM_PORT=4010
 DOCS_PORT=8080
@@ -527,12 +584,12 @@ The Makefile handles different query parameter formats:
 
 2. **Regenerate OpenAPI**:
    ```bash
-   make generate-openapi-spec-from-dd
+   make ebnf-dd-to-openapi-spec
    ```
 
 3. **Rebuild Collections**:
    ```bash
-   make postman-collection-build-and-test
+   make postman-instance-build-and-test
    ```
 
 ### Custom Test Overrides
@@ -579,6 +636,12 @@ NODE_OPTIONS=--no-deprecation newman run postman/generated/collection.json
 
 All endpoints now use a simplified two-level structure:
 
+### 🔐 Authentication Endpoints
+
+1. **POST** `/auth/tokens/long` - Issue long-term token (30-90 days)
+2. **POST** `/auth/tokens/short` - Exchange for short-term token (15 minutes)
+3. **POST** `/auth/tokens/{tokenId}/revoke` - Revoke any token
+
 #### 🎯 **RECOMMENDED: Template Endpoints** (Start Here!)
 
 These endpoints use pre-configured job templates for optimal results:
@@ -611,6 +674,7 @@ For advanced document processing:
 
 ```json
 POST /jobs/single-doc-job-template
+Authorization: Bearer {short-term-jwt-token}
 {
   "documentSourceIdentifier": "https://example.com/document.pdf",
   "jobTemplate": "standard-letter",
@@ -663,6 +727,12 @@ make postman-mock
 
 # Run specific endpoint test
 make prism-test-select PRISM_TEST_ENDPOINT=/jobs/single-doc-job-template
+
+# Run JWT authentication tests
+make jwt-test
+
+# Add JWT tests to Postman collection
+make postman-add-jwt-tests
 ```
 
 ### Test Configuration
@@ -705,12 +775,12 @@ make docs-stop
 
 - `install` - Install all dependencies
 - `venv` - Set up Python virtual environment
-- `lint` - Validate OpenAPI specification
-- `diff` - Compare spec changes
+- `open-api-spec-lint` - Validate OpenAPI specification
+- `open-api-spec-diff` - Compare spec changes
 
 ### Build & Publish Targets
 
-- `postman-collection-build-and-test` - Main pipeline
+- `postman-instance-build-and-test` - Main pipeline
 - `postman-api-full-publish` - Full API publication
 - `postman-spec-create-standalone` - Create standalone spec
 

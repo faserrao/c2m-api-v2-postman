@@ -2,52 +2,120 @@
 <html>
 <head>
     <style>
-        .template-banner {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
+        .template-banner-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
             margin: 20px 0;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         
-        .template-banner h2 {
-            margin: 0 0 10px 0;
+        @media (max-width: 968px) {
+            .template-banner-wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .template-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 8px 0 0 8px;
+        }
+        
+        .template-editor-panel {
+            background: #2d3748;
+            color: white;
+            padding: 30px;
+            border-radius: 0 8px 8px 0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .template-editor-panel h3 {
+            margin: 0 0 20px 0;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            font-weight: normal;
+        }
+        
+        .template-editor-panel .emoji {
             font-size: 24px;
+            margin-right: 10px;
+        }
+        
+        .editor-screenshot {
+            flex: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 0 0 20px 0;
+            background: white;
+        }
+        
+        .editor-screenshot img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .editor-info {
+            margin-top: auto;
+        }
+        
+        .editor-info h4 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            color: #e2e8f0;
             display: flex;
             align-items: center;
         }
         
-        .template-banner .emoji {
-            font-size: 28px;
-            margin-right: 10px;
+        .editor-info p {
+            margin: 0;
+            font-size: 14px;
+            color: #cbd5e0;
+            line-height: 1.5;
         }
         
-        .template-banner p {
-            margin: 10px 0;
+        .template-banner h2 {
+            margin: 0 0 20px 0;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            font-weight: normal;
+        }
+        
+        .template-banner .emoji {
+            font-size: 32px;
+            margin-right: 12px;
+        }
+        
+        .template-banner > p {
+            margin: 0 0 25px 0;
             font-size: 16px;
             line-height: 1.5;
         }
         
         .template-banner .benefits {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: 1fr 1fr;
             gap: 15px;
-            margin: 15px 0;
+            margin: 25px 0;
         }
         
         .template-banner .benefit {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 10px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
             border-radius: 5px;
             display: flex;
             align-items: center;
+            font-size: 15px;
         }
         
         .template-banner .benefit-icon {
-            font-size: 20px;
-            margin-right: 8px;
+            font-size: 22px;
+            margin-right: 10px;
         }
         
         .template-banner .cta {
@@ -57,8 +125,9 @@
             border-radius: 5px;
             text-decoration: none;
             display: inline-block;
-            margin-top: 10px;
-            font-weight: bold;
+            margin: 20px 10px 0 0;
+            font-weight: 600;
+            font-size: 14px;
             transition: transform 0.2s;
         }
         
@@ -68,93 +137,141 @@
         }
         
         .template-endpoints-section {
-            background: #f7fafc;
-            padding: 20px;
+            background: #f8f9fa;
+            padding: 30px;
             margin: 20px 0;
             border-radius: 8px;
-            border: 2px solid #e2e8f0;
         }
         
         .template-endpoints-section h3 {
             color: #2d3748;
-            margin-top: 0;
+            margin: 0 0 20px 0;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .template-endpoints-section .emoji {
+            margin-right: 8px;
         }
         
         .endpoint-card {
             background: white;
-            padding: 15px;
-            margin: 10px 0;
+            padding: 20px;
+            margin: 0 0 15px 0;
             border-radius: 5px;
             border-left: 4px solid #667eea;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
         
         .endpoint-card h4 {
-            margin: 0 0 5px 0;
+            margin: 0 0 8px 0;
             color: #2d3748;
+            font-size: 18px;
+            font-family: 'Courier New', monospace;
         }
         
         .endpoint-card .tag {
             display: inline-block;
             background: #667eea;
             color: white;
-            padding: 2px 8px;
+            padding: 3px 10px;
             border-radius: 3px;
-            font-size: 12px;
+            font-size: 11px;
             margin-left: 10px;
+            text-transform: uppercase;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         
         .endpoint-card p {
-            margin: 5px 0;
+            margin: 8px 0;
             color: #4a5568;
             font-size: 14px;
+            line-height: 1.5;
         }
+        
+        .endpoint-card p strong {
+            color: #2d3748;
+        }
+        
+        /* Icons for benefits */
+        .icon-define::before { content: "📝 "; }
+        .icon-skip::before { content: "⚡ "; }
+        .icon-validated::before { content: "✅ "; }
+        .icon-link::before { content: "🔗 "; }
+        .icon-no-code::before { content: "💻 "; }
+        .icon-why::before { content: "✨ "; }
     </style>
 </head>
 <body>
-    <div class="template-banner">
-        <h2><span class="emoji">🎯</span> Start with Template Endpoints!</h2>
-        <p>New to C2M API? We strongly recommend using our <strong>template endpoints</strong> for the fastest integration.</p>
-        
-        <div class="benefits">
-            <div class="benefit">
-                <span class="benefit-icon">⚡</span>
-                <span>5-minute setup</span>
+    <div class="template-banner-wrapper">
+        <!-- Left Panel - Template Banner -->
+        <div class="template-banner">
+            <h2><span class="emoji">🎯</span> Start with Template Endpoints!</h2>
+            <p>Use our <strong>Job Templates</strong> to define your mailing configuration once and reuse it for every API call.</p>
+            
+            <div class="benefits">
+                <div class="benefit">
+                    <span class="benefit-icon">📝</span>
+                    <span>Define once, use many times</span>
+                </div>
+                <div class="benefit">
+                    <span class="benefit-icon">⚡</span>
+                    <span>Skip repetitive setup</span>
+                </div>
+                <div class="benefit">
+                    <span class="benefit-icon">✅</span>
+                    <span>Pre-validated configurations</span>
+                </div>
+                <div class="benefit">
+                    <span class="benefit-icon">🔗</span>
+                    <span>Link documents & lists</span>
+                </div>
             </div>
-            <div class="benefit">
-                <span class="benefit-icon">✅</span>
-                <span>Pre-configured settings</span>
-            </div>
-            <div class="benefit">
-                <span class="benefit-icon">💰</span>
-                <span>Optimized pricing</span>
-            </div>
-            <div class="benefit">
-                <span class="benefit-icon">🛡️</span>
-                <span>Best practices built-in</span>
-            </div>
+            
+            <a href="#tag/Template-Endpoints" class="cta">↓ View Template Endpoints</a>
+            <a href="template-endpoints-quickstart.html" class="cta">📚 QuickStart Guide</a>
         </div>
         
-        <a href="#template-endpoints" class="cta">View Template Endpoints ↓</a>
+        <!-- Right Panel - Template Editor Screenshot -->
+        <div class="template-editor-panel">
+            <h3><span class="emoji">📋</span> How Job Templates Work</h3>
+            
+            <div class="editor-screenshot">
+                <img src="template-editor.png" alt="Job Template Editor Interface">
+            </div>
+            
+            <div class="editor-info">
+                <h4><span class="icon-no-code"></span>No Coding Required!</h4>
+                <p>Templates are created using our visual editor. Your marketing team, operations staff, or anyone can set up templates without any programming knowledge.</p>
+                
+                <h4 style="margin-top: 20px;"><span class="icon-why"></span>Why Use Templates?</h4>
+                <ul style="margin: 10px 0 0 0; padding-left: 20px;">
+                    <li style="margin: 5px 0;">One-time setup: Configure once, reuse forever</li>
+                    <li style="margin: 5px 0;">Error reduction: Pre-validated settings</li>
+                    <li style="margin: 5px 0;">Team consistency: Everyone uses same config</li>
+                </ul>
+            </div>
+        </div>
     </div>
     
     <div class="template-endpoints-section" id="template-endpoints">
-        <h3>🚀 Recommended Template Endpoints</h3>
+        <h3><span class="emoji">🚀</span> Recommended Template Endpoints</h3>
         
         <div class="endpoint-card">
-            <h4>/jobs/single-doc-job-template <span class="tag">RECOMMENDED</span></h4>
+            <h4>/jobs/single-doc-job-template <span class="tag">Recommended</span></h4>
             <p>Perfect for sending a single document to multiple recipients. Ideal for newsletters, statements, and notices.</p>
             <p><strong>Required parameters:</strong> documentSourceIdentifier, jobTemplate, paymentDetails</p>
         </div>
         
         <div class="endpoint-card">
-            <h4>/jobs/multi-docs-job-template <span class="tag">RECOMMENDED</span></h4>
+            <h4>/jobs/multi-docs-job-template <span class="tag">Recommended</span></h4>
             <p>Send different documents to different recipients in one batch. Great for personalized mailings.</p>
             <p><strong>Required parameters:</strong> items[], jobTemplate, paymentDetails</p>
         </div>
         
         <div class="endpoint-card">
-            <h4>/jobs/multi-doc-merge-job-template <span class="tag">RECOMMENDED</span></h4>
+            <h4>/jobs/multi-doc-merge-job-template <span class="tag">Recommended</span></h4>
             <p>Merge multiple documents into one mailing. Perfect for creating document packets.</p>
             <p><strong>Required parameters:</strong> documentsToMerge[], recipientAddressSource, jobTemplate</p>
         </div>

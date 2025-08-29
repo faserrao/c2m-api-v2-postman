@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Template Endpoints Quick Start Guide - C2M API</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            color: #4a5568;
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+        
+        h3 {
+            color: #667eea;
+            margin-top: 30px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        th {
+            background: #f7fafc;
+            color: #4a5568;
+            font-weight: bold;
+        }
+        
+        tr:hover {
+            background: #f7fafc;
+        }
+        
+        code {
+            background: #f7fafc;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        pre {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        
+        pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+        
+        .template-card {
+            background: #f7fafc;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .template-card h3 {
+            margin-top: 0;
+            color: #667eea;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-list li {
+            padding: 5px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #48bb78;
+            font-weight: bold;
+        }
+        
+        .dont-list li:before {
+            content: "✗";
+            color: #f56565;
+        }
+        
+        .cta-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 40px 0;
+        }
+        
+        .cta-section h2 {
+            color: white;
+            margin-top: 0;
+        }
+        
+        .cta-section a {
+            color: white;
+            text-decoration: underline;
+        }
+        
+        .back-link {
+            display: inline-block;
+            color: #667eea;
+            text-decoration: none;
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        
+        .back-link:hover {
+            background: #667eea;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to API Documentation</a>
+        
+        <h1>🚀 Template Endpoints Quick Start Guide</h1>
+        
+        <p>This guide helps you get started with the C2M API using our <strong>recommended template endpoints</strong>. These endpoints are designed to get you up and running in minutes!</p>
+        
+        <h2>Why Template Endpoints?</h2>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>Template Endpoints</th>
+                    <th>Custom Endpoints</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Setup Time</strong></td>
+                    <td>5 minutes</td>
+                    <td>30+ minutes</td>
+                </tr>
+                <tr>
+                    <td><strong>Parameters</strong></td>
+                    <td>3 required</td>
+                    <td>10+ required</td>
+                </tr>
+                <tr>
+                    <td><strong>Configuration</strong></td>
+                    <td>Pre-optimized</td>
+                    <td>Manual setup</td>
+                </tr>
+                <tr>
+                    <td><strong>Error Rate</strong></td>
+                    <td>Lower</td>
+                    <td>Higher</td>
+                </tr>
+                <tr>
+                    <td><strong>Support</strong></td>
+                    <td>Priority</td>
+                    <td>Standard</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h2>Available Templates</h2>
+        
+        <div class="template-card">
+            <h3>📮 standard-letter</h3>
+            <p><strong>Use for:</strong> Regular business mail, statements, notices</p>
+            <p><strong>Features:</strong> First-class mail, black & white, #10 envelope</p>
+            <p><strong>Delivery:</strong> 3-5 business days</p>
+        </div>
+        
+        <div class="template-card">
+            <h3>🎨 color-marketing</h3>
+            <p><strong>Use for:</strong> Marketing materials, promotional mail</p>
+            <p><strong>Features:</strong> Full color, glossy paper, custom envelope</p>
+            <p><strong>Delivery:</strong> 5-7 business days</p>
+        </div>
+        
+        <div class="template-card">
+            <h3>📨 certified-mail</h3>
+            <p><strong>Use for:</strong> Legal documents, important notices</p>
+            <p><strong>Features:</strong> Tracking, signature required, return receipt</p>
+            <p><strong>Delivery:</strong> 3-5 business days</p>
+        </div>
+        
+        <div class="template-card">
+            <h3>⚡ priority-express</h3>
+            <p><strong>Use for:</strong> Urgent documents</p>
+            <p><strong>Features:</strong> Express mail, tracking, guaranteed delivery</p>
+            <p><strong>Delivery:</strong> 1-2 business days</p>
+        </div>
+        
+        <h2>Quick Examples</h2>
+        
+        <h3>1. Send a Single Document</h3>
+        <pre><code>curl -X POST https://api.c2m.com/v1/jobs/single-doc-job-template \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "documentSourceIdentifier": "https://yoursite.com/invoice.pdf",
+    "jobTemplate": "standard-letter",
+    "paymentDetails": {
+      "paymentMethod": "purchase-order",
+      "purchaseOrderNumber": "PO-2024-001"
+    }
+  }'</code></pre>
+        
+        <h3>2. Send Multiple Documents</h3>
+        <pre><code>curl -X POST https://api.c2m.com/v1/jobs/multi-docs-job-template \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "items": [
+      {
+        "documentSourceIdentifier": "https://yoursite.com/statement1.pdf",
+        "recipientAddressSource": {
+          "firstName": "John",
+          "lastName": "Doe",
+          "address1": "123 Main St",
+          "city": "Anytown",
+          "state": "CA",
+          "zip": "90210"
+        }
+      },
+      {
+        "documentSourceIdentifier": "https://yoursite.com/statement2.pdf",
+        "recipientAddressSource": {
+          "firstName": "Jane",
+          "lastName": "Smith",
+          "address1": "456 Oak Ave",
+          "city": "Somewhere",
+          "state": "NY",
+          "zip": "10001"
+        }
+      }
+    ],
+    "jobTemplate": "standard-letter",
+    "paymentDetails": {
+      "paymentMethod": "purchase-order",
+      "purchaseOrderNumber": "PO-2024-002"
+    }
+  }'</code></pre>
+        
+        <h3>3. Merge and Send Documents</h3>
+        <pre><code>curl -X POST https://api.c2m.com/v1/jobs/multi-doc-merge-job-template \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "documentsToMerge": [
+      "https://yoursite.com/cover-letter.pdf",
+      "https://yoursite.com/report.pdf",
+      "https://yoursite.com/appendix.pdf"
+    ],
+    "recipientAddressSource": {
+      "firstName": "Bob",
+      "lastName": "Johnson",
+      "address1": "789 Elm St",
+      "city": "Metropolis",
+      "state": "IL",
+      "zip": "60601"
+    },
+    "jobTemplate": "standard-letter",
+    "paymentDetails": {
+      "paymentMethod": "purchase-order",
+      "purchaseOrderNumber": "PO-2024-003"
+    }
+  }'</code></pre>
+        
+        <h2>Response Format</h2>
+        
+        <p>All template endpoints return a consistent response:</p>
+        
+        <pre><code>{
+  "jobId": "job_abc123",
+  "status": "processing",
+  "estimatedCompletionTime": "2024-01-15T14:30:00Z",
+  "trackingUrl": "https://track.c2m.com/job_abc123"
+}</code></pre>
+        
+        <h2>Best Practices</h2>
+        
+        <h3>✅ DO:</h3>
+        <ul class="feature-list">
+            <li>Start with <code>standard-letter</code> template for testing</li>
+            <li>Use HTTPS URLs for document sources</li>
+            <li>Validate addresses before submission</li>
+            <li>Monitor job status via webhooks</li>
+        </ul>
+        
+        <h3>❌ DON'T:</h3>
+        <ul class="feature-list dont-list">
+            <li>Use custom endpoints unless absolutely necessary</li>
+            <li>Submit documents larger than 25MB</li>
+            <li>Include sensitive data in document URLs</li>
+            <li>Retry failed requests immediately</li>
+        </ul>
+        
+        <h2>Migration from Custom Endpoints</h2>
+        
+        <p>If you're currently using custom endpoints, here's the mapping:</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Custom Endpoint</th>
+                    <th>Template Endpoint</th>
+                    <th>Template to Use</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>/jobs/single-doc</code></td>
+                    <td><code>/jobs/single-doc-job-template</code></td>
+                    <td><code>standard-letter</code></td>
+                </tr>
+                <tr>
+                    <td><code>/jobs/multi-doc</code></td>
+                    <td><code>/jobs/multi-docs-job-template</code></td>
+                    <td><code>standard-letter</code></td>
+                </tr>
+                <tr>
+                    <td><code>/jobs/multi-doc-merge</code></td>
+                    <td><code>/jobs/multi-doc-merge-job-template</code></td>
+                    <td><code>standard-letter</code></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h2>Common Use Cases</h2>
+        
+        <h3>Monthly Statements</h3>
+        <pre><code>{
+  "documentSourceIdentifier": "https://api.yourcompany.com/statements/2024-01.pdf",
+  "jobTemplate": "standard-letter",
+  "paymentDetails": {
+    "paymentMethod": "purchase-order",
+    "purchaseOrderNumber": "STMT-2024-01"
+  }
+}</code></pre>
+        
+        <h3>Marketing Campaign</h3>
+        <pre><code>{
+  "documentSourceIdentifier": "https://cdn.yourcompany.com/summer-sale.pdf",
+  "jobTemplate": "color-marketing",
+  "paymentDetails": {
+    "paymentMethod": "purchase-order",
+    "purchaseOrderNumber": "MKT-SUMMER-2024"
+  }
+}</code></pre>
+        
+        <h3>Legal Notice</h3>
+        <pre><code>{
+  "documentSourceIdentifier": "https://secure.lawfirm.com/notice-12345.pdf",
+  "jobTemplate": "certified-mail",
+  "paymentDetails": {
+    "paymentMethod": "purchase-order",
+    "purchaseOrderNumber": "LEGAL-2024-789"
+  }
+}</code></pre>
+        
+        <div class="cta-section">
+            <h2>Need Help?</h2>
+            <p>📧 Email: <a href="mailto:support@c2m.com">support@c2m.com</a></p>
+            <p>📚 Full Documentation: <a href="https://docs.c2m.com">https://docs.c2m.com</a></p>
+            <p>💬 Slack: <a href="https://c2m-api.slack.com">c2m-api.slack.com</a></p>
+        </div>
+        
+        <hr style="margin: 40px 0; border: 1px solid #e2e8f0;">
+        
+        <p><strong>Remember:</strong> Template endpoints are the fastest, most reliable way to integrate with C2M API. Start here and only move to custom endpoints if you have specific requirements not covered by templates.</p>
+    </div>
+</body>
+</html>

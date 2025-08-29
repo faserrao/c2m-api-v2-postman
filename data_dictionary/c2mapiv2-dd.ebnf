@@ -8,21 +8,26 @@
 (* 
   Use Case 1: I have a document, recipient addresses & a job template.
   Endpoint: POST /jobs/single-doc-job-template
-  Combines templating for layout/routing with basic content and address override.
-  Will the address source always be addressListId?
-*)
 submitSingleDocWithTemplateParams = 
       documentSourceIdentifier 
     + [ { recipientAddressSource } ] 
     + jobTemplate 
     + [ paymentDetails ] 
     + [ tags ] ;
+*)
+
+
+submitSingleDocWithTemplateParams =
+      ( documentSourceIdentifier
+      | { recipientAddressSource }
+      | (documentSourceIdentifier + { recipientAddressSource}) )
+    + jobTemplate
+    + [ paymentDetails ]
+    + [ tags ] ;
 
 (* 
   Use Case 2: I have multiple documents each to different recipient addresses & a job template.
   Endpoint: POST /jobs/multi-docs-job-template
-  Allows personalized delivery at scale while applying a shared template.
-  Will the address source always be addressListId?
 *)
 submitMultiDocWithTemplateParams = 
       { documentSourceIdentifier + recipientAddressSource } 
@@ -33,8 +38,6 @@ submitMultiDocWithTemplateParams =
 (* 
   Use Case 3: I want to merge multiple documents, send them to a single recipient, and use a job template.
   Endpoint: POST /jobs/multi-doc-merge-job-template
-  Use this for templated packet assembly with one output per job.
-  Will the address source always be addressListId?
 *)
 mergeMultiDocWithTemplateParams = 
       documentsToMerge 
@@ -205,54 +208,78 @@ jobOptions =
   Payment options allow flexibility across B2B, B2C, and credit-based platforms.
   Some methods require additional nested structures.
 *)
-paymentDetails = 
-      billingType                         (* Determines how the job will be paid for *)
-    + [ optionalPaymentFields ] ;         (* Optional payment data required depending on billing type *)
+paymentDetails =
+      creditCardPayment
+    | invoicePayment
+    | achPayment
+    | userCreditPayment
+    | applePayPayment
+    | googlePayPayment ;
 
-billingType = 
-      "creditCard"                        (* Immediate payment using a credit card *)
-    | "invoice"                           (* Billed after fulfillment using invoice number *)
-    | "ach"                               (* Automated Clearing House for direct debit *)
-    | "userCredit" ;                      (* Deduct from user account balance *)
+applePayPayment =
+      "APPLE_PAY"                       (* Immediate payment using Apple Pay *)
+    + applePaymentDetails ;
 
-(* 
-  Credit card structure required for "creditCard" billing.
-  Must be PCI-compliant if implemented in production.
-*)
-creditCardDetails = 
-      cardType + cardNumber + expirationDate + cvv ;
+googlePayPayment =
+      "GOOGLE_PAY"                       (* Immediate payment using Apple Pay *)
+    + googlePaymentDetails ;
 
-invoiceDetails = 
-      invoiceNumber + amountDue ;         (* For "invoice" billing; amountDue should match quoted job total *)
+creditCardPayment =
+      "CREDIT_CARD"                       (* Immediate payment using a credit card *)
+    + creditCardDetails ;
 
-achDetails = 
-      routingNumber + accountNumber + checkDigit ;  (* Used for direct bank transfers *)
+invoicePayment =
+      "INVOICE"                           (* Billed after fulfillment using invoice number *)
+    + invoiceDetails ;
 
-creditAmount = 
-      amount + currency ;                 (* Relevant for internal billing systems or chargebacks *)
+achPayment =
+      "ACH"                               (* Automated Clearing House for direct debit *)
+    + achDetails ;
+
+userCreditPayment =
+      "USER_CREDIT"                       (* Deduct from user account balance *)
+    + creditAmount ;
+
+(* Credit card structure required for "creditCard" billing *)
+creditCardDetails =
+      cardType
+    + cardNumber
+    + expirationDate
+    + cvv ;
+
+invoiceDetails =
+      invoiceNumber
+    + amountDue ;
+
+achDetails =
+      routingNumber
+    + accountNumber
+    + checkDigit ;
+
+creditAmount =
+      amount
+    + currency ;
+
+applePaymentDetails = "TBD" ;
+
+googlePaymentDetails = "TBD" ;
 
 (* Value field types *)
-currency = "USD" | "EUR" | "GBP" | "CAD" | "AUD" ;  (* ISO 4217 codes *)
-amount = number ;  (* Floating-point or fixed-point monetary value *)
+currency = "USD" | "EUR" | "GBP" | "CAD" | "AUD" ;
+amount = number ;
 
-(* Leaf fields used across various structures *)
+(* Leaf fields *)
 cardNumber       = string ;
+cardType         = string ;
 expirationDate   = month + year ;
-month            = integer ;             (* Integer between 1–12 *)
-year             = integer ;             (* Full four-digit year *)
-cvv              = integer ;             (* Typically 3–4 digits *)
+month            = integer ;
+year             = integer ;
+cvv              = integer ;
 routingNumber    = string ;
 accountNumber    = string ;
 checkDigit       = integer ;
 invoiceNumber    = string ;
 amountDue        = number ;
-
-(* Optional fields based on payment method *)
-optionalPaymentFields = 
-      [ creditCardDetails ] 
-    + [ invoiceDetails ] 
-    + [ achDetails ] 
-    + [ creditAmount ] ;
 
 addressListId        = id; (* New as of 07082025 *)
 addressId            = id;

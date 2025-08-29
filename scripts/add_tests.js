@@ -36,15 +36,27 @@ function addTestsToItem(item) {
       item.event.push(testEvent);
     }
 
+    // Check if there's already a "Status code is allowed" test
+    const hasStatusTest = testEvent.script.exec.some(line => 
+      typeof line === 'string' && (
+        line.includes('Status code is allowed') || 
+        line.includes('"Status code is allowed') ||
+        line.includes("'Status code is allowed") ||
+        line.includes('pm.expect([') && line.includes(']).to.include(pm.response.code)')
+      )
+    );
+
     // Remove old "Status code is 200" tests
     testEvent.script.exec = testEvent.script.exec.filter(line => !line.includes('Status code is 200'));
 
-    // Add new tests
-    testsToAdd.forEach(test => {
-      if (!testEvent.script.exec.includes(test)) {
-        testEvent.script.exec.push(test);
-      }
-    });
+    // Only add new tests if no custom status test exists
+    if (!hasStatusTest) {
+      testsToAdd.forEach(test => {
+        if (!testEvent.script.exec.includes(test)) {
+          testEvent.script.exec.push(test);
+        }
+      });
+    }
   }
 
   // Recursively handle sub-items

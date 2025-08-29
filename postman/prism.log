@@ -1,672 +1,148 @@
-[2:35:21 PM] › [CLI] …  awaiting  Starting Prism…
-(node:34178) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+=== Thu Aug 28 15:22:16 EDT 2025 ===
+[3:22:18 PM] › [CLI] …  awaiting  Starting Prism…
+(node:4845) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-[2:35:21 PM] › [CLI] ✖  fatal     Error opening file "/Users/frankserrao/Dropbox/Customers/c2m/projects/c2m-api/C2M_API_v3/c2m-api-repo/openapi/c2mapiv2-openapi-spec-final.yaml-with-examples.yaml" 
-ENOENT: no such file or directory, open '/Users/frankserrao/Dropbox/Customers/c2m/projects/c2m-api/C2M_API_v3/c2m-api-repo/openapi/c2mapiv2-openapi-spec-final.yaml-with-examples.yaml'
-prism mock <document>
-
-Start a mock server with the given document file
-
-Positionals:
-  document  Path to a document file. Can be both a file or a fetchable resource on the web.  [string] [required]
-
-Options:
-      --version                           Show version number  [boolean]
-      --help                              Show help  [boolean]
-  -p, --port                              Port that Prism will run on.  [number] [required] [default: 4010]
-  -h, --host                              Host that Prism will listen to.  [string] [required] [default: "127.0.0.1"]
-      --cors                              Enables CORS headers.  [boolean] [default: true]
-  -m, --multiprocess                      Forks the http server from the CLI for faster log processing.  [boolean] [default: false]
-      --errors                            Specifies whether request/response violations marked as errors will produce an error response  [boolean] [required] [default: false]
-  -v, --verboseLevel                      Turns on verbose logging.  [required] [choices: "trace", "debug", "info", "warn", "error", "fatal", "silent"] [default: "info"]
-  -d, --dynamic                           Dynamically generate examples.  [boolean] [default: false]
-      --json-schema-faker-fillProperties  Generate additional properties when using dynamic generation.  [boolean]
-      --ignoreExamples                    Tell Prism to treat the spec as though it has no examples. When in static mode,
-                                                                  returns an example that has not been generated using json-schema-faker, but was
-                                                                  created by Prism. When in dynamic mode, this flag is ignored, since in dynamic mode,
-                                                                  examples are not consulted and json-schema-faker is used to generate a response based
-                                                                  on the schema defined in the spec  [boolean] [default: false]
-      --seed                              Provide a seed so that Prism generates dynamic examples deterministically  [string] [required] [default: null]
-
-{
-  stack: 'ResolverError: Error opening file "/Users/frankserrao/Dropbox/Customers/c2m/projects/c2m-api/C2M_API_v3/c2m-api-repo/openapi/c2mapiv2-openapi-spec-final.yaml-with-examples.yaml" \n' +
-    "ENOENT: no such file or directory, open '/Users/frankserrao/Dropbox/Customers/c2m/projects/c2m-api/C2M_API_v3/c2m-api-repo/openapi/c2mapiv2-openapi-spec-final.yaml-with-examples.yaml'\n" +
-    '    at ReadFileContext.callback (/Users/frankserrao/Dropbox/Customers/c2m/projects/c2m-api/C2M_API_v3/c2m-api-repo/node_modules/@stoplight/json-schema-ref-parser/lib/resolvers/file.js:52:20)\n' +
-    '    at FSReqCallback.readFileAfterOpen [as oncomplete] (node:fs:300:13)',
-  code: 'ERESOLVER',
-  message: 'Error opening file "/Users/frankserrao/Dropbox/Customers/c2m/projects/c2m-api/C2M_API_v3/c2m-api-repo/openapi/c2mapiv2-openapi-spec-final.yaml-with-examples.yaml" \n' +
-    "ENOENT: no such file or directory, open '/Users/frankserrao/Dropbox/Customers/c2m/projects/c2m-api/C2M_API_v3/c2m-api-repo/openapi/c2mapiv2-openapi-spec-final.yaml-with-examples.yaml'",
-  source: '/Users/frankserrao/Dropbox/Customers/c2m/projects/c2m-api/C2M_API_v3/c2m-api-repo/openapi/c2mapiv2-openapi-spec-final.yaml-with-examples.yaml',
-  path: null,
-  toJSON: [Function: toJSON],
-  ioErrorCode: 'ENOENT',
-  name: 'ResolverError',
-  toString: [Function: toString]
-}
-=== Thu Aug  7 19:33:42 EDT 2025 ===
-[7:33:43 PM] › [CLI] …  awaiting  Starting Prism…
-(node:6573) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[3:22:18 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
+[3:22:18 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
+[3:22:18 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
+[3:22:18 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
+[3:22:18 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
+[3:22:18 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
+[3:22:18 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
+[3:22:18 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
+[3:22:18 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
+[3:22:18 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
+[3:22:18 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
+[3:22:30 PM] › [HTTP SERVER] post /jobs/single-doc-job-template ℹ  info      Request received
+[3:22:30 PM] › [HTTP SERVER] post /jobs/single-doc-job-template ✖  error     Request terminated with error: https://stoplight.io/prism/errors#NO_PATH_MATCHED_ERROR: Route not resolved, no path matched
+=== Thu Aug 28 15:23:09 EDT 2025 ===
+[3:23:10 PM] › [CLI] …  awaiting  Starting Prism…
+(node:6225) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-[7:33:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[7:33:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[7:33:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[7:33:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[7:33:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[7:33:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[7:33:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[7:33:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[7:33:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[7:33:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[7:33:43 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Thu Aug  7 19:40:30 EDT 2025 ===
-[7:40:30 PM] › [CLI] …  awaiting  Starting Prism…
-(node:11201) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[3:23:10 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-doc-job-template
+[3:23:10 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-docs-job-template
+[3:23:10 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc-merge-job-template
+[3:23:10 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-doc
+[3:23:10 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc
+[3:23:10 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc-merge
+[3:23:10 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-pdf-split
+[3:23:10 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-pdf-split-addressCapture
+[3:23:10 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-pdf-address-capture
+[3:23:10 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/short
+[3:23:10 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/long
+[3:23:10 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/et/revoke
+[3:23:10 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
+[3:23:21 PM] › [HTTP SERVER] post /jobs/single-doc-job-template ℹ  info      Request received
+[3:23:21 PM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: */*
+[3:23:21 PM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[3:23:21 PM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for */*
+[3:23:21 PM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[3:23:21 PM] ›     [NEGOTIATOR] ℹ  info      > Responding with "200"
+[3:31:24 PM] › [HTTP SERVER] post /auth/tokens/long ℹ  info      Request received
+[3:31:24 PM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: */*
+[3:31:24 PM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[3:31:24 PM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for */*
+[3:31:24 PM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 201
+[3:31:24 PM] ›     [NEGOTIATOR] ℹ  info      > Responding with "201"
+=== Thu Aug 28 16:22:26 EDT 2025 ===
+[4:22:27 PM] › [CLI] …  awaiting  Starting Prism…
+(node:60694) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-[7:40:31 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[7:40:31 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[7:40:31 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[7:40:31 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[7:40:31 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[7:40:31 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[7:40:31 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[7:40:31 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[7:40:31 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[7:40:31 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[7:40:31 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Sat Aug  9 04:53:32 EDT 2025 ===
-[4:53:34 AM] › [CLI] …  awaiting  Starting Prism…
-(node:55244) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[4:22:28 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-doc-job-template
+[4:22:28 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-docs-job-template
+[4:22:28 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc-merge-job-template
+[4:22:28 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-doc
+[4:22:28 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc
+[4:22:28 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc-merge
+[4:22:28 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-pdf-split
+[4:22:28 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-pdf-split-addressCapture
+[4:22:28 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-pdf-address-capture
+[4:22:28 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/short
+[4:22:28 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/long
+[4:22:28 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/nobis/revoke
+[4:22:28 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
+=== Thu Aug 28 16:31:40 EDT 2025 ===
+[4:31:41 PM] › [CLI] …  awaiting  Starting Prism…
+(node:72609) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-[4:53:34 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[4:53:34 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[4:53:34 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[4:53:34 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[4:53:34 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[4:53:34 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[4:53:34 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[4:53:34 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[4:53:34 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[4:53:34 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[4:53:34 AM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Sat Aug  9 17:58:00 EDT 2025 ===
-[5:58:02 PM] › [CLI] …  awaiting  Starting Prism…
-(node:85689) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[4:31:41 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-doc-job-template
+[4:31:41 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-docs-job-template
+[4:31:41 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc-merge-job-template
+[4:31:41 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-doc
+[4:31:41 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc
+[4:31:41 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc-merge
+[4:31:41 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-pdf-split
+[4:31:41 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-pdf-split-addressCapture
+[4:31:41 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-pdf-address-capture
+[4:31:41 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/short
+[4:31:41 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/long
+[4:31:41 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/corporis/revoke
+[4:31:41 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
+=== Thu Aug 28 17:03:10 EDT 2025 ===
+[5:03:11 PM] › [CLI] …  awaiting  Starting Prism…
+(node:90843) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-[5:58:02 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[5:58:02 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[5:58:02 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[5:58:02 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[5:58:02 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[5:58:02 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[5:58:02 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[5:58:02 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[5:58:02 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[5:58:02 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[5:58:02 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Sat Aug  9 18:07:07 EDT 2025 ===
-[6:07:08 PM] › [CLI] …  awaiting  Starting Prism…
-(node:94410) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[5:03:11 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-doc-job-template
+[5:03:11 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-docs-job-template
+[5:03:11 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc-merge-job-template
+[5:03:11 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-doc
+[5:03:11 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc
+[5:03:11 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc-merge
+[5:03:11 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-pdf-split
+[5:03:11 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-pdf-split-addressCapture
+[5:03:11 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-pdf-address-capture
+[5:03:11 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/short
+[5:03:11 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/long
+[5:03:11 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/impedit/revoke
+[5:03:11 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
+=== Thu Aug 28 17:06:45 EDT 2025 ===
+[5:06:46 PM] › [CLI] …  awaiting  Starting Prism…
+(node:98231) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-[6:07:08 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[6:07:08 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[6:07:08 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[6:07:08 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[6:07:08 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[6:07:08 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[6:07:08 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[6:07:08 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[6:07:08 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[6:07:08 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[6:07:08 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Sun Aug 10 00:37:26 EDT 2025 ===
-[12:37:28 AM] › [CLI] …  awaiting  Starting Prism…
-(node:45672) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[5:06:46 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-doc-job-template
+[5:06:46 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-docs-job-template
+[5:06:46 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc-merge-job-template
+[5:06:46 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-doc
+[5:06:46 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc
+[5:06:46 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc-merge
+[5:06:46 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-pdf-split
+[5:06:46 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-pdf-split-addressCapture
+[5:06:46 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-pdf-address-capture
+[5:06:46 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/short
+[5:06:46 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/long
+[5:06:46 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/eius/revoke
+[5:06:46 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
+=== Thu Aug 28 17:15:00 EDT 2025 ===
+[5:15:01 PM] › [CLI] …  awaiting  Starting Prism…
+(node:10002) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-[12:37:28 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[12:37:28 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[12:37:28 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[12:37:28 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[12:37:28 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[12:37:28 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[12:37:28 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[12:37:28 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[12:37:28 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[12:37:28 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[12:37:28 AM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Wed Aug 13 16:02:40 EDT 2025 ===
-[4:02:43 PM] › [CLI] …  awaiting  Starting Prism…
-(node:19805) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+[5:15:01 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-doc-job-template
+[5:15:01 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-docs-job-template
+[5:15:01 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc-merge-job-template
+[5:15:01 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-doc
+[5:15:01 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc
+[5:15:01 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc-merge
+[5:15:01 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-pdf-split
+[5:15:01 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-pdf-split-addressCapture
+[5:15:01 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-pdf-address-capture
+[5:15:01 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/short
+[5:15:01 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/long
+[5:15:01 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/eius/revoke
+[5:15:01 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
+=== Thu Aug 28 18:31:26 EDT 2025 ===
+[6:31:28 PM] › [CLI] …  awaiting  Starting Prism…
+(node:39258) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-[4:02:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[4:02:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[4:02:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[4:02:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[4:02:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[4:02:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[4:02:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[4:02:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[4:02:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[4:02:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[4:02:43 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-[4:03:24 PM] › [HTTP SERVER] post /jobs/submit/single/doc ℹ  info      Request received
-[4:03:24 PM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: application/json
-[4:03:24 PM] ›     [VALIDATOR] ⚠  warning   Request did not pass the validation rules
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Request body property paymentDetails.creditCardDetails.expirationDate.month must be <= 12
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Request body property paymentDetails.achDetails.accountNumber must be string
-[4:03:24 PM] ›     [NEGOTIATOR] ✔  success   Found response 400. I'll try with it.
-[4:03:24 PM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 400
-[4:03:24 PM] ›     [NEGOTIATOR] ℹ  info      > Responding with "400"
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Violation: request.body.paymentDetails.creditCardDetails.expirationDate.month Request body property paymentDetails.creditCardDetails.expirationDate.month must be <= 12
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Violation: request.body.paymentDetails.achDetails.accountNumber Request body property paymentDetails.achDetails.accountNumber must be string
-[4:03:24 PM] › [HTTP SERVER] post /jobs/submit/single/doc/jobTemplate ℹ  info      Request received
-[4:03:24 PM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: */*
-[4:03:24 PM] ›     [VALIDATOR] ⚠  warning   Request did not pass the validation rules
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Request body property paymentDetails.creditCardDetails.expirationDate.month must be <= 12
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Request body property paymentDetails.achDetails.accountNumber must be string
-[4:03:24 PM] ›     [NEGOTIATOR] ✔  success   Found response 400. I'll try with it.
-[4:03:24 PM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 400
-[4:03:24 PM] ›     [NEGOTIATOR] ℹ  info      > Responding with "400"
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Violation: request.body.paymentDetails.creditCardDetails.expirationDate.month Request body property paymentDetails.creditCardDetails.expirationDate.month must be <= 12
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Violation: request.body.paymentDetails.achDetails.accountNumber Request body property paymentDetails.achDetails.accountNumber must be string
-[4:03:24 PM] › [HTTP SERVER] post /jobs/submit/single/pdf/split ℹ  info      Request received
-[4:03:24 PM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: */*
-[4:03:24 PM] ›     [VALIDATOR] ⚠  warning   Request did not pass the validation rules
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Request body property paymentDetails.creditCardDetails.expirationDate.month must be <= 12
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Request body property paymentDetails.achDetails.accountNumber must be string
-[4:03:24 PM] ›     [NEGOTIATOR] ✔  success   Found response 400. I'll try with it.
-[4:03:24 PM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 400
-[4:03:24 PM] ›     [NEGOTIATOR] ℹ  info      > Responding with "400"
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Violation: request.body.paymentDetails.creditCardDetails.expirationDate.month Request body property paymentDetails.creditCardDetails.expirationDate.month must be <= 12
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Violation: request.body.paymentDetails.achDetails.accountNumber Request body property paymentDetails.achDetails.accountNumber must be string
-[4:03:24 PM] › [HTTP SERVER] post /jobs/submit/single/pdf/split/addressCapture ℹ  info      Request received
-[4:03:24 PM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: */*
-[4:03:24 PM] ›     [VALIDATOR] ⚠  warning   Request did not pass the validation rules
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Request body property embeddedExtractionSpecs.0.addressRegion.width must be number
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Request body property embeddedExtractionSpecs.1.addressRegion.width must be number
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Request body property paymentDetails.creditCardDetails.expirationDate.month must be <= 12
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Request body property paymentDetails.achDetails.accountNumber must be string
-[4:03:24 PM] ›     [NEGOTIATOR] ✔  success   Found response 400. I'll try with it.
-[4:03:24 PM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 400
-[4:03:24 PM] ›     [NEGOTIATOR] ℹ  info      > Responding with "400"
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Violation: request.body.embeddedExtractionSpecs.0.addressRegion.width Request body property embeddedExtractionSpecs.0.addressRegion.width must be number
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Violation: request.body.embeddedExtractionSpecs.1.addressRegion.width Request body property embeddedExtractionSpecs.1.addressRegion.width must be number
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Violation: request.body.paymentDetails.creditCardDetails.expirationDate.month Request body property paymentDetails.creditCardDetails.expirationDate.month must be <= 12
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Violation: request.body.paymentDetails.achDetails.accountNumber Request body property paymentDetails.achDetails.accountNumber must be string
-[4:03:24 PM] › [HTTP SERVER] post /jobs/submit/multi/doc ℹ  info      Request received
-[4:03:24 PM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: */*
-[4:03:24 PM] ›     [VALIDATOR] ⚠  warning   Request did not pass the validation rules
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Request body property paymentDetails.creditCardDetails.expirationDate.month must be <= 12
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Request body property paymentDetails.achDetails.accountNumber must be string
-[4:03:24 PM] ›     [NEGOTIATOR] ✔  success   Found response 400. I'll try with it.
-[4:03:24 PM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 400
-[4:03:24 PM] ›     [NEGOTIATOR] ℹ  info      > Responding with "400"
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Violation: request.body.paymentDetails.creditCardDetails.expirationDate.month Request body property paymentDetails.creditCardDetails.expirationDate.month must be <= 12
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Violation: request.body.paymentDetails.achDetails.accountNumber Request body property paymentDetails.achDetails.accountNumber must be string
-[4:03:24 PM] › [HTTP SERVER] post /jobs/submit/multi/doc/merge ℹ  info      Request received
-[4:03:24 PM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: */*
-[4:03:24 PM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
-[4:03:24 PM] ›     [NEGOTIATOR] ⚠  warning   Unable to find content for */*
-[4:03:24 PM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
-[4:03:24 PM] ›     [NEGOTIATOR] ℹ  info      > Responding with "200"
-[4:03:24 PM] › [HTTP SERVER] post /jobs/submit/multi/doc/merge/jobTemplate ℹ  info      Request received
-[4:03:24 PM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: */*
-[4:03:24 PM] ›     [VALIDATOR] ⚠  warning   Request did not pass the validation rules
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Request body property paymentDetails.creditCardDetails.expirationDate.month must be <= 12
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Request body property paymentDetails.achDetails.accountNumber must be string
-[4:03:24 PM] ›     [NEGOTIATOR] ✔  success   Found response 400. I'll try with it.
-[4:03:24 PM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 400
-[4:03:24 PM] ›     [NEGOTIATOR] ℹ  info      > Responding with "400"
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Violation: request.body.paymentDetails.creditCardDetails.expirationDate.month Request body property paymentDetails.creditCardDetails.expirationDate.month must be <= 12
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Violation: request.body.paymentDetails.achDetails.accountNumber Request body property paymentDetails.achDetails.accountNumber must be string
-[4:03:24 PM] › [HTTP SERVER] post /jobs/submit/multi/docs/jobtemplate ℹ  info      Request received
-[4:03:24 PM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: */*
-[4:03:24 PM] ›     [VALIDATOR] ⚠  warning   Request did not pass the validation rules
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Request body property paymentDetails.creditCardDetails.expirationDate.month must be <= 12
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Request body property paymentDetails.achDetails.accountNumber must be string
-[4:03:24 PM] ›     [NEGOTIATOR] ✔  success   Found response 400. I'll try with it.
-[4:03:24 PM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 400
-[4:03:24 PM] ›     [NEGOTIATOR] ℹ  info      > Responding with "400"
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Violation: request.body.paymentDetails.creditCardDetails.expirationDate.month Request body property paymentDetails.creditCardDetails.expirationDate.month must be <= 12
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Violation: request.body.paymentDetails.achDetails.accountNumber Request body property paymentDetails.achDetails.accountNumber must be string
-[4:03:24 PM] › [HTTP SERVER] post /jobs/submit/multi/pdf/addressCapture ℹ  info      Request received
-[4:03:24 PM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: */*
-[4:03:24 PM] ›     [VALIDATOR] ⚠  warning   Request did not pass the validation rules
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Request body property addressCapturePdfs.0.addressListRegion.width must be number
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Request body property addressCapturePdfs.1.addressListRegion.width must be number
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Request body property paymentDetails.creditCardDetails.expirationDate.month must be <= 12
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Request body property paymentDetails.achDetails.accountNumber must be string
-[4:03:24 PM] ›     [NEGOTIATOR] ✔  success   Found response 400. I'll try with it.
-[4:03:24 PM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 400
-[4:03:24 PM] ›     [NEGOTIATOR] ℹ  info      > Responding with "400"
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Violation: request.body.addressCapturePdfs.0.addressListRegion.width Request body property addressCapturePdfs.0.addressListRegion.width must be number
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Violation: request.body.addressCapturePdfs.1.addressListRegion.width Request body property addressCapturePdfs.1.addressListRegion.width must be number
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Violation: request.body.paymentDetails.creditCardDetails.expirationDate.month Request body property paymentDetails.creditCardDetails.expirationDate.month must be <= 12
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Violation: request.body.paymentDetails.achDetails.accountNumber Request body property paymentDetails.achDetails.accountNumber must be string
-[4:03:24 PM] › [HTTP SERVER] post /webhooks/jobStatusUpdate ℹ  info      Request received
-[4:03:24 PM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: application/json
-[4:03:24 PM] ›     [VALIDATOR] ⚠  warning   Request did not pass the validation rules
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Request body property timestamp must match format "date-time"
-[4:03:24 PM] ›     [NEGOTIATOR] ✔  success   Found response 400. I'll try with it.
-[4:03:24 PM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 400
-[4:03:24 PM] ›     [NEGOTIATOR] ℹ  info      > Responding with "400"
-[4:03:24 PM] ›     [VALIDATOR] ✖  error     Violation: request.body.timestamp Request body property timestamp must match format "date-time"
-=== Wed Aug 20 01:31:24 EDT 2025 ===
-[1:31:25 AM] › [CLI] …  awaiting  Starting Prism…
-(node:54229) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-[1:31:25 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[1:31:25 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[1:31:25 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[1:31:25 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[1:31:25 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[1:31:25 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[1:31:25 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[1:31:25 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[1:31:25 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[1:31:25 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[1:31:25 AM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Wed Aug 20 01:47:00 EDT 2025 ===
-[1:47:01 AM] › [CLI] …  awaiting  Starting Prism…
-(node:62195) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-[1:47:01 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[1:47:01 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[1:47:01 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[1:47:01 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[1:47:01 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[1:47:01 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[1:47:01 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[1:47:01 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[1:47:01 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[1:47:01 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[1:47:01 AM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Wed Aug 20 01:47:43 EDT 2025 ===
-[1:47:44 AM] › [CLI] …  awaiting  Starting Prism…
-(node:65421) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-[1:47:44 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[1:47:44 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[1:47:44 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[1:47:44 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[1:47:44 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[1:47:44 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[1:47:44 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[1:47:44 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[1:47:44 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[1:47:44 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[1:47:44 AM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Wed Aug 20 16:54:20 EDT 2025 ===
-[4:54:21 PM] › [CLI] …  awaiting  Starting Prism…
-(node:52468) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-[4:54:21 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[4:54:21 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[4:54:21 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[4:54:21 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[4:54:21 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[4:54:21 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[4:54:21 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[4:54:21 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[4:54:21 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[4:54:21 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[4:54:21 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Thu Aug 21 13:02:54 EDT 2025 ===
-[1:02:55 PM] › [CLI] …  awaiting  Starting Prism…
-(node:70674) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-[1:02:55 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[1:02:55 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[1:02:55 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[1:02:55 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[1:02:55 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[1:02:55 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[1:02:55 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[1:02:55 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[1:02:55 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[1:02:55 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[1:02:55 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Thu Aug 21 13:06:11 EDT 2025 ===
-[1:06:11 PM] › [CLI] …  awaiting  Starting Prism…
-(node:76032) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-[1:06:11 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[1:06:11 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[1:06:11 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[1:06:11 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[1:06:11 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[1:06:11 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[1:06:11 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[1:06:11 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[1:06:11 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[1:06:11 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[1:06:11 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Thu Aug 21 16:06:18 EDT 2025 ===
-[4:06:19 PM] › [CLI] …  awaiting  Starting Prism…
-(node:90604) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-[4:06:19 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[4:06:19 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[4:06:19 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[4:06:19 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[4:06:19 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[4:06:19 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[4:06:19 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[4:06:19 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[4:06:19 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[4:06:19 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[4:06:19 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Thu Aug 21 18:02:49 EDT 2025 ===
-[6:02:50 PM] › [CLI] …  awaiting  Starting Prism…
-(node:19383) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-[6:02:50 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[6:02:50 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[6:02:50 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[6:02:50 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[6:02:50 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[6:02:50 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[6:02:50 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[6:02:50 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[6:02:50 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[6:02:50 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[6:02:50 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Thu Aug 21 18:06:13 EDT 2025 ===
-[6:06:14 PM] › [CLI] …  awaiting  Starting Prism…
-(node:25176) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-[6:06:14 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[6:06:14 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[6:06:14 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[6:06:14 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[6:06:14 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[6:06:14 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[6:06:14 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[6:06:14 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[6:06:14 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[6:06:14 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[6:06:14 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Thu Aug 21 20:15:48 EDT 2025 ===
-[8:15:50 PM] › [CLI] …  awaiting  Starting Prism…
-(node:67946) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-[8:15:50 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[8:15:50 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[8:15:50 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[8:15:50 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[8:15:50 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[8:15:50 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[8:15:50 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[8:15:50 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[8:15:50 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[8:15:50 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[8:15:50 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Thu Aug 21 20:22:40 EDT 2025 ===
-[8:22:42 PM] › [CLI] …  awaiting  Starting Prism…
-(node:74979) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-[8:22:42 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[8:22:42 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[8:22:42 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[8:22:42 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[8:22:42 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[8:22:42 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[8:22:42 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[8:22:42 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[8:22:42 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[8:22:42 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[8:22:42 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Thu Aug 21 21:33:21 EDT 2025 ===
-[9:33:23 PM] › [CLI] …  awaiting  Starting Prism…
-(node:1642) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-[9:33:23 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[9:33:23 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[9:33:23 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[9:33:23 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[9:33:23 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[9:33:23 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[9:33:23 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[9:33:23 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[9:33:23 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[9:33:23 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[9:33:23 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Thu Aug 21 23:00:46 EDT 2025 ===
-[11:00:47 PM] › [CLI] …  awaiting  Starting Prism…
-(node:34641) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-[11:00:47 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[11:00:47 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[11:00:47 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[11:00:47 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[11:00:47 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[11:00:47 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[11:00:47 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[11:00:47 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[11:00:47 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[11:00:47 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[11:00:47 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Fri Aug 22 08:44:23 EDT 2025 ===
-[8:44:24 AM] › [CLI] …  awaiting  Starting Prism…
-(node:46841) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-[8:44:24 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[8:44:24 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[8:44:24 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[8:44:24 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[8:44:24 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[8:44:24 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[8:44:24 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[8:44:24 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[8:44:24 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[8:44:24 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[8:44:24 AM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Fri Aug 22 08:47:22 EDT 2025 ===
-[8:47:22 AM] › [CLI] …  awaiting  Starting Prism…
-(node:52413) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-[8:47:23 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[8:47:23 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[8:47:23 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[8:47:23 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[8:47:23 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[8:47:23 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[8:47:23 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[8:47:23 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[8:47:23 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[8:47:23 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[8:47:23 AM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Fri Aug 22 08:49:05 EDT 2025 ===
-[8:49:06 AM] › [CLI] …  awaiting  Starting Prism…
-(node:57633) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-[8:49:06 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[8:49:06 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[8:49:06 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[8:49:06 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[8:49:06 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[8:49:06 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[8:49:06 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[8:49:06 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[8:49:06 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[8:49:06 AM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[8:49:06 AM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Fri Aug 22 13:04:57 EDT 2025 ===
-[1:04:58 PM] › [CLI] …  awaiting  Starting Prism…
-(node:36012) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-[1:04:58 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[1:04:58 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[1:04:58 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[1:04:58 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[1:04:58 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[1:04:58 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[1:04:58 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[1:04:58 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[1:04:58 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[1:04:58 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[1:04:58 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Fri Aug 22 13:17:02 EDT 2025 ===
-[1:17:03 PM] › [CLI] …  awaiting  Starting Prism…
-(node:45535) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-[1:17:03 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[1:17:03 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[1:17:03 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[1:17:03 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[1:17:03 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[1:17:03 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[1:17:03 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[1:17:03 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[1:17:03 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[1:17:03 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[1:17:03 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Fri Aug 22 18:55:32 EDT 2025 ===
-[6:55:33 PM] › [CLI] …  awaiting  Starting Prism…
-(node:344) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-[6:55:33 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[6:55:33 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[6:55:33 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[6:55:33 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[6:55:33 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[6:55:33 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[6:55:33 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[6:55:33 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[6:55:33 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[6:55:33 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[6:55:33 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Fri Aug 22 18:56:50 EDT 2025 ===
-[6:56:51 PM] › [CLI] …  awaiting  Starting Prism…
-(node:5914) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-[6:56:51 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[6:56:51 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[6:56:51 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[6:56:51 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[6:56:51 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[6:56:51 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[6:56:51 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[6:56:51 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[6:56:51 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[6:56:51 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[6:56:51 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Fri Aug 22 18:58:00 EDT 2025 ===
-[6:58:01 PM] › [CLI] …  awaiting  Starting Prism…
-(node:11075) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-[6:58:01 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[6:58:01 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[6:58:01 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[6:58:01 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[6:58:01 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[6:58:01 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[6:58:01 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[6:58:01 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[6:58:01 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[6:58:01 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[6:58:01 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Fri Aug 22 22:37:04 EDT 2025 ===
-[10:37:05 PM] › [CLI] …  awaiting  Starting Prism…
-(node:62651) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-[10:37:05 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[10:37:05 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[10:37:05 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[10:37:05 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[10:37:05 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[10:37:05 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[10:37:05 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[10:37:05 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[10:37:05 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[10:37:05 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[10:37:05 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Fri Aug 22 22:43:52 EDT 2025 ===
-[10:43:53 PM] › [CLI] …  awaiting  Starting Prism…
-(node:69389) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-[10:43:53 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[10:43:53 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[10:43:53 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[10:43:53 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[10:43:53 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[10:43:53 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[10:43:53 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[10:43:53 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[10:43:53 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[10:43:53 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[10:43:53 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Fri Aug 22 23:10:11 EDT 2025 ===
-[11:10:12 PM] › [CLI] …  awaiting  Starting Prism…
-(node:83142) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-[11:10:12 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[11:10:12 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[11:10:12 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[11:10:12 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[11:10:12 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[11:10:12 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[11:10:12 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[11:10:12 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[11:10:12 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[11:10:12 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[11:10:12 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Fri Aug 22 23:26:58 EDT 2025 ===
-[11:26:59 PM] › [CLI] …  awaiting  Starting Prism…
-(node:95149) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-[11:26:59 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[11:26:59 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[11:26:59 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[11:26:59 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[11:26:59 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[11:26:59 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[11:26:59 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[11:26:59 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[11:26:59 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[11:26:59 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[11:26:59 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Fri Aug 22 23:28:44 EDT 2025 ===
-[11:28:45 PM] › [CLI] …  awaiting  Starting Prism…
-(node:793) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-[11:28:45 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[11:28:45 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[11:28:45 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[11:28:45 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[11:28:45 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[11:28:45 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[11:28:45 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[11:28:45 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[11:28:45 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[11:28:45 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[11:28:45 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Fri Aug 22 23:29:46 EDT 2025 ===
-[11:29:47 PM] › [CLI] …  awaiting  Starting Prism…
-(node:6177) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-[11:29:47 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[11:29:47 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[11:29:47 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[11:29:47 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[11:29:47 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[11:29:47 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[11:29:47 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[11:29:47 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[11:29:47 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[11:29:47 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[11:29:47 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
-=== Fri Aug 22 23:30:34 EDT 2025 ===
-[11:30:35 PM] › [CLI] …  awaiting  Starting Prism…
-(node:11215) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-[11:30:35 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc
-[11:30:35 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc
-[11:30:35 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge
-[11:30:35 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/doc/jobTemplate
-[11:30:35 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/docs/jobtemplate
-[11:30:35 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/doc/merge/jobTemplate
-[11:30:35 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split
-[11:30:35 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/single/pdf/split/addressCapture
-[11:30:35 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/submit/multi/pdf/addressCapture
-[11:30:35 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/webhooks/jobStatusUpdate
-[11:30:35 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
+[6:31:28 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-doc-job-template
+[6:31:28 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-docs-job-template
+[6:31:28 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc-merge-job-template
+[6:31:28 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-doc
+[6:31:28 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc
+[6:31:28 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc-merge
+[6:31:28 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-pdf-split
+[6:31:28 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-pdf-split-addressCapture
+[6:31:28 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-pdf-address-capture
+[6:31:28 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/short
+[6:31:28 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/long
+[6:31:28 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/aperiam/revoke
+[6:31:28 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010

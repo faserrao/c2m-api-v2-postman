@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Check if correct number of arguments is provided
+if [ "$#" -ne 3 ]; then
+    echo "Usage: $0 <directory> <old_extension> <new_extension>"
+    exit 1
+fi
+
+# Get the arguments
+directory="$1"
+old_extension="$2"
+new_extension="$3"
+
+# Check if the directory exists
+if [ ! -d "$directory" ]; then
+    echo "Error: Directory '$directory' does not exist."
+    exit 1
+fi
+
+# Iterate over all files with the old extension
+for file in "$directory"/*."$old_extension"; do
+    # Check if the file exists to avoid errors when no files match
+    if [ -f "$file" ]; then
+        # Get the file's base name without the extension
+        base_name="${file%.*}"
+        # Rename the file with the new extension
+        mv "$file" "$base_name.$new_extension"
+        echo "Renamed: $file -> $base_name.$new_extension"
+    fi
+done
+
+echo "Extension replacement complete."
+

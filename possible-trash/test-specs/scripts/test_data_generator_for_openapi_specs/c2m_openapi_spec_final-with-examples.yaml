@@ -1,0 +1,1001 @@
+openapi: 3.0.3
+info:
+  title: C2M Document Submission API
+  version: 1.0.0
+  description: API for submitting document jobs document and address structures.
+servers:
+- url: http://localhost:4010
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    documentSourceIdentifier:
+      oneOf:
+      - type: object
+        required:
+        - documentId
+        properties:
+          documentId:
+            type: string
+            example: documentId-1uocgrq8
+        example:
+          documentId: documentId-1uocgrq8
+      - type: object
+        required:
+        - externalUrl
+        properties:
+          externalUrl:
+            type: string
+            format: uri
+            example: https://api.example.com/v1/resource/1
+        example:
+          externalUrl: https://api.example.com/v1/resource/1
+      - type: object
+        required:
+        - uploadRequestId
+        - documentName
+        properties:
+          uploadRequestId:
+            type: string
+            example: uploadRequestId-vr0k7fwf
+          documentName:
+            type: string
+            example: Diana Rodriguez
+        example:
+          uploadRequestId: uploadRequestId-vr0k7fwf
+          documentName: Diana Rodriguez
+      - type: object
+        required:
+        - uploadRequestId
+        - zipId
+        - documentName
+        properties:
+          uploadRequestId:
+            type: string
+            example: uploadRequestId-geauwcio
+          zipId:
+            type: string
+            example: zipId-rqfagqbq
+          documentName:
+            type: string
+            example: Grace Smith
+        example:
+          uploadRequestId: uploadRequestId-geauwcio
+          zipId: zipId-rqfagqbq
+          documentName: Grace Smith
+      - type: object
+        required:
+        - zipId
+        - documentName
+        properties:
+          zipId:
+            type: string
+            example: zipId-dlwyrm5f
+          documentName:
+            type: string
+            example: Henry Garcia
+        example:
+          zipId: zipId-dlwyrm5f
+          documentName: Henry Garcia
+    recipientAddress:
+      type: object
+      required:
+      - firstName
+      - lastName
+      - address1
+      - city
+      - state
+      - zip
+      - country
+      properties:
+        firstName:
+          type: string
+          example: Alice
+        lastName:
+          type: string
+          example: Johnson
+        nickName:
+          type: string
+          example: Charlie Jones
+        address1:
+          type: string
+          example: 8020 First Street
+        address2:
+          type: string
+          example: 5754 First Street
+        address3:
+          type: string
+          example: 5398 Main Street
+        city:
+          type: string
+          example: Chicago
+        state:
+          type: string
+          example: PA
+        zip:
+          type: string
+          example: '24932'
+        country:
+          type: string
+          example: USA
+        phoneNumber:
+          type: string
+          example: +1-555-853-8935
+      example:
+        firstName: Alice
+        lastName: Johnson
+        nickName: Charlie Jones
+        address1: 8020 First Street
+        address2: 5754 First Street
+        address3: 5398 Main Street
+        city: Chicago
+        state: PA
+        zip: '24932'
+        country: USA
+        phoneNumber: +1-555-853-8935
+    recipientAddressSource:
+      oneOf:
+      - $ref: '#/components/schemas/recipientAddress'
+      - type: object
+        required:
+        - addressListId
+        properties:
+          addressListId:
+            type: string
+            example: addressListId-03e2nnlb
+        example:
+          addressListId: addressListId-03e2nnlb
+      - type: object
+        required:
+        - addressId
+        properties:
+          addressId:
+            type: string
+            example: addressId-06frduxh
+        example:
+          addressId: addressId-06frduxh
+    jobOptions:
+      type: object
+      required:
+      - documentClass
+      - layout
+      - mailclass
+      - paperType
+      - printOption
+      - envelope
+      properties:
+        documentClass:
+          type: string
+          enum:
+          - businessLetter
+          - personalLetter
+          example: documentClass-54
+        layout:
+          type: string
+          enum:
+          - portrait
+          - landscape
+          example: layout-55
+        mailclass:
+          type: string
+          enum:
+          - firstClassMail
+          - priorityMail
+          - largeEnvelope
+          example: mailclass-56
+        paperType:
+          type: string
+          enum:
+          - letter
+          - legal
+          - postcard
+          example: paperType-57
+        printOption:
+          type: string
+          enum:
+          - none
+          - color
+          - grayscale
+          example: printOption-58
+        envelope:
+          type: string
+          enum:
+          - flat
+          - windowedFlat
+          - letter
+          - legal
+          - postcard
+          example: envelope-59
+      example:
+        documentClass: documentClass-54
+        layout: layout-55
+        mailclass: mailclass-56
+        paperType: paperType-57
+        printOption: printOption-58
+        envelope: envelope-59
+    creditCardDetails:
+      type: object
+      required:
+      - cardType
+      - cardNumber
+      - expirationDate
+      - cvv
+      properties:
+        cardType:
+          type: string
+          enum:
+          - visa
+          - mastercard
+          - discover
+          - americanExpress
+          example: cardType-60
+        cardNumber:
+          type: string
+          example: cardNumber-61
+        expirationDate:
+          type: object
+          required:
+          - month
+          - year
+          properties:
+            month:
+              type: integer
+              minimum: 1
+              maximum: 12
+              example: 4
+            year:
+              type: integer
+              minimum: 2000
+              example: 2013
+          example: &id001
+            month: 4
+            year: 2013
+        cvv:
+          type: integer
+          example: 2696
+      example:
+        cardType: cardType-60
+        cardNumber: cardNumber-61
+        expirationDate: *id001
+        cvv: 2696
+    achDetails:
+      type: object
+      required:
+      - routingNumber
+      - accountNumber
+      - checkDigit
+      properties:
+        routingNumber:
+          type: string
+          example: routingNumber-62
+        accountNumber:
+          type: string
+          example: accountNumber-63
+        checkDigit:
+          type: integer
+          example: 1470
+      example:
+        routingNumber: routingNumber-62
+        accountNumber: accountNumber-63
+        checkDigit: 1470
+    creditAmount:
+      type: object
+      required:
+      - amount
+      - currency
+      properties:
+        amount:
+          type: number
+          example: 774.41
+        currency:
+          type: string
+          enum:
+          - USD
+          - EUR
+          - GBP
+          - CAD
+          - AUD
+          example: currency-64
+      example:
+        amount: 774.41
+        currency: currency-64
+    paymentDetails:
+      type: object
+      required:
+      - billingType
+      properties:
+        billingType:
+          type: string
+          enum:
+          - creditCard
+          - invoice
+          - ach
+          - userCredit
+          example: billingType-65
+        creditCardDetails:
+          $ref: '#/components/schemas/creditCardDetails'
+        invoiceDetails:
+          type: object
+          properties:
+            invoiceNumber:
+              type: string
+              example: invoiceNumber-66
+            amountDue:
+              type: number
+              example: 174.33
+          example: &id002
+            invoiceNumber: invoiceNumber-66
+            amountDue: 174.33
+        achDetails:
+          $ref: '#/components/schemas/achDetails'
+        creditAmount:
+          $ref: '#/components/schemas/creditAmount'
+      example:
+        billingType: billingType-65
+        invoiceDetails: *id002
+    StandardResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: status-67
+        message:
+          type: string
+          example: message-68
+        jobId:
+          type: string
+          example: jobId-ug1ycc45
+      example:
+        status: status-67
+        message: message-68
+        jobId: jobId-ug1ycc45
+  parameters:
+    Authorization:
+      name: Authorization
+      in: header
+      required: true
+      schema:
+        type: string
+        example: Bearer <your-jwt-token>
+      description: JWT Bearer token for authorization
+    Content-Type:
+      name: Content-Type
+      in: header
+      required: true
+      schema:
+        type: string
+        example: application/json
+security:
+- bearerAuth: []
+paths:
+  /jobs/submit/single/doc:
+    post:
+      summary: Submit a single document to multiple recipients
+      operationId: submitSingleDoc
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - documentSourceIdentifier
+              - jobOptions
+              properties:
+                documentSourceIdentifier:
+                  $ref: '#/components/schemas/documentSourceIdentifier'
+                recipientAddresses:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/recipientAddressSource'
+                  example: &id003 []
+                jobOptions:
+                  $ref: '#/components/schemas/jobOptions'
+                paymentDetails:
+                  $ref: '#/components/schemas/paymentDetails'
+                tags:
+                  type: array
+                  items:
+                    type: string
+                    example: tags-5
+                  example: &id004
+                  - tags-2
+                  - tags-3
+                  - tags-4
+              example:
+                recipientAddresses: *id003
+                tags: *id004
+      responses:
+        '200':
+          description: Job submission accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jobId:
+                    type: string
+                    example: jobId-rzaf3fo1
+                  status:
+                    type: string
+                    example: status-1
+                example:
+                  jobId: jobId-rzaf3fo1
+                  status: status-1
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /jobs/submit/multi/doc:
+    post:
+      summary: Submit multiple documents, each to a different recipient
+      operationId: submitMultiDoc
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - documentRecipientPairs
+              - jobOptions
+              properties:
+                documentRecipientPairs:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - documentSourceIdentifier
+                    - recipientAddressSource
+                    properties:
+                      documentSourceIdentifier:
+                        $ref: '#/components/schemas/documentSourceIdentifier'
+                      recipientAddressSource:
+                        $ref: '#/components/schemas/recipientAddressSource'
+                  example: &id005 []
+                jobOptions:
+                  $ref: '#/components/schemas/jobOptions'
+                paymentDetails:
+                  $ref: '#/components/schemas/paymentDetails'
+                tags:
+                  type: array
+                  items:
+                    type: string
+                    example: tags-8
+                  example: &id006
+                  - tags-6
+                  - tags-7
+              example:
+                documentRecipientPairs: *id005
+                tags: *id006
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /jobs/submit/multi/doc/merge:
+    post:
+      summary: Merge multiple documents and send to a single recipient
+      operationId: submitMultiDocMerge
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - documentsToMerge
+              - recipientAddressSource
+              properties:
+                documentsToMerge:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/documentSourceIdentifier'
+                  example: &id007 []
+                recipientAddressSource:
+                  $ref: '#/components/schemas/recipientAddressSource'
+                tags:
+                  type: array
+                  items:
+                    type: string
+                    example: tags-12
+                  example: &id008
+                  - tags-9
+                  - tags-10
+                  - tags-11
+              example:
+                documentsToMerge: *id007
+                tags: *id008
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /jobs/submit/single/doc/jobTemplate:
+    post:
+      summary: Submit a document using a job template
+      operationId: submitSingleDocJobTemplate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - documentSourceIdentifier
+              - jobTemplate
+              properties:
+                documentSourceIdentifier:
+                  $ref: '#/components/schemas/documentSourceIdentifier'
+                recipientAddresses:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/recipientAddressSource'
+                  example: &id009 []
+                jobTemplate:
+                  type: string
+                  example: jobTemplate-13
+                jobOptions:
+                  $ref: '#/components/schemas/jobOptions'
+                paymentDetails:
+                  $ref: '#/components/schemas/paymentDetails'
+                tags:
+                  type: array
+                  items:
+                    type: string
+                    example: tags-16
+                  example: &id010
+                  - tags-14
+                  - tags-15
+              example:
+                recipientAddresses: *id009
+                jobTemplate: jobTemplate-13
+                tags: *id010
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /jobs/submit/multi/docs/jobtemplate:
+    post:
+      summary: Submit multiple documents with recipient addresses and job template
+      operationId: submitMultiDocsJobTemplate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - documentRecipientPairs
+              - jobTemplate
+              - paymentDetails
+              properties:
+                documentRecipientPairs:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - documentSourceIdentifier
+                    - recipientAddressSource
+                    properties:
+                      documentSourceIdentifier:
+                        $ref: '#/components/schemas/documentSourceIdentifier'
+                      recipientAddressSource:
+                        $ref: '#/components/schemas/recipientAddressSource'
+                  example: &id011 []
+                jobTemplate:
+                  type: string
+                  example: jobTemplate-17
+                paymentDetails:
+                  $ref: '#/components/schemas/paymentDetails'
+                tags:
+                  type: array
+                  items:
+                    type: string
+                    example: tags-20
+                  example: &id012
+                  - tags-18
+                  - tags-19
+              example:
+                documentRecipientPairs: *id011
+                jobTemplate: jobTemplate-17
+                tags: *id012
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /jobs/submit/multi/doc/merge/jobTemplate:
+    post:
+      summary: Merge documents, send to recipient using job template
+      operationId: submitMultiDocMergeJobTemplate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - documentsToMerge
+              - recipientAddressSource
+              - jobTemplate
+              properties:
+                documentsToMerge:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/documentSourceIdentifier'
+                  example: &id013 []
+                recipientAddressSource:
+                  $ref: '#/components/schemas/recipientAddressSource'
+                jobTemplate:
+                  type: string
+                  example: jobTemplate-21
+                paymentDetails:
+                  $ref: '#/components/schemas/paymentDetails'
+                tags:
+                  type: array
+                  items:
+                    type: string
+                    example: tags-24
+                  example: &id014
+                  - tags-22
+                  - tags-23
+              example:
+                documentsToMerge: *id013
+                jobTemplate: jobTemplate-21
+                tags: *id014
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /jobs/submit/single/pdf/split:
+    post:
+      summary: Split a PDF into page ranges and send to different recipients
+      operationId: submitSinglePdfSplit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - documentSourceIdentifier
+              - pageRanges
+              properties:
+                documentSourceIdentifier:
+                  $ref: '#/components/schemas/documentSourceIdentifier'
+                pageRanges:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - startPage
+                    - endPage
+                    - recipientAddressSource
+                    properties:
+                      startPage:
+                        type: integer
+                        example: 31
+                      endPage:
+                        type: integer
+                        example: 45
+                      recipientAddressSource:
+                        $ref: '#/components/schemas/recipientAddressSource'
+                    example:
+                      startPage: 31
+                      endPage: 45
+                  example: &id015
+                  - startPage: 52
+                    endPage: 57
+                  - startPage: 55
+                    endPage: 28
+                  - startPage: 35
+                    endPage: 54
+                paymentDetails:
+                  $ref: '#/components/schemas/paymentDetails'
+                tags:
+                  type: array
+                  items:
+                    type: string
+                    example: tags-28
+                  example: &id016
+                  - tags-25
+                  - tags-26
+                  - tags-27
+              example:
+                pageRanges: *id015
+                tags: *id016
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /jobs/submit/single/pdf/split/addressCapture:
+    post:
+      summary: Split PDF and extract embedded recipient addresses
+      operationId: submitSinglePdfSplitAddressCapture
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - documentSourceIdentifier
+              - embeddedExtractionSpecs
+              properties:
+                documentSourceIdentifier:
+                  $ref: '#/components/schemas/documentSourceIdentifier'
+                embeddedExtractionSpecs:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - startPage
+                    - endPage
+                    - addressRegion
+                    properties:
+                      startPage:
+                        type: integer
+                        example: 24
+                      endPage:
+                        type: integer
+                        example: 35
+                      addressRegion:
+                        type: object
+                        required:
+                        - x
+                        - y
+                        - width
+                        - height
+                        - pageOffset
+                        properties:
+                          x:
+                            type: number
+                            example: 204.06
+                          y:
+                            type: number
+                            example: 265.13
+                          width:
+                            type: number
+                            example: 183.05
+                          height:
+                            type: number
+                            example: 434.14
+                          pageOffset:
+                            type: integer
+                            example: 39
+                        example: &id017
+                          x: 204.06
+                          y: 265.13
+                          width: 183.05
+                          height: 434.14
+                          pageOffset: 39
+                    example:
+                      startPage: 24
+                      endPage: 35
+                      addressRegion: *id017
+                  example: &id018
+                  - startPage: 73
+                    endPage: 21
+                    addressRegion:
+                      x: 524.21
+                      y: 290.91
+                      width: 387.49
+                      height: 912.69
+                      pageOffset: 45
+                  - startPage: 77
+                    endPage: 30
+                    addressRegion:
+                      x: 114.31
+                      y: 499.31
+                      width: 773.15
+                      height: 77.32
+                      pageOffset: 45
+                paymentDetails:
+                  $ref: '#/components/schemas/paymentDetails'
+                tags:
+                  type: array
+                  items:
+                    type: string
+                    example: tags-31
+                  example: &id019
+                  - tags-29
+                  - tags-30
+              example:
+                embeddedExtractionSpecs: *id018
+                tags: *id019
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /jobs/submit/multi/pdf/addressCapture:
+    post:
+      summary: Submit multiple PDFs with embedded address regions
+      operationId: submitMultiPdfAddressCapture
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - addressCapturePdfs
+              - jobTemplate
+              properties:
+                addressCapturePdfs:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - documentSourceIdentifier
+                    - addressListRegion
+                    properties:
+                      documentSourceIdentifier:
+                        $ref: '#/components/schemas/documentSourceIdentifier'
+                      addressListRegion:
+                        type: object
+                        required:
+                        - x
+                        - y
+                        - width
+                        - height
+                        - pageOffset
+                        properties:
+                          x:
+                            type: number
+                            example: 338.63
+                          y:
+                            type: number
+                            example: 520.14
+                          width:
+                            type: number
+                            example: 553.94
+                          height:
+                            type: number
+                            example: 993.24
+                          pageOffset:
+                            type: integer
+                            example: 21
+                        example: &id020
+                          x: 338.63
+                          y: 520.14
+                          width: 553.94
+                          height: 993.24
+                          pageOffset: 21
+                      delimiter:
+                        type: string
+                        example: delimiter-41
+                      tags:
+                        type: array
+                        items:
+                          type: string
+                          example: tags-45
+                        example: &id021
+                        - tags-42
+                        - tags-43
+                        - tags-44
+                    example:
+                      addressListRegion: *id020
+                      delimiter: delimiter-41
+                      tags: *id021
+                  example: &id022
+                  - addressListRegion:
+                      x: 783.51
+                      y: 282.15
+                      width: 434.8
+                      height: 623.92
+                      pageOffset: 34
+                    delimiter: delimiter-32
+                    tags:
+                    - tags-33
+                    - tags-34
+                  - addressListRegion:
+                      x: 26.84
+                      y: 586.62
+                      width: 37.63
+                      height: 548.51
+                      pageOffset: 72
+                    delimiter: delimiter-36
+                    tags:
+                    - tags-37
+                    - tags-38
+                    - tags-39
+                jobTemplate:
+                  type: string
+                  example: jobTemplate-46
+                paymentDetails:
+                  $ref: '#/components/schemas/paymentDetails'
+                tags:
+                  type: array
+                  items:
+                    type: string
+                    example: tags-50
+                  example: &id023
+                  - tags-47
+                  - tags-48
+                  - tags-49
+              example:
+                addressCapturePdfs: *id022
+                jobTemplate: jobTemplate-46
+                tags: *id023
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /webhooks/jobStatusUpdate:
+    post:
+      summary: Webhook endpoint to receive job status updates
+      operationId: webhookJobStatusUpdate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - jobId
+              - status
+              - timestamp
+              properties:
+                jobId:
+                  type: string
+                  example: job_123456789
+                status:
+                  type: string
+                  enum:
+                  - queued
+                  - processing
+                  - completed
+                  - failed
+                  example: completed
+                timestamp:
+                  type: string
+                  format: date-time
+                  example: '2025-07-07T12:34:56Z'
+                metadata:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  example: &id024
+                    source: PrintCenterA
+                    batch: B20250707
+              example:
+                jobId: job_123456789
+                status: completed
+                timestamp: '2025-07-07T12:34:56Z'
+                metadata: *id024
+      responses:
+        '200':
+          description: Webhook received successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+        '400':
+          description: Invalid payload
+        '401':
+          description: Unauthorized

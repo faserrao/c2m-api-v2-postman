@@ -1,0 +1,203 @@
+{
+  "tool": "finspect",
+  "version": "1.0.0",
+  "timestamp": "2025-08-23T21:32:05.352299",
+  "directory": "tests/fixtures",
+  "total_files": 10,
+  "results": [
+    {
+      "tool": "finspect",
+      "version": "1.0.0",
+      "path": "tests/fixtures/archive.zip",
+      "size_bytes": 503,
+      "is_container": true,
+      "media_type": "application/zip",
+      "description": "ZIP archive",
+      "confidence": 100,
+      "sources": {
+        "magic_bytes": "504b0304"
+      },
+      "warnings": [],
+      "errors": [],
+      "entries": [
+        {
+          "name": "test.txt",
+          "media_type": "text/plain",
+          "confidence": 90
+        },
+        {
+          "name": "sample.pdf",
+          "media_type": "application/pdf",
+          "confidence": 100
+        },
+        {
+          "name": "sample.png",
+          "media_type": "image/png",
+          "confidence": 100
+        }
+      ],
+      "relative_path": "archive.zip"
+    },
+    {
+      "tool": "finspect",
+      "version": "1.0.0",
+      "path": "tests/fixtures/binary.dat",
+      "size_bytes": 256,
+      "is_container": false,
+      "media_type": "application/octet-stream",
+      "description": "Binary data",
+      "confidence": 50,
+      "sources": {
+        "fallback": "application/octet-stream"
+      },
+      "warnings": [],
+      "errors": [],
+      "relative_path": "binary.dat"
+    },
+    {
+      "tool": "finspect",
+      "version": "1.0.0",
+      "path": "tests/fixtures/empty.file",
+      "size_bytes": 0,
+      "is_container": false,
+      "media_type": "application/octet-stream",
+      "description": "Empty file",
+      "confidence": 100,
+      "sources": {
+        "empty": "application/octet-stream"
+      },
+      "warnings": [],
+      "errors": [],
+      "relative_path": "empty.file"
+    },
+    {
+      "tool": "finspect",
+      "version": "1.0.0",
+      "path": "tests/fixtures/sample.jpg",
+      "size_bytes": 37,
+      "is_container": false,
+      "media_type": "image/jpeg",
+      "description": "JPEG image",
+      "confidence": 100,
+      "sources": {
+        "magic_bytes": "ffd8ff"
+      },
+      "warnings": [],
+      "errors": [],
+      "relative_path": "sample.jpg"
+    },
+    {
+      "tool": "finspect",
+      "version": "1.0.0",
+      "path": "tests/fixtures/sample.json",
+      "size_bytes": 79,
+      "is_container": false,
+      "media_type": "application/json",
+      "description": "JSON document",
+      "confidence": 85,
+      "sources": {
+        "structure": "application/json"
+      },
+      "warnings": [],
+      "errors": [],
+      "relative_path": "sample.json"
+    },
+    {
+      "tool": "finspect",
+      "version": "1.0.0",
+      "path": "tests/fixtures/sample.pdf",
+      "size_bytes": 119,
+      "is_container": false,
+      "media_type": "application/pdf",
+      "description": "PDF document",
+      "confidence": 100,
+      "sources": {
+        "magic_bytes": "255044462d"
+      },
+      "warnings": [],
+      "errors": [],
+      "relative_path": "sample.pdf"
+    },
+    {
+      "tool": "finspect",
+      "version": "1.0.0",
+      "path": "tests/fixtures/sample.png",
+      "size_bytes": 64,
+      "is_container": false,
+      "media_type": "image/png",
+      "description": "PNG image",
+      "confidence": 100,
+      "sources": {
+        "magic_bytes": "89504e470d0a1a0a"
+      },
+      "warnings": [],
+      "errors": [],
+      "relative_path": "sample.png"
+    },
+    {
+      "tool": "finspect",
+      "version": "1.0.0",
+      "path": "tests/fixtures/sample.rtf",
+      "size_bytes": 78,
+      "is_container": false,
+      "media_type": "text/plain",
+      "description": "Plain text",
+      "confidence": 90,
+      "sources": {
+        "heuristic": "text/plain"
+      },
+      "warnings": [],
+      "errors": [],
+      "relative_path": "sample.rtf"
+    },
+    {
+      "tool": "finspect",
+      "version": "1.0.0",
+      "path": "tests/fixtures/sample.txt",
+      "size_bytes": 51,
+      "is_container": false,
+      "media_type": "text/plain",
+      "description": "Plain text",
+      "confidence": 90,
+      "sources": {
+        "heuristic": "text/plain"
+      },
+      "warnings": [],
+      "errors": [],
+      "relative_path": "sample.txt"
+    },
+    {
+      "tool": "finspect",
+      "version": "1.0.0",
+      "path": "tests/fixtures/sample.xml",
+      "size_bytes": 74,
+      "is_container": false,
+      "media_type": "application/xml",
+      "description": "XML document",
+      "confidence": 80,
+      "sources": {
+        "structure": "application/xml"
+      },
+      "warnings": [],
+      "errors": [],
+      "relative_path": "sample.xml"
+    }
+  ],
+  "summary": {
+    "total_files": 10,
+    "by_type": {
+      "application/zip": 1,
+      "application/octet-stream": 2,
+      "image/jpeg": 1,
+      "application/json": 1,
+      "application/pdf": 1,
+      "image/png": 1,
+      "text/plain": 2,
+      "application/xml": 1
+    },
+    "errors": 0,
+    "containers": 1,
+    "high_confidence": 7,
+    "low_confidence": 1
+  }
+}

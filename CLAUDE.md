@@ -133,3 +133,7 @@ High-value scripts not yet integrated into Makefile:
 - `generate_openapi_from_swagger.py` - Swagger to OpenAPI conversion
 - `merge_yaml_files.py` - Merge multiple YAML specs
 - `api_client_generator.py` - Generate Python client from OpenAPI
+
+## Learning Memories
+
+- `learn`: Placeholder for learning memories related to the project

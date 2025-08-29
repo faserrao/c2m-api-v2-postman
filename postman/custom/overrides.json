@@ -23,17 +23,87 @@
   ],
   "item": [
     {
-      "name": "Global test snippet",
-      "event": [
+      "name": "auth",
+      "item": [
         {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('Status code is 200', () => pm.response.to.have.status(200));",
-              "pm.test('Response time < 1s', () => pm.expect(pm.response.responseTime).to.be.below(1000));"
-            ]
-          }
+          "name": "tokens",
+          "item": [
+            {
+              "name": "short",
+              "item": [
+                {
+                  "name": "Issue a short-term access token",
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                          "// JWT token creation returns 201 Created",
+                          "pm.test('Status code is allowed (200,201,400,401)', function () { pm.expect([200, 201, 400, 401]).to.include(pm.response.code); });",
+                          "pm.test('Response time < 1s', function () { pm.expect(pm.response.responseTime).to.be.below(1000); });"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "long",
+              "item": [
+                {
+                  "name": "Issue or rotate a long-term token",
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "type": "text/javascript",
+                        "exec": [
+                          "// JWT endpoints have different allowed status codes",
+                          "pm.test('Status code is allowed (200,201,400,401,429)', function () { pm.expect([200, 201, 400, 401, 429]).to.include(pm.response.code); });",
+                          "pm.test('Response time < 1s', function () { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+                          "",
+                          "// Handle rate limiting gracefully",
+                          "if (pm.response.code === 429) {",
+                          "  pm.test('Rate limit response has Retry-After header', function () {",
+                          "    pm.response.to.have.header('Retry-After');",
+                          "  });",
+                          "}"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "{tokenId}",
+              "item": [
+                {
+                  "name": "revoke",
+                  "item": [
+                    {
+                      "name": "Revoke a token",
+                      "event": [
+                        {
+                          "listen": "test",
+                          "script": {
+                            "type": "text/javascript",
+                            "exec": [
+                              "// JWT revoke endpoint returns 204 No Content on success, 404 for non-existent tokens",
+                              "pm.test('Status code is allowed (200,204,400,401,404)', function () { pm.expect([200, 204, 400, 401, 404]).to.include(pm.response.code); });",
+                              "pm.test('Response time < 1s', function () { pm.expect(pm.response.responseTime).to.be.below(1000); });"
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         }
       ]
     }

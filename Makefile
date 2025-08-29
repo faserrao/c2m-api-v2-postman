@@ -32,8 +32,8 @@ VARS_OLD := $(.VARIABLES)
 # ========================================================================
 # Load local environment variables from .env if present
 # Expected variables in .env:
-#   POSTMAN_SERRAO_API_KEY=REDACTED
-#   POSTMAN_C2M_API_KEY=REDACTED
+#   POSTMAN_SERRAO_API_KEY=your-api-key
+#   POSTMAN_C2M_API_KEY=alternate-api-key
 ifneq (,$(wildcard .env))
     include .env
     export $(shell sed 's/=.*//' .env)
@@ -127,6 +127,11 @@ PREVIOUS_C2MAPIV2_OPENAPI_SPEC   := $(OPENAPI_DIR)/tmp-previous-spec.yaml
 POSTMAN_SPECS_URL                := $(POSTMAN_BASE_URL)/specs
 POSTMAN_SCHEMA_V2                := https://schema.getpostman.com/json/collection/v2.1.0/collection.json
 POSTMAN_SCHEMA_UID_FILE          := $(POSTMAN_DIR)/schema_uid.txt
+
+#--- OpenAPI Overlays ---
+OPENAPI_OVERLAYS_DIR             := $(OPENAPI_DIR)/overlays
+OPENAPI_AUTH_OVERLAY             := $(OPENAPI_OVERLAYS_DIR)/auth.tokens.yaml
+C2MAPIV2_OPENAPI_SPEC_BASE       := $(OPENAPI_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-openapi-spec-base.yaml
 OPENAPI_BUNDLED_FILE             := $(OPENAPI_DIR)/bundled.yaml
 
 # ========================================================================
@@ -222,6 +227,8 @@ TEST_DATA_DIR                    := test-data
 REPORT_HTML                      := $(POSTMAN_DIR)/newman-report.html
 # Default allowed status codes (comma-separated)
 POSTMAN_ALLOWED_CODES            ?= 200,400,401
+# JWT test collection output
+TEST_COLLECTION_WITH_JWT_TESTS   := $(POSTMAN_DIR)/generated/c2mapiv2-test-collection-jwt.json
 
 # ========================================================================
 # JQ FILTERS AND SCRIPTS
@@ -314,8 +321,8 @@ POSTMAN_WS                       := $(SERRAO_WS)
 
 #--- Postman API Keys ---
 # Select which API key to use
-POSTMAN_API_KEY                  :=REDACTED $(POSTMAN_SERRAO_API_KEY)
-# POSTMAN_API_KEY                :=REDACTED $(POSTMAN_C2M_API_KEY)
+POSTMAN_API_KEY                  := $(POSTMAN_SERRAO_API_KEY)
+# POSTMAN_API_KEY                := $(POSTMAN_C2M_API_KEY)
 
 #--- TOKENS ---
 # Extract token from environment file if it exists
@@ -326,7 +333,7 @@ TOKEN                            := $(if $(TOKEN_RAW),$(TOKEN_RAW),dummy-token)
 # HTTP HEADERS
 # ========================================================================
 #--- Postman HTTP Headers ---
-POSTMAN_HEADER_API_KEY           :=REDACTED --header "X-Api-Key: $(POSTMAN_API_KEY)"
+POSTMAN_HEADER_API_KEY           := --header "X-Api-Key: $(POSTMAN_API_KEY)"
 POSTMAN_HEADER_CONTENT_TYPE      := --header "Content-Type: application/json"
 POSTMAN_HEADER_ACCEPT            := --header "Accept: application/vnd.api.v10+json"
 POSTMAN_HEADER_AUTH              := --header "Authorization: Bearer $(POSTMAN_API_KEY)"
@@ -389,7 +396,9 @@ test-update-mock-env-call:
 .PHONY: ebnf-dd-to-openapi-spec
 ebnf-dd-to-openapi-spec: venv
 	$(MAKE) install
-	$(MAKE) generate-and-validate-openapi-spec
+	$(MAKE) generate-openapi-spec-from-ebnf-dd
+	$(MAKE) openapi-merge-overlays
+	$(MAKE) open-api-spec-lint
 
 # Generate and Upload the Postman Linked Collection
 # Using post-process flattening approach
@@ -633,8 +642,25 @@ generate-openapi-spec-from-ebnf-dd:
 	$(VENV_PIP) $(INSTALL_PYTHON_MODULES)
 
 	# --- Run the conversion script ---
-	@echo "🛠  Running: $(EBNF_TO_OPENAPI_SCRIPT) → $(C2MAPIV2_OPENAPI_SPEC)"
-	$(VENV_PYTHON) $(EBNF_TO_OPENAPI_SCRIPT) -o $(C2MAPIV2_OPENAPI_SPEC) $(DD_EBNF_FILE)
+	@echo "🛠  Running: $(EBNF_TO_OPENAPI_SCRIPT) → $(C2MAPIV2_OPENAPI_SPEC_BASE)"
+	$(VENV_PYTHON) $(EBNF_TO_OPENAPI_SCRIPT) -o $(C2MAPIV2_OPENAPI_SPEC_BASE) $(DD_EBNF_FILE)
+
+# Merge auth overlay into base OpenAPI spec
+.PHONY: openapi-merge-overlays
+openapi-merge-overlays: $(C2MAPIV2_OPENAPI_SPEC_BASE) $(OPENAPI_AUTH_OVERLAY)
+	@echo "🔗 Merging auth overlay into generated OpenAPI..."
+	@if command -v yq >/dev/null 2>&1; then \
+		yq ea -o=yaml 'select(fileIndex == 0) *+ select(fileIndex == 1)' \
+			$(C2MAPIV2_OPENAPI_SPEC_BASE) $(OPENAPI_AUTH_OVERLAY) > $(C2MAPIV2_OPENAPI_SPEC); \
+		echo "✅ Wrote $(C2MAPIV2_OPENAPI_SPEC)"; \
+	else \
+		echo "⚠️  yq not found. Installing via pip..."; \
+		$(VENV_PIP) install yq; \
+		$(VENV_DIR)/bin/yq ea -o=yaml 'select(fileIndex == 0) *+ select(fileIndex == 1)' \
+			$(C2MAPIV2_OPENAPI_SPEC_BASE) $(OPENAPI_AUTH_OVERLAY) > $(C2MAPIV2_OPENAPI_SPEC); \
+		echo "✅ Wrote $(C2MAPIV2_OPENAPI_SPEC)"; \
+	fi
+
 
 # ========================================================================
 # OPENAPI VALIDATION AND LINTING
@@ -668,6 +694,30 @@ clean-openapi-spec-diff:
 postman-login:
 	@echo "🔐 Logging in to Postman..."
 	@postman login --with-api-key $(POSTMAN_API_KEY)
+
+# ========================================================================
+# JWT AUTHENTICATION TESTING
+# ========================================================================
+# Run JWT authentication tests
+.PHONY: jwt-test
+jwt-test:
+	@echo "🔐 Running JWT authentication tests..."
+	@cd $(PROJECT_ROOT) && npm test -- tests/jwt-auth-tests.js || \
+		node tests/jwt-auth-tests.js
+
+# Add JWT tests to Postman collection
+.PHONY: postman-add-jwt-tests
+postman-add-jwt-tests:
+	@echo "🔧 Adding JWT-specific tests to collection..."
+	@if [ -f "$(TEST_COLLECTION_WITH_TESTS)" ]; then \
+		node scripts/add_tests_jwt.js \
+			"$(TEST_COLLECTION_WITH_TESTS)" \
+			"$(TEST_COLLECTION_WITH_JWT_TESTS)" \
+			--allowed-codes "200,201,204,400,401,403,404,429"; \
+		echo "✅ JWT tests added to collection"; \
+	else \
+		echo "⚠️  Test collection not found. Run 'make postman-create-test-collection' first."; \
+	fi
 
 # ========================================================================
 # PYTHON ENVIRONMENT FIXES
@@ -1493,7 +1543,7 @@ postman-link-env-to-mock-server:
 .PHONY: docs-build
 docs-build:
 	@echo "📚 Building API documentation with Redoc..."
-	$(REDOCLY) build-docs $(C2MAPIV2_OPENAPI_SPEC) -o $(REDOC_HTML_OUTPUT)
+	$(REDOCLY) build-docs $(C2MAPIV2_OPENAPI_SPEC) -o $(REDOC_HTML_OUTPUT) -t $(DOCS_DIR)/custom-redoc-template.hbs
 	$(SWAGGER) bundle $(C2MAPIV2_OPENAPI_SPEC) --outfile $(OPENAPI_BUNDLED_FILE) --type yaml
 
 # Serve documentation in background
@@ -1502,6 +1552,11 @@ docs-serve-bg:
 	@mkdir -p "$(DOCS_DIR)"
 	@nohup python3 -m http.server 8080 --directory "$(DOCS_DIR)" >/dev/null 2>&1 & echo $$! > "$(DOCS_PID_FILE)"
 	@echo "🌐 Docs served in background on http://localhost:8080 (PID: $$(cat $(DOCS_PID_FILE)))"
+
+# Fix template banner if it disappears
+.PHONY: fix-template-banner
+fix-template-banner:
+	@$(SCRIPTS_DIR)/fix-template-banner.sh
 
 # Stop documentation server
 .PHONY: docs-stop

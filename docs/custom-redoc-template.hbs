@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf8" />
+  <title>{{title}}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      padding: 0;
+      margin: 0;
+    }
+    
+    /* Banner container that sits between header and API content */
+    .template-banner-container {
+      display: grid;
+      grid-template-columns: 55% 40%;
+      gap: 5%;
+      margin: 20px 0 40px 0;
+      width: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      align-items: start;
+    }
+    
+    /* Left column container */
+    .left-column {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    @media (max-width: 968px) {
+      .template-banner-container {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    /* Left Purple Banner */
+    .template-banner {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .template-banner h2 {
+      margin: 0 0 20px 0;
+      font-size: 32px;
+      display: flex;
+      align-items: center;
+      font-weight: 600;
+    }
+    
+    .template-banner .emoji {
+      font-size: 36px;
+      margin-right: 15px;
+    }
+    
+    .template-banner > p {
+      margin: 0 0 25px 0;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+    
+    .template-banner .benefits-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin: 30px 0;
+    }
+    
+    .template-banner .benefit-box {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 20px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      font-size: 16px;
+    }
+    
+    .template-banner .benefit-icon {
+      font-size: 24px;
+      margin-right: 12px;
+    }
+    
+    .template-banner .buttons {
+      margin-top: 30px;
+      display: flex;
+      gap: 15px;
+    }
+    
+    .template-banner .cta {
+      background: white;
+      color: #667eea;
+      padding: 12px 24px;
+      border-radius: 5px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      font-weight: 600;
+      transition: transform 0.2s;
+      font-size: 16px;
+    }
+    
+    .template-banner .cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .template-banner .cta .icon {
+      margin-right: 8px;
+    }
+    
+    /* Template Info Panel (now below purple banner) */
+    .template-info-panel {
+      background: #263238;
+      color: white;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .template-info-panel h3 {
+      margin: 0 0 20px 0;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      font-weight: normal;
+    }
+    
+    .template-info-panel .emoji {
+      font-size: 24px;
+      margin-right: 10px;
+    }
+    
+    .job-template-editor {
+      background: white;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 20px 0 30px 0;
+    }
+    
+    .job-template-editor .editor-header {
+      background: #4a5568;
+      color: white;
+      padding: 8px 15px;
+      margin: -15px -15px 15px -15px;
+      border-radius: 8px 8px 0 0;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .save-template-btn {
+      background: #e53e3e;
+      color: white;
+      border: none;
+      padding: 6px 16px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    
+    .editor-screenshot {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    
+    .template-info-panel .section {
+      margin: 25px 0;
+    }
+    
+    .template-info-panel h4 {
+      margin: 0 0 12px 0;
+      font-size: 18px;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+    }
+    
+    .template-info-panel h4 .icon {
+      margin-right: 8px;
+    }
+    
+    .template-info-panel p {
+      margin: 0;
+      color: #cbd5e0;
+      line-height: 1.6;
+      font-size: 15px;
+    }
+    
+    .template-info-panel ul {
+      margin: 10px 0 0 0;
+      padding-left: 25px;
+    }
+    
+    .template-info-panel li {
+      margin: 8px 0;
+      color: #cbd5e0;
+      font-size: 15px;
+    }
+    
+    /* Recommended Template Endpoints Section */
+    .template-endpoints-section {
+      padding: 40px;
+      background: #263238;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      min-height: 100%;
+      margin-bottom: 30px;
+    }
+    
+    .template-endpoints-section h3 {
+      color: white;
+      margin: 0 0 25px 0;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .template-endpoints-section .emoji {
+      margin-right: 10px;
+    }
+    
+    .endpoint-card {
+      background: white;
+      padding: 30px;
+      margin: 0 0 25px 0;
+      border-radius: 8px;
+      border-left: 4px solid #48bb78;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    
+    .endpoint-card h4 {
+      margin: 0 0 12px 0;
+      color: #2d3748;
+      font-size: 18px;
+      font-family: 'Courier New', monospace;
+      line-height: 1.3;
+    }
+    
+    .endpoint-card .tag {
+      display: inline-block;
+      background: #764ba2;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-left: 12px;
+      text-transform: uppercase;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    
+    .endpoint-card p {
+      margin: 10px 0;
+      color: #4a5568;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    
+    .endpoint-card p strong {
+      color: #2d3748;
+    }
+    
+    /* Override Redoc's dark theme right column background */
+    .sc-jwTyAe.bDYKKx {
+      background-color: #263238 !important;
+    }
+    
+    /* Ensure the API info section has proper styling */
+    .api-content > div:first-child {
+      background: white;
+      z-index: 1;
+      position: relative;
+    }
+  </style>
+  {{{redocHead}}}
+  {{#unless disableGoogleFont}}<link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet">{{/unless}}
+</head>
+<body>
+  {{{redocHTML}}}
+  
+  <script>
+    let observer = null;
+    let injectionInProgress = false;
+    
+    // Wait for Redoc to fully load
+    function injectBanner() {
+      // Prevent multiple simultaneous injections
+      if (injectionInProgress) return;
+      
+      // Check if banner already exists
+      if (bannerExists()) {
+        return;
+      }
+      
+      injectionInProgress = true;
+      
+      // Try multiple selectors for better compatibility
+      const apiContent = document.querySelector('.api-content') || document.querySelector('[class*="api-content"]') || document.querySelector('[role="main"]');
+      const apiInfo = document.querySelector('.api-info') || document.querySelector('[class*="api-info"]');
+      const firstOperation = document.querySelector('[id^="operation/"]') || document.querySelector('.sc-dTvVRJ.gHrCVQ') || document.querySelector('[data-section-id]');
+      
+      console.log('Banner injection check:', {
+        apiContent: !!apiContent,
+        apiInfo: !!apiInfo,
+        firstOperation: !!firstOperation,
+        bannerExists: bannerExists()
+      });
+      
+      if (apiContent && apiInfo && firstOperation) {
+        // Create banner HTML
+        const bannerHTML = `
+          <div class="template-banner-container">
+            <!-- Left Column -->
+            <div class="left-column">
+              <!-- Purple Banner -->
+              <div class="template-banner">
+                <h2><span class="emoji">🎯</span> Start with Template Endpoints!</h2>
+                <p>Use our <strong>Job Templates</strong> to define your mailing configuration once and reuse it for every API call.</p>
+                
+                <div class="benefits-grid">
+                  <div class="benefit-box">
+                    <span class="benefit-icon">📝</span>
+                    <span>Define once, use many times</span>
+                  </div>
+                  <div class="benefit-box">
+                    <span class="benefit-icon">⚡</span>
+                    <span>Skip repetitive setup</span>
+                  </div>
+                  <div class="benefit-box">
+                    <span class="benefit-icon">✅</span>
+                    <span>Pre-validated configurations</span>
+                  </div>
+                  <div class="benefit-box">
+                    <span class="benefit-icon">🔗</span>
+                    <span>Link documents & lists</span>
+                  </div>
+                </div>
+                
+                <div class="buttons">
+                  <a href="#operation/submitSingleDocWithTemplateParams" class="cta">
+                    <span class="icon">↓</span> View Template Endpoints
+                  </a>
+                  <a href="template-endpoints-quickstart.html" class="cta">
+                    <span class="icon">📚</span> QuickStart Guide
+                  </a>
+                </div>
+              </div>
+              
+              <!-- Template Info Panel -->
+              <div class="template-info-panel">
+                <h3><span class="emoji">📋</span> How Job Templates Work</h3>
+                
+                <div class="job-template-editor">
+                  <div class="editor-header">
+                    <span>Job Template Editor</span>
+                    <button class="save-template-btn">SAVE TEMPLATE</button>
+                  </div>
+                  <img src="template-editor.png" alt="Job Template Editor Interface" class="editor-screenshot">
+                </div>
+                
+                <div class="section">
+                  <h4><span class="icon">💻</span> No Coding Required!</h4>
+                  <p>Templates are created using our visual editor. Your marketing team, operations staff, or anyone can set up templates without any programming knowledge.</p>
+                </div>
+                
+                <div class="section">
+                  <h4><span class="icon">✨</span> Why Use Templates?</h4>
+                  <ul>
+                    <li><strong>One-time setup:</strong> Configure once, reuse forever</li>
+                    <li><strong>Error reduction:</strong> Pre-validated settings</li>
+                    <li><strong>Team consistency:</strong> Everyone uses same config</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Right Column - Recommended Endpoints -->
+            <div class="template-endpoints-section">
+              <h3><span class="emoji">🚀</span> Recommended Template Endpoints</h3>
+              
+              <div class="endpoint-card">
+                <h4>/jobs/single-doc-job-template <span class="tag">Recommended</span></h4>
+                <p>Perfect for sending a single document to multiple recipients. Ideal for newsletters, statements, and notices.</p>
+                <p><strong>Required parameters:</strong> documentSourceIdentifier, jobTemplate, paymentDetails</p>
+              </div>
+              
+              <div class="endpoint-card">
+                <h4>/jobs/multi-docs-job-template <span class="tag">Recommended</span></h4>
+                <p>Send different documents to different recipients in one batch. Great for personalized mailings.</p>
+                <p><strong>Required parameters:</strong> items[], jobTemplate, paymentDetails</p>
+              </div>
+              
+              <div class="endpoint-card">
+                <h4>/jobs/multi-doc-merge-job-template <span class="tag">Recommended</span></h4>
+                <p>Merge multiple documents into one mailing. Perfect for creating document packets.</p>
+                <p><strong>Required parameters:</strong> documentsToMerge[], recipientAddressSource, jobTemplate</p>
+              </div>
+            </div>
+          </div>
+        `;
+        
+        // Create wrapper div to hold all banner content
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = bannerHTML;
+        
+        // Insert the banner container before the first operation
+        const bannerContainer = wrapper.querySelector('.template-banner-container');
+        
+        if (bannerContainer) {
+          firstOperation.parentNode.insertBefore(bannerContainer, firstOperation);
+          console.log('Banner injected successfully');
+        }
+        injectionInProgress = false;
+      } else {
+        // Retry if elements not found
+        injectionInProgress = false;
+        setTimeout(injectBanner, 100);
+      }
+    }
+    
+    // Function to check if banner already exists
+    function bannerExists() {
+      return document.querySelector('.template-banner-container') !== null;
+    }
+    
+    // Set up MutationObserver to watch for Redoc changes
+    function setupObserver() {
+      if (observer) observer.disconnect();
+      
+      const targetNode = document.body;
+      const config = { childList: true, subtree: true };
+      
+      observer = new MutationObserver(function(mutationsList) {
+        // Check if the banner was removed
+        if (!bannerExists()) {
+          // Disconnect observer temporarily to avoid infinite loop
+          observer.disconnect();
+          
+          // Re-inject banner
+          setTimeout(() => {
+            injectBanner();
+            // Reconnect observer after injection
+            setTimeout(() => observer.observe(targetNode, config), 500);
+          }, 100);
+        }
+      });
+      
+      observer.observe(targetNode, config);
+    }
+    
+    // Start injection when DOM is ready
+    function startInjection() {
+      try {
+        console.log('Starting banner injection...');
+        injectBanner();
+        setupObserver();
+      } catch (e) {
+        console.error('Banner injection error:', e);
+        // Retry after a delay
+        setTimeout(startInjection, 1000);
+      }
+    }
+    
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() {
+        // Give React time to stabilize
+        setTimeout(startInjection, 500);
+      });
+    } else {
+      // Give React time to stabilize
+      setTimeout(startInjection, 500);
+    }
+    
+    // Re-setup observer on visibility change
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden) {
+        setupObserver();
+        if (!bannerExists()) {
+          setTimeout(injectBanner, 100);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
