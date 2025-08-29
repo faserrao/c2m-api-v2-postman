@@ -1797,6 +1797,36 @@ postman-workspace-debug:
 # ========================================================================
 # HELP
 # ========================================================================
+# ========================================================================
+# CI/CD ALIASES
+# ========================================================================
+# These aliases provide stable targets for GitHub Actions CI/CD workflow
+# They delegate to existing rich targets maintaining single source of truth
+
+.PHONY: openapi-build
+openapi-build: generate-openapi-spec-from-ebnf-dd ## Build OpenAPI from EBNF + overlays + lint [CI alias]
+	$(MAKE) open-api-spec-lint
+
+.PHONY: postman-collection-build
+postman-collection-build: ## Generate and flatten the primary collection [CI alias]
+	$(MAKE) postman-api-linked-collection-generate
+	$(MAKE) postman-linked-collection-flatten
+
+.PHONY: docs
+docs: docs-build ## Build API documentation [CI alias]
+
+.PHONY: lint
+lint: open-api-spec-lint ## Lint OpenAPI spec [CI alias]
+
+.PHONY: diff
+diff: open-api-spec-diff ## Diff OpenAPI spec vs origin/main [CI alias]
+
+.PHONY: postman-publish
+postman-publish: ## Push API + collection to Postman (no mocks in CI) [CI alias]
+	$(MAKE) postman-import-openapi-as-api
+	$(MAKE) postman-linked-collection-upload
+	$(MAKE) postman-linked-collection-link
+
 # Show all available targets with descriptions
 .PHONY: help
 help:## Show help

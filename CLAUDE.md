@@ -34,6 +34,17 @@ make postman-cleanup-all                # Delete all Postman resources
 make prism-stop                         # Stop local mock server
 ```
 
+### CI/CD Commands (GitHub Actions)
+```bash
+# These aliases are used by GitHub Actions workflow
+make openapi-build                      # Build OpenAPI from EBNF + lint
+make postman-collection-build           # Generate and flatten collection
+make docs                               # Build API documentation
+make lint                               # Lint OpenAPI spec
+make diff                               # Diff spec vs origin/main
+make postman-publish                    # Push to Postman (API + collection)
+```
+
 ## Architecture
 
 The project follows a data-driven approach where the EBNF data dictionary is the single source of truth:
@@ -126,6 +137,30 @@ make update-mock-env         # Update mock environment
    - Creates mock server
    - Runs tests
    - Generates documentation
+
+## GitHub Actions CI/CD
+
+The project includes automated CI/CD pipelines:
+
+### Main Workflow (`api-ci-cd.yml`)
+- **Triggers**: Push to main, PRs, manual dispatch
+- **Actions**: 
+  - Builds OpenAPI spec from EBNF
+  - Generates Postman collections
+  - Builds documentation
+  - Auto-commits generated files (main branch only)
+  - Publishes to Postman (if secrets configured)
+  - Deploys docs to GitHub Pages
+
+### PR Drift Check (`pr-drift-check.yml`)
+- **Purpose**: Ensures generated files are committed
+- **Fails PR if**: Generated artifacts differ from committed versions
+- **Auto-comments**: Instructions to regenerate files
+
+### Required Secrets
+Configure in GitHub Settings → Secrets:
+- `POSTMAN_API_KEY`: Your Postman API key
+- `POSTMAN_WORKSPACE_ID`: Target workspace UUID
 
 ## Script Integration Opportunities
 

@@ -936,4 +936,4 @@ MIT License - see LICENSE file for details
 
 ---
 
-**Remember:** Always start with template endpoints for the fastest integration. They're designed to handle 90% of use cases with minimal configuration.
+**Remember:** Always start with template endpoints for the fastest integration. They're designed to handle 90% of use cases with minimal configuration.# Test

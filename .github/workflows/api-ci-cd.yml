@@ -1,0 +1,280 @@
+name: API Spec, Docs, and Postman CI/CD
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'openapi/**'
+      - 'data_dictionary/**'
+      - 'docs/**'
+      - 'postman/**'
+      - 'scripts/**'
+      - 'Makefile'
+      - '.github/workflows/api-ci-cd.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'openapi/**'
+      - 'data_dictionary/**'
+      - 'docs/**'
+      - 'postman/**'
+      - 'scripts/**'
+      - 'Makefile'
+      - '.github/workflows/api-ci-cd.yml'
+  workflow_dispatch:
+    inputs:
+      publish_to_postman:
+        description: 'Publish to Postman'
+        type: boolean
+        default: true
+      deploy_gh_pages:
+        description: 'Deploy to GitHub Pages'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+env:
+  # Environment configuration
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '20'
+  OPENAPI_DIR: openapi
+  POSTMAN_DIR: postman
+  DOCS_DIR: docs
+  DATA_DICT_DIR: data_dictionary
+  
+  # Feature toggles
+  PUBLISH_TO_POSTMAN: ${{ github.event.inputs.publish_to_postman || 'true' }}
+  DEPLOY_GH_PAGES: ${{ github.event.inputs.deploy_gh_pages || 'true' }}
+  
+  # Postman configuration
+  POSTMAN_API_BASE: https://api.postman.com
+  POSTMAN_WS: ${{ secrets.POSTMAN_WORKSPACE_ID }}
+
+jobs:
+  build:
+    name: Build API Spec, Collections, and Docs
+    runs-on: ubuntu-latest
+    
+    steps:
+      # ---------- Setup ----------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for diff
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: |
+            requirements.txt
+            scripts/python_env/requirements.txt
+
+      # ---------- Dependencies ----------
+      - name: Install Node dependencies
+        if: hashFiles('package-lock.json') != ''
+        run: npm ci
+
+      - name: Install Python dependencies
+        if: hashFiles('requirements.txt') != '' || hashFiles('scripts/python_env/requirements.txt') != ''
+        run: |
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+          if [ -f scripts/python_env/requirements.txt ]; then
+            pip install -r scripts/python_env/requirements.txt
+          fi
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq curl
+
+      # ---------- Environment Info ----------
+      - name: Print environment info
+        run: |
+          echo "🔧 Environment Information:"
+          echo "Python: $(python --version)"
+          echo "Node: $(node --version)"
+          echo "npm: $(npm --version)"
+          echo "jq: $(jq --version)"
+          echo "curl: $(curl --version | head -n 1)"
+          echo "GitHub Event: ${{ github.event_name }}"
+          echo "GitHub Ref: ${{ github.ref }}"
+
+      - name: Print Make variables (debug)
+        run: make -n print-vars || true
+
+      # ---------- Build Steps ----------
+      - name: Build OpenAPI from EBNF
+        run: |
+          echo "📋 Building OpenAPI spec from EBNF data dictionary..."
+          make openapi-build
+
+      - name: Build Postman Collection
+        run: |
+          echo "📦 Building Postman collection..."
+          make postman-collection-build
+
+      - name: Lint OpenAPI Spec
+        continue-on-error: true
+        run: |
+          echo "🔍 Linting OpenAPI spec..."
+          make lint || echo "⚠️  Linting completed with warnings"
+
+      - name: Diff OpenAPI Spec
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        run: |
+          echo "📊 Comparing OpenAPI spec changes..."
+          make diff || echo "ℹ️  Diff completed"
+
+      - name: Build Documentation
+        run: |
+          echo "📚 Building API documentation..."
+          make docs
+
+      # ---------- Drift Detection (PRs only) ----------
+      - name: Check for uncommitted changes
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "🔍 Checking for uncommitted generated artifacts..."
+          if [ -n "$(git status --porcelain ${{ env.OPENAPI_DIR }} ${{ env.POSTMAN_DIR }}/generated ${{ env.DOCS_DIR }})" ]; then
+            echo "❌ Error: Generated artifacts are out of sync!"
+            echo "Please run the following commands locally and commit the changes:"
+            echo "  make openapi-build"
+            echo "  make postman-collection-build"
+            echo "  make docs"
+            echo ""
+            echo "Modified files:"
+            git status --porcelain ${{ env.OPENAPI_DIR }} ${{ env.POSTMAN_DIR }}/generated ${{ env.DOCS_DIR }}
+            exit 1
+          else
+            echo "✅ All generated artifacts are up to date"
+          fi
+
+      # ---------- Publish to Postman (optional) ----------
+      - name: Publish to Postman
+        if: |
+          github.event_name == 'push' && 
+          github.ref == 'refs/heads/main' && 
+          env.PUBLISH_TO_POSTMAN == 'true' && 
+          env.POSTMAN_WS != ''
+        env:
+          POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
+        run: |
+          if [ -z "$POSTMAN_API_KEY" ]; then
+            echo "⚠️  Skipping Postman publish: POSTMAN_API_KEY not set"
+          else
+            echo "🚀 Publishing to Postman workspace..."
+            make postman-publish
+          fi
+
+      # ---------- Commit generated artifacts (main only) ----------
+      - name: Commit generated artifacts
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(ci): update OpenAPI spec, Postman collection, and docs"
+          commit_user_name: c2m-api-bot
+          commit_user_email: c2m-api-bot@users.noreply.github.com
+          file_pattern: |
+            ${{ env.OPENAPI_DIR }}/**
+            ${{ env.POSTMAN_DIR }}/generated/**
+            ${{ env.DOCS_DIR }}/**
+
+      # ---------- Upload artifacts ----------
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-artifacts
+          path: |
+            ${{ env.OPENAPI_DIR }}/c2mapiv2-openapi-spec-final.yaml
+            ${{ env.OPENAPI_DIR }}/bundled.yaml
+            ${{ env.POSTMAN_DIR }}/generated/*.json
+            ${{ env.DOCS_DIR }}/index.html
+            ${{ env.DOCS_DIR }}/site/**
+            ${{ env.DOCS_DIR }}/swagger/**
+
+      # ---------- Prepare GitHub Pages ----------
+      - name: Setup Pages
+        if: env.DEPLOY_GH_PAGES == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/configure-pages@v4
+
+      - name: Upload GitHub Pages artifact
+        if: env.DEPLOY_GH_PAGES == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/site
+
+  # ---------- Deploy to GitHub Pages ----------
+  deploy-pages:
+    name: Deploy to GitHub Pages
+    if: |
+      github.event_name == 'push' && 
+      github.ref == 'refs/heads/main' &&
+      needs.build.result == 'success'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  # ---------- Summary ----------
+  summary:
+    name: Workflow Summary
+    if: always()
+    needs: [build, deploy-pages]
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## 📊 CI/CD Workflow Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Build status
+          echo "### Build Status" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.build.result }}" == "success" ]; then
+            echo "✅ Build completed successfully" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Build failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Deployment status
+          if [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "### Deployments" >> $GITHUB_STEP_SUMMARY
+            if [ "${{ needs.deploy-pages.result }}" == "success" ]; then
+              echo "✅ GitHub Pages deployment successful" >> $GITHUB_STEP_SUMMARY
+            elif [ "${{ needs.deploy-pages.result }}" == "skipped" ]; then
+              echo "⏭️  GitHub Pages deployment skipped" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "❌ GitHub Pages deployment failed" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Links
+          echo "### 🔗 Quick Links" >> $GITHUB_STEP_SUMMARY
+          echo "- [View Workflow Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+          echo "- [Download Artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts)" >> $GITHUB_STEP_SUMMARY
