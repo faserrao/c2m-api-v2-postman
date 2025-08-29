@@ -16,6 +16,7 @@
 - [API Endpoints](#api-endpoints)
 - [Testing](#testing)
 - [Deployment](#deployment)
+- [CI/CD Pipeline (GitHub Actions)](#cicd-pipeline-github-actions)
 - [Makefile Documentation](#makefile-documentation)
 - [Troubleshooting](#troubleshooting)
 - [Debugging Playbook](#debugging-playbook)
@@ -766,6 +767,153 @@ make docs-stop
 2. **Documentation**: Host the generated docs on your documentation platform
 3. **Monitoring**: Set up webhooks for job status monitoring
 4. **Testing**: Run the Postman collection in your CI/CD pipeline
+
+---
+
+## CI/CD Pipeline (GitHub Actions)
+
+The project includes a comprehensive CI/CD pipeline that automates the entire workflow from code changes to deployment.
+
+### 🚀 Pipeline Overview
+
+The CI/CD pipeline automatically:
+- Builds OpenAPI specifications from EBNF data dictionary
+- Generates and validates Postman collections
+- Builds API documentation
+- Publishes to Postman cloud
+- Deploys documentation to GitHub Pages
+- Ensures all generated files are committed
+
+### 📋 Workflows
+
+#### 1. **Main CI/CD Workflow** (`api-ci-cd.yml`)
+
+Triggers on:
+- Push to `main` branch
+- Pull requests
+- Manual workflow dispatch
+
+Actions:
+```mermaid
+graph LR
+    A[Checkout Code] --> B[Setup Dependencies]
+    B --> C[Build OpenAPI]
+    C --> D[Generate Collections]
+    D --> E[Build Docs]
+    E --> F{Branch Check}
+    F -->|main| G[Auto-commit Changes]
+    F -->|PR| H[Drift Detection]
+    G --> I[Publish to Postman]
+    I --> J[Deploy to Pages]
+```
+
+#### 2. **PR Drift Check** (`pr-drift-check.yml`)
+
+Ensures generated files are committed:
+- Regenerates all artifacts
+- Compares with committed versions
+- Auto-comments on PR if files need updating
+- Provides exact commands to fix issues
+
+### 🔧 Setup Instructions
+
+#### 1. Configure GitHub Secrets
+
+Go to **Settings → Secrets and variables → Actions** and add:
+
+| Secret | Description | Example |
+|--------|-------------|---------|
+| `POSTMAN_API_KEY` | Your Postman API key | `PMAK-xxxxx...` |
+| `POSTMAN_WORKSPACE_ID` | Target workspace UUID | `d8a1f479-a2aa-...` |
+
+#### 2. Enable GitHub Pages
+
+1. Go to **Settings → Pages**
+2. Set Source to "GitHub Actions"
+3. Save changes
+
+#### 3. Test the Pipeline
+
+```bash
+# Create a feature branch
+git checkout -b feature/my-change
+
+# Make changes to EBNF or scripts
+echo "// Test comment" >> data_dictionary/c2mapiv2-dd.ebnf
+
+# Regenerate artifacts locally
+make openapi-build
+make postman-collection-build
+make docs
+
+# Commit everything
+git add -A
+git commit -m "feat: update API specification"
+
+# Push and create PR
+git push origin feature/my-change
+```
+
+### 📊 Pipeline Features
+
+#### Automated Artifact Management
+- Generated files are automatically committed to maintain consistency
+- PR checks ensure no drift between source and generated files
+- Clear error messages guide developers to fix issues
+
+#### Conditional Publishing
+- Postman publishing only occurs on main branch with configured secrets
+- GitHub Pages deployment is configurable via workflow inputs
+- All actions are idempotent and safe to re-run
+
+#### CI/CD Commands
+
+The pipeline uses these Makefile targets (also available for local development):
+
+```bash
+make openapi-build           # Build OpenAPI from EBNF + lint
+make postman-collection-build # Generate and flatten collection
+make docs                    # Build API documentation
+make lint                    # Validate OpenAPI spec
+make diff                    # Compare spec changes
+make postman-publish         # Push to Postman workspace
+```
+
+### 🔍 Monitoring Pipeline Status
+
+1. **GitHub Actions Tab**: View all workflow runs at `/actions`
+2. **PR Checks**: See status on each pull request
+3. **Deployment Status**: Check GitHub Pages URL for latest docs
+4. **Postman Workspace**: Verify collections are updated
+
+### 🛡️ Security Considerations
+
+- API keys are stored as encrypted secrets
+- Workflows have minimal required permissions
+- Auto-commits use a bot identity
+- No sensitive data in logs
+
+### 📈 Best Practices
+
+1. **Always regenerate locally** before pushing:
+   ```bash
+   make openapi-build postman-collection-build docs
+   ```
+
+2. **Review auto-generated changes** carefully in PRs
+
+3. **Keep secrets updated** - rotate API keys regularly
+
+4. **Monitor failed workflows** - check Actions tab for issues
+
+### 🆘 Troubleshooting CI/CD
+
+| Issue | Solution |
+|-------|----------|
+| "Generated files out of sync" | Run the commands shown in PR comment |
+| "Postman publish failed" | Check API key is valid and has workspace access |
+| "Pages deployment failed" | Ensure Pages is enabled in repository settings |
+| "Python/Node setup failed" | Check `requirements.txt` and `package.json` are valid |
 
 ---
 
