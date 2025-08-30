@@ -24,7 +24,7 @@ jobs:
         run: npm install -g @redocly/cli
 
       - name: Lint OpenAPI spec
-        run: redocly lint openapi/c2m_openapi_spec_final.yaml
+        run: redocly lint openapi/c2mapiv2-openapi-spec-final.yaml
 
   build-docs:
     runs-on: ubuntu-latest
@@ -41,5 +41,5 @@ jobs:
         run: npm install -g @redocly/cli
 
       - name: Build Redoc HTML
-        run: redocly build-docs openapi/c2m_openapi_spec_final.yaml -o docs/index.html
+        run: redocly build-docs openapi/c2mapiv2-openapi-spec-final.yaml -o docs/index.html
 
