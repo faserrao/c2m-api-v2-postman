@@ -146,3 +146,68 @@
 [6:31:28 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/long
 [6:31:28 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/aperiam/revoke
 [6:31:28 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
+[6:16:01 PM] › [HTTP SERVER] post /submit/single/doc ℹ  info      Request received
+[6:16:01 PM] › [HTTP SERVER] post /submit/single/doc ✖  error     Request terminated with error: https://stoplight.io/prism/errors#NO_PATH_MATCHED_ERROR: Route not resolved, no path matched
+[6:22:53 PM] › [HTTP SERVER] post /single-doc-job-template ℹ  info      Request received
+[6:22:53 PM] › [HTTP SERVER] post /single-doc-job-template ✖  error     Request terminated with error: https://stoplight.io/prism/errors#NO_PATH_MATCHED_ERROR: Route not resolved, no path matched
+[6:23:06 PM] › [HTTP SERVER] post /jobs/single-doc-job-template ℹ  info      Request received
+[6:23:06 PM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: */*
+[6:23:06 PM] ›     [VALIDATOR] ⚠  warning   Request did not pass the validation rules
+[6:23:06 PM] ›     [VALIDATOR] ✖  error     Invalid security scheme used
+[6:23:06 PM] ›     [VALIDATOR] ✖  error     Body parameter is required
+[6:23:06 PM] ›     [NEGOTIATOR] ✔  success   Found response 401. I'll try with it.
+[6:23:06 PM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 401
+[6:23:06 PM] ›     [NEGOTIATOR] ℹ  info      > Responding with "401"
+[6:23:06 PM] ›     [VALIDATOR] ✖  error     Violation: request Invalid security scheme used
+[6:23:06 PM] ›     [VALIDATOR] ✖  error     Violation: request Body parameter is required
+=== Sat Aug 30 14:49:35 EDT 2025 ===
+[2:49:36 PM] › [CLI] …  awaiting  Starting Prism…
+(node:29126) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[2:49:36 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-doc-job-template
+[2:49:36 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-docs-job-template
+[2:49:36 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc-merge-job-template
+[2:49:36 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-doc
+[2:49:36 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc
+[2:49:36 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc-merge
+[2:49:36 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-pdf-split
+[2:49:36 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-pdf-split-addressCapture
+[2:49:36 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-pdf-address-capture
+[2:49:36 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/short
+[2:49:36 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/long
+[2:49:36 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/explicabo/revoke
+[2:49:36 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
+=== Sat Aug 30 14:56:42 EDT 2025 ===
+[2:56:43 PM] › [CLI] …  awaiting  Starting Prism…
+(node:35125) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[2:56:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-doc-job-template
+[2:56:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-docs-job-template
+[2:56:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc-merge-job-template
+[2:56:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-doc
+[2:56:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc
+[2:56:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc-merge
+[2:56:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-pdf-split
+[2:56:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-pdf-split-addressCapture
+[2:56:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-pdf-address-capture
+[2:56:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/short
+[2:56:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/long
+[2:56:43 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/et/revoke
+[2:56:43 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
+=== Sat Aug 30 14:57:54 EDT 2025 ===
+[2:57:54 PM] › [CLI] …  awaiting  Starting Prism…
+(node:38693) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[2:57:54 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-doc-job-template
+[2:57:54 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-docs-job-template
+[2:57:54 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc-merge-job-template
+[2:57:54 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-doc
+[2:57:54 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc
+[2:57:54 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc-merge
+[2:57:54 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-pdf-split
+[2:57:54 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-pdf-split-addressCapture
+[2:57:54 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-pdf-address-capture
+[2:57:54 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/short
+[2:57:54 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/long
+[2:57:54 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/molestiae/revoke
+[2:57:54 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010

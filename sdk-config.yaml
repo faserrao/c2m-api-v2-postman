@@ -1,0 +1,123 @@
+# ========================================================================
+# SDK Generation Configuration for C2M API
+# ========================================================================
+# This file contains advanced configuration options for SDK generation
+# Used by the generate-sdk.sh script
+
+# Global configuration applied to all SDKs
+global:
+  gitUserId: c2m
+  gitRepoIdPrefix: c2m-api
+  author: C2M Development Team
+  authorEmail: dev@c2m.com
+  authorUrl: https://c2m.com
+  licenseName: MIT
+  licenseUrl: https://opensource.org/licenses/MIT
+
+# Language-specific configurations
+languages:
+  python:
+    generator: python
+    packageName: c2m_api
+    projectName: c2m-api-python
+    packageVersion: 1.0.0
+    packageUrl: https://github.com/c2m/c2m-api-python
+    library: urllib3
+    additionalProperties:
+      generateSourceCodeOnly: false
+      packageVersion: 1.0.0
+    
+  javascript:
+    generator: javascript
+    projectName: c2m-api-js
+    projectDescription: JavaScript client library for C2M API
+    projectVersion: 1.0.0
+    usePromises: true
+    useES6: true
+    additionalProperties:
+      supportsES6: true
+      npmName: "@c2m/api-client"
+      npmVersion: 1.0.0
+      
+  typescript:
+    generator: typescript-axios
+    npmName: "@c2m/api-client-ts"
+    npmVersion: 1.0.0
+    supportsES6: true
+    withSeparateModelsAndApi: true
+    modelPropertyNaming: camelCase
+    additionalProperties:
+      supportsES6: true
+      withInterfaces: true
+      
+  java:
+    generator: java
+    groupId: com.c2m
+    artifactId: c2m-api-client
+    artifactVersion: 1.0.0
+    apiPackage: com.c2m.api
+    modelPackage: com.c2m.api.model
+    invokerPackage: com.c2m.api.client
+    library: okhttp-gson
+    dateLibrary: java8
+    additionalProperties:
+      java8: true
+      serializableModel: true
+      
+  go:
+    generator: go
+    packageName: c2mapi
+    packageVersion: 1.0.0
+    additionalProperties:
+      isGoSubmodule: true
+      
+  ruby:
+    generator: ruby
+    gemName: c2m_api
+    gemVersion: 1.0.0
+    moduleName: C2mApi
+    gemAuthor: C2M Development Team
+    gemAuthorEmail: dev@c2m.com
+    gemHomepage: https://github.com/c2m/c2m-api-ruby
+    gemSummary: Ruby client for C2M API
+    gemDescription: Ruby client library for interacting with the C2M document processing API
+    
+  php:
+    generator: php
+    invokerPackage: C2M\\Api
+    packageName: c2m-api-php
+    gitUserId: c2m
+    gitRepoId: c2m-api-php
+    artifactVersion: 1.0.0
+    additionalProperties:
+      packageName: c2m/api-client
+
+# Template customization
+templates:
+  # Custom templates can be added here
+  # templateDir: ./custom-templates
+  
+# Post-processing hooks
+hooks:
+  postGenerate:
+    - name: "Add CI/CD"
+      command: "cp .github/workflows/sdk-ci.yml"
+    - name: "Format code"
+      command: "make format"
+      
+# Documentation generation
+documentation:
+  includeExamples: true
+  includeReadme: true
+  includeLicense: true
+  includeChangeLog: true
+  
+# Testing configuration  
+testing:
+  generateTests: true
+  testFramework: default
+  
+# Validation
+validation:
+  validateSpec: true
+  strictValidation: false

@@ -171,49 +171,79 @@ curl -X POST https://api.c2m.com/v1/jobs/multi-docs-job-template \
 
 ---
 
-## Directory Structure
+## Project Structure
 
 ```
 c2m-api-repo/
 ├── data_dictionary/          # EBNF data definitions (source of truth)
+│   ├── README.md            # [📖 Data Dictionary Guide](data_dictionary/README.md)
 │   ├── c2mapiv2-dd.ebnf     # Main data dictionary
 │   └── modules/             # Modular EBNF definitions
-├── openapi/                 # OpenAPI specifications
+├── openapi/                 # OpenAPI specifications  
+│   ├── README.md            # [📖 OpenAPI Guide](openapi/README.md)
 │   ├── c2mapiv2-openapi-spec-final.yaml
 │   ├── overlays/            # OpenAPI overlays (auth, etc.)
 │   │   └── auth.tokens.yaml # JWT authentication overlay
-│   └── examples/            # Request/response examples
+│   └── bundled.yaml         # Single-file spec (refs resolved)
 ├── postman/                 # Postman collections and artifacts
+│   ├── README.md            # [📖 Postman Guide](postman/README.md)
 │   ├── generated/           # Auto-generated collections
 │   ├── custom/              # User customizations
 │   ├── scripts/             # Postman scripts
 │   │   └── jwt-pre-request.js # JWT auto-refresh script
 │   └── *.txt, *.json        # IDs, payloads, debug outputs
 ├── scripts/                 # Automation scripts
+│   ├── README.md            # [📖 Scripts Guide](scripts/README.md)
 │   ├── ebnf_to_openapi_*.py # EBNF to OpenAPI converters
+│   ├── generate-sdk.sh      # SDK generation script
+│   ├── deploy-docs.sh       # Documentation deployment
+│   ├── prism_test.sh        # Advanced Prism testing
 │   ├── add_tests.js         # Test injection
-│   ├── add_tests_jwt.js     # JWT-specific test injection
 │   ├── fix_collection_*.py  # Collection fixers
-│   ├── inject-banner*.js    # Banner injection for docs
-│   ├── replace-enum-values.js # Enum value replacement
-│   └── validate_collection.js # Collection validation
+│   └── jq/                  # JSON processing scripts
+├── sdk/                     # Client SDKs
+│   ├── README.md            # [📖 SDK Guide](sdk/README.md)
+│   └── python/              # Python SDK
+│       ├── README.md        # [📖 Python SDK Guide](sdk/python/README.md)
+│       ├── c2m_api/         # SDK package
+│       └── docs/            # API documentation
 ├── examples/                # Code examples
+│   ├── README.md            # [📖 Examples Guide](examples/README.md)
 │   └── jwt-authentication-examples.md # JWT client examples
 ├── docs/                    # Generated documentation
+│   ├── README.md            # [📖 Documentation Guide](docs/README.md)
 │   ├── templates/           # Doc templates
 │   └── index.html          # Redoc output
 ├── tests/                   # Test suites
 │   └── jwt-auth-tests.js    # JWT authentication tests
+├── .github/                 # GitHub configuration
+│   └── workflows/           # GitHub Actions workflows
+│       ├── api-ci-cd.yml    # Main CI/CD pipeline
+│       └── pr-drift-check.yml # PR validation
 ├── finspect/               # File inspection tool
 ├── test-images/            # Test screenshots
 ├── .env.example            # Environment template
+├── sdk-config.yaml         # SDK generation config
 ├── Makefile                # Main automation
 ├── CLAUDE.md               # AI assistant guide
+├── SDK_GUIDE.md            # SDK development guide
 ├── TEMPLATE_ENDPOINTS_QUICKSTART.md # Template endpoint guide
 ├── JWT_AUTHENTICATION_README.md # JWT implementation guide
 ├── JWT_IMPLEMENTATION_SUMMARY.md # JWT technical summary
 └── README.md               # This file
 ```
+
+### Directory Details
+
+Each major directory contains its own README with detailed documentation:
+
+- **[data_dictionary/](data_dictionary/README.md)** - EBNF format guide and data modeling
+- **[openapi/](openapi/README.md)** - OpenAPI spec generation and overlays
+- **[postman/](postman/README.md)** - Postman integration and testing
+- **[scripts/](scripts/README.md)** - Script documentation and usage
+- **[sdk/](sdk/README.md)** - SDK generation and language support
+- **[examples/](examples/README.md)** - Code examples and patterns
+- **[docs/](docs/README.md)** - Documentation generation and hosting
 
 ---
 
@@ -633,52 +663,103 @@ NODE_OPTIONS=--no-deprecation newman run postman/generated/collection.json
 
 ## API Endpoints
 
-### Current Endpoints (v3)
+### Complete Endpoint Reference
 
-All endpoints now use a simplified two-level structure:
+All endpoints use a simplified two-level structure. The API base URL is `https://api.c2m.com/v2`.
 
 ### 🔐 Authentication Endpoints
 
-1. **POST** `/auth/tokens/long` - Issue long-term token (30-90 days)
-2. **POST** `/auth/tokens/short` - Exchange for short-term token (15 minutes)
-3. **POST** `/auth/tokens/{tokenId}/revoke` - Revoke any token
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| **POST** | `/auth/tokens/long` | Issue or rotate a long-term token (30-90 days) for server/automation use |
+| **POST** | `/auth/tokens/short` | Exchange long-term token for short-term JWT (15 minutes) |
+| **POST** | `/auth/tokens/{tokenId}/revoke` | Revoke a specific token (idempotent operation) |
 
-#### 🎯 **RECOMMENDED: Template Endpoints** (Start Here!)
+### 🎯 **RECOMMENDED: Template Endpoints** (Start Here!)
 
-These endpoints use pre-configured job templates for optimal results:
+These endpoints reference pre-created templates that can include job options, documents, and/or address lists:
 
-1. **POST** `/jobs/single-doc-job-template` ⭐ - Submit document using a job template
-2. **POST** `/jobs/multi-docs-job-template` ⭐ - Submit multiple documents with job template
-3. **POST** `/jobs/multi-doc-merge-job-template` ⭐ - Merge documents using job template
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| **POST** | `/jobs/single-doc-job-template` ⭐ | Submit job using a template (can override document/addresses) |
+| **POST** | `/jobs/multi-docs-job-template` ⭐ | Submit multiple jobs using templates |
+| **POST** | `/jobs/multi-doc-merge-job-template` ⭐ | Merge documents using template configuration |
 
-> **Why use template endpoints?** They provide pre-configured settings for paper type, print quality, and mailing options. Perfect for 90% of use cases!
+> **💡 Why use template endpoints?** 
+> - **Minimal API payload** - just reference the template ID
+> - **Reusable configurations** - templates store job options, documents, and/or address lists
+> - **Perfect for recurring jobs** - same document to same recipients
+> - **Flexible** - can override template's document or addresses per request
+> - **No job options needed** - template contains all print/mail settings
 
-#### Custom Configuration Endpoints
+### 📄 Non-Template Endpoints
 
-Use these only if you need specific control over individual parameters:
+These endpoints require all job details in the API request:
 
-4. **POST** `/jobs/single-doc` - Submit a single document to multiple recipients
-5. **POST** `/jobs/multi-doc` - Submit multiple documents, each to different recipients
-6. **POST** `/jobs/multi-doc-merge` - Merge multiple documents and send to a single recipient
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| **POST** | `/jobs/single-doc` | Submit a single document with custom job options |
+| **POST** | `/jobs/multi-doc` | Submit multiple documents with individual configurations |
+| **POST** | `/jobs/multi-doc-merge` | Merge multiple documents with custom merge options |
 
-#### Specialized Endpoints
+### 🔧 Specialized Processing Endpoints
 
-For advanced document processing:
+For advanced document processing scenarios:
 
-7. **POST** `/jobs/single-pdf-split` - Split PDF and send ranges to different recipients
-8. **POST** `/jobs/single-pdf-split-addressCapture` - Split PDF with address extraction
-9. **POST** `/jobs/multi-pdf-address-capture` - Process multiple PDFs with embedded addresses
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| **POST** | `/jobs/single-pdf-split` | Split a PDF into ranges, send each to different recipients |
+| **POST** | `/jobs/single-pdf-split-addressCapture` | Split PDF with automatic address extraction from pages |
+| **POST** | `/jobs/multi-pdf-address-capture` | Process multiple PDFs extracting embedded addresses |
 
-### Example: Single Document Submission
+### Endpoint Categories Summary
 
-**Using Template Endpoint (Recommended):**
+1. **Authentication** (3 endpoints) - Token management and security
+2. **Template-based** (3 endpoints) - Recommended for most users
+3. **Custom jobs** (3 endpoints) - Full parameter control
+4. **PDF processing** (3 endpoints) - Advanced PDF manipulation
 
+Total: **12 endpoints** covering all document submission scenarios
+
+### API Examples
+
+#### Authentication Examples
+
+**1. Get Long-Term Token:**
+```json
+POST /auth/tokens/long
+{
+  "grant_type": "client_credentials",
+  "client_id": "your_client_id",
+  "client_secret": "your_secret",
+  "scopes": ["jobs:submit", "templates:read"],
+  "ttl_seconds": 7776000  // 90 days
+}
+```
+
+**2. Exchange for Short-Term Token:**
+```json
+POST /auth/tokens/short
+Authorization: Bearer {long-term-token}
+{
+  "scopes": ["jobs:submit"]  // Optional: limit scopes
+}
+```
+
+**3. Revoke Token:**
+```json
+POST /auth/tokens/{tokenId}/revoke
+Authorization: Bearer {any-valid-token}
+```
+
+#### Template Endpoint Examples
+
+**4. Single Doc with Template (Minimal):**
 ```json
 POST /jobs/single-doc-job-template
-Authorization: Bearer {short-term-jwt-token}
+Authorization: Bearer {short-term-jwt}
 {
-  "documentSourceIdentifier": "https://example.com/document.pdf",
-  "jobTemplate": "standard-letter",
+  "jobTemplate": "monthly-newsletter",  // Template has doc & addresses
   "paymentDetails": {
     "paymentMethod": "purchase-order",
     "purchaseOrderNumber": "PO-12345"
@@ -686,18 +767,172 @@ Authorization: Bearer {short-term-jwt-token}
 }
 ```
 
-**Using Custom Endpoint:**
+**5. Single Doc with Template (Override Document):**
+```json
+POST /jobs/single-doc-job-template
+Authorization: Bearer {short-term-jwt}
+{
+  "jobTemplate": "standard-letter",  // Template has job options & addresses
+  "documentSourceIdentifier": "https://example.com/new-doc.pdf",  // Override template's doc
+  "paymentDetails": {
+    "paymentMethod": "purchase-order",
+    "purchaseOrderNumber": "PO-12345"
+  }
+}
+```
 
+**6. Multi-Doc with Templates:**
+```json
+POST /jobs/multi-docs-job-template
+Authorization: Bearer {short-term-jwt}
+{
+  "jobs": [
+    {
+      "jobTemplate": "invoice-template",
+      "documentSourceIdentifier": "https://example.com/invoice-001.pdf"
+    },
+    {
+      "jobTemplate": "invoice-template", 
+      "documentSourceIdentifier": "https://example.com/invoice-002.pdf"
+    }
+  ],
+  "paymentDetails": {...}
+}
+```
+
+**7. Merge Documents with Template:**
+```json
+POST /jobs/multi-doc-merge-job-template
+Authorization: Bearer {short-term-jwt}
+{
+  "jobTemplate": "packet-template",
+  "documentSourceIdentifiers": [
+    "https://example.com/cover.pdf",
+    "https://example.com/report.pdf",
+    "https://example.com/appendix.pdf"
+  ],
+  "paymentDetails": {...}
+}
+```
+
+#### Non-Template Endpoint Examples
+
+**8. Single Document (Full Specification):**
 ```json
 POST /jobs/single-doc
+Authorization: Bearer {short-term-jwt}
 {
   "documentSourceIdentifier": "https://example.com/document.pdf",
-  "recipientAddressSources": [...],
+  "recipientAddressSources": [
+    {
+      "name": "John Doe",
+      "address": {
+        "line1": "123 Main St",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001"
+      }
+    }
+  ],
   "jobOptions": {
     "paperType": "standard",
-    "printColor": "bw",
-    "mailClass": "first"
-  }
+    "printOption": "bw",
+    "mailClass": "first",
+    "envelope": "standard-10"
+  },
+  "paymentDetails": {...}
+}
+```
+
+**9. Multiple Documents:**
+```json
+POST /jobs/multi-doc
+Authorization: Bearer {short-term-jwt}
+{
+  "jobs": [
+    {
+      "documentSourceIdentifier": "https://example.com/doc1.pdf",
+      "recipientAddressSource": {...},
+      "jobOptions": {...}
+    },
+    {
+      "documentSourceIdentifier": "https://example.com/doc2.pdf", 
+      "recipientAddressSource": {...},
+      "jobOptions": {...}
+    }
+  ],
+  "paymentDetails": {...}
+}
+```
+
+**10. Merge Multiple Documents:**
+```json
+POST /jobs/multi-doc-merge
+Authorization: Bearer {short-term-jwt}
+{
+  "documentSourceIdentifiers": [
+    "https://example.com/page1.pdf",
+    "https://example.com/page2.pdf"
+  ],
+  "recipientAddressSource": {...},
+  "jobOptions": {...},
+  "paymentDetails": {...}
+}
+```
+
+#### PDF Processing Examples
+
+**11. Split PDF by Page Ranges:**
+```json
+POST /jobs/single-pdf-split
+Authorization: Bearer {short-term-jwt}
+{
+  "documentSourceIdentifier": "https://example.com/multi-page.pdf",
+  "splits": [
+    {
+      "pageRange": "1-3",
+      "recipientAddressSource": {...}
+    },
+    {
+      "pageRange": "4-6",
+      "recipientAddressSource": {...}
+    }
+  ],
+  "jobOptions": {...},
+  "paymentDetails": {...}
+}
+```
+
+**12. Split PDF with Address Capture:**
+```json
+POST /jobs/single-pdf-split-addressCapture
+Authorization: Bearer {short-term-jwt}
+{
+  "documentSourceIdentifier": "https://example.com/statements.pdf",
+  "addressExtractionSpec": {
+    "region": "top-right",
+    "pageInterval": 3  // New recipient every 3 pages
+  },
+  "jobOptions": {...},
+  "paymentDetails": {...}
+}
+```
+
+**13. Multi-PDF Address Capture:**
+```json
+POST /jobs/multi-pdf-address-capture
+Authorization: Bearer {short-term-jwt}
+{
+  "documentSourceIdentifiers": [
+    "https://example.com/batch1.pdf",
+    "https://example.com/batch2.pdf"
+  ],
+  "addressExtractionSpec": {
+    "region": "window",  // Standard #10 window position
+    "ocrEnabled": true
+  },
+  "jobOptions": {...},
+  "paymentDetails": {...}
 }
 ```
 
@@ -1038,6 +1273,118 @@ This saves:
 - **404 Not Found**: Ensure resource exists in correct workspace
 - **Empty responses**: Resource might not exist yet
 - **Auth errors**: Verify API key is valid
+
+---
+
+## Project Structure
+
+### Directory Overview
+
+```
+c2m-api-repo/
+├── .github/                    # GitHub configuration and workflows [README]
+├── data_dictionary/            # EBNF data dictionary source files
+├── docs/                       # API documentation (Swagger/Redoc) [README]
+├── examples/                   # Example code and usage samples
+├── openapi/                    # OpenAPI specifications and overlays
+├── postman/                    # Postman collections and configs [README]
+├── scripts/                    # Build and utility scripts
+├── sdk/                        # Generated SDKs
+├── sdk-clients/                # SDK client implementations [README]
+├── tests/                      # Test suites and fixtures [README]
+└── various config files        # See Root Files section below
+```
+
+### Directories with READMEs
+
+- **[.github/](.github/)** - GitHub Actions workflows and configuration ([README](.github/README.md))
+- **[docs/](docs/)** - API documentation generation and templates ([README](docs/README.md))
+- **[postman/](postman/)** - Postman collection management ([README](postman/README.md))
+- **[sdk-clients/](sdk-clients/)** - Pre-built SDK clients ([README](sdk-clients/README.md))
+- **[tests/](tests/)** - Testing framework and test cases ([README](tests/README.md))
+
+### Core Directories
+
+#### `data_dictionary/`
+EBNF (Extended Backus-Naur Form) data dictionary files that define the API structure:
+- `c2mapiv2-dd.ebnf` - Main data dictionary definition
+- `DocumentationAndNotes/` - Additional documentation
+
+#### `openapi/`
+OpenAPI specification files:
+- `c2mapiv2-openapi-spec-base.yaml` - Base specification generated from EBNF
+- `c2mapiv2-openapi-spec-final.yaml` - Final spec with overlays applied
+- `bundled.yaml` - Single-file bundled specification
+- `overlays/` - Specification overlays (auth, examples, etc.)
+  - `auth.tokens.yaml` - Authentication overlay
+
+#### `scripts/`
+Build automation and utility scripts:
+- `ebnf_to_openapi_dynamic_v3.py` - EBNF to OpenAPI converter
+- `generate-sdk.sh` - SDK generation script
+- `deploy-docs.sh` - Documentation deployment script
+- `prism_test.sh` - Prism mock server testing
+- `cleanup-*.sh` - Directory cleanup utilities
+- `jq/` - JQ scripts for JSON processing
+- `makefile-scripts/` - Makefile support scripts
+- `python_env/` - Python virtual environment config
+- `test_data_generator_*/` - Test data generation tools
+
+#### `sdk/`
+Generated SDK output directory:
+- `python/` - Python SDK ([README](sdk/python/README.md))
+- Other language SDKs generated here
+
+#### `examples/`
+Example implementations:
+- `authentication/` - JWT authentication examples
+- API usage examples for various endpoints
+
+### Root Files
+
+#### Documentation Files
+- `README.md` - This file, main project documentation
+- `CLAUDE.md` - Claude Code AI assistant guidance
+- `CONTRIBUTING.md` - Contribution guidelines
+- `LICENSE` - Project license
+- `SDK_GUIDE.md` - Comprehensive SDK usage guide
+- `JWT_AUTHENTICATION_README.md` - JWT authentication documentation
+- `JWT_IMPLEMENTATION_SUMMARY.md` - JWT implementation details
+- `TEMPLATE_ENDPOINTS_QUICKSTART.md` - Quick start guide for template endpoints
+- `UNUSED_SCRIPTS_ANALYSIS.md` - Analysis of unused scripts
+
+#### Configuration Files
+- `Makefile` - Primary build automation (1900+ lines)
+- `package.json` - Node.js project configuration
+- `package-lock.json` - Locked Node.js dependencies
+- `.env.example` - Environment variable template
+- `openapitools.json` - OpenAPI Generator configuration
+- `sdk-config.yaml` - SDK generation configuration
+- `.gitignore` - Git ignore patterns
+
+#### Temporary/Generated Files
+- `prism_test_body.json` - Prism test request body
+- Various `*.pid` and log files (git-ignored)
+
+### Deprecated/Archive Directories
+
+- `possible-trash/` - Files marked for potential deletion
+- `DocumentationAndNotes/` - Legacy documentation (being migrated)
+- `cryptv/` - Cryptography-related utilities (legacy)
+- `finspect/` - File inspection tool ([README](finspect/README.md))
+- `output/` - Generated output files (git-ignored)
+- `vscode-setup/` - VS Code configuration files
+
+### Getting Directory-Specific Help
+
+Each directory with a README provides detailed documentation about:
+- Purpose and contents
+- File descriptions
+- Usage instructions
+- Dependencies
+- Examples
+
+Start with the directory's README for detailed information about that component.
 
 ---
 

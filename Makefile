@@ -267,9 +267,9 @@ endef
 # ========================================================================
 #--- SCRIPTS ---
 ADD_EXAMPLES_TO_OPENAPI_SPEC     := $(SCRIPTS_DIR)/test_data_genertor_for_openapi_specs/add_examples_to_spec.py $(C2MAPIV2_OPENAPI_SPEC)
-ADD_TESTS_SCRIPT                 := $(SCRIPTS_DIR)/add_tests.js
-EBNF_TO_OPENAPI_SCRIPT           := $(SCRIPTS_DIR)/ebnf_to_openapi_dynamic_v3.py
-FIX_COLLECTION_URLS              := $(SCRIPTS_DIR)/fix_collection_urls_v2.py
+ADD_TESTS_SCRIPT                 := $(SCRIPTS_DIR)/active/add_tests.js
+EBNF_TO_OPENAPI_SCRIPT           := $(SCRIPTS_DIR)/active/ebnf_to_openapi_dynamic_v3.py
+FIX_COLLECTION_URLS              := $(SCRIPTS_DIR)/active/fix_collection_urls_v2.py
 FIX_PATHS_SCRIPT                 := $(SCRIPTS_DIR)/fix_paths.jq
 JQ_ADD_INFO                      := --arg name "$$(POSTMAN_LINKED_COLLECTION_NAME)" '. as $$c | {info: {name: $$name, schema: "$$(POSTMAN_SCHEMA_V2)"}, item: $$c.item}'
 JQ_AUTO_FIX                      := jq 'walk(if type == "object" and (has("name") and (has("request") | not) and (has("item") | not)) then . + { "item": [] } else . end)'
@@ -278,7 +278,7 @@ JQ_VERIFY_URLS                   := jq -r '.. | objects | select(has("url")) | .
 MERGE_POSTMAN_OVERRIDES          := $(SCRIPTS_DIR)/merge_overrides.jq
 MERGE_SCRIPT                     := $(SCRIPTS_DIR)/merge.jq
 NODE_COLLECTION_VALIDATE         := node -e "const {Collection}=require('postman-collection'); const fs=require('fs'); const data=JSON.parse(fs.readFileSync('$(POSTMAN_TEST_COLLECTION_FIXED)','utf8')); try { new Collection(data); console.log('✅ Collection is valid.'); } catch(e) { console.error('❌ Validation failed:', e.message); process.exit(1); }"
-POSTMAN_VALIDATOR                := $(SCRIPTS_DIR)/validate_collection.js
+POSTMAN_VALIDATOR                := $(SCRIPTS_DIR)/active/validate_collection.js
 INSTALL_PYTHON_MODULES           := install -r $(SCRIPTS_DIR)/python_env/requirements.txt
 
 ADD_EXAMPLES_TO_COLLECTION_SCRIPT := node $(SCRIPTS_DIR)/test_data_generator_for_collections/addRandomDataToRaw.js
@@ -570,6 +570,277 @@ rebuild-all-with-delete-flat:
 	$(MAKE) rebuild-all-no-delete
 	@echo "✅ Rebuild complete with flattened collections!"
 
+# ========================================================================
+# SMART REBUILD SYSTEM WITH CASCADE CHANGE DETECTION
+# ========================================================================
+# This system checks for actual content changes before rebuilding
+# It cascades through the pipeline, only rebuilding what has changed
+
+# Directory for storing build hashes
+HASH_DIR := .build-hashes
+
+# Hash files for tracking changes
+DD_HASH_FILE := $(HASH_DIR)/data-dictionary.hash
+OPENAPI_HASH_FILE := $(HASH_DIR)/openapi-spec.hash
+POSTMAN_COLLECTION_HASH_FILE := $(HASH_DIR)/postman-collection.hash
+SDK_HASH_FILE := $(HASH_DIR)/sdk.hash
+DOCS_HASH_FILE := $(HASH_DIR)/docs.hash
+
+# Function to calculate hash of a file
+define calculate_hash
+	if [ -f "$(1)" ]; then \
+		if command -v shasum >/dev/null 2>&1; then \
+			shasum -a 256 "$(1)" | cut -d' ' -f1; \
+		else \
+			sha256sum "$(1)" | cut -d' ' -f1; \
+		fi \
+	else \
+		echo "FILE_NOT_FOUND"; \
+	fi
+endef
+
+# Function to check if file has changed
+define has_changed
+	mkdir -p $(HASH_DIR); \
+	CURRENT_HASH=$$($(call calculate_hash,$(1))); \
+	if [ -f "$(2)" ]; then \
+		STORED_HASH=$$(cat "$(2)"); \
+		if [ "$$CURRENT_HASH" != "$$STORED_HASH" ]; then \
+			echo "true"; \
+		else \
+			echo "false"; \
+		fi \
+	else \
+		echo "true"; \
+	fi
+endef
+
+# Function to update hash file
+define update_hash
+	mkdir -p $(HASH_DIR); \
+	CURRENT_HASH=$$($(call calculate_hash,$(1))); \
+	echo "$$CURRENT_HASH" > "$(2)"
+endef
+
+# Smart rebuild target - main entry point
+.PHONY: smart-rebuild
+smart-rebuild:
+	@echo "🧠 Starting smart rebuild with cascade change detection..."
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	
+	# Check data dictionary changes
+	@DD_CHANGED=$$($(call has_changed,$(DD_EBNF_FILE),$(DD_HASH_FILE))); \
+	if [ "$$DD_CHANGED" = "true" ]; then \
+		echo "📝 Data dictionary changed - regenerating OpenAPI spec..."; \
+		$(MAKE) smart-rebuild-openapi; \
+	else \
+		echo "✅ Data dictionary unchanged - checking OpenAPI spec..."; \
+		$(MAKE) smart-check-openapi; \
+	fi
+
+# Rebuild OpenAPI spec from data dictionary
+.PHONY: smart-rebuild-openapi
+smart-rebuild-openapi:
+	@echo "🔄 Generating OpenAPI spec from data dictionary..."
+	
+	# Store old spec for comparison
+	@if [ -f "$(C2MAPIV2_OPENAPI_SPEC)" ]; then \
+		cp "$(C2MAPIV2_OPENAPI_SPEC)" "$(C2MAPIV2_OPENAPI_SPEC).old"; \
+	fi
+	
+	# Generate new spec
+	$(MAKE) ebnf-dd-to-openapi-spec
+	
+	# Update data dictionary hash
+	$(call update_hash,$(DD_EBNF_FILE),$(DD_HASH_FILE))
+	
+	# Show diff if old spec exists
+	@if [ -f "$(C2MAPIV2_OPENAPI_SPEC).old" ]; then \
+		echo ""; \
+		echo "📊 OpenAPI Spec Changes:"; \
+		echo "------------------------"; \
+		diff -u "$(C2MAPIV2_OPENAPI_SPEC).old" "$(C2MAPIV2_OPENAPI_SPEC)" | head -50 || true; \
+		rm -f "$(C2MAPIV2_OPENAPI_SPEC).old"; \
+		echo ""; \
+	fi
+	
+	# Continue cascade
+	$(MAKE) smart-check-openapi
+
+# Check if OpenAPI spec has changed
+.PHONY: smart-check-openapi
+smart-check-openapi:
+	@OPENAPI_CHANGED=$$($(call has_changed,$(C2MAPIV2_OPENAPI_SPEC),$(OPENAPI_HASH_FILE))); \
+	if [ "$$OPENAPI_CHANGED" = "true" ]; then \
+		echo "📋 OpenAPI spec changed - updating downstream artifacts..."; \
+		$(call update_hash,$(C2MAPIV2_OPENAPI_SPEC),$(OPENAPI_HASH_FILE)); \
+		$(MAKE) smart-rebuild-postman; \
+		$(MAKE) smart-rebuild-sdk; \
+		$(MAKE) smart-rebuild-docs; \
+	else \
+		echo "✅ OpenAPI spec unchanged - no downstream updates needed"; \
+		echo ""; \
+		echo "🎉 Smart rebuild complete - everything is up to date!"; \
+	fi
+
+# Rebuild Postman collections
+.PHONY: smart-rebuild-postman
+smart-rebuild-postman:
+	@echo "🔄 Rebuilding Postman collections..."
+	
+	# Store old collection for comparison
+	@if [ -f "$(POSTMAN_COLLECTION_FINAL)" ]; then \
+		cp "$(POSTMAN_COLLECTION_FINAL)" "$(POSTMAN_COLLECTION_FINAL).old"; \
+	fi
+	
+	# Rebuild Postman artifacts
+	$(MAKE) postman-import-openapi-spec
+	$(MAKE) postman-create-test-collection
+	$(MAKE) postman-create-mock-and-env
+	
+	# Update hash
+	$(call update_hash,$(POSTMAN_COLLECTION_FINAL),$(POSTMAN_COLLECTION_HASH_FILE))
+	
+	# Show what changed
+	@if [ -f "$(POSTMAN_COLLECTION_FINAL).old" ]; then \
+		echo ""; \
+		echo "📊 Postman Collection Changes:"; \
+		echo "------------------------------"; \
+		node -e "const fs=require('fs'); \
+			const old=JSON.parse(fs.readFileSync('$(POSTMAN_COLLECTION_FINAL).old')); \
+			const cur=JSON.parse(fs.readFileSync('$(POSTMAN_COLLECTION_FINAL)')); \
+			console.log('Old endpoints:', old.item?.length || 0); \
+			console.log('New endpoints:', cur.item?.length || 0);" || true; \
+		rm -f "$(POSTMAN_COLLECTION_FINAL).old"; \
+	fi
+	
+	@echo "✅ Postman collections rebuilt"
+
+# Rebuild SDK
+.PHONY: smart-rebuild-sdk  
+smart-rebuild-sdk:
+	@echo "🔄 Rebuilding SDK..."
+	
+	# Check if SDK directory exists
+	@if [ -d "sdk" ]; then \
+		echo "📦 Backing up current SDK..."; \
+		rm -rf sdk.backup; \
+		cp -r sdk sdk.backup; \
+	fi
+	
+	# Generate SDK
+	$(MAKE) generate-sdk
+	
+	# Calculate hash of key SDK files
+	@find sdk -name "*.py" -o -name "*.js" -o -name "*.java" | sort | xargs cat | \
+		(if command -v shasum >/dev/null 2>&1; then shasum -a 256; else sha256sum; fi) | \
+		cut -d' ' -f1 > $(SDK_HASH_FILE)
+	
+	# Show what changed
+	@if [ -d "sdk.backup" ]; then \
+		echo ""; \
+		echo "📊 SDK Changes:"; \
+		echo "---------------"; \
+		diff -rq sdk.backup sdk | head -20 || true; \
+		rm -rf sdk.backup; \
+	fi
+	
+	@echo "✅ SDK rebuilt"
+
+# Rebuild documentation
+.PHONY: smart-rebuild-docs
+smart-rebuild-docs:
+	@echo "🔄 Rebuilding documentation..."
+	
+	# Generate docs
+	$(MAKE) docs-build
+	
+	# Update hash (hash the OpenAPI spec since docs are generated from it)
+	$(call update_hash,$(C2MAPIV2_OPENAPI_SPEC),$(DOCS_HASH_FILE))
+	
+	@echo "✅ Documentation rebuilt"
+
+# Show current build state
+.PHONY: smart-rebuild-status
+smart-rebuild-status:
+	@echo "📊 Smart Rebuild Status"
+	@echo "━━━━━━━━━━━━━━━━━━━━━━"
+	@echo ""
+	@echo "Data Dictionary:"
+	@if [ -f "$(DD_HASH_FILE)" ]; then \
+		echo "  Last build: $$(stat -f '%Sm' $(DD_HASH_FILE) 2>/dev/null || stat -c '%y' $(DD_HASH_FILE) 2>/dev/null | cut -d' ' -f1-2)"; \
+		echo "  Hash: $$(head -c 12 $(DD_HASH_FILE))..."; \
+	else \
+		echo "  Status: Never built"; \
+	fi
+	@echo ""
+	@echo "OpenAPI Spec:"
+	@if [ -f "$(OPENAPI_HASH_FILE)" ]; then \
+		echo "  Last build: $$(stat -f '%Sm' $(OPENAPI_HASH_FILE) 2>/dev/null || stat -c '%y' $(OPENAPI_HASH_FILE) 2>/dev/null | cut -d' ' -f1-2)"; \
+		echo "  Hash: $$(head -c 12 $(OPENAPI_HASH_FILE))..."; \
+	else \
+		echo "  Status: Never built"; \
+	fi
+	@echo ""
+	@echo "Postman Collection:"
+	@if [ -f "$(POSTMAN_COLLECTION_HASH_FILE)" ]; then \
+		echo "  Last build: $$(stat -f '%Sm' $(POSTMAN_COLLECTION_HASH_FILE) 2>/dev/null || stat -c '%y' $(POSTMAN_COLLECTION_HASH_FILE) 2>/dev/null | cut -d' ' -f1-2)"; \
+		echo "  Hash: $$(head -c 12 $(POSTMAN_COLLECTION_HASH_FILE))..."; \
+	else \
+		echo "  Status: Never built"; \
+	fi
+	@echo ""
+	@echo "SDK:"
+	@if [ -f "$(SDK_HASH_FILE)" ]; then \
+		echo "  Last build: $$(stat -f '%Sm' $(SDK_HASH_FILE) 2>/dev/null || stat -c '%y' $(SDK_HASH_FILE) 2>/dev/null | cut -d' ' -f1-2)"; \
+		echo "  Hash: $$(head -c 12 $(SDK_HASH_FILE))..."; \
+	else \
+		echo "  Status: Never built"; \
+	fi
+	@echo ""
+	@echo "Documentation:"
+	@if [ -f "$(DOCS_HASH_FILE)" ]; then \
+		echo "  Last build: $$(stat -f '%Sm' $(DOCS_HASH_FILE) 2>/dev/null || stat -c '%y' $(DOCS_HASH_FILE) 2>/dev/null | cut -d' ' -f1-2)"; \
+		echo "  Hash: $$(head -c 12 $(DOCS_HASH_FILE))..."; \
+	else \
+		echo "  Status: Never built"; \
+	fi
+
+# Clean hash files (forces full rebuild next time)
+.PHONY: smart-rebuild-clean
+smart-rebuild-clean:
+	@echo "🧹 Cleaning smart rebuild hash files..."
+	rm -rf $(HASH_DIR)
+	@echo "✅ Hash files cleaned - next smart-rebuild will rebuild everything"
+
+# Check what would be rebuilt without actually doing it
+.PHONY: smart-rebuild-dry-run
+smart-rebuild-dry-run:
+	@echo "🔍 Smart Rebuild Dry Run"
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo ""
+	@DD_CHANGED=$$($(call has_changed,$(DD_EBNF_FILE),$(DD_HASH_FILE))); \
+	if [ "$$DD_CHANGED" = "true" ]; then \
+		echo "❗ Data Dictionary: Would rebuild (changed)"; \
+		echo "   → Would trigger: OpenAPI spec generation"; \
+		echo "   → Would trigger: Postman collections rebuild"; \
+		echo "   → Would trigger: SDK regeneration"; \
+		echo "   → Would trigger: Documentation rebuild"; \
+	else \
+		echo "✅ Data Dictionary: No changes"; \
+		OPENAPI_CHANGED=$$($(call has_changed,$(C2MAPIV2_OPENAPI_SPEC),$(OPENAPI_HASH_FILE))); \
+		if [ "$$OPENAPI_CHANGED" = "true" ]; then \
+			echo "❗ OpenAPI Spec: Would rebuild (changed)"; \
+			echo "   → Would trigger: Postman collections rebuild"; \
+			echo "   → Would trigger: SDK regeneration"; \
+			echo "   → Would trigger: Documentation rebuild"; \
+		else \
+			echo "✅ OpenAPI Spec: No changes"; \
+			echo ""; \
+			echo "✅ Nothing would be rebuilt - all artifacts up to date"; \
+		fi \
+	fi
+
 
 # ========================================================================
 # PYTHON VIRTUAL ENVIRONMENT
@@ -710,7 +981,7 @@ jwt-test:
 postman-add-jwt-tests:
 	@echo "🔧 Adding JWT-specific tests to collection..."
 	@if [ -f "$(TEST_COLLECTION_WITH_TESTS)" ]; then \
-		node scripts/add_tests_jwt.js \
+		node scripts/active/add_tests_jwt.js \
 			"$(TEST_COLLECTION_WITH_TESTS)" \
 			"$(TEST_COLLECTION_WITH_JWT_TESTS)" \
 			--allowed-codes "200,201,204,400,401,403,404,429"; \
@@ -1479,12 +1750,6 @@ prism-mock-test:
 		--reporter-html-export $(REPORT_HTML)
 	@echo "✅ Newman test report generated at $(REPORT_HTML)"
 
-# Test specific endpoint with Prism
-.PHONY: prism-test-select
-prism-test-select:
-	@echo "🚀 Testing endpoint: $(PRISM_TEST_ENDPOINT) with Prism mock (body index: $(PRISM_BODY_INDEX)..."
-	@$(PRISM_TEST_SCRIPT) $(PRISM_TEST_ENDPOINT) --select $(PRISM_BODY_INDEX)
-
 # Sanitize collection placeholders
 .PHONY: postman-test-collection-fix-examples
 postman-test-collection-fix-examples:
@@ -1556,7 +1821,7 @@ docs-serve-bg:
 # Fix template banner if it disappears
 .PHONY: fix-template-banner
 fix-template-banner:
-	@$(SCRIPTS_DIR)/fix-template-banner.sh
+	@$(SCRIPTS_DIR)/active/fix-template-banner.sh
 
 # Stop documentation server
 .PHONY: docs-stop
@@ -1793,6 +2058,128 @@ postman-api-debug-B:
 .PHONY: postman-workspace-debug
 postman-workspace-debug:
 	@echo "🔍 Current Postman workspace ID: $(POSTMAN_WS)"
+
+# ========================================================================
+# ADVANCED TESTING UTILITIES
+# ========================================================================
+# Test specific endpoint with Prism using request body from Postman collection
+.PHONY: prism-test-endpoint
+prism-test-endpoint: ## Test specific endpoint with Prism mock server
+	@if [ -z "$(PRISM_TEST_ENDPOINT)" ]; then \
+		echo "❌ Please specify PRISM_TEST_ENDPOINT. Example: make prism-test-endpoint PRISM_TEST_ENDPOINT=/jobs/single-doc"; \
+		exit 1; \
+	fi
+	@if ! lsof -i :$(PRISM_PORT) -t >/dev/null; then \
+		echo "❌ Prism is not running. Start it with 'make prism-start'"; \
+		exit 1; \
+	fi
+	@echo "🧪 Testing endpoint: $(PRISM_TEST_ENDPOINT)"
+	@$(SCRIPTS_DIR)/utilities/prism_test.sh "$(PRISM_TEST_ENDPOINT)"
+
+# List available test bodies for an endpoint
+.PHONY: prism-test-list
+prism-test-list: ## List available test bodies for endpoint
+	@if [ -z "$(PRISM_TEST_ENDPOINT)" ]; then \
+		echo "❌ Please specify PRISM_TEST_ENDPOINT. Example: make prism-test-list PRISM_TEST_ENDPOINT=/jobs/single-doc"; \
+		exit 1; \
+	fi
+	@$(SCRIPTS_DIR)/utilities/prism_test.sh "$(PRISM_TEST_ENDPOINT)" --list
+
+# Test specific endpoint with selected test body
+.PHONY: prism-test-select
+prism-test-select: ## Test endpoint with specific test body index
+	@if [ -z "$(PRISM_TEST_ENDPOINT)" ]; then \
+		echo "❌ Please specify PRISM_TEST_ENDPOINT"; \
+		exit 1; \
+	fi
+	@if [ -z "$(PRISM_TEST_INDEX)" ]; then \
+		echo "❌ Please specify PRISM_TEST_INDEX (e.g., PRISM_TEST_INDEX=2)"; \
+		exit 1; \
+	fi
+	@$(SCRIPTS_DIR)/utilities/prism_test.sh "$(PRISM_TEST_ENDPOINT)" --select "$(PRISM_TEST_INDEX)"
+
+# ========================================================================
+# SDK GENERATION
+# ========================================================================
+# Generate SDK from OpenAPI specification
+.PHONY: generate-sdk
+generate-sdk: ## Generate SDK from OpenAPI specification
+	@echo "🔧 Generating SDK from OpenAPI specification..."
+	@if [ ! -f "$(C2MAPIV2_OPENAPI_SPEC)" ]; then \
+		echo "❌ OpenAPI spec not found: $(C2MAPIV2_OPENAPI_SPEC)"; \
+		echo "   Run 'make openapi-build' first"; \
+		exit 1; \
+	fi
+	@if [ -x "$(SCRIPTS_DIR)/utilities/generate-sdk.sh" ]; then \
+		if [ -n "$(LANG)" ]; then \
+			$(SCRIPTS_DIR)/utilities/generate-sdk.sh $(LANG); \
+		else \
+			$(SCRIPTS_DIR)/utilities/generate-sdk.sh; \
+		fi \
+	else \
+		echo "⚠️  SDK generation script not implemented yet"; \
+		echo "   TODO: Implement $(SCRIPTS_DIR)/utilities/generate-sdk.sh"; \
+		echo "   Consider using OpenAPI Generator or similar tool"; \
+	fi
+
+# ========================================================================
+# DOCUMENTATION DEPLOYMENT
+# ========================================================================
+# Deploy documentation to hosting service
+.PHONY: deploy-docs
+deploy-docs: docs-build ## Deploy API documentation
+	@echo "🚀 Deploying API documentation..."
+	@if [ -x "$(SCRIPTS_DIR)/utilities/deploy-docs.sh" ]; then \
+		$(SCRIPTS_DIR)/utilities/deploy-docs.sh; \
+	else \
+		echo "⚠️  Documentation deployment not implemented yet"; \
+		echo "   TODO: Implement $(SCRIPTS_DIR)/utilities/deploy-docs.sh"; \
+		echo "   Consider deploying to GitHub Pages, S3, or similar"; \
+	fi
+
+# ========================================================================
+# MAINTENANCE UTILITIES
+# ========================================================================
+# Clean up scripts directory
+.PHONY: cleanup-scripts
+cleanup-scripts: ## Clean up obsolete scripts
+	@echo "🧹 Cleaning up scripts directory..."
+	@$(SCRIPTS_DIR)/utilities/cleanup-scripts-directory.sh
+
+# Clean up OpenAPI directory
+.PHONY: cleanup-openapi
+cleanup-openapi: ## Clean up old OpenAPI files
+	@echo "🧹 Cleaning up OpenAPI directory..."
+	@$(SCRIPTS_DIR)/utilities/cleanup-openapi-directory.sh
+
+# Clean up docs directory
+.PHONY: cleanup-docs
+cleanup-docs: ## Clean up temporary documentation files
+	@echo "🧹 Cleaning up docs directory..."
+	@$(SCRIPTS_DIR)/utilities/cleanup-docs-directory.sh
+
+# Clean all directories
+.PHONY: cleanup-all
+cleanup-all: cleanup-scripts cleanup-openapi cleanup-docs ## Clean all temporary and obsolete files
+
+# ========================================================================
+# GIT WORKFLOW HELPERS
+# ========================================================================
+# Git pull with rebase
+.PHONY: git-pull-rebase
+git-pull-rebase: ## Pull latest changes with rebase
+	@echo "🔄 Pulling latest changes with rebase..."
+	@$(SCRIPTS_DIR)/utilities/git-pull-rebase.sh
+
+# Quick save (add, commit, push)
+.PHONY: git-save
+git-save: ## Quick git save (requires MSG="commit message")
+	@if [ -z "$(MSG)" ]; then \
+		echo "❌ Please provide a commit message: make git-save MSG=\"your message\""; \
+		exit 1; \
+	fi
+	@echo "💾 Saving changes: $(MSG)"
+	@$(SCRIPTS_DIR)/utilities/git-push.sh "$(MSG)"
 
 # ========================================================================
 # HELP

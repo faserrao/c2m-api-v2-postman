@@ -45,6 +45,49 @@ make diff                               # Diff spec vs origin/main
 make postman-publish                    # Push to Postman (API + collection)
 ```
 
+### Smart Rebuild System (NEW!)
+```bash
+# Intelligent rebuild that only regenerates what has changed
+make smart-rebuild                      # Check for changes and rebuild only what's needed
+make smart-rebuild-dry-run             # Show what would be rebuilt without doing it
+make smart-rebuild-status              # Show current build state and hashes
+make smart-rebuild-clean               # Clear hash cache (forces full rebuild)
+```
+
+The smart rebuild system cascades through the pipeline:
+1. Checks if data dictionary (EBNF) changed → regenerates OpenAPI if needed
+2. Checks if OpenAPI spec changed → rebuilds Postman collections if needed
+3. Checks if collections changed → regenerates SDK if needed
+4. All changes trigger documentation rebuild
+5. Shows diffs of what changed at each step
+
+### Advanced Testing
+```bash
+# Test specific endpoints with Prism mock server
+make prism-test-endpoint PRISM_TEST_ENDPOINT=/jobs/single-doc
+make prism-test-list PRISM_TEST_ENDPOINT=/jobs/single-doc
+make prism-test-select PRISM_TEST_ENDPOINT=/jobs/single-doc PRISM_TEST_INDEX=2
+```
+
+### Utility Commands
+```bash
+# SDK Generation
+make generate-sdk                       # Generate SDK from OpenAPI spec
+
+# Documentation Deployment
+make deploy-docs                        # Deploy docs to hosting service
+
+# Maintenance
+make cleanup-scripts                    # Clean obsolete scripts
+make cleanup-openapi                    # Clean old OpenAPI files
+make cleanup-docs                       # Clean temp documentation files
+make cleanup-all                        # Clean all directories
+
+# Git Workflow
+make git-pull-rebase                    # Pull with rebase
+make git-save MSG="your commit message" # Quick add, commit, push
+```
+
 ## Architecture
 
 The project follows a data-driven approach where the EBNF data dictionary is the single source of truth:
@@ -162,9 +205,17 @@ Configure in GitHub Settings → Secrets:
 - `POSTMAN_API_KEY`: Your Postman API key
 - `POSTMAN_WORKSPACE_ID`: Target workspace UUID
 
-## Script Integration Opportunities
+## Script Integration Status
 
-High-value scripts not yet integrated into Makefile:
+### Recently Integrated Scripts
+✅ `prism_test.sh` - Advanced endpoint testing with Prism (targets: prism-test-*)
+✅ `generate-sdk.sh` - SDK generation placeholder (target: generate-sdk)
+✅ `deploy-docs.sh` - Documentation deployment placeholder (target: deploy-docs)
+✅ `cleanup-*.sh` - Directory cleanup utilities (targets: cleanup-*)
+✅ `git-pull-rebase.sh` - Git workflow helper (target: git-pull-rebase)
+✅ `git-push.sh` - Quick commit helper (target: git-save)
+
+### Remaining Integration Opportunities
 - `generate_openapi_from_swagger.py` - Swagger to OpenAPI conversion
 - `merge_yaml_files.py` - Merge multiple YAML specs
 - `api_client_generator.py` - Generate Python client from OpenAPI
@@ -172,3 +223,4 @@ High-value scripts not yet integrated into Makefile:
 ## Learning Memories
 
 - `learn`: Placeholder for learning memories related to the project
+- Added a placeholder for `memorize`
