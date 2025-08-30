@@ -292,7 +292,7 @@ ADD_EXAMPLES_TO_COLLECTION       := $(ADD_EXAMPLES_TO_COLLECTION_SCRIPT) $(ADD_E
 # Isolated Python environment for conversion scripts
 PYTHON_ENV_DIR                   := $(SCRIPTS_DIR)/python_env
 VENV_DIR                         := $(PYTHON_ENV_DIR)/e2o.venv
-VENV_PIP                         := $(VENV_DIR)/bin/pip3.13
+VENV_PIP                         := $(VENV_DIR)/bin/pip
 VENV_PYTHON                      := $(VENV_DIR)/bin/python
 PYTHON3                          := python3
 PYTHON                           := $(PYTHON3)
