@@ -1,0 +1,86 @@
+{
+  "info": {
+    "name": "Test API Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Damian\",\n  \"lastName\": \"Bashirian\",\n  \"email\": \"Saul.Nader39@gmail.com\",\n  \"age\": 20,\n  \"isActive\": true,\n  \"salary\": 885.47\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"Dina\",\n  \"lastName\": \"Anderson\",\n  \"email\": \"Haylee.Schneider@gmail.com\"\n}"
+                }
+              },
+              "body": "{\n  \"id\": \"NA9YqucHoO\",\n  \"firstName\": \"Minerva\",\n  \"lastName\": \"Sanford\",\n  \"createdAt\": \"192.168.1.999\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"(421) 411-2444 x38424\",\n  \"address\": \"1418 Hudson Cove\",\n  \"city\": \"Lansing\",\n  \"country\": \"Armenia\",\n  \"zipCode\": \"81174\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{userId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productName\": \"Mr. Wilbur Kuvalis\",\n  \"description\": \"Valens compono testimonium demo adsidue adhuc cibus curriculum confero antea. Ubi appositus communis adstringo cohors certus attonbitus capto. Villa clam acidus aurum sunt bellum appono votum laborum.\",\n  \"price\": \"\",\n  \"quantity\": null,\n  \"inStock\": false\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

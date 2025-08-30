@@ -18,7 +18,7 @@
 set -eo pipefail
 
 # Configuration
-PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+PROJECT_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 OPENAPI_SPEC="${PROJECT_ROOT}/openapi/c2mapiv2-openapi-spec-final.yaml"
 SDK_BASE_DIR="${PROJECT_ROOT}/sdk"
 OPENAPI_GENERATOR_VERSION="latest"

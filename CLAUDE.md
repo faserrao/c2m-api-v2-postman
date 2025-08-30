@@ -101,9 +101,12 @@ The project follows a data-driven approach where the EBNF data dictionary is the
 ## Key Directories
 
 - **`scripts/`**: Conversion and utility scripts (Python, Node.js, Shell)
-  - `ebnf_to_openapi_class_based.py` - Core EBNF to OpenAPI converter
-  - `add_tests.js` - Adds automated tests to collections
-  - `fix_collection_urls_v2.py` - Fixes URLs in collections
+  - `active/` - Primary pipeline scripts
+    - `ebnf_to_openapi_class_based.py` - Core EBNF to OpenAPI converter
+    - `add_tests.js` - Adds automated tests to collections
+    - `fix_collection_urls_v2.py` - Fixes URLs in collections
+  - `utilities/` - Support and maintenance scripts
+  - `archived/` - Legacy and deprecated scripts
 
 - **`postman/`**: Postman-related files
   - `custom/` - User customizations and overrides
@@ -224,3 +227,5 @@ Configure in GitHub Settings → Secrets:
 
 - `learn`: Placeholder for learning memories related to the project
 - Added a placeholder for `memorize`
+- First memory added: Learning how to effectively manage and update project documentation
+- Discovered the importance of dynamic pipeline generation based on source document changes

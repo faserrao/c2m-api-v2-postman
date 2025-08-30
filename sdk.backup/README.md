@@ -105,7 +105,7 @@ pytest
 
 ### Contributing
 When adding new SDK languages:
-1. Update `scripts/generate-sdk.sh` with language config
+1. Update `scripts/utilities/generate-sdk.sh` with language config
 2. Create language directory
 3. Generate initial SDK
 4. Add language-specific README

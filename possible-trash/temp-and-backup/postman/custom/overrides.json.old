@@ -1,0 +1,4 @@
+node scripts/merge-postman.js \
+     postman/generated/collection.json \
+     postman/custom/overrides.json \
+     > postman/generated/collection.merged.json

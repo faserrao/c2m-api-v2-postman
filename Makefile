@@ -270,13 +270,13 @@ ADD_EXAMPLES_TO_OPENAPI_SPEC     := $(SCRIPTS_DIR)/test_data_genertor_for_openap
 ADD_TESTS_SCRIPT                 := $(SCRIPTS_DIR)/active/add_tests.js
 EBNF_TO_OPENAPI_SCRIPT           := $(SCRIPTS_DIR)/active/ebnf_to_openapi_dynamic_v3.py
 FIX_COLLECTION_URLS              := $(SCRIPTS_DIR)/active/fix_collection_urls_v2.py
-FIX_PATHS_SCRIPT                 := $(SCRIPTS_DIR)/fix_paths.jq
+FIX_PATHS_SCRIPT                 := $(SCRIPTS_DIR)/jq/fix_paths.jq
 JQ_ADD_INFO                      := --arg name "$$(POSTMAN_LINKED_COLLECTION_NAME)" '. as $$c | {info: {name: $$name, schema: "$$(POSTMAN_SCHEMA_V2)"}, item: $$c.item}'
 JQ_AUTO_FIX                      := jq 'walk(if type == "object" and (has("name") and (has("request") | not) and (has("item") | not)) then . + { "item": [] } else . end)'
 JQ_FIX_URLS                      := jq 'walk(if type == "object" and has("url") and (.url | type) == "object" and .url.raw then .url.raw |= sub("http://localhost"; "{{baseUrl}}") else . end)'
 JQ_VERIFY_URLS                   := jq -r '.. | objects | select(has("url")) | .url.raw? // empty'
-MERGE_POSTMAN_OVERRIDES          := $(SCRIPTS_DIR)/merge_overrides.jq
-MERGE_SCRIPT                     := $(SCRIPTS_DIR)/merge.jq
+MERGE_POSTMAN_OVERRIDES          := $(SCRIPTS_DIR)/jq/merge_overrides.jq
+MERGE_SCRIPT                     := $(SCRIPTS_DIR)/jq/merge.jq
 NODE_COLLECTION_VALIDATE         := node -e "const {Collection}=require('postman-collection'); const fs=require('fs'); const data=JSON.parse(fs.readFileSync('$(POSTMAN_TEST_COLLECTION_FIXED)','utf8')); try { new Collection(data); console.log('✅ Collection is valid.'); } catch(e) { console.error('❌ Validation failed:', e.message); process.exit(1); }"
 POSTMAN_VALIDATOR                := $(SCRIPTS_DIR)/active/validate_collection.js
 INSTALL_PYTHON_MODULES           := install -r $(SCRIPTS_DIR)/python_env/requirements.txt
@@ -1568,7 +1568,7 @@ postman-env-create:
 	jq -n \
 		--arg baseUrl "$$MOCK_URL" \
 		--arg token "$(TOKEN)" \
-		-f scripts/env_template.jq \
+		-f scripts/jq/env_template.jq \
 		> $(POSTMAN_ENV_FILE); \
 	echo "✅ Environment file written to $(POSTMAN_ENV_FILE) with baseUrl=$$MOCK_URL"
 

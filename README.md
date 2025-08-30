@@ -194,13 +194,16 @@ c2m-api-repo/
 │   └── *.txt, *.json        # IDs, payloads, debug outputs
 ├── scripts/                 # Automation scripts
 │   ├── README.md            # [📖 Scripts Guide](scripts/README.md)
-│   ├── ebnf_to_openapi_*.py # EBNF to OpenAPI converters
-│   ├── generate-sdk.sh      # SDK generation script
-│   ├── deploy-docs.sh       # Documentation deployment
-│   ├── prism_test.sh        # Advanced Prism testing
-│   ├── add_tests.js         # Test injection
-│   ├── fix_collection_*.py  # Collection fixers
-│   └── jq/                  # JSON processing scripts
+│   ├── active/              # Primary pipeline scripts
+│   │   ├── ebnf_to_openapi_*.py  # EBNF to OpenAPI converters
+│   │   ├── add_tests.js          # Test injection
+│   │   └── fix_collection_*.py   # Collection fixers
+│   ├── utilities/           # Support and utility scripts
+│   │   ├── generate-sdk.sh       # SDK generation script
+│   │   ├── deploy-docs.sh        # Documentation deployment
+│   │   └── prism_test.sh         # Advanced Prism testing
+│   ├── jq/                  # JSON processing scripts
+│   └── archived/            # Legacy scripts
 ├── sdk/                     # Client SDKs
 │   ├── README.md            # [📖 SDK Guide](sdk/README.md)
 │   └── python/              # Python SDK
@@ -483,7 +486,7 @@ This runs the complete pipeline:
 ```
 Data Dictionary (EBNF)
        │
-       ├─(scripts/ebnf_to_openapi_*.py)──▶ OpenAPI YAML
+       ├─(scripts/active/ebnf_to_openapi_*.py)──▶ OpenAPI YAML
        │                                    ├─ lint/diff (redocly/spectral/openapi-diff)
        │                                    └─ Postman import (/apis?workspaceId=...)
        │                                                 │
@@ -1320,14 +1323,19 @@ OpenAPI specification files:
 
 #### `scripts/`
 Build automation and utility scripts:
-- `ebnf_to_openapi_dynamic_v3.py` - EBNF to OpenAPI converter
-- `generate-sdk.sh` - SDK generation script
-- `deploy-docs.sh` - Documentation deployment script
-- `prism_test.sh` - Prism mock server testing
-- `cleanup-*.sh` - Directory cleanup utilities
+- `active/` - Primary pipeline scripts
+  - `ebnf_to_openapi_dynamic_v3.py` - EBNF to OpenAPI converter
+  - `fix_collection_urls_v2.py` - Collection URL fixer
+  - `add_tests.js` - Test script injection
+- `utilities/` - Support and maintenance scripts
+  - `generate-sdk.sh` - SDK generation script
+  - `deploy-docs.sh` - Documentation deployment script
+  - `prism_test.sh` - Prism mock server testing
+  - `cleanup-*.sh` - Directory cleanup utilities
 - `jq/` - JQ scripts for JSON processing
 - `makefile-scripts/` - Makefile support scripts
 - `python_env/` - Python virtual environment config
+- `archived/` - Legacy and deprecated scripts
 - `test_data_generator_*/` - Test data generation tools
 
 #### `sdk/`

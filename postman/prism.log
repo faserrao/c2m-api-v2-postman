@@ -211,3 +211,86 @@
 [2:57:54 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/long
 [2:57:54 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/molestiae/revoke
 [2:57:54 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
+=== Sat Aug 30 17:13:16 EDT 2025 ===
+[5:13:17 PM] › [CLI] …  awaiting  Starting Prism…
+(node:60399) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[5:13:17 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-doc-job-template
+[5:13:17 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-docs-job-template
+[5:13:17 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc-merge-job-template
+[5:13:17 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-doc
+[5:13:17 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc
+[5:13:17 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc-merge
+[5:13:17 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-pdf-split
+[5:13:17 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-pdf-split-addressCapture
+[5:13:17 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-pdf-address-capture
+[5:13:17 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/short
+[5:13:17 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/long
+[5:13:17 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/corporis/revoke
+[5:13:17 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
+=== Sat Aug 30 17:14:51 EDT 2025 ===
+[5:14:52 PM] › [CLI] …  awaiting  Starting Prism…
+(node:63460) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[5:14:52 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-doc-job-template
+[5:14:52 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-docs-job-template
+[5:14:52 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc-merge-job-template
+[5:14:52 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-doc
+[5:14:52 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc
+[5:14:52 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc-merge
+[5:14:52 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-pdf-split
+[5:14:52 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-pdf-split-addressCapture
+[5:14:52 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-pdf-address-capture
+[5:14:52 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/short
+[5:14:52 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/long
+[5:14:52 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/et/revoke
+[5:14:52 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
+[5:15:03 PM] › [HTTP SERVER] post /jobs/single-doc-job-template ℹ  info      Request received
+[5:15:03 PM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: */*
+[5:15:03 PM] ›     [VALIDATOR] ⚠  warning   Request did not pass the validation rules
+[5:15:03 PM] ›     [VALIDATOR] ✖  error     Invalid security scheme used
+[5:15:03 PM] ›     [VALIDATOR] ✖  error     Request body property paymentDetails must have required property 'creditCardDetails'
+[5:15:03 PM] ›     [VALIDATOR] ✖  error     Request body property paymentDetails must have required property 'invoiceDetails'
+[5:15:03 PM] ›     [VALIDATOR] ✖  error     Request body property paymentDetails must have required property 'achDetails'
+[5:15:03 PM] ›     [VALIDATOR] ✖  error     Request body property paymentDetails must have required property 'creditAmount'
+[5:15:03 PM] ›     [VALIDATOR] ✖  error     Request body property paymentDetails must have required property 'applePaymentDetails'
+[5:15:03 PM] ›     [VALIDATOR] ✖  error     Request body property paymentDetails must have required property 'googlePaymentDetails'
+[5:15:03 PM] ›     [VALIDATOR] ✖  error     Request body property paymentDetails must match exactly one schema in oneOf
+[5:15:03 PM] ›     [NEGOTIATOR] ✔  success   Found response 401. I'll try with it.
+[5:15:03 PM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 401
+[5:15:03 PM] ›     [NEGOTIATOR] ℹ  info      > Responding with "401"
+[5:15:03 PM] ›     [VALIDATOR] ✖  error     Violation: request Invalid security scheme used
+[5:15:03 PM] ›     [VALIDATOR] ✖  error     Violation: request.body.paymentDetails Request body property paymentDetails must have required property 'creditCardDetails'
+[5:15:03 PM] ›     [VALIDATOR] ✖  error     Violation: request.body.paymentDetails Request body property paymentDetails must have required property 'invoiceDetails'
+[5:15:03 PM] ›     [VALIDATOR] ✖  error     Violation: request.body.paymentDetails Request body property paymentDetails must have required property 'achDetails'
+[5:15:03 PM] ›     [VALIDATOR] ✖  error     Violation: request.body.paymentDetails Request body property paymentDetails must have required property 'creditAmount'
+[5:15:03 PM] ›     [VALIDATOR] ✖  error     Violation: request.body.paymentDetails Request body property paymentDetails must have required property 'applePaymentDetails'
+[5:15:03 PM] ›     [VALIDATOR] ✖  error     Violation: request.body.paymentDetails Request body property paymentDetails must have required property 'googlePaymentDetails'
+[5:15:03 PM] ›     [VALIDATOR] ✖  error     Violation: request.body.paymentDetails Request body property paymentDetails must match exactly one schema in oneOf
+[5:15:13 PM] › [HTTP SERVER] post /jobs/single-doc-job-template ℹ  info      Request received
+[5:15:13 PM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: */*
+[5:15:13 PM] ›     [VALIDATOR] ⚠  warning   Request did not pass the validation rules
+[5:15:13 PM] ›     [VALIDATOR] ✖  error     Invalid security scheme used
+[5:15:13 PM] ›     [VALIDATOR] ✖  error     Body parameter is required
+[5:15:13 PM] ›     [NEGOTIATOR] ✔  success   Found response 401. I'll try with it.
+[5:15:13 PM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 401
+[5:15:13 PM] ›     [NEGOTIATOR] ℹ  info      > Responding with "401"
+[5:15:13 PM] ›     [VALIDATOR] ✖  error     Violation: request Invalid security scheme used
+[5:15:13 PM] ›     [VALIDATOR] ✖  error     Violation: request Body parameter is required
+=== Sat Aug 30 17:16:38 EDT 2025 ===
+[5:16:39 PM] › [CLI] …  awaiting  Starting Prism…
+(node:68145) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[5:16:39 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-doc-job-template
+[5:16:39 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-docs-job-template
+[5:16:39 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc-merge-job-template
+[5:16:39 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-doc
+[5:16:39 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc
+[5:16:39 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-doc-merge
+[5:16:39 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-pdf-split
+[5:16:39 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/single-pdf-split-addressCapture
+[5:16:39 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/jobs/multi-pdf-address-capture
+[5:16:39 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/short
+[5:16:39 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/long
+[5:16:39 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/auth/tokens/qui/revoke
+[5:16:39 PM] › [CLI] ▶  start     Prism is listening on http://127.0.0.1:4010
