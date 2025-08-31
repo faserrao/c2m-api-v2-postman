@@ -538,6 +538,18 @@ postman-cleanup-all:
 	$(MAKE) postman-delete-environments
 	$(MAKE) postman-api-clean-trash
 	$(MAKE) postman-delete-specs
+	@echo "🔍 Verifying cleanup..."
+	@REMAINING_APIS=$$(curl --silent --location \
+		--request GET "$(POSTMAN_APIS_URL)$(POSTMAN_Q_ID)" \
+		$(POSTMAN_CURL_HEADERS_XC) | jq -r '.apis | length'); \
+	if [ "$$REMAINING_APIS" -gt 0 ]; then \
+		echo "⚠️  Warning: $$REMAINING_APIS APIs still remain in workspace after cleanup!"; \
+		curl --silent --location \
+			--request GET "$(POSTMAN_APIS_URL)$(POSTMAN_Q_ID)" \
+			$(POSTMAN_CURL_HEADERS_XC) | jq -r '.apis[] | "  - \(.id): \(.name)"'; \
+	else \
+		echo "✅ All APIs successfully deleted"; \
+	fi
 	@echo "✅ Postman cleanup complete for workspace $(POSTMAN_WS)."
 
 
@@ -1873,15 +1885,29 @@ postman-delete-collections:
 .PHONY: postman-delete-apis
 postman-delete-apis:
 	@echo "🔍 Fetching APIs from workspace $(POSTMAN_WS)..."
-	@APIS=$$(curl --silent --location \
+	@RESPONSE=$$(curl --silent --location \
 		--request GET "$(POSTMAN_APIS_URL)$(POSTMAN_Q_ID)" \
-		$(POSTMAN_CURL_HEADERS_XC) | jq -r '.apis // [] | .[].id'); \
-	for API in $$APIS; do \
-		echo "🗑 Deleting API $$API..."; \
-		curl --silent --location \
-			--request DELETE "$(POSTMAN_APIS_URL)/$$API" \
-			$(POSTMAN_CURL_HEADERS_XC) || echo "⚠️ Failed to delete API $$API"; \
-	done
+		$(POSTMAN_CURL_HEADERS_XC)); \
+	echo "$$RESPONSE" | jq -r '.apis[] | "\(.id) - \(.name)"' 2>/dev/null || echo "📊 Found APIs to delete"; \
+	APIS=$$(echo "$$RESPONSE" | jq -r '.apis // [] | .[].id'); \
+	if [ -z "$$APIS" ]; then \
+		echo "ℹ️  No APIs found in workspace"; \
+	else \
+		for API in $$APIS; do \
+			echo "🗑 Deleting API $$API..."; \
+			DELETE_RESPONSE=$$(curl --silent --location --write-out "\n%{http_code}" \
+				--request DELETE "$(POSTMAN_APIS_URL)/$$API" \
+				$(POSTMAN_CURL_HEADERS_XC)); \
+			HTTP_CODE=$$(echo "$$DELETE_RESPONSE" | tail -n1); \
+			BODY=$$(echo "$$DELETE_RESPONSE" | head -n-1); \
+			if [ "$$HTTP_CODE" = "200" ] || [ "$$HTTP_CODE" = "204" ]; then \
+				echo "✅ Successfully deleted API $$API"; \
+			else \
+				echo "⚠️  Failed to delete API $$API (HTTP $$HTTP_CODE)"; \
+				echo "$$BODY" | jq . 2>/dev/null || echo "$$BODY"; \
+			fi; \
+		done; \
+	fi
 
 # Delete all environments in workspace
 .PHONY: postman-delete-environments
