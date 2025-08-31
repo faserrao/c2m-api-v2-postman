@@ -541,12 +541,14 @@ postman-cleanup-all:
 	@echo "🔍 Verifying cleanup..."
 	@REMAINING_APIS=$$(curl --silent --location \
 		--request GET "$(POSTMAN_APIS_URL)$(POSTMAN_Q_ID)" \
-		$(POSTMAN_CURL_HEADERS_XC) | jq -r '.apis | length'); \
+		--header "X-Api-Key: $(POSTMAN_API_KEY)" | jq -r '.apis | length' || echo 0); \
 	if [ "$$REMAINING_APIS" -gt 0 ]; then \
 		echo "⚠️  Warning: $$REMAINING_APIS APIs still remain in workspace after cleanup!"; \
 		curl --silent --location \
 			--request GET "$(POSTMAN_APIS_URL)$(POSTMAN_Q_ID)" \
-			$(POSTMAN_CURL_HEADERS_XC) | jq -r '.apis[] | "  - \(.id): \(.name)"'; \
+			--header "X-Api-Key: $(POSTMAN_API_KEY)" | jq -r '.apis[] | "  - \(.id): \(.name)"'; \
+		echo "🔄 Attempting cleanup again..."; \
+		$(MAKE) postman-delete-apis; \
 	else \
 		echo "✅ All APIs successfully deleted"; \
 	fi
@@ -1059,6 +1061,8 @@ postman-import-openapi-as-api:
 		echo "❌ Error: POSTMAN_API_KEY is not set"; \
 		exit 1; \
 	fi
+	@echo "🧹 Pre-import cleanup: Deleting existing APIs with same name..."
+	@$(MAKE) postman-delete-apis
 	@echo "🔑 Using API Key: $$(echo $(POSTMAN_API_KEY) | head -c 8)..."
 	@echo "📍 Target Workspace: $(POSTMAN_WS)"
 	@echo "🌐 API URL: $(POSTMAN_APIS_URL)?workspaceId=$(POSTMAN_WS)"
