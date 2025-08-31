@@ -1240,17 +1240,7 @@ POSTMAN_LINKED_COLLECTION_FLAT := $(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_AP
 postman-linked-collection-flatten:
 	@echo "🧹 Flattening linked collection from $(POSTMAN_COLLECTION_RAW)..."
 	@$(call guard-file,$(POSTMAN_COLLECTION_RAW))
-	@jq '\
-	  def all_items(i): \
-	    (i // []) as $$a \
-	    | [ $$a[] | if has("item") then all_items(.item)[] else . end ]; \
-	  def req_name(r): \
-	    (r.request.method // "REQ") as $$m \
-	    | (r.request.url.path // []) as $$p \
-	    | ($$p | join("/")) as $$path \
-	    | if $$path == "" then $$m else ($$m + " /" + $$path) end; \
-	  .item = (all_items(.item) | map( .name = req_name(.) )) \
-	' $(POSTMAN_COLLECTION_RAW) > $(POSTMAN_LINKED_COLLECTION_FLAT)
+	@jq 'def all_items(i): (i // []) as $$a | [ $$a[] | if has("item") then all_items(.item)[] else . end ]; def req_name(r): (r.request.method // "REQ") as $$m | (r.request.url.path // []) as $$p | ($$p | join("/")) as $$path | if $$path == "" then $$m else ($$m + " /" + $$path) end; .item = (all_items(.item) | map( .name = req_name(.) ))' $(POSTMAN_COLLECTION_RAW) > $(POSTMAN_LINKED_COLLECTION_FLAT)
 	@echo "✅ Linked collection flattened with renamed requests"
 
 # ========================================================================
