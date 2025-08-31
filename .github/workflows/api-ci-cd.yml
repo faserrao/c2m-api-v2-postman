@@ -238,7 +238,7 @@ jobs:
         if: env.DEPLOY_GH_PAGES == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs/site
+          path: docs
 
   # ---------- Deploy to GitHub Pages ----------
   deploy-pages:
