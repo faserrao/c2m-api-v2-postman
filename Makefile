@@ -2255,7 +2255,7 @@ postman-publish-personal: ## Push API + collection to personal workspace
 	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) workspace-info
 	@echo ""
 	@echo "🧹 Cleaning up old APIs to avoid limit..."
-	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-cleanup-api || true
+	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-delete-apis || true
 	@echo ""
 	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-import-openapi-as-api
 	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-linked-collection-upload
@@ -2272,7 +2272,7 @@ postman-publish-team: ## Push API + collection to team workspace
 	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) workspace-info
 	@echo ""
 	@echo "🧹 Cleaning up old APIs to avoid limit..."
-	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-cleanup-api || true
+	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-delete-apis || true
 	@echo ""
 	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-import-openapi-as-api
 	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-linked-collection-upload
