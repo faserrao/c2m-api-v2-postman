@@ -2238,11 +2238,11 @@ postman-publish-personal: ## Push API + collection to personal workspace
 		echo "personal" > .postman-target; \
 		echo "📝 Saved target 'personal' to .postman-target for CI/CD"; \
 	fi
-	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE=$(POSTMAN_SERRAO_API_KEY) $(MAKE) workspace-info
+	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) workspace-info
 	@echo ""
-	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE=$(POSTMAN_SERRAO_API_KEY) $(MAKE) postman-import-openapi-as-api
-	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE=$(POSTMAN_SERRAO_API_KEY) $(MAKE) postman-linked-collection-upload
-	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE=$(POSTMAN_SERRAO_API_KEY) $(MAKE) postman-linked-collection-link
+	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-import-openapi-as-api
+	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-linked-collection-upload
+	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-linked-collection-link
 	@echo "✅ Personal workspace updated successfully"
 
 .PHONY: postman-publish-team
@@ -2252,11 +2252,11 @@ postman-publish-team: ## Push API + collection to team workspace
 		echo "team" > .postman-target; \
 		echo "📝 Saved target 'team' to .postman-target for CI/CD"; \
 	fi
-	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE=$(POSTMAN_C2M_API_KEY) $(MAKE) workspace-info
+	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) workspace-info
 	@echo ""
-	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE=$(POSTMAN_C2M_API_KEY) $(MAKE) postman-import-openapi-as-api
-	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE=$(POSTMAN_C2M_API_KEY) $(MAKE) postman-linked-collection-upload
-	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE=$(POSTMAN_C2M_API_KEY) $(MAKE) postman-linked-collection-link
+	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-import-openapi-as-api
+	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-linked-collection-upload
+	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-linked-collection-link
 	@echo "✅ Team workspace updated successfully"
 
 .PHONY: postman-publish-both
