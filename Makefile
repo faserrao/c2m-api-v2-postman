@@ -159,6 +159,7 @@ POSTMAN_TEST_COLLECTION_FIXED_WITH_TESTS := $(basename $(POSTMAN_TEST_COLLECTION
 POSTMAN_LINKED_COLLECTION_UID_FILE := $(POSTMAN_DIR)/postman_linked_collection_uid.txt
 POSTMAN_LINKED_COLLECTION_UID    := $(shell cat $(POSTMAN_LINKED_COLLECTION_UID_FILE))
 POSTMAN_LINKED_COLLECTION_TMP    := $(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-linked-collection-tmp.json
+# TODO: Base collection name api name like we did for the test collection
 POSTMAN_LINKED_COLLECTION_NAME   := C2mApiCollectionLinked
 POSTMAN_COLLECTIONS_URL          := $(POSTMAN_BASE_URL)/collections
 
