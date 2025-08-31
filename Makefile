@@ -1166,14 +1166,7 @@ postman-spec-create-standalone:
 		--arg name "$(C2MAPIV2_POSTMAN_API_NAME_PC)" \
 		--arg type "OPENAPI:3.0" \
 		--arg content "$$CONTENT" \
-		'{ \
-			name: $$name, \
-			type: $$type, \
-			files: [{ \
-				path: "openapi.yaml", \
-				content: $$content \
-			}] \
-		}' > "$(POSTMAN_DIR)/spec-standalone-payload.json"
+		'{ name: $$name, type: $$type, files: [{ path: "openapi.yaml", content: $$content }] }' > "$(POSTMAN_DIR)/spec-standalone-payload.json"
 	@RESPONSE=$$(curl --silent --location --request POST "$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS)" \
 		$(POSTMAN_CURL_HEADERS_XC) \
 		--data-binary "@$(POSTMAN_DIR)/spec-standalone-payload.json"); \
