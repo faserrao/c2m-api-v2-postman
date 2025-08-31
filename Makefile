@@ -1048,15 +1048,18 @@ postman-import-openapi-as-api:
 		exit 1; \
 	fi
 	@echo "🔑 Using API Key: $$(echo $(POSTMAN_API_KEY) | head -c 8)..."
+	@echo "📍 Target Workspace: $(POSTMAN_WS)"
+	@echo "🌐 API URL: $(POSTMAN_APIS_URL)?workspaceId=$(POSTMAN_WS)"
 	@CONTENT=$$(jq -Rs . < "$(C2MAPIV2_OPENAPI_SPEC)"); \
 	PAYLOAD=$$(jq -n \
 		--arg name "$(POSTMAN_API_NAME)" \
 		--arg schema "$$CONTENT" \
 		'{ name: $$name, schema: { type: "openapi3", language: "yaml", schema: $$schema } }'); \
+	echo "🔧 Headers: X-Api-Key: $$(echo $(POSTMAN_API_KEY) | head -c 8)..."; \
 	API_RESPONSE=$$( $(call curl_json_xcaa,\
 		--request POST "$(POSTMAN_APIS_URL)?workspaceId=$(POSTMAN_WS)",\
 		--data "$$PAYLOAD" \
-	); ); \
+	) 2>&1 ); \
 	echo "$$API_RESPONSE" | jq . > postman/import-api-debug.json || echo "$$API_RESPONSE" > postman/import-api-debug.json; \
 	API_ID=$$(echo "$$API_RESPONSE" | jq -r '.id // empty'); \
 	if [ -z "$$API_ID" ]; then \
