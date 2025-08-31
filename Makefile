@@ -1056,14 +1056,28 @@ postman-import-openapi-as-api:
 		--arg schema "$$CONTENT" \
 		'{ name: $$name, schema: { type: "openapi3", language: "yaml", schema: $$schema } }'); \
 	echo "🔧 Headers: X-Api-Key: $$(echo $(POSTMAN_API_KEY) | head -c 8)..."; \
-	API_RESPONSE=$$( $(call curl_json_xcaa,\
-		--request POST "$(POSTMAN_APIS_URL)?workspaceId=$(POSTMAN_WS)",\
-		--data "$$PAYLOAD" \
-	) 2>&1 ); \
+	echo "📤 Sending request to Postman API..."; \
+	HTTP_CODE=$$(curl --silent --show-error --write-out "%{http_code}" --output postman/import-api-response.json \
+		--location --request POST "$(POSTMAN_APIS_URL)?workspaceId=$(POSTMAN_WS)" \
+		--header "X-Api-Key: $(POSTMAN_API_KEY)" \
+		--header "Content-Type: application/json" \
+		--header "Accept: application/vnd.api.v10+json" \
+		--header "Authorization: Bearer $(POSTMAN_API_KEY)" \
+		--data "$$PAYLOAD"); \
+	echo "📡 HTTP Response Code: $$HTTP_CODE"; \
+	if [ "$$HTTP_CODE" != "200" ] && [ "$$HTTP_CODE" != "201" ]; then \
+		echo "❌ API request failed with HTTP code: $$HTTP_CODE"; \
+		echo "📄 Response body:"; \
+		cat postman/import-api-response.json 2>/dev/null || echo "No response body"; \
+		exit 1; \
+	fi; \
+	API_RESPONSE=$$(cat postman/import-api-response.json); \
 	echo "$$API_RESPONSE" | jq . > postman/import-api-debug.json || echo "$$API_RESPONSE" > postman/import-api-debug.json; \
 	API_ID=$$(echo "$$API_RESPONSE" | jq -r '.id // empty'); \
 	if [ -z "$$API_ID" ]; then \
 		echo "❌ Failed to import API. Check postman/import-api-debug.json for details."; \
+		echo "📄 Response:"; \
+		cat postman/import-api-debug.json 2>/dev/null || echo "No response"; \
 		exit 1; \
 	else \
 		echo "✅ Imported API with ID: $$API_ID"; \
