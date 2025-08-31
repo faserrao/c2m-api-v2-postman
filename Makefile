@@ -1859,13 +1859,19 @@ postman-delete-mock-servers:
 	@echo "🔍 Fetching mock servers from workspace $(POSTMAN_WS)..."
 	@MOCKS=$$(curl --silent --location \
 		--request GET "$(POSTMAN_MOCKS_URL)$(POSTMAN_Q)" \
-		$(POSTMAN_CURL_HEADERS_XC) | jq -r '.mocks // [] | .[].id'); \
-	for MOCK in $$MOCKS; do \
-		echo "🗑 Deleting mock server $$MOCK..."; \
+		$(POSTMAN_CURL_HEADERS_XC) | jq -r '.mocks[]?.id' 2>/dev/null | grep -v '^null$$' | grep .); \
+	if [ -z "$$MOCKS" ]; then \
+		echo "ℹ️  No mock servers found in workspace"; \
+	else \
+		for MOCK in $$MOCKS; do \
+			if [ -n "$$MOCK" ]; then \
+				echo "🗑 Deleting mock server $$MOCK..."; \
 		curl --silent --location \
 			--request DELETE "$(POSTMAN_MOCKS_URL)/$$MOCK" \
 			$(POSTMAN_CURL_HEADERS_XC) || echo "⚠️ Failed to delete mock server $$MOCK"; \
-	done
+		fi; \
+		done; \
+	fi
 
 # Delete all collections in workspace
 .PHONY: postman-delete-collections
@@ -1873,13 +1879,19 @@ postman-delete-collections:
 	@echo "🔍 Fetching collections from workspace $(POSTMAN_WS)..."
 	@COLLECTIONS=$$(curl --silent --location \
 		--request GET "$(POSTMAN_COLLECTIONS_URL)$(POSTMAN_Q)" \
-		$(POSTMAN_CURL_HEADERS_XC) | jq -r '.collections // [] | .[].uid'); \
-	for COL in $$COLLECTIONS; do \
-		echo "🗑 Deleting collection $$COL..."; \
+		$(POSTMAN_CURL_HEADERS_XC) | jq -r '.collections[]?.uid' 2>/dev/null | grep -v '^null$$' | grep .); \
+	if [ -z "$$COLLECTIONS" ]; then \
+		echo "ℹ️  No collections found in workspace"; \
+	else \
+		for COL in $$COLLECTIONS; do \
+			if [ -n "$$COL" ]; then \
+				echo "🗑 Deleting collection $$COL..."; \
 		curl --silent --location \
 			--request DELETE "$(POSTMAN_COLLECTIONS_URL)/$$COL" \
 			$(POSTMAN_CURL_HEADERS_XC) || echo "⚠️ Failed to delete collection $$COL"; \
-	done
+		fi; \
+		done; \
+	fi
 
 # Delete all APIs in workspace
 .PHONY: postman-delete-apis
