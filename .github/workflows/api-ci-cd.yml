@@ -52,7 +52,9 @@ env:
   
   # Postman configuration
   POSTMAN_API_BASE: https://api.postman.com
-  POSTMAN_WS: ${{ secrets.POSTMAN_WORKSPACE_ID }}
+  # Note: Workspace is auto-selected by Makefile based on branch
+  POSTMAN_SERRAO_API_KEY: ${{ secrets.POSTMAN_SERRAO_API_KEY }}
+  POSTMAN_C2M_API_KEY: ${{ secrets.POSTMAN_C2M_API_KEY }}
 
 jobs:
   build:
@@ -168,17 +170,34 @@ jobs:
       - name: Publish to Postman
         if: |
           github.event_name == 'push' && 
-          github.ref == 'refs/heads/main' && 
-          env.PUBLISH_TO_POSTMAN == 'true' && 
-          env.POSTMAN_WS != ''
+          github.ref == 'refs/heads/main' &&
+          env.PUBLISH_TO_POSTMAN == 'true'
         env:
-          POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
+          POSTMAN_SERRAO_API_KEY: ${{ secrets.POSTMAN_SERRAO_API_KEY }}
+          POSTMAN_C2M_API_KEY: ${{ secrets.POSTMAN_C2M_API_KEY }}
+          POSTMAN_TARGET_OVERRIDE: ${{ secrets.POSTMAN_TARGET }}
         run: |
-          if [ -z "$POSTMAN_API_KEY" ]; then
-            echo "⚠️  Skipping Postman publish: POSTMAN_API_KEY not set"
+          if [ -z "$POSTMAN_SERRAO_API_KEY" ] && [ -z "$POSTMAN_C2M_API_KEY" ]; then
+            echo "⚠️  Skipping Postman publish: No API keys configured"
+            echo "   Add POSTMAN_SERRAO_API_KEY and/or POSTMAN_C2M_API_KEY secrets"
           else
-            echo "🚀 Publishing to Postman workspace..."
-            make postman-publish
+            # Read target from file if it exists, otherwise use override or default
+            if [ -f .postman-target ]; then
+              POSTMAN_TARGET=$(cat .postman-target)
+              echo "📄 Using target from .postman-target file: $POSTMAN_TARGET"
+            elif [ -n "$POSTMAN_TARGET_OVERRIDE" ]; then
+              POSTMAN_TARGET=$POSTMAN_TARGET_OVERRIDE
+              echo "🔧 Using target from secret: $POSTMAN_TARGET"
+            else
+              POSTMAN_TARGET="personal"
+              echo "📍 Using default target: $POSTMAN_TARGET"
+            fi
+            
+            echo "🚀 Publishing to Postman workspaces..."
+            echo "   Target: $POSTMAN_TARGET"
+            make workspace-info
+            echo ""
+            POSTMAN_TARGET=$POSTMAN_TARGET make postman-publish
           fi
 
       # ---------- Commit generated artifacts (main only) ----------

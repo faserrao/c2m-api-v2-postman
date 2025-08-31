@@ -317,12 +317,11 @@ OPENAPI_DIFF                     := openapi-diff
 #--- Postman Workspaces ---
 SERRAO_WS                        := d8a1f479-a2aa-4471-869e-b12feea0a98c
 C2M_WS                           := c740f0f4-0de2-4db3-8ab6-f8a0fa6fbeb1
-POSTMAN_WS                       := $(SERRAO_WS)
 
-#--- Postman API Keys ---
-# Select which API key to use
-POSTMAN_API_KEY                  := $(POSTMAN_SERRAO_API_KEY)
-# POSTMAN_API_KEY                := $(POSTMAN_C2M_API_KEY)
+#--- Default workspace configuration ---
+# Default to personal workspace, allow override
+POSTMAN_WS                       := $(or $(POSTMAN_WORKSPACE_OVERRIDE),$(SERRAO_WS))
+POSTMAN_API_KEY                  := $(or $(POSTMAN_API_KEY_OVERRIDE),$(POSTMAN_SERRAO_API_KEY))
 
 #--- TOKENS ---
 # Extract token from environment file if it exists
@@ -2209,15 +2208,99 @@ lint: open-api-spec-lint ## Lint OpenAPI spec [CI alias]
 diff: open-api-spec-diff ## Diff OpenAPI spec vs origin/main [CI alias]
 
 .PHONY: postman-publish
-postman-publish: ## Push API + collection to Postman (no mocks in CI) [CI alias]
-	$(MAKE) postman-import-openapi-as-api
-	$(MAKE) postman-linked-collection-upload
-	$(MAKE) postman-linked-collection-link
+postman-publish: ## Push API + collection to current workspace (use POSTMAN_TARGET to control)
+	@if [ "$(POSTMAN_TARGET)" = "both" ]; then \
+		$(MAKE) postman-publish-both; \
+	elif [ "$(POSTMAN_TARGET)" = "team" ]; then \
+		$(MAKE) postman-publish-team; \
+	elif [ "$(POSTMAN_TARGET)" = "personal" ]; then \
+		$(MAKE) postman-publish-personal; \
+	else \
+		echo "📍 Publishing to default workspace (personal)..."; \
+		$(MAKE) postman-import-openapi-as-api; \
+		$(MAKE) postman-linked-collection-upload; \
+		$(MAKE) postman-linked-collection-link; \
+	fi
+
+.PHONY: postman-publish-personal
+postman-publish-personal: ## Push API + collection to personal workspace
+	@echo "🏠 Publishing to PERSONAL workspace..."
+	@if [ -z "$(SKIP_TARGET_SAVE)" ]; then \
+		echo "personal" > .postman-target; \
+		echo "📝 Saved target 'personal' to .postman-target for CI/CD"; \
+	fi
+	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE=$(POSTMAN_SERRAO_API_KEY) $(MAKE) workspace-info
+	@echo ""
+	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE=$(POSTMAN_SERRAO_API_KEY) $(MAKE) postman-import-openapi-as-api
+	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE=$(POSTMAN_SERRAO_API_KEY) $(MAKE) postman-linked-collection-upload
+	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE=$(POSTMAN_SERRAO_API_KEY) $(MAKE) postman-linked-collection-link
+	@echo "✅ Personal workspace updated successfully"
+
+.PHONY: postman-publish-team
+postman-publish-team: ## Push API + collection to team workspace
+	@echo "👥 Publishing to TEAM workspace..."
+	@if [ -z "$(SKIP_TARGET_SAVE)" ]; then \
+		echo "team" > .postman-target; \
+		echo "📝 Saved target 'team' to .postman-target for CI/CD"; \
+	fi
+	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE=$(POSTMAN_C2M_API_KEY) $(MAKE) workspace-info
+	@echo ""
+	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE=$(POSTMAN_C2M_API_KEY) $(MAKE) postman-import-openapi-as-api
+	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE=$(POSTMAN_C2M_API_KEY) $(MAKE) postman-linked-collection-upload
+	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE=$(POSTMAN_C2M_API_KEY) $(MAKE) postman-linked-collection-link
+	@echo "✅ Team workspace updated successfully"
+
+.PHONY: postman-publish-both
+postman-publish-both: ## Push API + collection to BOTH workspaces
+	@echo "🚀 Publishing to BOTH workspaces..."
+	@echo "both" > .postman-target
+	@echo "📝 Saved target 'both' to .postman-target for CI/CD"
+	@echo ""
+	@SKIP_TARGET_SAVE=1 $(MAKE) postman-publish-personal
+	@echo ""
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo ""
+	@SKIP_TARGET_SAVE=1 $(MAKE) postman-publish-team
+	@echo ""
+	@echo "🎉 Both workspaces updated successfully!"
 
 # Show all available targets with descriptions
 .PHONY: help
 help:## Show help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+
+# ========================================================================
+# WORKSPACE INFORMATION AND SWITCHING
+# ========================================================================
+.PHONY: workspace-info
+workspace-info: ## Show current Postman workspace configuration
+	@echo "🔍 Postman Workspace Configuration:"
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo "Current Workspace: $(if $(findstring $(POSTMAN_WS),$(C2M_WS)),C2M Team,Personal/Serrao)"
+	@echo "Workspace ID: $(POSTMAN_WS)"
+	@echo "API Key: $(if $(findstring $(POSTMAN_API_KEY),$(POSTMAN_C2M_API_KEY)),C2M Team Key,Personal Key)"
+	@if [ -f .postman-target ]; then \
+		echo "CI/CD Target: $$(cat .postman-target) (from .postman-target file)"; \
+	else \
+		echo "CI/CD Target: personal (default - no .postman-target file)"; \
+	fi
+	@echo ""
+	@echo "📚 Available Publishing Options:"
+	@echo "  • make postman-publish-personal → Publish to personal workspace"
+	@echo "  • make postman-publish-team     → Publish to team workspace"
+	@echo "  • make postman-publish-both     → Publish to BOTH workspaces"
+	@echo ""
+	@echo "💡 These commands also save the target for CI/CD in .postman-target"
+
+.PHONY: use-team-workspace
+use-team-workspace: ## Force use of C2M team workspace
+	@echo "🔄 Forcing C2M team workspace..."
+	POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE=$(POSTMAN_C2M_API_KEY) $(MAKE) workspace-info
+
+.PHONY: use-personal-workspace
+use-personal-workspace: ## Force use of personal workspace
+	@echo "🔄 Forcing personal workspace..."
+	POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE=$(POSTMAN_SERRAO_API_KEY) $(MAKE) workspace-info
 
 # ========================================================================
 # LOGGING
