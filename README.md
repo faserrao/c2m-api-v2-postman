@@ -1018,9 +1018,10 @@ The CI/CD pipeline automatically:
 - Builds OpenAPI specifications from EBNF data dictionary
 - Generates and validates Postman collections
 - Builds API documentation
-- Publishes to Postman cloud
+- Publishes to Postman cloud (personal or corporate workspaces)
 - Deploys documentation to GitHub Pages
 - Ensures all generated files are committed
+- Supports both manual builds and automated CI/CD
 
 ### 📋 Workflows
 
@@ -1063,6 +1064,11 @@ Go to **Settings → Secrets and variables → Actions** and add:
 |--------|-------------|---------|
 | `POSTMAN_API_KEY` | Your Postman API key | `PMAK-xxxxx...` |
 | `POSTMAN_WORKSPACE_ID` | Target workspace UUID | `d8a1f479-a2aa-...` |
+
+**Note**: The pipeline uses a `.postman-target` file to determine which workspace to publish to:
+- `personal` - Uses default workspace from .env
+- `corporate` - Uses corporate workspace (if configured)
+- Create this file with: `echo "personal" > .postman-target`
 
 #### 2. Enable GitHub Pages
 
@@ -1114,7 +1120,10 @@ make postman-collection-build # Generate and flatten collection
 make docs                    # Build API documentation
 make lint                    # Validate OpenAPI spec
 make diff                    # Compare spec changes
-make postman-publish         # Push to Postman workspace
+make postman-publish         # Push to Postman workspace (reads .postman-target)
+make postman-publish-personal # Explicitly publish to personal workspace
+make postman-publish-corporate # Explicitly publish to corporate workspace
+make postman-cleanup-all     # Clean up all Postman resources before rebuild
 ```
 
 ### 🔍 Monitoring Pipeline Status
@@ -1152,6 +1161,9 @@ make postman-publish         # Push to Postman workspace
 | "Postman publish failed" | Check API key is valid and has workspace access |
 | "Pages deployment failed" | Ensure Pages is enabled in repository settings |
 | "Python/Node setup failed" | Check `requirements.txt` and `package.json` are valid |
+| "Wrong workspace published" | Check `.postman-target` file content |
+| "Cleanup failed" | Ensure API has delete permissions |
+| "jq errors in GitHub Actions" | Script uses portable jq syntax (no line continuations) |
 
 ---
 

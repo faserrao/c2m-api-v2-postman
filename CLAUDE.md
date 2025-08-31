@@ -42,7 +42,13 @@ make postman-collection-build           # Generate and flatten collection
 make docs                               # Build API documentation
 make lint                               # Lint OpenAPI spec
 make diff                               # Diff spec vs origin/main
-make postman-publish                    # Push to Postman (API + collection)
+make postman-publish                    # Push to Postman (reads .postman-target)
+make postman-publish-personal           # Explicitly publish to personal workspace
+make postman-publish-corporate          # Explicitly publish to corporate workspace
+
+# GitHub Actions specific behavior
+# The workflow reads .postman-target file to determine which workspace to use
+# Creates this file with: echo "personal" > .postman-target
 ```
 
 ### Smart Rebuild System (NEW!)
@@ -164,6 +170,8 @@ make update-mock-env         # Update mock environment
 3. **Workspace ID**: Default is Serrao workspace (`d8a1f479-a2aa-4471-869e-b12feea0a98c`)
 4. **Mock URLs**: Automatically saved to tracking files in `postman/`
 5. **Collection Fixes**: URLs are automatically fixed to use `{{baseUrl}}` placeholder
+6. **GitHub Actions**: Uses portable jq syntax (no line continuations) for compatibility
+7. **API Deletion**: Fixed to properly delete all APIs in workspace during cleanup
 
 ## Troubleshooting
 
@@ -171,6 +179,9 @@ make update-mock-env         # Update mock environment
 - **Port Conflicts**: Prism uses 4010, docs use 8080
 - **API Key Issues**: Check `.env` file and `POSTMAN_API_KEY` selection in Makefile
 - **Collection Validation**: Run `make postman-test-collection-validate`
+- **GitHub Actions jq errors**: Fixed - uses portable syntax without line continuations
+- **Wrong workspace published**: Check `.postman-target` file content
+- **Only 1 API deleted**: Fixed - now properly deletes all APIs during cleanup
 
 ## Pipeline Flow
 
@@ -195,7 +206,8 @@ The project includes automated CI/CD pipelines:
   - Generates Postman collections
   - Builds documentation
   - Auto-commits generated files (main branch only)
-  - Publishes to Postman (if secrets configured)
+  - Cleans up existing Postman resources before publishing
+  - Publishes to Postman workspace based on `.postman-target` file
   - Deploys docs to GitHub Pages
 
 ### PR Drift Check (`pr-drift-check.yml`)
@@ -207,6 +219,14 @@ The project includes automated CI/CD pipelines:
 Configure in GitHub Settings → Secrets:
 - `POSTMAN_API_KEY`: Your Postman API key
 - `POSTMAN_WORKSPACE_ID`: Target workspace UUID
+
+### Workspace Publishing
+The workflow determines which workspace to publish to:
+1. Reads `.postman-target` file (contains "personal" or "corporate")
+2. Runs corresponding make target: `make postman-publish-{target}`
+3. Default is "personal" if file doesn't exist
+
+To set target: `echo "personal" > .postman-target`
 
 ## Script Integration Status
 
@@ -229,3 +249,6 @@ Configure in GitHub Settings → Secrets:
 - Added a placeholder for `memorize`
 - First memory added: Learning how to effectively manage and update project documentation
 - Discovered the importance of dynamic pipeline generation based on source document changes
+- Fixed API deletion issue where only 1 of N APIs was being deleted
+- Implemented workspace-based publishing system using `.postman-target` file
+- Created comprehensive build guide for non-technical users
