@@ -19,7 +19,6 @@
 #
 # Load environment variables from .env file if it exists
 -include .env
-export
 
 # Prerequisites:
 #   - Node.js and npm

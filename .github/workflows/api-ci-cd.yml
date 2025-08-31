@@ -195,6 +195,9 @@ jobs:
             
             echo "🚀 Publishing to Postman workspaces..."
             echo "   Target: $POSTMAN_TARGET"
+            echo "   API Keys available: SERRAO=$([ -n "$POSTMAN_SERRAO_API_KEY" ] && echo "Yes" || echo "No"), C2M=$([ -n "$POSTMAN_C2M_API_KEY" ] && echo "Yes" || echo "No")"
+            export POSTMAN_SERRAO_API_KEY
+            export POSTMAN_C2M_API_KEY
             make workspace-info
             echo ""
             POSTMAN_TARGET=$POSTMAN_TARGET make postman-publish
