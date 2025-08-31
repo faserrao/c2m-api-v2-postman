@@ -2246,7 +2246,7 @@ postman-publish: ## Push API + collection to current workspace (use POSTMAN_TARG
 	fi
 
 .PHONY: postman-publish-personal
-postman-publish-personal: ## Push API + collection to personal workspace
+postman-publish-personal: ## Push complete suite to personal workspace
 	@echo "🏠 Publishing to PERSONAL workspace..."
 	@if [ -z "$(SKIP_TARGET_SAVE)" ]; then \
 		echo "personal" > .postman-target; \
@@ -2257,13 +2257,29 @@ postman-publish-personal: ## Push API + collection to personal workspace
 	@echo "🧹 Cleaning up ALL old Postman resources..."
 	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-cleanup-all || true
 	@echo ""
+	@echo "📥 1/6: Importing OpenAPI as API definition..."
 	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-import-openapi-as-api
+	@echo ""
+	@echo "📄 2/6: Creating standalone spec..."
+	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-spec-create-standalone || true
+	@echo ""
+	@echo "📦 3/6: Uploading linked collection..."
 	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-linked-collection-upload
 	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-linked-collection-link
-	@echo "✅ Personal workspace updated successfully"
+	@echo ""
+	@echo "🧪 4/6: Creating test collection..."
+	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-create-test-collection || true
+	@echo ""
+	@echo "🌐 5/6: Creating mock server and environment..."
+	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-create-mock-and-env || true
+	@echo ""
+	@echo "📋 6/6: Importing OpenAPI spec..."
+	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-import-openapi-spec || true
+	@echo ""
+	@echo "✅ Personal workspace updated with complete suite!"
 
 .PHONY: postman-publish-team
-postman-publish-team: ## Push API + collection to team workspace
+postman-publish-team: ## Push complete suite to team workspace
 	@echo "👥 Publishing to TEAM workspace..."
 	@if [ -z "$(SKIP_TARGET_SAVE)" ]; then \
 		echo "team" > .postman-target; \
@@ -2274,10 +2290,26 @@ postman-publish-team: ## Push API + collection to team workspace
 	@echo "🧹 Cleaning up ALL old Postman resources..."
 	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-cleanup-all || true
 	@echo ""
+	@echo "📥 1/6: Importing OpenAPI as API definition..."
 	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-import-openapi-as-api
+	@echo ""
+	@echo "📄 2/6: Creating standalone spec..."
+	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-spec-create-standalone || true
+	@echo ""
+	@echo "📦 3/6: Uploading linked collection..."
 	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-linked-collection-upload
 	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-linked-collection-link
-	@echo "✅ Team workspace updated successfully"
+	@echo ""
+	@echo "🧪 4/6: Creating test collection..."
+	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-create-test-collection || true
+	@echo ""
+	@echo "🌐 5/6: Creating mock server and environment..."
+	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-create-mock-and-env || true
+	@echo ""
+	@echo "📋 6/6: Importing OpenAPI spec..."
+	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-import-openapi-spec || true
+	@echo ""
+	@echo "✅ Team workspace updated with complete suite!"
 
 .PHONY: postman-publish-both
 postman-publish-both: ## Push API + collection to BOTH workspaces
