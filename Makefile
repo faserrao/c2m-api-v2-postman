@@ -1899,8 +1899,8 @@ postman-delete-apis:
 	@echo "🔍 Fetching APIs from workspace $(POSTMAN_WS)..."
 	@RESPONSE=$$(curl --silent --location \
 		--request GET "$(POSTMAN_APIS_URL)$(POSTMAN_Q_ID)" \
-		$(POSTMAN_CURL_HEADERS_XC)); \
-	echo "$$RESPONSE" | jq -r '.apis[] | "\(.id) - \(.name)"' 2>/dev/null || echo "📊 Found APIs to delete"; \
+		--header "X-Api-Key: $(POSTMAN_API_KEY)"); \
+	echo "$$RESPONSE" | jq -r '.apis[] | "\(.id) - \(.name)"' 2>/dev/null || echo "📊 Checking for APIs..."; \
 	APIS=$$(echo "$$RESPONSE" | jq -r '.apis[]?.id' 2>/dev/null | grep -v '^null$$' || true); \
 	API_COUNT=$$(echo "$$APIS" | grep -c . || echo 0); \
 	echo "📊 Found $$API_COUNT APIs to delete"; \
@@ -1914,7 +1914,7 @@ postman-delete-apis:
 				echo "🗑 Deleting API $$API..."; \
 			DELETE_RESPONSE=$$(curl --silent --location --write-out "\n%{http_code}" \
 				--request DELETE "$(POSTMAN_APIS_URL)/$$API" \
-				$(POSTMAN_CURL_HEADERS_XC)); \
+				--header "X-Api-Key: $(POSTMAN_API_KEY)"); \
 			HTTP_CODE=$$(echo "$$DELETE_RESPONSE" | tail -n1); \
 			BODY=$$(echo "$$DELETE_RESPONSE" | sed '$$d'); \
 			if [ "$$HTTP_CODE" = "200" ] || [ "$$HTTP_CODE" = "204" ]; then \
@@ -1933,13 +1933,19 @@ postman-delete-environments:
 	@echo "🔍 Fetching environments from workspace $(POSTMAN_WS)..."
 	@ENVS=$$(curl --silent --location \
 		--request GET "$(POSTMAN_ENVIRONMENTS_URL)$(POSTMAN_Q)" \
-		$(POSTMAN_CURL_HEADERS_XC) | jq -r '.environments // [] | .[].uid'); \
-	for ENV in $$ENVS; do \
-		echo "🗑 Deleting environment $$ENV..."; \
+		--header "X-Api-Key: $(POSTMAN_API_KEY)" | jq -r '.environments[]?.uid' 2>/dev/null | grep -v '^null$$' || true); \
+	if [ -z "$$ENVS" ]; then \
+		echo "ℹ️  No environments found in workspace"; \
+	else \
+		for ENV in $$ENVS; do \
+			if [ -n "$$ENV" ]; then \
+				echo "🗑 Deleting environment $$ENV..."; \
 		curl --silent --location \
 			--request DELETE "$(POSTMAN_ENVIRONMENTS_URL)/$$ENV" \
-			$(POSTMAN_CURL_HEADERS_XC) || echo "⚠️ Failed to delete environment $$ENV"; \
-	done
+			--header "X-Api-Key: $(POSTMAN_API_KEY)" || echo "⚠️ Failed to delete environment $$ENV"; \
+		fi; \
+		done; \
+	fi
 
 # Clean trash in workspace
 .PHONY: postman-api-clean-trash
