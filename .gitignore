@@ -1,40 +1,151 @@
-node_modules/
-__pycache__/
-dist/
+# Environment and config
 .env
-Old/
-secure/
-OldVersions/
-postman/postman_api_key.txt
-Makefile
-.DS_Store
-*.mov
+.env.*
 
-# Local ignores
-.DS_Store
-*.mov
-# Node
+# Dependencies
 node_modules/
 **/node_modules/
 
-# Python virtual envs
-.venv/
-**/.venv/
+# Python
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*pycache*
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+.eggs/
+*.manifest
+*.spec
+
+# Virtual environments
 venv/
 **/venv/
+.venv/
+**/.venv/
 env/
 **/env/
+ENV/
+env.bak/
+venv.bak/
+virtualenv/
+*/e2o.venv/
+*/test_data_generator.venv/
 
-# Caches & junk
-__pycache__/
-*.py[cod]
-*.egg-info/
+# OS generated files
 .DS_Store
-# Node
-node_modules/
-**/node_modules/
+**/.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*~
 
-C2MBackups/
+# Editor files
+*.swp
+*.swo
+*.swn
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.project
+.settings/
 
-# Smart rebuild hash tracking
+# Logs and databases
+*.log
+*.sql
+*.sqlite
+*.db
+logs/
+*.pid
+
+# Testing
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Backup files
+*.bak
+*.backup
+*.old
+*.orig
+.backup*/
+*_backup/
+*_bak/
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+.temp/
+tmp/
+temp/
+
+# Build artifacts
+dist/
+build/
+*.build/
 .build-hashes/
+
+# Output directories
+output/
+
+# Project specific
+postman/postman_api_key.txt
+postman/prism.log
+docs/http_pid.txt
+finspect/*.egg-info/
+Old/
+OldVersions/
+secure/
+C2MBackups/
+scripts/.backup*/
+
+# Compiled files
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Archives
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Media files (keep this if you don't want to track them)
+*.mov
+*.mp4
+*.avi
+*.mkv
+
+# Certificates and keys (security)
+*.pem
+*.key
+*.crt
+*.cer
+*.der
+*.p12
+*.pfx
+
+# Makefile (if you want to keep it untracked)
+# Makefile
