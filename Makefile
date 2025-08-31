@@ -907,9 +907,16 @@ generate-openapi-spec-from-ebnf-dd:
 		echo "❌ EBNF Data Dictionary not found: $(DD_EBNF_FILE)"; exit 1; \
 	fi
 
+	# --- Create venv if it doesn't exist ---
+	@if [ ! -d "$(VENV_DIR)" ]; then \
+		echo "🐍 Creating Python virtual environment..."; \
+		$(PYTHON3) -m venv "$(VENV_DIR)"; \
+	fi
+	
 	# --- Install Python dependencies ---
 	@echo "📦 Installing required Python modules into venv..."
-	$(VENV_PIP) $(INSTALL_PYTHON_MODULES)
+	@$(VENV_PIP) install -U pip setuptools wheel
+	@$(VENV_PIP) $(INSTALL_PYTHON_MODULES)
 
 	# --- Run the conversion script ---
 	@echo "🛠  Running: $(EBNF_TO_OPENAPI_SCRIPT) → $(C2MAPIV2_OPENAPI_SPEC_BASE)"
