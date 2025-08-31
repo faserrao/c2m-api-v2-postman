@@ -17,6 +17,10 @@
 #   make postman-instance-build-and-test  # Run complete pipeline
 #   make postman-cleanup-all           # Clean all Postman resources
 #
+# Load environment variables from .env file if it exists
+-include .env
+export
+
 # Prerequisites:
 #   - Node.js and npm
 #   - Python 3
@@ -321,7 +325,8 @@ C2M_WS                           := c740f0f4-0de2-4db3-8ab6-f8a0fa6fbeb1
 #--- Default workspace configuration ---
 # Default to personal workspace, allow override
 POSTMAN_WS                       := $(or $(POSTMAN_WORKSPACE_OVERRIDE),$(SERRAO_WS))
-POSTMAN_API_KEY                  := $(or $(POSTMAN_API_KEY_OVERRIDE),$(POSTMAN_SERRAO_API_KEY))
+# Check for API key in environment first (for GitHub Actions), then fall back to override
+POSTMAN_API_KEY                  := $(or $(POSTMAN_API_KEY_OVERRIDE),$(POSTMAN_SERRAO_API_KEY),$(POSTMAN_C2M_API_KEY))
 
 #--- TOKENS ---
 # Extract token from environment file if it exists
@@ -1039,6 +1044,11 @@ postman-import-openapi-flat-native:
 .PHONY: postman-import-openapi-as-api
 postman-import-openapi-as-api:
 	@echo "📥 Importing OpenAPI as API definition (shows under APIs)..."
+	@if [ -z "$(POSTMAN_API_KEY)" ]; then \
+		echo "❌ Error: POSTMAN_API_KEY is not set"; \
+		exit 1; \
+	fi
+	@echo "🔑 Using API Key: $$(echo $(POSTMAN_API_KEY) | head -c 8)..."
 	@CONTENT=$$(jq -Rs . < "$(C2MAPIV2_OPENAPI_SPEC)"); \
 	PAYLOAD=$$(jq -n \
 		--arg name "$(POSTMAN_API_NAME)" \
