@@ -2255,26 +2255,26 @@ postman-publish-personal: ## Push complete suite to personal workspace
 	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) workspace-info
 	@echo ""
 	@echo "🧹 Cleaning up ALL old Postman resources..."
-	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-cleanup-all || true
+	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-cleanup-all
 	@echo ""
 	@echo "📥 1/6: Importing OpenAPI as API definition..."
 	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-import-openapi-as-api
 	@echo ""
 	@echo "📄 2/6: Creating standalone spec..."
-	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-spec-create-standalone || true
+	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-spec-create-standalone
 	@echo ""
 	@echo "📦 3/6: Uploading linked collection..."
 	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-linked-collection-upload
 	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-linked-collection-link
 	@echo ""
 	@echo "🧪 4/6: Creating test collection..."
-	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-create-test-collection || true
+	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-create-test-collection
 	@echo ""
 	@echo "🌐 5/6: Creating mock server and environment..."
-	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-create-mock-and-env || true
+	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-create-mock-and-env
 	@echo ""
 	@echo "📋 6/6: Importing OpenAPI spec..."
-	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-import-openapi-spec || true
+	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-import-openapi-spec
 	@echo ""
 	@echo "✅ Personal workspace updated with complete suite!"
 
@@ -2288,26 +2288,26 @@ postman-publish-team: ## Push complete suite to team workspace
 	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) workspace-info
 	@echo ""
 	@echo "🧹 Cleaning up ALL old Postman resources..."
-	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-cleanup-all || true
+	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-cleanup-all
 	@echo ""
 	@echo "📥 1/6: Importing OpenAPI as API definition..."
 	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-import-openapi-as-api
 	@echo ""
 	@echo "📄 2/6: Creating standalone spec..."
-	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-spec-create-standalone || true
+	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-spec-create-standalone
 	@echo ""
 	@echo "📦 3/6: Uploading linked collection..."
 	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-linked-collection-upload
 	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-linked-collection-link
 	@echo ""
 	@echo "🧪 4/6: Creating test collection..."
-	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-create-test-collection || true
+	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-create-test-collection
 	@echo ""
 	@echo "🌐 5/6: Creating mock server and environment..."
-	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-create-mock-and-env || true
+	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-create-mock-and-env
 	@echo ""
 	@echo "📋 6/6: Importing OpenAPI spec..."
-	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-import-openapi-spec || true
+	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-import-openapi-spec
 	@echo ""
 	@echo "✅ Team workspace updated with complete suite!"
 
