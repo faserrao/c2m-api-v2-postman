@@ -1503,12 +1503,7 @@ POSTMAN_TEST_COLLECTION_FLAT := $(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_
 postman-test-collection-flatten:
 	@echo "🧹 Flattening collection (removing folder hierarchy) from $(POSTMAN_TEST_COLLECTION_FIXED)..."
 	@$(call guard-file,$(POSTMAN_TEST_COLLECTION_FIXED))
-	@jq '\
-	  def all_items(i): \
-	    (i // []) as $$a \
-	    | [ $$a[] | if has("item") then all_items(.item)[] else . end ]; \
-	  .item = all_items(.item) \
-	' $(POSTMAN_TEST_COLLECTION_FIXED) > $(POSTMAN_TEST_COLLECTION_FLAT)
+	@jq 'def all_items(i): (i // []) as $$a | [ $$a[] | if has("item") then all_items(.item)[] else . end ]; .item = all_items(.item)' $(POSTMAN_TEST_COLLECTION_FIXED) > $(POSTMAN_TEST_COLLECTION_FLAT)
 	@echo "✅ Collection flattened to $(POSTMAN_TEST_COLLECTION_FLAT)"
 	@echo "📊 Original items: $$(jq '[.. | .item? // empty] | add | length' $(POSTMAN_TEST_COLLECTION_FIXED))"
 	@echo "📊 Flattened items: $$(jq '.item | length' $(POSTMAN_TEST_COLLECTION_FLAT))"
@@ -1518,17 +1513,7 @@ postman-test-collection-flatten:
 postman-test-collection-flatten-rename:
 	@echo "🧹 Flattening and renaming requests to 'METHOD /path' format..."
 	@$(call guard-file,$(POSTMAN_TEST_COLLECTION_FIXED))
-	@jq '\
-	  def all_items(i): \
-	    (i // []) as $$a \
-	    | [ $$a[] | if has("item") then all_items(.item)[] else . end ]; \
-	  def req_name(r): \
-	    (r.request.method // "REQ") as $$m \
-	    | (r.request.url.path // []) as $$p \
-	    | ($$p | join("/")) as $$path \
-	    | if $$path == "" then $$m else ($$m + " /" + $$path) end; \
-	  .item = (all_items(.item) | map( .name = req_name(.) )) \
-	' $(POSTMAN_TEST_COLLECTION_FIXED) > $(POSTMAN_TEST_COLLECTION_FLAT)
+	@jq 'def all_items(i): (i // []) as $$a | [ $$a[] | if has("item") then all_items(.item)[] else . end ]; def req_name(r): (r.request.method // "REQ") as $$m | (r.request.url.path // []) as $$p | ($$p | join("/")) as $$path | if $$path == "" then $$m else ($$m + " /" + $$path) end; .item = (all_items(.item) | map( .name = req_name(.) ))' $(POSTMAN_TEST_COLLECTION_FIXED) > $(POSTMAN_TEST_COLLECTION_FLAT)
 	@echo "✅ Collection flattened with renamed requests"
 
 # ========================================================================
@@ -1649,15 +1634,7 @@ update-mock-env:
 	@curl --silent --show-error --fail --location \
 		--request PUT "$(POSTMAN_MOCKS_URL)/$(POSTMAN_MOCK_ID)" \
 		$(POSTMAN_CURL_HEADERS_XC) \
-		--data-raw '{ \
-			"mock": { \
-				"name": "C2mApiV2MockServer", \
-				"collection": "$(POSTMAN_TEST_COLLECTION_UID)", \
-				"environment": "$(POSTMAN_ENV_UID)", \
-				"description": "Mock server environment updated via Makefile.", \
-				"private": false \
-			} \
-		}' \
+		--data-raw '{ "mock": { "name": "C2mApiV2MockServer", "collection": "$(POSTMAN_TEST_COLLECTION_UID)", "environment": "$(POSTMAN_ENV_UID)", "description": "Mock server environment updated via Makefile.", "private": false } }' \
 		--output /dev/null \
 		&& echo "✅ Mock server environment updated." \
 		|| (echo "❌ Failed to update mock server. Check UID/ID values and API key." && exit 1)
@@ -1668,14 +1645,7 @@ verify-mock:
 	@echo "🔍 Fetching mock server details..."
 	@curl --silent --location --request GET "$(POSTMAN_MOCKS_URL)/$(POSTMAN_MOCK_ID)" \
 		--header "x-api-key: $(POSTMAN_API_KEY)" \
-		| jq '{ \
-			mockUrl: .mock.mockUrl, \
-			name: .mock.name, \
-			collection: .mock.collection, \
-			environment: .mock.environment, \
-			private: .mock.private, \
-			updatedAt: .mock.updatedAt \
-		}'
+		| jq '{ mockUrl: .mock.mockUrl, name: .mock.name, collection: .mock.collection, environment: .mock.environment, private: .mock.private, updatedAt: .mock.updatedAt }'
 
 # ========================================================================
 # PRISM MOCK SERVER
