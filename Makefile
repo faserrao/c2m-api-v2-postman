@@ -1889,23 +1889,29 @@ postman-delete-apis:
 		--request GET "$(POSTMAN_APIS_URL)$(POSTMAN_Q_ID)" \
 		$(POSTMAN_CURL_HEADERS_XC)); \
 	echo "$$RESPONSE" | jq -r '.apis[] | "\(.id) - \(.name)"' 2>/dev/null || echo "📊 Found APIs to delete"; \
-	APIS=$$(echo "$$RESPONSE" | jq -r '.apis // [] | .[].id'); \
+	APIS=$$(echo "$$RESPONSE" | jq -r '.apis[]?.id' 2>/dev/null | grep -v '^null$$' | grep .); \
+	API_COUNT=$$(echo "$$APIS" | grep -c . || echo 0); \
+	echo "📊 Found $$API_COUNT APIs to delete"; \
 	if [ -z "$$APIS" ]; then \
 		echo "ℹ️  No APIs found in workspace"; \
 	else \
-		for API in $$APIS; do \
-			echo "🗑 Deleting API $$API..."; \
+		echo "📋 API IDs to delete:"; \
+		echo "$$APIS" | sed 's/^/  - /'; \
+		echo "$$APIS" | while IFS= read -r API; do \
+			if [ -n "$$API" ]; then \
+				echo "🗑 Deleting API $$API..."; \
 			DELETE_RESPONSE=$$(curl --silent --location --write-out "\n%{http_code}" \
 				--request DELETE "$(POSTMAN_APIS_URL)/$$API" \
 				$(POSTMAN_CURL_HEADERS_XC)); \
 			HTTP_CODE=$$(echo "$$DELETE_RESPONSE" | tail -n1); \
-			BODY=$$(echo "$$DELETE_RESPONSE" | head -n-1); \
+			BODY=$$(echo "$$DELETE_RESPONSE" | sed '$$d'); \
 			if [ "$$HTTP_CODE" = "200" ] || [ "$$HTTP_CODE" = "204" ]; then \
 				echo "✅ Successfully deleted API $$API"; \
 			else \
 				echo "⚠️  Failed to delete API $$API (HTTP $$HTTP_CODE)"; \
 				echo "$$BODY" | jq . 2>/dev/null || echo "$$BODY"; \
 			fi; \
+		fi; \
 		done; \
 	fi
 
