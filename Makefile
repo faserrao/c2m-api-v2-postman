@@ -1859,7 +1859,7 @@ postman-delete-mock-servers:
 	@echo "🔍 Fetching mock servers from workspace $(POSTMAN_WS)..."
 	@MOCKS=$$(curl --silent --location \
 		--request GET "$(POSTMAN_MOCKS_URL)$(POSTMAN_Q)" \
-		$(POSTMAN_CURL_HEADERS_XC) | jq -r '.mocks[]?.id' 2>/dev/null | grep -v '^null$$' | grep .); \
+		$(POSTMAN_CURL_HEADERS_XC) | jq -r '.mocks[]?.id' 2>/dev/null | grep -v '^null$$' || true); \
 	if [ -z "$$MOCKS" ]; then \
 		echo "ℹ️  No mock servers found in workspace"; \
 	else \
@@ -1879,7 +1879,7 @@ postman-delete-collections:
 	@echo "🔍 Fetching collections from workspace $(POSTMAN_WS)..."
 	@COLLECTIONS=$$(curl --silent --location \
 		--request GET "$(POSTMAN_COLLECTIONS_URL)$(POSTMAN_Q)" \
-		$(POSTMAN_CURL_HEADERS_XC) | jq -r '.collections[]?.uid' 2>/dev/null | grep -v '^null$$' | grep .); \
+		$(POSTMAN_CURL_HEADERS_XC) | jq -r '.collections[]?.uid' 2>/dev/null | grep -v '^null$$' || true); \
 	if [ -z "$$COLLECTIONS" ]; then \
 		echo "ℹ️  No collections found in workspace"; \
 	else \
@@ -1901,7 +1901,7 @@ postman-delete-apis:
 		--request GET "$(POSTMAN_APIS_URL)$(POSTMAN_Q_ID)" \
 		$(POSTMAN_CURL_HEADERS_XC)); \
 	echo "$$RESPONSE" | jq -r '.apis[] | "\(.id) - \(.name)"' 2>/dev/null || echo "📊 Found APIs to delete"; \
-	APIS=$$(echo "$$RESPONSE" | jq -r '.apis[]?.id' 2>/dev/null | grep -v '^null$$' | grep .); \
+	APIS=$$(echo "$$RESPONSE" | jq -r '.apis[]?.id' 2>/dev/null | grep -v '^null$$' || true); \
 	API_COUNT=$$(echo "$$APIS" | grep -c . || echo 0); \
 	echo "📊 Found $$API_COUNT APIs to delete"; \
 	if [ -z "$$APIS" ]; then \
