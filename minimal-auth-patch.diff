@@ -1,0 +1,49 @@
+diff --git a/Makefile b/Makefile
+index abc123..def456 100644
+--- a/Makefile
++++ b/Makefile
+@@ -114,6 +114,10 @@ POSTMAN_OVERRIDES_FILE           := $(POSTMAN_CUSTOM_DIR)/overrides.json
+ POSTMAN_UPLOAD_TEST_DEBUG        := $(POSTMAN_DIR)/upload-test-debug.json
+ TEST_DATA_DIR                    := test-data
+ REPORT_HTML                      := $(POSTMAN_DIR)/newman-report.html
++
++# Security scripts (for auth provider)
++SECURITY_POSTMAN_SCRIPTS_DIR     := ../c2m-api-v2-security/postman/scripts
++
+ # Default allowed status codes (comma-separated)
+ POSTMAN_ALLOWED_CODES            ?= 200,400,401
+ # JWT test collection output
+@@ -1456,6 +1460,16 @@ postman-create-test-collection:
+ 	$(MAKE) postman-test-collection-add-examples || echo "⚠️  Skipping examples (optional step)."
+ 	$(MAKE) postman-test-collection-merge-overrides
+ 	$(MAKE) postman-test-collection-add-tests || echo "⚠️  Skipping adding tests (optional step)."
++	$(MAKE) postman-auth-setup || echo "⚠️  Skipping auth setup (provider not available)."
+ 	$(MAKE) postman-test-collection-diff-tests
+ 	$(MAKE) postman-test-collection-auto-fix
+ 	$(MAKE) postman-test-collection-fix-v2
+@@ -1920,6 +1934,25 @@ postman-cleanup-all:
+ 	$(MAKE) postman-api-clean-trash
+ 	@echo "✅ Postman cleanup complete."
+ 
++# ========================================================================
++# AUTHENTICATION CONFIGURATION
++# ========================================================================
++# Setup authentication configuration for collections
++.PHONY: postman-auth-setup
++postman-auth-setup: ## Configure authentication for Postman collection
++	@echo "🔐 Setting up authentication configuration..."
++	@if [ -f "$(SECURITY_POSTMAN_SCRIPTS_DIR)/jwt-auth-provider.js" ]; then \
++		echo "📋 Loading JWT auth provider script..."; \
++		AUTH_SCRIPT=$$(cat "$(SECURITY_POSTMAN_SCRIPTS_DIR)/jwt-auth-provider.js"); \
++		echo "✅ Storing auth provider as collection variable..."; \
++		jq --arg script "$$AUTH_SCRIPT" \
++			'.collection.variable = (.collection.variable // []) + [{"key": "authProviderScript", "value": $$script, "type": "string"}]' \
++			$(POSTMAN_TEST_COLLECTION_FINAL) > $(POSTMAN_TEST_COLLECTION_FINAL).tmp && \
++		mv $(POSTMAN_TEST_COLLECTION_FINAL).tmp $(POSTMAN_TEST_COLLECTION_FINAL); \
++	else \
++		echo "⚠️  Auth provider script not found in security directory"; \
++	fi
++
+ # ========================================================================
+ # MOCK SERVER MANAGEMENT
+ # ========================================================================
