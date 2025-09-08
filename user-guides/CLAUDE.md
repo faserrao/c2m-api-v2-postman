@@ -262,3 +262,39 @@ To set target: `echo "personal" > .postman-target`
 - Fixed API deletion issue where only 1 of N APIs was being deleted
 - Implemented workspace-based publishing system using `.postman-target` file
 - Created comprehensive build guide for non-technical users
+- Fixed OpenAPI spec double-encoding bug (was using `jq -Rs .` instead of `cat`)
+- Simplified publish targets to use orchestrator pattern (eliminated ~1000 lines)
+- Restored repo from broken state with auth integration mixed in
+
+## Project Memory & Key Patterns
+
+### Critical Files to Remember
+- **PROJECT_MEMORY.md** - Comprehensive project knowledge base
+- **Makefile** - Main orchestrator (now clean and simplified)
+- **data_dictionary/c2mapiv2-dd.ebnf** - Source of truth for API
+- **openapi/c2mapiv2-openapi-spec-final.yaml** - Generated API spec
+- **postman/scripts/jwt-pre-request.js** - JWT auth integration point
+
+### Key Commands to Remember
+```bash
+# Most common development command
+make postman-instance-build-and-test
+
+# When things go wrong
+make postman-cleanup-all
+make prism-mock-test
+
+# Check what's in Postman
+make postman-workspace-debug
+```
+
+### Common Gotchas
+1. **Double encoding bug**: Always use `cat` not `jq -Rs .` for spec content
+2. **Workspace switching**: Use orchestrator pattern, not duplicate targets
+3. **Auth integration**: Keep in security repo, minimal hooks only
+4. **Test failures**: Check allowed status codes (now includes 403)
+
+### Repository Relationships
+- **Main repo**: c2m-api-repo (core API functionality)
+- **Security repo**: c2m-api-v2-security (JWT auth implementation)
+- **Integration**: Minimal hooks, not full integration
