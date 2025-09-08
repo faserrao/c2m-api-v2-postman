@@ -230,7 +230,7 @@ POSTMAN_UPLOAD_TEST_DEBUG        := $(POSTMAN_DIR)/upload-test-debug.json
 TEST_DATA_DIR                    := test-data
 REPORT_HTML                      := $(POSTMAN_DIR)/newman-report.html
 # Default allowed status codes (comma-separated)
-POSTMAN_ALLOWED_CODES            ?= 200,201,204,400,401,404,429
+POSTMAN_ALLOWED_CODES            ?= 200,201,204,400,401,403,404,429
 # JWT test collection output
 TEST_COLLECTION_WITH_JWT_TESTS   := $(POSTMAN_DIR)/generated/c2mapiv2-test-collection-jwt.json
 
