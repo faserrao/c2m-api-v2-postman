@@ -230,7 +230,7 @@ POSTMAN_UPLOAD_TEST_DEBUG        := $(POSTMAN_DIR)/upload-test-debug.json
 TEST_DATA_DIR                    := test-data
 REPORT_HTML                      := $(POSTMAN_DIR)/newman-report.html
 # Default allowed status codes (comma-separated)
-POSTMAN_ALLOWED_CODES            ?= 200,400,401
+POSTMAN_ALLOWED_CODES            ?= 200,201,204,400,401,404,429
 # JWT test collection output
 TEST_COLLECTION_WITH_JWT_TESTS   := $(POSTMAN_DIR)/generated/c2mapiv2-test-collection-jwt.json
 
@@ -402,7 +402,7 @@ ebnf-dd-to-openapi-spec: venv
 	$(MAKE) install
 	$(MAKE) generate-openapi-spec-from-ebnf-dd
 	$(MAKE) openapi-merge-overlays
-	$(MAKE) open-api-spec-lint
+	$(MAKE) openapi-spec-lint
 
 # Generate and Upload the Postman Linked Collection
 # Using post-process flattening approach
@@ -460,8 +460,8 @@ postman-create-test-collection-legacy:
 .PHONY: generate-and-validate-openapi-spec
 generate-and-validate-openapi-spec:
 	$(MAKE) generate-openapi-spec-from-ebnf-dd
-	$(MAKE) open-api-spec-lint
-	$(MAKE) open-api-spec-diff
+	$(MAKE) openapi-spec-lint
+	$(MAKE) openapi-spec-diff
 	$(MAKE) clean-openapi-spec-diff
 
 # Create both environment and mock server in sequence
@@ -555,310 +555,18 @@ postman-cleanup-all:
 	fi
 	@echo "✅ Postman cleanup complete for workspace $(POSTMAN_WS)."
 
-
-# Rebuild Postman instance without deleting existing resources
-.PHONY: rebuild-postman-instance-no-delete
-rebuild-postman-instance-no-delete:
-	$(MAKE) postman-instance-build-and-test
-
-# Rebuild Postman instance after deleting existing resources
-.PHONY: rebuild-postman-instance-with-delete
-rebuild-postman-instance-with-delete:
-	$(MAKE) postman-cleanup-all
-	$(MAKE) rebuild-postman-instance-no-delete
-
 # Rebuild everything without deleting existing resources
 .PHONY: rebuild-all-no-delete
 rebuild-all-no-delete:
 	$(MAKE) install
 	$(MAKE) generate-and-validate-openapi-spec
-	$(MAKE) rebuild-postman-instance-no-delete
+	$(MAKE) postman-instance-build-and-test
 
 # Delete existing resources and rebuild everything.
 .PHONY: rebuild-all-with-delete
 rebuild-all-with-delete:
 	$(MAKE) postman-cleanup-all
 	$(MAKE) rebuild-all-no-delete
-
-# Delete and rebuild with flattened collections
-.PHONY: rebuild-all-with-delete-flat
-rebuild-all-with-delete-flat:
-	@echo "🏗️  Starting full rebuild with FLATTENED collections..."
-	$(MAKE) postman-cleanup-all
-	$(MAKE) rebuild-all-no-delete
-	@echo "✅ Rebuild complete with flattened collections!"
-
-# ========================================================================
-# SMART REBUILD SYSTEM WITH CASCADE CHANGE DETECTION
-# ========================================================================
-# This system checks for actual content changes before rebuilding
-# It cascades through the pipeline, only rebuilding what has changed
-
-# Directory for storing build hashes
-HASH_DIR := .build-hashes
-
-# Hash files for tracking changes
-DD_HASH_FILE := $(HASH_DIR)/data-dictionary.hash
-OPENAPI_HASH_FILE := $(HASH_DIR)/openapi-spec.hash
-POSTMAN_COLLECTION_HASH_FILE := $(HASH_DIR)/postman-collection.hash
-SDK_HASH_FILE := $(HASH_DIR)/sdk.hash
-DOCS_HASH_FILE := $(HASH_DIR)/docs.hash
-
-# Function to calculate hash of a file
-define calculate_hash
-	if [ -f "$(1)" ]; then \
-		if command -v shasum >/dev/null 2>&1; then \
-			shasum -a 256 "$(1)" | cut -d' ' -f1; \
-		else \
-			sha256sum "$(1)" | cut -d' ' -f1; \
-		fi \
-	else \
-		echo "FILE_NOT_FOUND"; \
-	fi
-endef
-
-# Function to check if file has changed
-define has_changed
-	mkdir -p $(HASH_DIR); \
-	CURRENT_HASH=$$($(call calculate_hash,$(1))); \
-	if [ -f "$(2)" ]; then \
-		STORED_HASH=$$(cat "$(2)"); \
-		if [ "$$CURRENT_HASH" != "$$STORED_HASH" ]; then \
-			echo "true"; \
-		else \
-			echo "false"; \
-		fi \
-	else \
-		echo "true"; \
-	fi
-endef
-
-# Function to update hash file
-define update_hash
-	mkdir -p $(HASH_DIR); \
-	CURRENT_HASH=$$($(call calculate_hash,$(1))); \
-	echo "$$CURRENT_HASH" > "$(2)"
-endef
-
-# Smart rebuild target - main entry point
-.PHONY: smart-rebuild
-smart-rebuild:
-	@echo "🧠 Starting smart rebuild with cascade change detection..."
-	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-	
-	# Check data dictionary changes
-	@DD_CHANGED=$$($(call has_changed,$(DD_EBNF_FILE),$(DD_HASH_FILE))); \
-	if [ "$$DD_CHANGED" = "true" ]; then \
-		echo "📝 Data dictionary changed - regenerating OpenAPI spec..."; \
-		$(MAKE) smart-rebuild-openapi; \
-	else \
-		echo "✅ Data dictionary unchanged - checking OpenAPI spec..."; \
-		$(MAKE) smart-check-openapi; \
-	fi
-
-# Rebuild OpenAPI spec from data dictionary
-.PHONY: smart-rebuild-openapi
-smart-rebuild-openapi:
-	@echo "🔄 Generating OpenAPI spec from data dictionary..."
-	
-	# Store old spec for comparison
-	@if [ -f "$(C2MAPIV2_OPENAPI_SPEC)" ]; then \
-		cp "$(C2MAPIV2_OPENAPI_SPEC)" "$(C2MAPIV2_OPENAPI_SPEC).old"; \
-	fi
-	
-	# Generate new spec
-	$(MAKE) ebnf-dd-to-openapi-spec
-	
-	# Update data dictionary hash
-	$(call update_hash,$(DD_EBNF_FILE),$(DD_HASH_FILE))
-	
-	# Show diff if old spec exists
-	@if [ -f "$(C2MAPIV2_OPENAPI_SPEC).old" ]; then \
-		echo ""; \
-		echo "📊 OpenAPI Spec Changes:"; \
-		echo "------------------------"; \
-		diff -u "$(C2MAPIV2_OPENAPI_SPEC).old" "$(C2MAPIV2_OPENAPI_SPEC)" | head -50 || true; \
-		rm -f "$(C2MAPIV2_OPENAPI_SPEC).old"; \
-		echo ""; \
-	fi
-	
-	# Continue cascade
-	$(MAKE) smart-check-openapi
-
-# Check if OpenAPI spec has changed
-.PHONY: smart-check-openapi
-smart-check-openapi:
-	@OPENAPI_CHANGED=$$($(call has_changed,$(C2MAPIV2_OPENAPI_SPEC),$(OPENAPI_HASH_FILE))); \
-	if [ "$$OPENAPI_CHANGED" = "true" ]; then \
-		echo "📋 OpenAPI spec changed - updating downstream artifacts..."; \
-		$(call update_hash,$(C2MAPIV2_OPENAPI_SPEC),$(OPENAPI_HASH_FILE)); \
-		$(MAKE) smart-rebuild-postman; \
-		$(MAKE) smart-rebuild-sdk; \
-		$(MAKE) smart-rebuild-docs; \
-	else \
-		echo "✅ OpenAPI spec unchanged - no downstream updates needed"; \
-		echo ""; \
-		echo "🎉 Smart rebuild complete - everything is up to date!"; \
-	fi
-
-# Rebuild Postman collections
-.PHONY: smart-rebuild-postman
-smart-rebuild-postman:
-	@echo "🔄 Rebuilding Postman collections..."
-	
-	# Store old collection for comparison
-	@if [ -f "$(POSTMAN_COLLECTION_FINAL)" ]; then \
-		cp "$(POSTMAN_COLLECTION_FINAL)" "$(POSTMAN_COLLECTION_FINAL).old"; \
-	fi
-	
-	# Rebuild Postman artifacts
-	$(MAKE) postman-import-openapi-spec
-	$(MAKE) postman-create-test-collection
-	$(MAKE) postman-create-mock-and-env
-	
-	# Update hash
-	$(call update_hash,$(POSTMAN_COLLECTION_FINAL),$(POSTMAN_COLLECTION_HASH_FILE))
-	
-	# Show what changed
-	@if [ -f "$(POSTMAN_COLLECTION_FINAL).old" ]; then \
-		echo ""; \
-		echo "📊 Postman Collection Changes:"; \
-		echo "------------------------------"; \
-		node -e "const fs=require('fs'); \
-			const old=JSON.parse(fs.readFileSync('$(POSTMAN_COLLECTION_FINAL).old')); \
-			const cur=JSON.parse(fs.readFileSync('$(POSTMAN_COLLECTION_FINAL)')); \
-			console.log('Old endpoints:', old.item?.length || 0); \
-			console.log('New endpoints:', cur.item?.length || 0);" || true; \
-		rm -f "$(POSTMAN_COLLECTION_FINAL).old"; \
-	fi
-	
-	@echo "✅ Postman collections rebuilt"
-
-# Rebuild SDK
-.PHONY: smart-rebuild-sdk  
-smart-rebuild-sdk:
-	@echo "🔄 Rebuilding SDK..."
-	
-	# Check if SDK directory exists
-	@if [ -d "sdk" ]; then \
-		echo "📦 Backing up current SDK..."; \
-		rm -rf sdk.backup; \
-		cp -r sdk sdk.backup; \
-	fi
-	
-	# Generate SDK
-	$(MAKE) generate-sdk
-	
-	# Calculate hash of key SDK files
-	@find sdk -name "*.py" -o -name "*.js" -o -name "*.java" | sort | xargs cat | \
-		(if command -v shasum >/dev/null 2>&1; then shasum -a 256; else sha256sum; fi) | \
-		cut -d' ' -f1 > $(SDK_HASH_FILE)
-	
-	# Show what changed
-	@if [ -d "sdk.backup" ]; then \
-		echo ""; \
-		echo "📊 SDK Changes:"; \
-		echo "---------------"; \
-		diff -rq sdk.backup sdk | head -20 || true; \
-		rm -rf sdk.backup; \
-	fi
-	
-	@echo "✅ SDK rebuilt"
-
-# Rebuild documentation
-.PHONY: smart-rebuild-docs
-smart-rebuild-docs:
-	@echo "🔄 Rebuilding documentation..."
-	
-	# Generate docs
-	$(MAKE) docs-build
-	
-	# Update hash (hash the OpenAPI spec since docs are generated from it)
-	$(call update_hash,$(C2MAPIV2_OPENAPI_SPEC),$(DOCS_HASH_FILE))
-	
-	@echo "✅ Documentation rebuilt"
-
-# Show current build state
-.PHONY: smart-rebuild-status
-smart-rebuild-status:
-	@echo "📊 Smart Rebuild Status"
-	@echo "━━━━━━━━━━━━━━━━━━━━━━"
-	@echo ""
-	@echo "Data Dictionary:"
-	@if [ -f "$(DD_HASH_FILE)" ]; then \
-		echo "  Last build: $$(stat -f '%Sm' $(DD_HASH_FILE) 2>/dev/null || stat -c '%y' $(DD_HASH_FILE) 2>/dev/null | cut -d' ' -f1-2)"; \
-		echo "  Hash: $$(head -c 12 $(DD_HASH_FILE))..."; \
-	else \
-		echo "  Status: Never built"; \
-	fi
-	@echo ""
-	@echo "OpenAPI Spec:"
-	@if [ -f "$(OPENAPI_HASH_FILE)" ]; then \
-		echo "  Last build: $$(stat -f '%Sm' $(OPENAPI_HASH_FILE) 2>/dev/null || stat -c '%y' $(OPENAPI_HASH_FILE) 2>/dev/null | cut -d' ' -f1-2)"; \
-		echo "  Hash: $$(head -c 12 $(OPENAPI_HASH_FILE))..."; \
-	else \
-		echo "  Status: Never built"; \
-	fi
-	@echo ""
-	@echo "Postman Collection:"
-	@if [ -f "$(POSTMAN_COLLECTION_HASH_FILE)" ]; then \
-		echo "  Last build: $$(stat -f '%Sm' $(POSTMAN_COLLECTION_HASH_FILE) 2>/dev/null || stat -c '%y' $(POSTMAN_COLLECTION_HASH_FILE) 2>/dev/null | cut -d' ' -f1-2)"; \
-		echo "  Hash: $$(head -c 12 $(POSTMAN_COLLECTION_HASH_FILE))..."; \
-	else \
-		echo "  Status: Never built"; \
-	fi
-	@echo ""
-	@echo "SDK:"
-	@if [ -f "$(SDK_HASH_FILE)" ]; then \
-		echo "  Last build: $$(stat -f '%Sm' $(SDK_HASH_FILE) 2>/dev/null || stat -c '%y' $(SDK_HASH_FILE) 2>/dev/null | cut -d' ' -f1-2)"; \
-		echo "  Hash: $$(head -c 12 $(SDK_HASH_FILE))..."; \
-	else \
-		echo "  Status: Never built"; \
-	fi
-	@echo ""
-	@echo "Documentation:"
-	@if [ -f "$(DOCS_HASH_FILE)" ]; then \
-		echo "  Last build: $$(stat -f '%Sm' $(DOCS_HASH_FILE) 2>/dev/null || stat -c '%y' $(DOCS_HASH_FILE) 2>/dev/null | cut -d' ' -f1-2)"; \
-		echo "  Hash: $$(head -c 12 $(DOCS_HASH_FILE))..."; \
-	else \
-		echo "  Status: Never built"; \
-	fi
-
-# Clean hash files (forces full rebuild next time)
-.PHONY: smart-rebuild-clean
-smart-rebuild-clean:
-	@echo "🧹 Cleaning smart rebuild hash files..."
-	rm -rf $(HASH_DIR)
-	@echo "✅ Hash files cleaned - next smart-rebuild will rebuild everything"
-
-# Check what would be rebuilt without actually doing it
-.PHONY: smart-rebuild-dry-run
-smart-rebuild-dry-run:
-	@echo "🔍 Smart Rebuild Dry Run"
-	@echo "━━━━━━━━━━━━━━━━━━━━━━━"
-	@echo ""
-	@DD_CHANGED=$$($(call has_changed,$(DD_EBNF_FILE),$(DD_HASH_FILE))); \
-	if [ "$$DD_CHANGED" = "true" ]; then \
-		echo "❗ Data Dictionary: Would rebuild (changed)"; \
-		echo "   → Would trigger: OpenAPI spec generation"; \
-		echo "   → Would trigger: Postman collections rebuild"; \
-		echo "   → Would trigger: SDK regeneration"; \
-		echo "   → Would trigger: Documentation rebuild"; \
-	else \
-		echo "✅ Data Dictionary: No changes"; \
-		OPENAPI_CHANGED=$$($(call has_changed,$(C2MAPIV2_OPENAPI_SPEC),$(OPENAPI_HASH_FILE))); \
-		if [ "$$OPENAPI_CHANGED" = "true" ]; then \
-			echo "❗ OpenAPI Spec: Would rebuild (changed)"; \
-			echo "   → Would trigger: Postman collections rebuild"; \
-			echo "   → Would trigger: SDK regeneration"; \
-			echo "   → Would trigger: Documentation rebuild"; \
-		else \
-			echo "✅ OpenAPI Spec: No changes"; \
-			echo ""; \
-			echo "✅ Nothing would be rebuilt - all artifacts up to date"; \
-		fi \
-	fi
-
 
 # ========================================================================
 # PYTHON VIRTUAL ENVIRONMENT
@@ -963,13 +671,13 @@ openapi-merge-overlays: $(C2MAPIV2_OPENAPI_SPEC_BASE) $(OPENAPI_AUTH_OVERLAY)
 # ========================================================================
 # Validate OpenAPI specification with multiple linters
 .PHONY: openapi-spec-lint
-open-api-spec-lint:
+openapi-spec-lint:
 	$(REDOCLY) lint $(C2MAPIV2_OPENAPI_SPEC)
 	$(SPECTRAL) lint $(C2MAPIV2_OPENAPI_SPEC)
 
 # Compare current spec with main branch version
 .PHONY: openapi-spec-diff
-open-api-spec-diff:
+openapi-spec-diff:
 	@echo "📤 Fetching latest from origin/main…"
 	git fetch origin
 	@echo "🧾 Checking out previous version of spec for diff comparison…"
@@ -2232,7 +1940,7 @@ git-save: ## Quick git save (requires MSG="commit message")
 
 .PHONY: openapi-build
 openapi-build: generate-openapi-spec-from-ebnf-dd ## Build OpenAPI from EBNF + overlays + lint [CI alias]
-	$(MAKE) open-api-spec-lint
+	$(MAKE) openapi-spec-lint
 
 .PHONY: postman-collection-build
 postman-collection-build: ## Generate and flatten the primary collection [CI alias]
@@ -2243,10 +1951,10 @@ postman-collection-build: ## Generate and flatten the primary collection [CI ali
 docs: docs-build ## Build API documentation [CI alias]
 
 .PHONY: lint
-lint: open-api-spec-lint ## Lint OpenAPI spec [CI alias]
+lint: openapi-spec-lint ## Lint OpenAPI spec [CI alias]
 
 .PHONY: diff
-diff: open-api-spec-diff ## Diff OpenAPI spec vs origin/main [CI alias]
+diff: openapi-spec-diff ## Diff OpenAPI spec vs origin/main [CI alias]
 
 .PHONY: postman-publish
 postman-publish: ## Push API + collection to current workspace (use POSTMAN_TARGET to control)
@@ -2270,31 +1978,11 @@ postman-publish-personal: ## Push complete suite to personal workspace
 		echo "personal" > .postman-target; \
 		echo "📝 Saved target 'personal' to .postman-target for CI/CD"; \
 	fi
-	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) workspace-info
+	@echo "🔧 Setting workspace to: $(SERRAO_WS)"
+	@echo "🔑 Using API key: POSTMAN_SERRAO_API_KEY"
 	@echo ""
-	@echo "🧹 Cleaning up ALL old Postman resources..."
-	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-cleanup-all
-	@echo ""
-	@echo "📥 1/6: Importing OpenAPI as API definition..."
-	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-import-openapi-as-api
-	@echo ""
-	@echo "📄 2/6: Creating standalone spec..."
-	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-spec-create-standalone
-	@echo ""
-	@echo "📦 3/6: Uploading linked collection..."
-	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-linked-collection-upload
-	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-linked-collection-link
-	@echo ""
-	@echo "🧪 4/6: Creating test collection..."
-	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-create-test-collection
-	@echo ""
-	@echo "🌐 5/6: Creating mock server and environment..."
-	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-create-mock-and-env
-	@echo ""
-	@echo "📋 6/6: Importing OpenAPI spec..."
-	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" $(MAKE) postman-import-openapi-spec
-	@echo ""
-	@echo "✅ Personal workspace updated with complete suite!"
+	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" \
+		$(MAKE) rebuild-all-with-delete
 
 .PHONY: postman-publish-team
 postman-publish-team: ## Push complete suite to team workspace
@@ -2303,42 +1991,24 @@ postman-publish-team: ## Push complete suite to team workspace
 		echo "team" > .postman-target; \
 		echo "📝 Saved target 'team' to .postman-target for CI/CD"; \
 	fi
-	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) workspace-info
+	@echo "🔧 Setting workspace to: $(C2M_WS)"
+	@echo "🔑 Using API key: POSTMAN_C2M_API_KEY"
 	@echo ""
-	@echo "🧹 Cleaning up ALL old Postman resources..."
-	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-cleanup-all
-	@echo ""
-	@echo "📥 1/6: Importing OpenAPI as API definition..."
-	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-import-openapi-as-api
-	@echo ""
-	@echo "📄 2/6: Creating standalone spec..."
-	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-spec-create-standalone
-	@echo ""
-	@echo "📦 3/6: Uploading linked collection..."
-	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-linked-collection-upload
-	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-linked-collection-link
-	@echo ""
-	@echo "🧪 4/6: Creating test collection..."
-	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-create-test-collection
-	@echo ""
-	@echo "🌐 5/6: Creating mock server and environment..."
-	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-create-mock-and-env
-	@echo ""
-	@echo "📋 6/6: Importing OpenAPI spec..."
-	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" $(MAKE) postman-import-openapi-spec
-	@echo ""
-	@echo "✅ Team workspace updated with complete suite!"
+	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" \
+		$(MAKE) rebuild-all-with-delete
 
 .PHONY: postman-publish-both
 postman-publish-both: ## Push API + collection to BOTH workspaces
 	@echo "🚀 Publishing to BOTH workspaces..."
-	@echo "both" > .postman-target
-	@echo "📝 Saved target 'both' to .postman-target for CI/CD"
+	@if [ -z "$(SKIP_TARGET_SAVE)" ]; then \
+		echo "both" > .postman-target; \
+		echo "📝 Saved target 'both' to .postman-target for CI/CD"; \
+	fi
 	@echo ""
+	@echo "──── Publishing to PERSONAL workspace ────"
 	@SKIP_TARGET_SAVE=1 $(MAKE) postman-publish-personal
 	@echo ""
-	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-	@echo ""
+	@echo "──── Publishing to TEAM workspace ────"
 	@SKIP_TARGET_SAVE=1 $(MAKE) postman-publish-team
 	@echo ""
 	@echo "🎉 Both workspaces updated successfully!"

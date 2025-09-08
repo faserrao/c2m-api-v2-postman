@@ -149,7 +149,7 @@ You'll need to install some software first. Don't worry - we'll guide you throug
 
 2. Edit the `.env` file with a text editor and add:
    ```
-   POSTMAN_SERRAO_API_KEY=REDACTED
+   POSTMAN_SERRAO_API_KEY=your-postman-api-key-here
    ```
    (Replace with your actual Postman API key from earlier)
 
