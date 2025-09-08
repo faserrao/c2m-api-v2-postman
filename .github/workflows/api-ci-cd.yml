@@ -104,6 +104,8 @@ jobs:
           sudo apt-get install -y jq curl
           # Install Postman CLI
           curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
+          # Add Postman CLI to PATH
+          echo "/usr/local/bin" >> $GITHUB_PATH
 
       # ---------- Environment Info ----------
       - name: Print environment info
@@ -114,6 +116,7 @@ jobs:
           echo "npm: $(npm --version)"
           echo "jq: $(jq --version)"
           echo "curl: $(curl --version | head -n 1)"
+          echo "postman: $(which postman || echo 'Not found in PATH')"
           echo "GitHub Event: ${{ github.event_name }}"
           echo "GitHub Ref: ${{ github.ref }}"
 
