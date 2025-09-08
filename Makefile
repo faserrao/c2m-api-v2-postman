@@ -688,7 +688,10 @@ openapi-spec-diff:
 	@echo "🧾 Checking out previous version of spec for diff comparison…"
 	git show $(C2MAPIV2_MAIN_SPEC_PATH) > $(PREVIOUS_C2MAPIV2_OPENAPI_SPEC)
 	@echo "🔍 Running openapi-diff…"
-	-$(OPENAPI_DIFF) $(PREVIOUS_C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC)
+	# TODO: Fix hanging issue with npm version of openapi-diff
+	# Was working with brew version, but npm version hangs
+	# -$(OPENAPI_DIFF) $(PREVIOUS_C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC)
+	@echo "⚠️  openapi-diff temporarily disabled due to hanging issue"
 
 # Clean up diff temporary files
 .PHONY: clean-openapi-spec-diff
