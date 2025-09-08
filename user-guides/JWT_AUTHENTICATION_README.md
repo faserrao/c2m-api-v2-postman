@@ -1,5 +1,7 @@
 # JWT Authentication Implementation Guide
 
+> **Note**: As of September 2025, authentication has been separated into its own repository (`c2m-api-v2-security`). This guide documents how JWT authentication will work when integrated back into the main API. For current authentication implementation, refer to the security repository.
+
 This guide provides comprehensive documentation for the JWT authentication system implemented in the C2M API v2.
 
 ## Quick Start

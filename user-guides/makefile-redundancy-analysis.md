@@ -1,5 +1,7 @@
 # Makefile Redundancy Analysis
 
+> **📋 HISTORICAL DOCUMENT** - This analysis led to the cleanup performed on 2025-09-08. The redundant targets identified here have been removed.
+
 ## Overview
 This analysis identifies redundant targets in the Makefile, focusing on the `rebuild-all-with-delete` orchestrator and CI/CD aliases.
 

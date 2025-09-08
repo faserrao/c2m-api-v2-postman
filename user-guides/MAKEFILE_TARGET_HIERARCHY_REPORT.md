@@ -1,12 +1,13 @@
 # Makefile Target Hierarchy Report
 
-Generated on: September 7, 2025
+Generated on: September 8, 2025
 
 ## Overview
 
-Total targets: 110
-Phony targets: 110 (100%)
-Documented targets (with ##): 21
+Total targets: 113
+Documented targets (with ##): 25
+
+> **Note**: This report has been updated after the Makefile cleanup that removed redundant auth-related targets.
 
 ## Primary Entry Points
 
@@ -37,8 +38,6 @@ Documented targets (with ##): 21
   - `postman-login`
   - `openapi-build`
   - `postman-collection-build`
-  - `postman-collection-build-test-with-jwt`
-  - `postman-upload-test-collection`
   - `postman-create-mock-and-env`
   - `run-postman-and-prism-tests`
 
@@ -299,3 +298,12 @@ rebuild-all-with-delete
 - Environment variables control workspace selection
 - File-based tracking for UIDs and state
 - Comprehensive error handling with fallbacks
+
+## Cleanup Changes (September 2025)
+
+The following targets were removed during the Makefile cleanup:
+- `postman-collection-build-test-with-jwt` - JWT functionality moved to security repo
+- `postman-upload-test-collection` - Redundant with other upload targets
+- Various auth-specific targets that were causing bloat
+
+The cleanup maintained all core functionality while removing redundant and auth-specific targets that belong in the separate security repository.
