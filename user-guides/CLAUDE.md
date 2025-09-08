@@ -6,6 +6,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is the C2M API V2 project that implements a unique pipeline: EBNF Data Dictionary → OpenAPI Specification → Postman Collection → Mock Server → API Documentation.
 
+## Restoration Status (2025-09-08)
+
+✅ **RESTORATION COMPLETE** - The c2m-api-repo has been successfully restored to its pre-auth state:
+- JWT authentication code moved to separate security repository
+- Makefile cleaned up (removed redundant targets, simplified publish workflow)
+- Documentation reorganized into user-guides directory with symlinks
+- OpenAPI spec creation in Postman fixed (was double-encoding issue)
+- All 24 tests passing (including auth endpoint with 403 status allowed)
+- Successfully merged to main branch
+
 ## Key Commands
 
 ### Initial Setup

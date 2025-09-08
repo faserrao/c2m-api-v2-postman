@@ -1,5 +1,15 @@
 # C2M API V3 - Comprehensive Documentation
 
+## 📢 Restoration Update (2025-09-08)
+
+✅ **REPOSITORY RESTORED** - The c2m-api-repo has been successfully restored to a clean state:
+- JWT authentication moved to separate security repository
+- Makefile streamlined (removed ~1000 lines of redundancy)
+- Documentation reorganized for better maintainability
+- All systems operational with 24/24 tests passing
+
+See [RESTORE_REPORT.md](./RESTORE_REPORT.md) for full details of the restoration.
+
 ## Table of Contents
 - [Overview](#overview)
 - [Architecture](#architecture)
