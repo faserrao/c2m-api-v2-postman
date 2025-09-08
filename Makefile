@@ -688,7 +688,7 @@ openapi-spec-diff:
 	@echo "🧾 Checking out previous version of spec for diff comparison…"
 	git show $(C2MAPIV2_MAIN_SPEC_PATH) > $(PREVIOUS_C2MAPIV2_OPENAPI_SPEC)
 	@echo "🔍 Running openapi-diff…"
-	-openapi-diff $(PREVIOUS_C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC) --fail-on-incompatible
+	-$(OPENAPI_DIFF) $(PREVIOUS_C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC) --fail-on-incompatible
 
 # Clean up diff temporary files
 .PHONY: clean-openapi-spec-diff
