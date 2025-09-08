@@ -229,6 +229,10 @@ POSTMAN_OVERRIDES_FILE           := $(POSTMAN_CUSTOM_DIR)/overrides.json
 POSTMAN_UPLOAD_TEST_DEBUG        := $(POSTMAN_DIR)/upload-test-debug.json
 TEST_DATA_DIR                    := test-data
 REPORT_HTML                      := $(POSTMAN_DIR)/newman-report.html
+
+# Security scripts (for auth provider)
+SECURITY_POSTMAN_SCRIPTS_DIR     := ../c2m-api-v2-security/postman/scripts
+
 # Default allowed status codes (comma-separated)
 POSTMAN_ALLOWED_CODES            ?= 200,201,204,400,401,403,404,429
 # JWT test collection output
@@ -429,6 +433,7 @@ postman-create-test-collection:
 	$(MAKE) postman-test-collection-add-examples || echo "⚠️  Skipping examples (optional step)."
 	$(MAKE) postman-test-collection-merge-overrides
 	$(MAKE) postman-test-collection-add-tests || echo "⚠️  Skipping adding tests (optional step)."
+	$(MAKE) postman-auth-setup || echo "⚠️  Skipping auth setup (provider not available)."
 	$(MAKE) postman-test-collection-diff-tests
 	$(MAKE) postman-test-collection-auto-fix
 	$(MAKE) postman-test-collection-fix-v2
@@ -1928,6 +1933,46 @@ git-save: ## Quick git save (requires MSG="commit message")
 	fi
 	@echo "💾 Saving changes: $(MSG)"
 	@$(SCRIPTS_DIR)/utilities/git-push.sh "$(MSG)"
+
+# ========================================================================
+# AUTHENTICATION CONFIGURATION
+# ========================================================================
+# Setup authentication configuration for collections
+.PHONY: postman-auth-setup
+postman-auth-setup: ## Configure authentication for Postman collection
+	@echo "🔐 Setting up authentication configuration..."
+	@if [ -f "$(SECURITY_POSTMAN_SCRIPTS_DIR)/jwt-auth-provider.js" ]; then \
+		echo "📋 Loading JWT auth provider script from security repo..."; \
+		AUTH_SCRIPT=$$(cat "$(SECURITY_POSTMAN_SCRIPTS_DIR)/jwt-auth-provider.js"); \
+		echo "✅ Adding auth provider as collection pre-request script..."; \
+		if [ -f "$(POSTMAN_TEST_COLLECTION_WITH_TESTS)" ]; then \
+			jq --arg script "$$AUTH_SCRIPT" \
+				'.event = (.event // []) | \
+				.event |= map(select(.listen != "prerequest")) + \
+				[{"listen": "prerequest", "script": {"type": "text/javascript", "exec": ($$script | split("\n"))}}]' \
+				"$(POSTMAN_TEST_COLLECTION_WITH_TESTS)" > "$(POSTMAN_TEST_COLLECTION_WITH_TESTS).tmp" && \
+			mv "$(POSTMAN_TEST_COLLECTION_WITH_TESTS).tmp" "$(POSTMAN_TEST_COLLECTION_WITH_TESTS)"; \
+			echo "✅ Auth provider script added to test collection"; \
+		else \
+			echo "⚠️  Test collection not found, skipping auth setup"; \
+		fi; \
+	else \
+		echo "📋 Auth provider script not found in security repo, using local script..."; \
+		if [ -f "$(POSTMAN_DIR)/scripts/jwt-pre-request.js" ]; then \
+			AUTH_SCRIPT=$$(cat "$(POSTMAN_DIR)/scripts/jwt-pre-request.js"); \
+			if [ -f "$(POSTMAN_TEST_COLLECTION_WITH_TESTS)" ]; then \
+				jq --arg script "$$AUTH_SCRIPT" \
+					'.event = (.event // []) | \
+					.event |= map(select(.listen != "prerequest")) + \
+					[{"listen": "prerequest", "script": {"type": "text/javascript", "exec": ($$script | split("\n"))}}]' \
+					"$(POSTMAN_TEST_COLLECTION_WITH_TESTS)" > "$(POSTMAN_TEST_COLLECTION_WITH_TESTS).tmp" && \
+				mv "$(POSTMAN_TEST_COLLECTION_WITH_TESTS).tmp" "$(POSTMAN_TEST_COLLECTION_WITH_TESTS)"; \
+				echo "✅ Local auth provider script added to test collection"; \
+			fi; \
+		else \
+			echo "⚠️  No auth provider script found"; \
+		fi; \
+	fi
 
 # ========================================================================
 # HELP
