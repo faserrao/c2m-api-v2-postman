@@ -102,6 +102,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y jq curl
+          # Install Postman CLI
+          curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
 
       # ---------- Environment Info ----------
       - name: Print environment info
