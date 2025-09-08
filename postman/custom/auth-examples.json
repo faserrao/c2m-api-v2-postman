@@ -1,0 +1,73 @@
+{
+  "auth": {
+    "tokens": {
+      "short": {
+        "request": {
+          "body": {
+            "mode": "raw",
+            "raw": {
+              "withScopes": {
+                "scopes": ["jobs:submit", "jobs:read", "templates:read"]
+              },
+              "minimalScopes": {
+                "scopes": ["jobs:submit"]
+              },
+              "fullAccess": {
+                "scopes": ["jobs:submit", "jobs:read", "jobs:update", "jobs:delete", "templates:read", "templates:write", "account:read"]
+              }
+            }
+          }
+        }
+      },
+      "long": {
+        "request": {
+          "body": {
+            "mode": "raw",
+            "raw": {
+              "clientSecret": {
+                "grant_type": "client_credentials",
+                "client_id": "c2m_prod_acme_corp_2024",
+                "client_secret": "sk_live_4242424242424242424242424242424242424242",
+                "scopes": ["jobs:submit", "jobs:read", "jobs:update", "templates:read", "account:read"],
+                "ttl_seconds": 7776000
+              },
+              "otp": {
+                "grant_type": "client_credentials",
+                "client_id": "c2m_prod_acme_corp_2024",
+                "otp_code": "836251",
+                "scopes": ["jobs:submit", "jobs:read", "templates:read"],
+                "ttl_seconds": 2592000
+              },
+              "assertion": {
+                "grant_type": "assertion",
+                "client_id": "c2m_prod_acme_corp_2024",
+                "assertion_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
+                "assertion": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImFjbWVfY29ycF8yMDI0In0.eyJpc3MiOiJjMm1fcHJvZF9hY21lX2NvcnBfMjAyNCIsInN1YiI6ImMyTV9wcm9kX2FjbWVfY29ycF8yMDI0IiwiYXVkIjoiaHR0cHM6Ly9hcGkuY2xpY2sybWFpbC5jb20vdjIvYXV0aC90b2tlbnMvbG9uZyIsImlhdCI6MTcyNTI5NDAwMCwiZXhwIjoxNzI1Mjk0MzAwLCJqdGkiOiJhY21lXzIwMjQwOTAyXzE1MDAwMF9hYmNkZWYifQ.dGhpcyBpcyBhIGZha2Ugc2lnbmF0dXJlIGZvciBleGFtcGxlIHB1cnBvc2VzIG9ubHk",
+                "scopes": ["jobs:submit", "jobs:read", "jobs:update", "jobs:delete", "templates:read", "templates:write"]
+              }
+            }
+          }
+        }
+      },
+      "{tokenId}": {
+        "revoke": {
+          "request": {
+            "body": {
+              "mode": "raw",
+              "raw": {
+                "immediate": {
+                  "reason": "Compromised key",
+                  "revoke_all_related": false
+                },
+                "revokeAll": {
+                  "reason": "Security policy update",
+                  "revoke_all_related": true
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+# CardType
+
+
+## Enum
+
+* `Visa` (value: `'visa'`)
+
+* `Mastercard` (value: `'mastercard'`)
+
+* `Discover` (value: `'discover'`)
+
+* `AmericanExpress` (value: `'americanExpress'`)
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -84,7 +84,7 @@ get_language_config() {
             echo "python --package-name c2m_api"
             ;;
         "javascript")
-            echo "javascript --project-name c2m-api-js"
+            echo "javascript --invoker-package c2m_api"
             ;;
         "typescript")
             echo "typescript-axios --npm-name c2m-api-ts --npm-version 1.0.0"
@@ -99,7 +99,19 @@ get_language_config() {
             echo "ruby --gem-name c2m_api"
             ;;
         "php")
-            echo "php --package-name C2M\\Api"
+            echo "php --invoker-package C2M\\Api"
+            ;;
+        "csharp")
+            echo "csharp --package-name C2M.Api"
+            ;;
+        "swift")
+            echo "swift5 --project-name C2MApi"
+            ;;
+        "kotlin")
+            echo "kotlin --package-name com.c2m.api"
+            ;;
+        "rust")
+            echo "rust --package-name c2m_api"
             ;;
         *)
             return 1
@@ -150,8 +162,10 @@ generate_sdk() {
                 ;;
         esac
         
-        # Create basic usage example
-        create_usage_example "$language" "$output_dir"
+        # Create basic usage example (skip if directory doesn't exist)
+        if [ -d "$output_dir" ]; then
+            create_usage_example "$language" "$output_dir"
+        fi
         
     else
         print_error "Failed to generate SDK"

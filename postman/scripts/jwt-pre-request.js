@@ -3,6 +3,8 @@
 
 // Configuration - Set these in your Postman environment
 const config = {
+    // Use authUrl for authentication endpoints, fallback to baseUrl for compatibility
+    authUrl: pm.environment.get('authUrl') || pm.environment.get('baseUrl') || 'http://localhost:4010',
     baseUrl: pm.environment.get('baseUrl') || 'http://localhost:4010',
     clientId: pm.environment.get('clientId'),
     clientSecret: pm.environment.get('clientSecret'),
@@ -26,7 +28,7 @@ async function getLongTermToken() {
     console.log('Obtaining new long-term token...');
     
     const request = {
-        url: `${config.baseUrl}/auth/tokens/long`,
+        url: `${config.authUrl}/auth/tokens/long`,
         method: 'POST',
         header: {
             'Content-Type': 'application/json',
@@ -52,7 +54,7 @@ async function getLongTermToken() {
                 return;
             }
             
-            if (response.code === 201) {
+            if (response.code === 200 || response.code === 201) {
                 const data = response.json();
                 pm.environment.set(config.longTokenVar, data.access_token);
                 pm.environment.set('longTokenId', data.token_id);
@@ -72,7 +74,7 @@ async function getShortTermToken(longTermToken) {
     console.log('Exchanging for short-term token...');
     
     const request = {
-        url: `${config.baseUrl}/auth/tokens/short`,
+        url: `${config.authUrl}/auth/tokens/short`,
         method: 'POST',
         header: {
             'Authorization': `Bearer ${longTermToken}`,
@@ -94,7 +96,7 @@ async function getShortTermToken(longTermToken) {
                 return;
             }
             
-            if (response.code === 201) {
+            if (response.code === 200 || response.code === 201) {
                 const data = response.json();
                 pm.environment.set(config.shortTokenVar, data.access_token);
                 pm.environment.set(config.tokenExpiryVar, data.expires_at);
@@ -176,7 +178,7 @@ pm.globals.set('revokeCurrentToken', async function() {
     }
     
     const request = {
-        url: `${config.baseUrl}/auth/tokens/${tokenId}/revoke`,
+        url: `${config.authUrl}/auth/tokens/${tokenId}/revoke`,
         method: 'POST',
         header: {
             'Authorization': `Bearer ${token}`
@@ -186,7 +188,7 @@ pm.globals.set('revokeCurrentToken', async function() {
     pm.sendRequest(request, (err, response) => {
         if (err) {
             console.error('Failed to revoke token:', err);
-        } else if (response.code === 204) {
+        } else if (response.code === 200 || response.code === 204) {
             console.log(`Token ${tokenId} revoked successfully`);
             pm.environment.unset(config.shortTokenVar);
             pm.environment.unset(config.tokenExpiryVar);

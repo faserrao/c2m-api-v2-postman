@@ -1,0 +1,28 @@
+{
+  "auth": {
+    "tokens": {
+      "long": {
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"grant_type\": \"client_credentials\",\n  \"client_id\": \"{{clientId}}\",\n  \"client_secret\": \"{{clientSecret}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "short": {
+        "body": {
+          "mode": "raw", 
+          "raw": "{\n  \"scopes\": [\"jobs:submit\", \"jobs:read\", \"templates:read\"]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    }
+  }
+}

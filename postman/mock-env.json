@@ -1,19 +1,67 @@
 {
   "environment": {
-    "id": "c2m-env-id",
-    "name": "C2mApiV2Env",
+    "name": "C2M API - Mock Server",
     "values": [
       {
         "key": "baseUrl",
-        "value": "https://35e1fc7b-1e4a-4479-979b-c6cc0c4c2aef.mock.pstmn.io",
+        "value": "https://749ea909-f630-4693-89a1-2b374d0fbff4.mock.pstmn.io",
+        "type": "default",
         "enabled": true
       },
       {
-        "key": "token",
-        "value": "dummy-token",
+        "key": "authUrl",
+        "value": "https://j0dos52r5e.execute-api.us-east-1.amazonaws.com/dev",
+        "type": "default",
+        "enabled": true
+      },
+      {
+        "key": "clientId", 
+        "value": "test-client-123",
+        "type": "default",
+        "enabled": true
+      },
+      {
+        "key": "clientSecret",
+        "value": "super-secret-password-123",
+        "type": "secret",
+        "enabled": true
+      },
+      {
+        "key": "longTermToken",
+        "value": "",
+        "type": "secret",
+        "enabled": true
+      },
+      {
+        "key": "shortTermToken",
+        "value": "",
+        "type": "secret", 
+        "enabled": true
+      },
+      {
+        "key": "tokenExpiry",
+        "value": "",
+        "type": "default",
+        "enabled": true
+      },
+      {
+        "key": "currentTokenId",
+        "value": "",
+        "type": "default",
+        "enabled": true
+      },
+      {
+        "key": "longTokenId",
+        "value": "",
+        "type": "default",
+        "enabled": true
+      },
+      {
+        "key": "longTokenExpiry",
+        "value": "",
+        "type": "default",
         "enabled": true
       }
-    ],
-    "_type": "environment"
+    ]
   }
 }

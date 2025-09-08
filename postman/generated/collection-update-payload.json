@@ -1,0 +1,3101 @@
+{
+  "collection": {
+    "info": {
+      "name": "C2mApiV2TestCollection",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+      "item": []
+    },
+    "item": [
+      {
+        "id": "395b1748-b649-4f04-b5c5-4534b8735936",
+        "name": "POST /auth/tokens/short",
+        "request": {
+          "name": "Issue a short-term access token",
+          "description": {
+            "content": "Exchange a valid long-term token for a short-lived JWT (e.g., 15 minutes).\nThe long-term token must be sent in the Authorization header as `Bearer <long_token>`.\n",
+            "type": "text/plain"
+          },
+          "url": {
+            "path": [
+              "auth",
+              "tokens",
+              "short"
+            ],
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "query": [],
+            "variable": [],
+            "raw": "{{baseUrl}}/auth/tokens/short"
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Accept",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"scopes\": [\n    \"jobs:submit\",\n    \"jobs:read\",\n    \"templates:read\"\n  ]\n}",
+            "options": {
+              "raw": {
+                "headerFamily": "json",
+                "language": "json"
+              }
+            }
+          },
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              {
+                "key": "token",
+                "value": "{{bearerToken}}"
+              }
+            ]
+          },
+          "item": []
+        },
+        "response": [
+          {
+            "id": "1d1c05d5-de69-4246-81a3-f4389b001981",
+            "name": "Short-term token issued",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "auth",
+                  "tokens",
+                  "short"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/auth/tokens/short"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"long_token\": \"bardus\",\n  \"scopes\": [\n    \"astrum\",\n    \"ulterius\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "Created",
+            "code": 201,
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": "{\n  \"token_type\": \"Bearer\",\n  \"access_token\": \"comprehendo\",\n  \"expires_in\": 928,\n  \"expires_at\": \"<dateTime>\",\n  \"scopes\": [\n    \"tabula\",\n    \"somnus\"\n  ],\n  \"token_id\": \"qQI579W4uB\"\n}",
+            "cookie": [],
+            "_postman_previewlanguage": "json",
+            "item": []
+          },
+          {
+            "id": "ee37e702-cd56-44ef-b7dc-53e495af6ee8",
+            "name": "Bad request",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "auth",
+                  "tokens",
+                  "short"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/auth/tokens/short"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"long_token\": \"depulso\",\n  \"scopes\": [\n    \"vulgo\",\n    \"video\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "Bad Request",
+            "code": 400,
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": "{\n  \"code\": \"cuius\",\n  \"message\": 29,\n  \"details\": {}\n}",
+            "cookie": [],
+            "_postman_previewlanguage": "json",
+            "item": []
+          },
+          {
+            "id": "e33c1a35-ac98-4bc4-bce9-c189a896eb4b",
+            "name": "Unauthorized",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "auth",
+                  "tokens",
+                  "short"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/auth/tokens/short"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"long_token\": \"condico\",\n  \"scopes\": [\n    \"ea\",\n    \"sperno\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "Unauthorized",
+            "code": 401,
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": "{\n  \"code\": \"necessitatibus\",\n  \"message\": 65,\n  \"details\": {}\n}",
+            "cookie": [],
+            "_postman_previewlanguage": "json",
+            "item": []
+          },
+          {
+            "id": "c7ebe4bf-182c-4b7c-a53d-3a3e70eaab89",
+            "name": "Too Many Requests",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "auth",
+                  "tokens",
+                  "short"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/auth/tokens/short"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"long_token\": \"earum\",\n  \"scopes\": [\n    \"tergum\",\n    \"succurro\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "Too Many Requests",
+            "code": 429,
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": "{\n  \"code\": \"tyrannus\",\n  \"message\": 59,\n  \"details\": {}\n}",
+            "cookie": [],
+            "_postman_previewlanguage": "json",
+            "item": []
+          }
+        ],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test(\"Status code is allowed (200,201,204,400,401,403,404,429)\", function () { pm.expect([200,201,204,400,401,403,404,429]).to.include(pm.response.code); });",
+                "pm.test(\"Response time < 1s\", function () { pm.expect(pm.response.responseTime).to.be.below(1000); });"
+              ]
+            }
+          }
+        ],
+        "protocolProfileBehavior": {
+          "disableBodyPruning": true
+        }
+      },
+      {
+        "id": "a41f0ee5-3958-4a9e-9ec6-4ea0ee033d2e",
+        "name": "POST /auth/tokens/long",
+        "request": {
+          "name": "Issue or rotate a long-term token",
+          "description": {
+            "content": "Issues a long-term token (e.g., 30-90 days) for automation or server-to-server use.\nRequires step-up authentication. Choose one of the supported grant types:\n\n- `client_credentials` + `client_secret`\n- `client_credentials` + one-time `otp_code`\n- `assertion` (e.g., signed JWT by your private key)\n- Or an existing short-term token with the `tokens:write` scope\n\nOnly one mechanism is required per call.\n",
+            "type": "text/plain"
+          },
+          "url": {
+            "path": [
+              "auth",
+              "tokens",
+              "long"
+            ],
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "query": [],
+            "variable": [],
+            "raw": "{{baseUrl}}/auth/tokens/long"
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Accept",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"grant_type\": \"client_credentials\",\n  \"client_id\": \"{{clientId}}\",\n  \"client_secret\": \"{{clientSecret}}\",\n  \"scopes\": [\n    \"jobs:submit\",\n    \"jobs:read\",\n    \"jobs:update\",\n    \"templates:read\",\n    \"account:read\"\n  ],\n  \"ttl_seconds\": 7776000\n}",
+            "options": {
+              "raw": {
+                "headerFamily": "json",
+                "language": "json"
+              }
+            }
+          },
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              {
+                "key": "token",
+                "value": "{{bearerToken}}"
+              }
+            ]
+          },
+          "item": []
+        },
+        "response": [
+          {
+            "id": "a617ddef-bcbf-46c0-a4d1-8c23263ccdea",
+            "name": "Long-term token issued",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "auth",
+                  "tokens",
+                  "long"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/auth/tokens/long"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"grant_type\": \"client_credentials\",\n  \"client_id\": \"2XDn4LkaUq\",\n  \"client_secret\": \"tenuis\",\n  \"otp_code\": \"totus\",\n  \"assertion_type\": \"color\",\n  \"assertion\": \"utrum\",\n  \"scopes\": [\n    \"tersus\",\n    \"conspergo\"\n  ],\n  \"ttl_seconds\": 727\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "Created",
+            "code": 201,
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "disabled": false,
+                "description": {
+                  "content": "Server-generated identifier for revocation and audit",
+                  "type": "text/plain"
+                },
+                "key": "X-Token-Id",
+                "value": "<string>"
+              }
+            ],
+            "body": "{\n  \"token_type\": \"Bearer\",\n  \"access_token\": \"cilicium\",\n  \"expires_in\": 26,\n  \"expires_at\": \"<dateTime>\",\n  \"scopes\": [\n    \"cinis\",\n    \"canonicus\"\n  ],\n  \"token_id\": \"xtSpbqpFN8\"\n}",
+            "cookie": [],
+            "_postman_previewlanguage": "json",
+            "item": []
+          },
+          {
+            "id": "bb81721e-a546-4056-97ee-99214c3767a2",
+            "name": "Bad request",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "auth",
+                  "tokens",
+                  "long"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/auth/tokens/long"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"grant_type\": \"client_credentials\",\n  \"client_id\": \"cbpHUI2pu1\",\n  \"client_secret\": \"trepide\",\n  \"otp_code\": \"textilis\",\n  \"assertion_type\": \"velum\",\n  \"assertion\": \"asper\",\n  \"scopes\": [\n    \"ab\",\n    \"defessus\"\n  ],\n  \"ttl_seconds\": 486\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "Bad Request",
+            "code": 400,
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": "{\n  \"code\": \"tertius\",\n  \"message\": 71,\n  \"details\": {}\n}",
+            "cookie": [],
+            "_postman_previewlanguage": "json",
+            "item": []
+          },
+          {
+            "id": "ef07bf0f-6f58-4afd-84a2-fdd263b5d0bf",
+            "name": "Unauthorized",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "auth",
+                  "tokens",
+                  "long"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/auth/tokens/long"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"grant_type\": \"client_credentials\",\n  \"client_id\": \"cE1jxbOPbh\",\n  \"client_secret\": \"utor\",\n  \"otp_code\": \"cubicularis\",\n  \"assertion_type\": \"admoveo\",\n  \"assertion\": \"comedo\",\n  \"scopes\": [\n    \"cunctatio\",\n    \"libero\"\n  ],\n  \"ttl_seconds\": 454\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "Unauthorized",
+            "code": 401,
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": "{\n  \"code\": \"aestivus\",\n  \"message\": 25,\n  \"details\": {}\n}",
+            "cookie": [],
+            "_postman_previewlanguage": "json",
+            "item": []
+          },
+          {
+            "id": "191f1162-2b9e-40d8-b2b5-9e16d417447a",
+            "name": "Forbidden",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "auth",
+                  "tokens",
+                  "long"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/auth/tokens/long"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"grant_type\": \"client_credentials\",\n  \"client_id\": \"KOVsTFQh8O\",\n  \"client_secret\": \"succurro\",\n  \"otp_code\": \"libero\",\n  \"assertion_type\": \"peior\",\n  \"assertion\": \"caterva\",\n  \"scopes\": [\n    \"suasoria\",\n    \"audio\"\n  ],\n  \"ttl_seconds\": 222\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "Forbidden",
+            "code": 403,
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": "{\n  \"code\": \"defleo\",\n  \"message\": 58,\n  \"details\": {}\n}",
+            "cookie": [],
+            "_postman_previewlanguage": "json",
+            "item": []
+          },
+          {
+            "id": "df353752-f2b0-4e2a-afbc-02081ae9182f",
+            "name": "Too Many Requests",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "auth",
+                  "tokens",
+                  "long"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/auth/tokens/long"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"grant_type\": \"client_credentials\",\n  \"client_id\": \"wH5aH0xsiQ\",\n  \"client_secret\": \"bos\",\n  \"otp_code\": \"cito\",\n  \"assertion_type\": \"deputo\",\n  \"assertion\": \"villa\",\n  \"scopes\": [\n    \"animadverto\",\n    \"venustas\"\n  ],\n  \"ttl_seconds\": 241\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "Too Many Requests",
+            "code": 429,
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": "{\n  \"code\": \"voluptatibus\",\n  \"message\": 30,\n  \"details\": {}\n}",
+            "cookie": [],
+            "_postman_previewlanguage": "json",
+            "item": []
+          }
+        ],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test(\"Status code is allowed (200,201,204,400,401,403,404,429)\", function () { pm.expect([200,201,204,400,401,403,404,429]).to.include(pm.response.code); });",
+                "pm.test(\"Response time < 1s\", function () { pm.expect(pm.response.responseTime).to.be.below(1000); });"
+              ]
+            }
+          }
+        ],
+        "protocolProfileBehavior": {
+          "disableBodyPruning": true
+        }
+      },
+      {
+        "id": "157043f2-2564-4de6-a39a-7832a240c051",
+        "name": "POST /auth/tokens/:tokenId/revoke",
+        "request": {
+          "name": "Revoke a token",
+          "description": {
+            "content": "Revokes a short- or long-term token by its `tokenId`. Idempotent.",
+            "type": "text/plain"
+          },
+          "url": {
+            "path": [
+              "auth",
+              "tokens",
+              ":tokenId",
+              "revoke"
+            ],
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "query": [],
+            "variable": [
+              {
+                "type": "any",
+                "value": "<string>",
+                "key": "tokenId",
+                "disabled": false,
+                "description": {
+                  "content": "(Required) The token ID to revoke",
+                  "type": "text/plain"
+                }
+              }
+            ],
+            "raw": "{{baseUrl}}/auth/tokens/:tokenId/revoke"
+          },
+          "header": [
+            {
+              "key": "Accept",
+              "value": "application/json"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"reason\": \"Compromised key\",\n  \"revoke_all_related\": false\n}"
+          },
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              {
+                "key": "token",
+                "value": "{{bearerToken}}"
+              }
+            ]
+          },
+          "item": []
+        },
+        "response": [
+          {
+            "id": "08873ea9-cb81-4b8d-b3dc-c682b6002e68",
+            "name": "Revoked (idempotent)",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "auth",
+                  "tokens",
+                  ":tokenId",
+                  "revoke"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/auth/tokens/:tokenId/revoke"
+              },
+              "header": [
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {}
+            },
+            "status": "No Content",
+            "code": 204,
+            "header": [],
+            "cookie": [],
+            "_postman_previewlanguage": "text",
+            "item": []
+          },
+          {
+            "id": "bd0f6709-df88-4e40-a52d-9f136b01fe1c",
+            "name": "Unauthorized",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "auth",
+                  "tokens",
+                  ":tokenId",
+                  "revoke"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/auth/tokens/:tokenId/revoke"
+              },
+              "header": [
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {}
+            },
+            "status": "Unauthorized",
+            "code": 401,
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": "{\n  \"code\": \"defetiscor\",\n  \"message\": 54,\n  \"details\": {}\n}",
+            "cookie": [],
+            "_postman_previewlanguage": "json",
+            "item": []
+          },
+          {
+            "id": "bc91fb83-cbab-4d79-ab14-b3b8751905ea",
+            "name": "Not found",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "auth",
+                  "tokens",
+                  ":tokenId",
+                  "revoke"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/auth/tokens/:tokenId/revoke"
+              },
+              "header": [
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {}
+            },
+            "status": "Not Found",
+            "code": 404,
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": "{\n  \"code\": \"desolo\",\n  \"message\": 61,\n  \"details\": {}\n}",
+            "cookie": [],
+            "_postman_previewlanguage": "json",
+            "item": []
+          }
+        ],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test(\"Status code is allowed (200,201,204,400,401,403,404,429)\", function () { pm.expect([200,201,204,400,401,403,404,429]).to.include(pm.response.code); });",
+                "pm.test(\"Response time < 1s\", function () { pm.expect(pm.response.responseTime).to.be.below(1000); });"
+              ]
+            }
+          }
+        ],
+        "protocolProfileBehavior": {
+          "disableBodyPruning": true
+        }
+      },
+      {
+        "id": "94a16a7e-a5a3-4ec0-bce3-0f2e52824d33",
+        "name": "POST /jobs/single-doc-job-template",
+        "request": {
+          "name": "Operation for /jobs/single-doc-job-template",
+          "description": {},
+          "url": {
+            "path": [
+              "jobs",
+              "single-doc-job-template"
+            ],
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "query": [],
+            "variable": [],
+            "raw": "{{baseUrl}}/jobs/single-doc-job-template"
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Accept",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"jobTemplate\": \"defluo\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"textilis\",\n      \"expirationDate\": {\n        \"month\": 545,\n        \"year\": 2013\n      },\n      \"cvv\": 609\n    }\n  },\n  \"tags\": [\n    \"cum\",\n    \"decens\"\n  ]\n}",
+            "options": {
+              "raw": {
+                "headerFamily": "json",
+                "language": "json"
+              }
+            }
+          },
+          "auth": null,
+          "item": []
+        },
+        "response": [
+          {
+            "id": "b2b5e0f7-e7d1-4090-bd58-5f08bcd42ae1",
+            "name": "Success",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "jobs",
+                  "single-doc-job-template"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/jobs/single-doc-job-template"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"jobTemplate\": \"adaugeo\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"damnatio\",\n      \"expirationDate\": {\n        \"month\": 128,\n        \"year\": 2012\n      },\n      \"cvv\": 291\n    }\n  },\n  \"tags\": [\n    \"totidem\",\n    \"adipiscor\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "OK",
+            "code": 200,
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": "{\n  \"status\": \"verecundia\",\n  \"message\": 29,\n  \"jobId\": \"PyfaDJ0Jw7\"\n}",
+            "cookie": [],
+            "_postman_previewlanguage": "json",
+            "item": []
+          },
+          {
+            "id": "36317ca2-f001-4bd5-9fba-c300fadd3cb9",
+            "name": "Invalid request",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "jobs",
+                  "single-doc-job-template"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/jobs/single-doc-job-template"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"jobTemplate\": \"confugo\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"conor\",\n      \"expirationDate\": {\n        \"month\": 261,\n        \"year\": 2005\n      },\n      \"cvv\": 62\n    }\n  },\n  \"tags\": [\n    \"depereo\",\n    \"auctus\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "Bad Request",
+            "code": 400,
+            "header": [],
+            "cookie": [],
+            "_postman_previewlanguage": "text",
+            "item": []
+          },
+          {
+            "id": "967c4e5e-b868-4c3d-9d66-cce09bf48793",
+            "name": "Unauthorized",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "jobs",
+                  "single-doc-job-template"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/jobs/single-doc-job-template"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"jobTemplate\": \"sollicito\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"asperiores\",\n      \"expirationDate\": {\n        \"month\": 56,\n        \"year\": 2010\n      },\n      \"cvv\": 315\n    }\n  },\n  \"tags\": [\n    \"crux\",\n    \"ater\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "Unauthorized",
+            "code": 401,
+            "header": [],
+            "cookie": [],
+            "_postman_previewlanguage": "text",
+            "item": []
+          }
+        ],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test(\"Status code is allowed (200,201,204,400,401,403,404,429)\", function () { pm.expect([200,201,204,400,401,403,404,429]).to.include(pm.response.code); });",
+                "pm.test(\"Response time < 1s\", function () { pm.expect(pm.response.responseTime).to.be.below(1000); });"
+              ]
+            }
+          }
+        ],
+        "protocolProfileBehavior": {
+          "disableBodyPruning": true
+        }
+      },
+      {
+        "id": "afb1fea9-9782-491a-ab40-00bf34fb0b02",
+        "name": "POST /jobs/multi-docs-job-template",
+        "request": {
+          "name": "Operation for /jobs/multi-docs-job-template",
+          "description": {},
+          "url": {
+            "path": [
+              "jobs",
+              "multi-docs-job-template"
+            ],
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "query": [],
+            "variable": [],
+            "raw": "{{baseUrl}}/jobs/multi-docs-job-template"
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Accept",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"items\": [\n    {\n      \"documentSourceIdentifier\": \"GgqIj9Y3YH\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"Raquel\",\n        \"lastName\": \"Stanton-Toy\",\n        \"address1\": \"513 Mosciski Extension\",\n        \"city\": \"Pourosville\",\n        \"state\": \"Wisconsin\",\n        \"zip\": \"86772\",\n        \"country\": \"New Zealand\",\n        \"nickName\": \"Samuel Upton II\",\n        \"address2\": \"12631 Grange Road\",\n        \"address3\": \"96293 Jessie Prairie\",\n        \"phoneNumber\": \"576.567.9409 x7193\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": \"WTZ70hkA2U\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"Kaleb\",\n        \"lastName\": \"Lang\",\n        \"address1\": \"7822 Wisozk Falls\",\n        \"city\": \"Asiabury\",\n        \"state\": \"New Jersey\",\n        \"zip\": \"75535\",\n        \"country\": \"South Georgia and the South Sandwich Islands\",\n        \"nickName\": \"Lila Marquardt\",\n        \"address2\": \"765 Hillside Avenue\",\n        \"address3\": \"412 Hayes Harbor\",\n        \"phoneNumber\": \"736-347-7075 x16339\"\n      }\n    }\n  ],\n  \"jobTemplate\": \"corrupti\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"mastercard\",\n      \"cardNumber\": \"tremo\",\n      \"expirationDate\": {\n        \"month\": 93,\n        \"year\": 2004\n      },\n      \"cvv\": 208\n    }\n  },\n  \"tags\": [\n    \"accusamus\",\n    \"casso\"\n  ]\n}",
+            "options": {
+              "raw": {
+                "headerFamily": "json",
+                "language": "json"
+              }
+            }
+          },
+          "auth": null,
+          "item": []
+        },
+        "response": [
+          {
+            "id": "1c0b40b6-d8c7-4773-a6fb-fe5be4fcd2c5",
+            "name": "Success",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "jobs",
+                  "multi-docs-job-template"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/jobs/multi-docs-job-template"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"items\": [\n    {\n      \"documentSourceIdentifier\": \"iIgA54gvmV\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"Janiya\",\n        \"lastName\": \"Bode\",\n        \"address1\": \"71408 Tower Road\",\n        \"city\": \"North Claudeside\",\n        \"state\": \"Pennsylvania\",\n        \"zip\": \"94758-8940\",\n        \"country\": \"Gambia\",\n        \"nickName\": \"Mr. Martin Schuppe\",\n        \"address2\": \"25932 Rectory Lane\",\n        \"address3\": \"76542 S 1st Avenue\",\n        \"phoneNumber\": \"548-265-5888 x390\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": \"l66NOyMuy5\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"Federico\",\n        \"lastName\": \"Ward\",\n        \"address1\": \"430 Abigail Harbors\",\n        \"city\": \"Port Bayleeberg\",\n        \"state\": \"South Carolina\",\n        \"zip\": \"10700-8914\",\n        \"country\": \"Uganda\",\n        \"nickName\": \"Chelsea Stiedemann\",\n        \"address2\": \"478 S Elm Street\",\n        \"address3\": \"151 S Park Street\",\n        \"phoneNumber\": \"1-721-540-4895 x0048\"\n      }\n    }\n  ],\n  \"jobTemplate\": \"vitium\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"mastercard\",\n      \"cardNumber\": \"tot\",\n      \"expirationDate\": {\n        \"month\": 890,\n        \"year\": 2000\n      },\n      \"cvv\": 510\n    }\n  },\n  \"tags\": [\n    \"surgo\",\n    \"vere\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "OK",
+            "code": 200,
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": "{\n  \"status\": \"depopulo\",\n  \"message\": 45,\n  \"jobId\": \"htStnOd1eU\"\n}",
+            "cookie": [],
+            "_postman_previewlanguage": "json",
+            "item": []
+          },
+          {
+            "id": "ebe5a6e9-48a6-49d4-832e-c5dc054d8bc5",
+            "name": "Invalid request",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "jobs",
+                  "multi-docs-job-template"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/jobs/multi-docs-job-template"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"items\": [\n    {\n      \"documentSourceIdentifier\": \"VKr7zok1lF\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"Jolie\",\n        \"lastName\": \"Oberbrunner\",\n        \"address1\": \"3421 Olen Ridges\",\n        \"city\": \"Oak Park\",\n        \"state\": \"Kentucky\",\n        \"zip\": \"82697\",\n        \"country\": \"Israel\",\n        \"nickName\": \"Alison Rutherford\",\n        \"address2\": \"2336 Orchard Lane\",\n        \"address3\": \"656 Hall Street\",\n        \"phoneNumber\": \"571.278.4524 x98112\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": \"vmrHtDItaY\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"Danyka\",\n        \"lastName\": \"Zieme\",\n        \"address1\": \"9205 The Avenue\",\n        \"city\": \"Lonnyland\",\n        \"state\": \"Minnesota\",\n        \"zip\": \"26797\",\n        \"country\": \"Mozambique\",\n        \"nickName\": \"Stacy Koelpin\",\n        \"address2\": \"6082 West Ways\",\n        \"address3\": \"147 Lowe Forges\",\n        \"phoneNumber\": \"235.493.2695 x69984\"\n      }\n    }\n  ],\n  \"jobTemplate\": \"vox\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"mastercard\",\n      \"cardNumber\": \"fugit\",\n      \"expirationDate\": {\n        \"month\": 845,\n        \"year\": 2003\n      },\n      \"cvv\": 32\n    }\n  },\n  \"tags\": [\n    \"valde\",\n    \"video\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "Bad Request",
+            "code": 400,
+            "header": [],
+            "cookie": [],
+            "_postman_previewlanguage": "text",
+            "item": []
+          },
+          {
+            "id": "953030f8-77e8-4fc1-b8f5-a9dfd6ce7391",
+            "name": "Unauthorized",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "jobs",
+                  "multi-docs-job-template"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/jobs/multi-docs-job-template"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"items\": [\n    {\n      \"documentSourceIdentifier\": \"47duCklaMM\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"Ada\",\n        \"lastName\": \"Franecki\",\n        \"address1\": \"5963 Dayana Crest\",\n        \"city\": \"Carmichael\",\n        \"state\": \"Vermont\",\n        \"zip\": \"45028\",\n        \"country\": \"Libyan Arab Jamahiriya\",\n        \"nickName\": \"Kim Lebsack\",\n        \"address2\": \"4933 Lee Street\",\n        \"address3\": \"96915 David Extension\",\n        \"phoneNumber\": \"840-548-4487 x999\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": \"dhUfbTGWdt\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"Lennie\",\n        \"lastName\": \"Wolf\",\n        \"address1\": \"595 Orchard Drive\",\n        \"city\": \"West Lulu\",\n        \"state\": \"Minnesota\",\n        \"zip\": \"45240\",\n        \"country\": \"Moldova\",\n        \"nickName\": \"Alfredo Kling\",\n        \"address2\": \"7122 S Central Avenue\",\n        \"address3\": \"4642 Kelley Heights\",\n        \"phoneNumber\": \"924-249-0753 x77909\"\n      }\n    }\n  ],\n  \"jobTemplate\": \"deprecator\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"mastercard\",\n      \"cardNumber\": \"quas\",\n      \"expirationDate\": {\n        \"month\": 655,\n        \"year\": 2015\n      },\n      \"cvv\": 332\n    }\n  },\n  \"tags\": [\n    \"beatus\",\n    \"apud\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "Unauthorized",
+            "code": 401,
+            "header": [],
+            "cookie": [],
+            "_postman_previewlanguage": "text",
+            "item": []
+          }
+        ],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test(\"Status code is allowed (200,201,204,400,401,403,404,429)\", function () { pm.expect([200,201,204,400,401,403,404,429]).to.include(pm.response.code); });",
+                "pm.test(\"Response time < 1s\", function () { pm.expect(pm.response.responseTime).to.be.below(1000); });"
+              ]
+            }
+          }
+        ],
+        "protocolProfileBehavior": {
+          "disableBodyPruning": true
+        }
+      },
+      {
+        "id": "8c718da4-a76b-4c9b-9a6e-1f8ec0416acc",
+        "name": "POST /jobs/multi-doc-merge-job-template",
+        "request": {
+          "name": "Operation for /jobs/multi-doc-merge-job-template",
+          "description": {},
+          "url": {
+            "path": [
+              "jobs",
+              "multi-doc-merge-job-template"
+            ],
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "query": [],
+            "variable": [],
+            "raw": "{{baseUrl}}/jobs/multi-doc-merge-job-template"
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Accept",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"documentsToMerge\": [\n    267,\n    737\n  ],\n  \"recipientAddressSource\": {\n    \"firstName\": \"Adam\",\n    \"lastName\": \"Mueller\",\n    \"address1\": \"16662 Eulalia Rue\",\n    \"city\": \"Candidaview\",\n    \"state\": \"New Hampshire\",\n    \"zip\": \"73255\",\n    \"country\": \"Luxembourg\",\n    \"nickName\": \"Nettie Smith\",\n    \"address2\": \"374 Verlie Mills\",\n    \"address3\": \"57312 Camylle Orchard\",\n    \"phoneNumber\": \"1-963-615-3080 x2460\"\n  },\n  \"jobTemplate\": \"vulpes\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"mastercard\",\n      \"cardNumber\": \"stabilis\",\n      \"expirationDate\": {\n        \"month\": 377,\n        \"year\": 2018\n      },\n      \"cvv\": 179\n    }\n  },\n  \"tags\": [\n    \"vilis\",\n    \"peior\"\n  ]\n}",
+            "options": {
+              "raw": {
+                "headerFamily": "json",
+                "language": "json"
+              }
+            }
+          },
+          "auth": null,
+          "item": []
+        },
+        "response": [
+          {
+            "id": "56062c61-13ca-4bcb-b3fd-897db127bf92",
+            "name": "Success",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "jobs",
+                  "multi-doc-merge-job-template"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/jobs/multi-doc-merge-job-template"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"documentsToMerge\": [\n    866,\n    373\n  ],\n  \"recipientAddressSource\": {\n    \"firstName\": \"Cierra\",\n    \"lastName\": \"Zemlak\",\n    \"address1\": \"187 Honeysuckle Close\",\n    \"city\": \"South Marlonport\",\n    \"state\": \"West Virginia\",\n    \"zip\": \"49595\",\n    \"country\": \"North Macedonia\",\n    \"nickName\": \"Claudia Tromp\",\n    \"address2\": \"97608 N Locust Street\",\n    \"address3\": \"502 Church Avenue\",\n    \"phoneNumber\": \"(875) 680-0812 x5244\"\n  },\n  \"jobTemplate\": \"communis\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"mastercard\",\n      \"cardNumber\": \"reiciendis\",\n      \"expirationDate\": {\n        \"month\": 232,\n        \"year\": 2013\n      },\n      \"cvv\": 353\n    }\n  },\n  \"tags\": [\n    \"tenus\",\n    \"ventito\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "OK",
+            "code": 200,
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": "{\n  \"status\": \"sto\",\n  \"message\": 43,\n  \"jobId\": \"9HuaekcnxN\"\n}",
+            "cookie": [],
+            "_postman_previewlanguage": "json",
+            "item": []
+          },
+          {
+            "id": "6722dc4b-4cf1-41b8-949d-f9b3e9a59a4e",
+            "name": "Invalid request",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "jobs",
+                  "multi-doc-merge-job-template"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/jobs/multi-doc-merge-job-template"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"documentsToMerge\": [\n    391,\n    386\n  ],\n  \"recipientAddressSource\": {\n    \"firstName\": \"Jose\",\n    \"lastName\": \"Rutherford\",\n    \"address1\": \"4253 Buckridge Parkway\",\n    \"city\": \"West Clementberg\",\n    \"state\": \"Iowa\",\n    \"zip\": \"97557\",\n    \"country\": \"New Zealand\",\n    \"nickName\": \"Amber Murray DVM\",\n    \"address2\": \"249 S 7th Street\",\n    \"address3\": \"594 Guiseppe Extension\",\n    \"phoneNumber\": \"992.670.0011 x015\"\n  },\n  \"jobTemplate\": \"stipes\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"mastercard\",\n      \"cardNumber\": \"appositus\",\n      \"expirationDate\": {\n        \"month\": 790,\n        \"year\": 2021\n      },\n      \"cvv\": 673\n    }\n  },\n  \"tags\": [\n    \"confero\",\n    \"stultus\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "Bad Request",
+            "code": 400,
+            "header": [],
+            "cookie": [],
+            "_postman_previewlanguage": "text",
+            "item": []
+          },
+          {
+            "id": "b219eaab-b190-4d85-ad90-18cc108b1669",
+            "name": "Unauthorized",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "jobs",
+                  "multi-doc-merge-job-template"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/jobs/multi-doc-merge-job-template"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"documentsToMerge\": [\n    935,\n    694\n  ],\n  \"recipientAddressSource\": {\n    \"firstName\": \"Alexandrine\",\n    \"lastName\": \"Braun\",\n    \"address1\": \"14455 Jordon Ways\",\n    \"city\": \"Malcolmberg\",\n    \"state\": \"Illinois\",\n    \"zip\": \"08390-8638\",\n    \"country\": \"Finland\",\n    \"nickName\": \"Mrs. Kay Reynolds\",\n    \"address2\": \"4329 E Main Street\",\n    \"address3\": \"346 Maple Avenue\",\n    \"phoneNumber\": \"870-231-6009 x6401\"\n  },\n  \"jobTemplate\": \"denique\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"mastercard\",\n      \"cardNumber\": \"conduco\",\n      \"expirationDate\": {\n        \"month\": 56,\n        \"year\": 2012\n      },\n      \"cvv\": 741\n    }\n  },\n  \"tags\": [\n    \"tenetur\",\n    \"comes\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "Unauthorized",
+            "code": 401,
+            "header": [],
+            "cookie": [],
+            "_postman_previewlanguage": "text",
+            "item": []
+          }
+        ],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test(\"Status code is allowed (200,201,204,400,401,403,404,429)\", function () { pm.expect([200,201,204,400,401,403,404,429]).to.include(pm.response.code); });",
+                "pm.test(\"Response time < 1s\", function () { pm.expect(pm.response.responseTime).to.be.below(1000); });"
+              ]
+            }
+          }
+        ],
+        "protocolProfileBehavior": {
+          "disableBodyPruning": true
+        }
+      },
+      {
+        "id": "1e9e746f-25b9-4af8-ab36-bd918e07eff9",
+        "name": "POST /jobs/single-doc",
+        "request": {
+          "name": "Operation for /jobs/single-doc",
+          "description": {},
+          "url": {
+            "path": [
+              "jobs",
+              "single-doc"
+            ],
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "query": [],
+            "variable": [],
+            "raw": "{{baseUrl}}/jobs/single-doc"
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Accept",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"documentSourceIdentifier\": \"s2F0ShgraA\",\n  \"recipientAddressSources\": [\n    {\n      \"firstName\": \"Golda\",\n      \"lastName\": \"Dickens\",\n      \"address1\": \"3230 Lincoln Highway\",\n      \"city\": \"New Alexzander\",\n      \"state\": \"Colorado\",\n      \"zip\": \"40776-2561\",\n      \"country\": \"Seychelles\",\n      \"nickName\": \"Hilda Gottlieb\",\n      \"address2\": \"65095 Tromp Bridge\",\n      \"address3\": \"28163 Kunze Ville\",\n      \"phoneNumber\": \"(384) 309-4846 x17657\"\n    },\n    {\n      \"firstName\": \"Hunter\",\n      \"lastName\": \"Volkman-Witting\",\n      \"address1\": \"15470 Edward Street\",\n      \"city\": \"South Cathystead\",\n      \"state\": \"Kentucky\",\n      \"zip\": \"70281\",\n      \"country\": \"Angola\",\n      \"nickName\": \"Tom McClure\",\n      \"address2\": \"45754 Hauck Radial\",\n      \"address3\": \"901 Milton Road\",\n      \"phoneNumber\": \"632-229-3970\"\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"businessLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"largeEnvelope\",\n    \"paperType\": \"postcard\",\n    \"printOption\": \"none\",\n    \"envelope\": \"flat\"\n  },\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"tenax\",\n      \"expirationDate\": {\n        \"month\": 957,\n        \"year\": 2000\n      },\n      \"cvv\": 574\n    }\n  },\n  \"tags\": [\n    \"altus\",\n    \"hic\"\n  ]\n}",
+            "options": {
+              "raw": {
+                "headerFamily": "json",
+                "language": "json"
+              }
+            }
+          },
+          "auth": null,
+          "item": []
+        },
+        "response": [
+          {
+            "id": "efb1c488-e8fb-4ac6-adcf-8ecd7c8df772",
+            "name": "Success",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "jobs",
+                  "single-doc"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/jobs/single-doc"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"documentSourceIdentifier\": \"mrXFshkj02\",\n  \"recipientAddressSources\": [\n    {\n      \"firstName\": \"Judy\",\n      \"lastName\": \"Flatley\",\n      \"address1\": \"2297 Gusikowski Court\",\n      \"city\": \"Lake Jailyn\",\n      \"state\": \"New Mexico\",\n      \"zip\": \"43625-7828\",\n      \"country\": \"Jamaica\",\n      \"nickName\": \"Ora McDermott Jr.\",\n      \"address2\": \"598 Melody Islands\",\n      \"address3\": \"377 Clark Street\",\n      \"phoneNumber\": \"1-338-396-3521 x10104\"\n    },\n    {\n      \"firstName\": \"Eino\",\n      \"lastName\": \"Bergnaum\",\n      \"address1\": \"35735 Werner Meadow\",\n      \"city\": \"New Florencefort\",\n      \"state\": \"Florida\",\n      \"zip\": \"14390-3660\",\n      \"country\": \"Kenya\",\n      \"nickName\": \"Tommy Kulas\",\n      \"address2\": \"72783 Kolby Courts\",\n      \"address3\": \"78817 Eveline Valley\",\n      \"phoneNumber\": \"1-769-907-1399\"\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"businessLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"largeEnvelope\",\n    \"paperType\": \"postcard\",\n    \"printOption\": \"none\",\n    \"envelope\": \"flat\"\n  },\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"virtus\",\n      \"expirationDate\": {\n        \"month\": 506,\n        \"year\": 2011\n      },\n      \"cvv\": 520\n    }\n  },\n  \"tags\": [\n    \"combibo\",\n    \"campana\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "OK",
+            "code": 200,
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": "{\n  \"status\": \"sapiente\",\n  \"message\": 71,\n  \"jobId\": \"mkiEyQF6yr\"\n}",
+            "cookie": [],
+            "_postman_previewlanguage": "json",
+            "item": []
+          },
+          {
+            "id": "d5ae05fa-a938-4ff3-9a41-ce4a1f2c3b1a",
+            "name": "Invalid request",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "jobs",
+                  "single-doc"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/jobs/single-doc"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"documentSourceIdentifier\": \"LFr8cGZkG8\",\n  \"recipientAddressSources\": [\n    {\n      \"firstName\": \"Mae\",\n      \"lastName\": \"Streich\",\n      \"address1\": \"95952 Jace Greens\",\n      \"city\": \"La Habra\",\n      \"state\": \"Arkansas\",\n      \"zip\": \"89308-5959\",\n      \"country\": \"Serbia\",\n      \"nickName\": \"Billy Kautzer\",\n      \"address2\": \"462 Skyline Drive\",\n      \"address3\": \"37689 Bobby Ferry\",\n      \"phoneNumber\": \"804.683.3385\"\n    },\n    {\n      \"firstName\": \"Charlene\",\n      \"lastName\": \"Sporer\",\n      \"address1\": \"8194 Wolf River\",\n      \"city\": \"Charlottesville\",\n      \"state\": \"Idaho\",\n      \"zip\": \"73594\",\n      \"country\": \"Czechia\",\n      \"nickName\": \"Amy Reichert\",\n      \"address2\": \"508 Arnoldo Valleys\",\n      \"address3\": \"8208 Wood Lane\",\n      \"phoneNumber\": \"(910) 464-2840\"\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"businessLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"largeEnvelope\",\n    \"paperType\": \"postcard\",\n    \"printOption\": \"none\",\n    \"envelope\": \"flat\"\n  },\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"subseco\",\n      \"expirationDate\": {\n        \"month\": 392,\n        \"year\": 2015\n      },\n      \"cvv\": 374\n    }\n  },\n  \"tags\": [\n    \"decor\",\n    \"solutio\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "Bad Request",
+            "code": 400,
+            "header": [],
+            "cookie": [],
+            "_postman_previewlanguage": "text",
+            "item": []
+          },
+          {
+            "id": "40a091f8-ca4e-4036-9a8a-597efc36ff1a",
+            "name": "Unauthorized",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "jobs",
+                  "single-doc"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/jobs/single-doc"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"documentSourceIdentifier\": \"7mKg91ElPK\",\n  \"recipientAddressSources\": [\n    {\n      \"firstName\": \"Earlene\",\n      \"lastName\": \"Altenwerth\",\n      \"address1\": \"247 Emmet Corners\",\n      \"city\": \"Arjunstead\",\n      \"state\": \"Minnesota\",\n      \"zip\": \"96528-8695\",\n      \"country\": \"Guernsey\",\n      \"nickName\": \"Dr. Wallace Lebsack\",\n      \"address2\": \"7585 Queenie Common\",\n      \"address3\": \"866 Zoie Dale\",\n      \"phoneNumber\": \"611.538.3774\"\n    },\n    {\n      \"firstName\": \"Arvel\",\n      \"lastName\": \"Ward\",\n      \"address1\": \"57887 Alysha Greens\",\n      \"city\": \"Lake Georgiannashire\",\n      \"state\": \"South Dakota\",\n      \"zip\": \"98554\",\n      \"country\": \"Costa Rica\",\n      \"nickName\": \"Jessica O'Conner\",\n      \"address2\": \"2181 Kaylah Harbor\",\n      \"address3\": \"73769 Cara Locks\",\n      \"phoneNumber\": \"841.846.8795 x8511\"\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"businessLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"largeEnvelope\",\n    \"paperType\": \"postcard\",\n    \"printOption\": \"none\",\n    \"envelope\": \"flat\"\n  },\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"vulgivagus\",\n      \"expirationDate\": {\n        \"month\": 564,\n        \"year\": 2004\n      },\n      \"cvv\": 328\n    }\n  },\n  \"tags\": [\n    \"fugiat\",\n    \"culpo\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "Unauthorized",
+            "code": 401,
+            "header": [],
+            "cookie": [],
+            "_postman_previewlanguage": "text",
+            "item": []
+          }
+        ],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test(\"Status code is allowed (200,201,204,400,401,403,404,429)\", function () { pm.expect([200,201,204,400,401,403,404,429]).to.include(pm.response.code); });",
+                "pm.test(\"Response time < 1s\", function () { pm.expect(pm.response.responseTime).to.be.below(1000); });"
+              ]
+            }
+          }
+        ],
+        "protocolProfileBehavior": {
+          "disableBodyPruning": true
+        }
+      },
+      {
+        "id": "be2f1b22-46e5-43e0-9a0c-fb4237286a4c",
+        "name": "POST /jobs/multi-doc",
+        "request": {
+          "name": "Operation for /jobs/multi-doc",
+          "description": {},
+          "url": {
+            "path": [
+              "jobs",
+              "multi-doc"
+            ],
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "query": [],
+            "variable": [],
+            "raw": "{{baseUrl}}/jobs/multi-doc"
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Accept",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"items\": [\n    {\n      \"documentSourceIdentifier\": \"Pm2Ez3I7jy\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"Dallas\",\n        \"lastName\": \"Schmitt\",\n        \"address1\": \"87628 Janie Mall\",\n        \"city\": \"Rowlett\",\n        \"state\": \"Delaware\",\n        \"zip\": \"59761\",\n        \"country\": \"Lebanon\",\n        \"nickName\": \"Jackie Hammes I\",\n        \"address2\": \"6212 E Front Street\",\n        \"address3\": \"62978 Manor Drive\",\n        \"phoneNumber\": \"(229) 472-4682 x18820\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": \"EbRxbUagb6\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"Stewart\",\n        \"lastName\": \"Veum\",\n        \"address1\": \"33301 Mariam Path\",\n        \"city\": \"North Baylee\",\n        \"state\": \"Hawaii\",\n        \"zip\": \"58296-0285\",\n        \"country\": \"Macao\",\n        \"nickName\": \"Christine Corwin\",\n        \"address2\": \"6422 Jacynthe Stream\",\n        \"address3\": \"307 Cartwright Alley\",\n        \"phoneNumber\": \"582-526-3429 x96320\"\n      }\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"businessLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"largeEnvelope\",\n    \"paperType\": \"letter\",\n    \"printOption\": \"grayscale\",\n    \"envelope\": \"flat\"\n  },\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"alioqui\",\n      \"expirationDate\": {\n        \"month\": 952,\n        \"year\": 2017\n      },\n      \"cvv\": 829\n    }\n  },\n  \"tags\": [\n    \"ulciscor\",\n    \"debitis\"\n  ]\n}",
+            "options": {
+              "raw": {
+                "headerFamily": "json",
+                "language": "json"
+              }
+            }
+          },
+          "auth": null,
+          "item": []
+        },
+        "response": [
+          {
+            "id": "8777f099-6f38-4a5b-9c89-81564dea4c37",
+            "name": "Success",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "jobs",
+                  "multi-doc"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/jobs/multi-doc"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"items\": [\n    {\n      \"documentSourceIdentifier\": \"76NQWzHLYj\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"Kathlyn\",\n        \"lastName\": \"McLaughlin\",\n        \"address1\": \"3932 Dayton Row\",\n        \"city\": \"East Shirley\",\n        \"state\": \"Iowa\",\n        \"zip\": \"52318\",\n        \"country\": \"Australia\",\n        \"nickName\": \"Mr. Timothy Lindgren\",\n        \"address2\": \"4832 Hand Burgs\",\n        \"address3\": \"476 Braun Mills\",\n        \"phoneNumber\": \"234-887-4900 x8456\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": \"6TutniFJPR\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"Katarina\",\n        \"lastName\": \"Batz\",\n        \"address1\": \"1759 Katelin Mountains\",\n        \"city\": \"Port Rosa\",\n        \"state\": \"Texas\",\n        \"zip\": \"59754-2866\",\n        \"country\": \"Czechia\",\n        \"nickName\": \"Rickey Watsica\",\n        \"address2\": \"91155 Atlantic Avenue\",\n        \"address3\": \"276 Schmeler Crescent\",\n        \"phoneNumber\": \"(249) 921-8262\"\n      }\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"businessLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"largeEnvelope\",\n    \"paperType\": \"letter\",\n    \"printOption\": \"grayscale\",\n    \"envelope\": \"flat\"\n  },\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"aggredior\",\n      \"expirationDate\": {\n        \"month\": 981,\n        \"year\": 2020\n      },\n      \"cvv\": 117\n    }\n  },\n  \"tags\": [\n    \"adiuvo\",\n    \"tibi\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "OK",
+            "code": 200,
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": "{\n  \"status\": \"talus\",\n  \"message\": 78,\n  \"jobId\": \"GsWJ18dJcD\"\n}",
+            "cookie": [],
+            "_postman_previewlanguage": "json",
+            "item": []
+          },
+          {
+            "id": "1f470c74-c507-428a-af0c-049b38d0d0b2",
+            "name": "Invalid request",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "jobs",
+                  "multi-doc"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/jobs/multi-doc"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"items\": [\n    {\n      \"documentSourceIdentifier\": \"DB4AXgp0T9\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"Natalie\",\n        \"lastName\": \"Larkin-Schulist\",\n        \"address1\": \"436 Mayer Creek\",\n        \"city\": \"Casperfield\",\n        \"state\": \"Kentucky\",\n        \"zip\": \"55386-3615\",\n        \"country\": \"Turkmenistan\",\n        \"nickName\": \"Freda Bergnaum\",\n        \"address2\": \"7434 S Maple Street\",\n        \"address3\": \"9490 Mill Road\",\n        \"phoneNumber\": \"576-456-6703 x948\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": \"AoukKrVQB5\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"Jeanne\",\n        \"lastName\": \"Volkman\",\n        \"address1\": \"3657 Johns Cape\",\n        \"city\": \"Leliastead\",\n        \"state\": \"Louisiana\",\n        \"zip\": \"65603-1234\",\n        \"country\": \"Switzerland\",\n        \"nickName\": \"Aubrey Collier\",\n        \"address2\": \"877 Fletcher Pines\",\n        \"address3\": \"55957 South Street\",\n        \"phoneNumber\": \"896.406.5945 x2165\"\n      }\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"businessLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"largeEnvelope\",\n    \"paperType\": \"letter\",\n    \"printOption\": \"grayscale\",\n    \"envelope\": \"flat\"\n  },\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"vigor\",\n      \"expirationDate\": {\n        \"month\": 644,\n        \"year\": 2017\n      },\n      \"cvv\": 360\n    }\n  },\n  \"tags\": [\n    \"ars\",\n    \"apparatus\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "Bad Request",
+            "code": 400,
+            "header": [],
+            "cookie": [],
+            "_postman_previewlanguage": "text",
+            "item": []
+          },
+          {
+            "id": "6b24cf15-8bde-4604-8da5-74dfc3394ccf",
+            "name": "Unauthorized",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "jobs",
+                  "multi-doc"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/jobs/multi-doc"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"items\": [\n    {\n      \"documentSourceIdentifier\": \"nfvKBaVdk0\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"Santiago\",\n        \"lastName\": \"Schuster\",\n        \"address1\": \"52841 Carroll Drive\",\n        \"city\": \"Goyetteport\",\n        \"state\": \"South Carolina\",\n        \"zip\": \"58833\",\n        \"country\": \"Sweden\",\n        \"nickName\": \"Kent Paucek\",\n        \"address2\": \"694 Maida Creek\",\n        \"address3\": \"642 Hillside\",\n        \"phoneNumber\": \"(471) 234-7484\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": \"luFu2VGRQG\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"Maye\",\n        \"lastName\": \"Spencer\",\n        \"address1\": \"21658 Seamus Ville\",\n        \"city\": \"Des Moines\",\n        \"state\": \"Utah\",\n        \"zip\": \"03771-1195\",\n        \"country\": \"Kenya\",\n        \"nickName\": \"Dr. Bertha Nicolas\",\n        \"address2\": \"87291 Katherine Hills\",\n        \"address3\": \"9064 Mraz Highway\",\n        \"phoneNumber\": \"(525) 439-1581 x116\"\n      }\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"businessLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"largeEnvelope\",\n    \"paperType\": \"letter\",\n    \"printOption\": \"grayscale\",\n    \"envelope\": \"flat\"\n  },\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"laudantium\",\n      \"expirationDate\": {\n        \"month\": 746,\n        \"year\": 2006\n      },\n      \"cvv\": 140\n    }\n  },\n  \"tags\": [\n    \"sopor\",\n    \"abscido\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "Unauthorized",
+            "code": 401,
+            "header": [],
+            "cookie": [],
+            "_postman_previewlanguage": "text",
+            "item": []
+          }
+        ],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test(\"Status code is allowed (200,201,204,400,401,403,404,429)\", function () { pm.expect([200,201,204,400,401,403,404,429]).to.include(pm.response.code); });",
+                "pm.test(\"Response time < 1s\", function () { pm.expect(pm.response.responseTime).to.be.below(1000); });"
+              ]
+            }
+          }
+        ],
+        "protocolProfileBehavior": {
+          "disableBodyPruning": true
+        }
+      },
+      {
+        "id": "60c86ab4-a0d0-4f33-8b82-9cf7576ecccb",
+        "name": "POST /jobs/multi-doc-merge",
+        "request": {
+          "name": "Operation for /jobs/multi-doc-merge",
+          "description": {},
+          "url": {
+            "path": [
+              "jobs",
+              "multi-doc-merge"
+            ],
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "query": [],
+            "variable": [],
+            "raw": "{{baseUrl}}/jobs/multi-doc-merge"
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Accept",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"documentsToMerge\": [\n    60,\n    178\n  ],\n  \"recipientAddressSource\": {\n    \"firstName\": \"Elva\",\n    \"lastName\": \"Satterfield-Lind\",\n    \"address1\": \"1740 Trevor Forest\",\n    \"city\": \"North Jacinthecester\",\n    \"state\": \"Colorado\",\n    \"zip\": \"18126-4016\",\n    \"country\": \"Croatia\",\n    \"nickName\": \"Elisa Trantow\",\n    \"address2\": \"1142 Kathryne Loop\",\n    \"address3\": \"30669 Darren Via\",\n    \"phoneNumber\": \"(254) 417-7692 x6361\"\n  },\n  \"tags\": [\n    \"aetas\",\n    \"cognomen\"\n  ]\n}",
+            "options": {
+              "raw": {
+                "headerFamily": "json",
+                "language": "json"
+              }
+            }
+          },
+          "auth": null,
+          "item": []
+        },
+        "response": [
+          {
+            "id": "b769a653-5828-4125-ba4a-f3fd2109776f",
+            "name": "Success",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "jobs",
+                  "multi-doc-merge"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/jobs/multi-doc-merge"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"documentsToMerge\": [\n    354,\n    225\n  ],\n  \"recipientAddressSource\": {\n    \"firstName\": \"Sincere\",\n    \"lastName\": \"Hermann\",\n    \"address1\": \"835 Main Street N\",\n    \"city\": \"Fort Jamison\",\n    \"state\": \"Illinois\",\n    \"zip\": \"79434-1132\",\n    \"country\": \"Christmas Island\",\n    \"nickName\": \"Winston Sauer\",\n    \"address2\": \"523 Hilpert Fort\",\n    \"address3\": \"6299 E Elm Street\",\n    \"phoneNumber\": \"1-834-717-2718\"\n  },\n  \"tags\": [\n    \"cruentus\",\n    \"arto\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "OK",
+            "code": 200,
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": "{\n  \"status\": \"cicuta\",\n  \"message\": 63,\n  \"jobId\": \"sKwM48Vk62\"\n}",
+            "cookie": [],
+            "_postman_previewlanguage": "json",
+            "item": []
+          },
+          {
+            "id": "adeb9e71-6552-450f-8dd4-00fbab04fdca",
+            "name": "Invalid request",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "jobs",
+                  "multi-doc-merge"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/jobs/multi-doc-merge"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"documentsToMerge\": [\n    622,\n    8\n  ],\n  \"recipientAddressSource\": {\n    \"firstName\": \"Kim\",\n    \"lastName\": \"Schoen\",\n    \"address1\": \"38462 Hawthorn Avenue\",\n    \"city\": \"Port Enacester\",\n    \"state\": \"Connecticut\",\n    \"zip\": \"39650\",\n    \"country\": \"Cameroon\",\n    \"nickName\": \"Latoya Watsica\",\n    \"address2\": \"48407 Yundt Canyon\",\n    \"address3\": \"36420 Meadow Close\",\n    \"phoneNumber\": \"(359) 299-6100\"\n  },\n  \"tags\": [\n    \"colo\",\n    \"thorax\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "Bad Request",
+            "code": 400,
+            "header": [],
+            "cookie": [],
+            "_postman_previewlanguage": "text",
+            "item": []
+          },
+          {
+            "id": "307c46a4-ee19-4129-93b0-b48acc99ec73",
+            "name": "Unauthorized",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "jobs",
+                  "multi-doc-merge"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/jobs/multi-doc-merge"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"documentsToMerge\": [\n    859,\n    74\n  ],\n  \"recipientAddressSource\": {\n    \"firstName\": \"Marta\",\n    \"lastName\": \"Bayer\",\n    \"address1\": \"714 Grove Street\",\n    \"city\": \"North Blaiseland\",\n    \"state\": \"Nebraska\",\n    \"zip\": \"18830-8711\",\n    \"country\": \"Latvia\",\n    \"nickName\": \"Roman Nicolas\",\n    \"address2\": \"751 S West Street\",\n    \"address3\": \"495 Purdy Gardens\",\n    \"phoneNumber\": \"755-896-4463\"\n  },\n  \"tags\": [\n    \"creator\",\n    \"perspiciatis\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "Unauthorized",
+            "code": 401,
+            "header": [],
+            "cookie": [],
+            "_postman_previewlanguage": "text",
+            "item": []
+          }
+        ],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test(\"Status code is allowed (200,201,204,400,401,403,404,429)\", function () { pm.expect([200,201,204,400,401,403,404,429]).to.include(pm.response.code); });",
+                "pm.test(\"Response time < 1s\", function () { pm.expect(pm.response.responseTime).to.be.below(1000); });"
+              ]
+            }
+          }
+        ],
+        "protocolProfileBehavior": {
+          "disableBodyPruning": true
+        }
+      },
+      {
+        "id": "2bc60072-1c8a-477f-9899-45444fa7cd47",
+        "name": "POST /jobs/single-pdf-split",
+        "request": {
+          "name": "Operation for /jobs/single-pdf-split",
+          "description": {},
+          "url": {
+            "path": [
+              "jobs",
+              "single-pdf-split"
+            ],
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "query": [],
+            "variable": [],
+            "raw": "{{baseUrl}}/jobs/single-pdf-split"
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Accept",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"documentSourceIdentifier\": \"mJKVlu1c3z\",\n  \"items\": [\n    {\n      \"pageRange\": {\n        \"startPage\": 38,\n        \"endPage\": 20\n      },\n      \"recipientAddressSources\": [\n        {\n          \"firstName\": \"Art\",\n          \"lastName\": \"Powlowski\",\n          \"address1\": \"96315 Fabian Hills\",\n          \"city\": \"New Bettye\",\n          \"state\": \"Idaho\",\n          \"zip\": \"32594-2454\",\n          \"country\": \"New Caledonia\",\n          \"nickName\": \"Jack Collier-Ruecker\",\n          \"address2\": \"73822 S 14th Street\",\n          \"address3\": \"2211 Ash Road\",\n          \"phoneNumber\": \"(305) 875-2587 x085\"\n        },\n        {\n          \"firstName\": \"Nyasia\",\n          \"lastName\": \"Keeling\",\n          \"address1\": \"623 Franecki Rest\",\n          \"city\": \"East Duncan\",\n          \"state\": \"Washington\",\n          \"zip\": \"97013\",\n          \"country\": \"Eritrea\",\n          \"nickName\": \"Pedro Runte\",\n          \"address2\": \"473 Neoma Mountains\",\n          \"address3\": \"9078 Jordy Lane\",\n          \"phoneNumber\": \"240.352.0637\"\n        }\n      ]\n    },\n    {\n      \"pageRange\": {\n        \"startPage\": 47,\n        \"endPage\": 35\n      },\n      \"recipientAddressSources\": [\n        {\n          \"firstName\": \"Berniece\",\n          \"lastName\": \"Schroeder\",\n          \"address1\": \"8250 The Woodlands\",\n          \"city\": \"Port Pattiebury\",\n          \"state\": \"Wyoming\",\n          \"zip\": \"25596-6604\",\n          \"country\": \"Kazakhstan\",\n          \"nickName\": \"Billy Shields\",\n          \"address2\": \"8609 Rosalinda Estates\",\n          \"address3\": \"851 Howard Street\",\n          \"phoneNumber\": \"529-819-5356 x7500\"\n        },\n        {\n          \"firstName\": \"Amelia\",\n          \"lastName\": \"Senger\",\n          \"address1\": \"78765 Fritsch Throughway\",\n          \"city\": \"Homenickberg\",\n          \"state\": \"Georgia\",\n          \"zip\": \"47372-6635\",\n          \"country\": \"Guinea-Bissau\",\n          \"nickName\": \"Ruby Glover Jr.\",\n          \"address2\": \"3901 Fay Flats\",\n          \"address3\": \"296 Beech Grove\",\n          \"phoneNumber\": \"1-922-758-6937 x815\"\n        }\n      ]\n    }\n  ],\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"discover\",\n      \"cardNumber\": \"eius\",\n      \"expirationDate\": {\n        \"month\": 944,\n        \"year\": 2019\n      },\n      \"cvv\": 209\n    }\n  },\n  \"tags\": [\n    \"vita\",\n    \"cur\"\n  ]\n}",
+            "options": {
+              "raw": {
+                "headerFamily": "json",
+                "language": "json"
+              }
+            }
+          },
+          "auth": null,
+          "item": []
+        },
+        "response": [
+          {
+            "id": "bcfc3860-3aca-4f46-9d0a-1cd86e368c70",
+            "name": "Success",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "jobs",
+                  "single-pdf-split"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/jobs/single-pdf-split"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"documentSourceIdentifier\": \"DrNxLV4sRp\",\n  \"items\": [\n    {\n      \"pageRange\": {\n        \"startPage\": 18,\n        \"endPage\": 62\n      },\n      \"recipientAddressSources\": [\n        {\n          \"firstName\": \"Rashawn\",\n          \"lastName\": \"Lesch\",\n          \"address1\": \"4061 Gerhold Turnpike\",\n          \"city\": \"Robelburgh\",\n          \"state\": \"California\",\n          \"zip\": \"78452\",\n          \"country\": \"Saint Pierre and Miquelon\",\n          \"nickName\": \"Dr. Fred Nader-Nader\",\n          \"address2\": \"8573 Hoeger Cove\",\n          \"address3\": \"715 Wunsch Port\",\n          \"phoneNumber\": \"787-722-0062\"\n        },\n        {\n          \"firstName\": \"Lon\",\n          \"lastName\": \"Schultz\",\n          \"address1\": \"124 Rosenbaum Mountain\",\n          \"city\": \"Port Cullenchester\",\n          \"state\": \"Mississippi\",\n          \"zip\": \"72949\",\n          \"country\": \"Tunisia\",\n          \"nickName\": \"Vickie Ryan\",\n          \"address2\": \"1390 Charles Street\",\n          \"address3\": \"1418 Romaguera Ville\",\n          \"phoneNumber\": \"(981) 835-1951 x36219\"\n        }\n      ]\n    },\n    {\n      \"pageRange\": {\n        \"startPage\": 35,\n        \"endPage\": 41\n      },\n      \"recipientAddressSources\": [\n        {\n          \"firstName\": \"Mireya\",\n          \"lastName\": \"Mueller\",\n          \"address1\": \"2079 S 8th Street\",\n          \"city\": \"Morissettemouth\",\n          \"state\": \"Kentucky\",\n          \"zip\": \"90020\",\n          \"country\": \"Congo\",\n          \"nickName\": \"Robin Williamson\",\n          \"address2\": \"67139 Lilian River\",\n          \"address3\": \"266 Kuhic Mill\",\n          \"phoneNumber\": \"692.958.7239\"\n        },\n        {\n          \"firstName\": \"Maxwell\",\n          \"lastName\": \"Walsh\",\n          \"address1\": \"15830 N Jackson Street\",\n          \"city\": \"Boyerfield\",\n          \"state\": \"Illinois\",\n          \"zip\": \"91681-9267\",\n          \"country\": \"Northern Mariana Islands\",\n          \"nickName\": \"Jerome Thompson IV\",\n          \"address2\": \"908 Wilbert Radial\",\n          \"address3\": \"8279 Jedidiah Burgs\",\n          \"phoneNumber\": \"359.882.7827 x674\"\n        }\n      ]\n    }\n  ],\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"discover\",\n      \"cardNumber\": \"odit\",\n      \"expirationDate\": {\n        \"month\": 101,\n        \"year\": 2009\n      },\n      \"cvv\": 108\n    }\n  },\n  \"tags\": [\n    \"sordeo\",\n    \"tener\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "OK",
+            "code": 200,
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": "{\n  \"status\": \"solium\",\n  \"message\": 25,\n  \"jobId\": \"UTkOGz4zEm\"\n}",
+            "cookie": [],
+            "_postman_previewlanguage": "json",
+            "item": []
+          },
+          {
+            "id": "486375cc-94c8-436e-bc83-0f569837ff67",
+            "name": "Invalid request",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "jobs",
+                  "single-pdf-split"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/jobs/single-pdf-split"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"documentSourceIdentifier\": \"PhBkJw3u26\",\n  \"items\": [\n    {\n      \"pageRange\": {\n        \"startPage\": 35,\n        \"endPage\": 80\n      },\n      \"recipientAddressSources\": [\n        {\n          \"firstName\": \"Autumn\",\n          \"lastName\": \"Goyette\",\n          \"address1\": \"839 Vicarage Lane\",\n          \"city\": \"Yostbury\",\n          \"state\": \"Minnesota\",\n          \"zip\": \"09962\",\n          \"country\": \"Pitcairn Islands\",\n          \"nickName\": \"Gwen Hauck\",\n          \"address2\": \"625 Prudence Gardens\",\n          \"address3\": \"3225 Carli Trail\",\n          \"phoneNumber\": \"(718) 542-7318 x946\"\n        },\n        {\n          \"firstName\": \"Marilyne\",\n          \"lastName\": \"Roberts\",\n          \"address1\": \"7910 Torp Ville\",\n          \"city\": \"West Danyka\",\n          \"state\": \"California\",\n          \"zip\": \"04334\",\n          \"country\": \"Saint Lucia\",\n          \"nickName\": \"Wallace Ferry\",\n          \"address2\": \"15235 Roob Forges\",\n          \"address3\": \"2651 Jackson Street\",\n          \"phoneNumber\": \"248.593.4851\"\n        }\n      ]\n    },\n    {\n      \"pageRange\": {\n        \"startPage\": 25,\n        \"endPage\": 18\n      },\n      \"recipientAddressSources\": [\n        {\n          \"firstName\": \"Bernadine\",\n          \"lastName\": \"Moore\",\n          \"address1\": \"885 E 5th Street\",\n          \"city\": \"North Dorothy\",\n          \"state\": \"Pennsylvania\",\n          \"zip\": \"75667-5099\",\n          \"country\": \"Uganda\",\n          \"nickName\": \"Louise Howe IV\",\n          \"address2\": \"7340 The Oval\",\n          \"address3\": \"72995 Earnestine Orchard\",\n          \"phoneNumber\": \"932.810.0460 x7753\"\n        },\n        {\n          \"firstName\": \"Greta\",\n          \"lastName\": \"Klocko\",\n          \"address1\": \"708 Cromwell Road\",\n          \"city\": \"East Florian\",\n          \"state\": \"Arkansas\",\n          \"zip\": \"50134-2683\",\n          \"country\": \"Virgin Islands, British\",\n          \"nickName\": \"Carlton Borer\",\n          \"address2\": \"261 S Broadway\",\n          \"address3\": \"1549 Vena Divide\",\n          \"phoneNumber\": \"(266) 298-6449 x96786\"\n        }\n      ]\n    }\n  ],\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"discover\",\n      \"cardNumber\": \"vivo\",\n      \"expirationDate\": {\n        \"month\": 512,\n        \"year\": 2015\n      },\n      \"cvv\": 951\n    }\n  },\n  \"tags\": [\n    \"pariatur\",\n    \"acerbitas\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "Bad Request",
+            "code": 400,
+            "header": [],
+            "cookie": [],
+            "_postman_previewlanguage": "text",
+            "item": []
+          },
+          {
+            "id": "f7c49e54-d38b-4a25-b7cb-39a5f372a12c",
+            "name": "Unauthorized",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "jobs",
+                  "single-pdf-split"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/jobs/single-pdf-split"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"documentSourceIdentifier\": \"xVYYxTPfbE\",\n  \"items\": [\n    {\n      \"pageRange\": {\n        \"startPage\": 37,\n        \"endPage\": 73\n      },\n      \"recipientAddressSources\": [\n        {\n          \"firstName\": \"Jaeden\",\n          \"lastName\": \"Feest\",\n          \"address1\": \"329 Market Street\",\n          \"city\": \"Framistad\",\n          \"state\": \"Alabama\",\n          \"zip\": \"32501\",\n          \"country\": \"Cocos (Keeling) Islands\",\n          \"nickName\": \"Jana Maggio\",\n          \"address2\": \"4648 Cliff Road\",\n          \"address3\": \"7361 Collier Valley\",\n          \"phoneNumber\": \"1-513-751-6758 x00441\"\n        },\n        {\n          \"firstName\": \"Angelo\",\n          \"lastName\": \"Breitenberg\",\n          \"address1\": \"33325 Nicklaus River\",\n          \"city\": \"Jarrettville\",\n          \"state\": \"North Carolina\",\n          \"zip\": \"64839-1575\",\n          \"country\": \"Cote d'Ivoire\",\n          \"nickName\": \"Sylvia Weimann\",\n          \"address2\": \"795 Grant Tunnel\",\n          \"address3\": \"4569 Feeney Court\",\n          \"phoneNumber\": \"1-695-840-7905 x802\"\n        }\n      ]\n    },\n    {\n      \"pageRange\": {\n        \"startPage\": 31,\n        \"endPage\": 75\n      },\n      \"recipientAddressSources\": [\n        {\n          \"firstName\": \"Jana\",\n          \"lastName\": \"Yost\",\n          \"address1\": \"11094 Ashley Roads\",\n          \"city\": \"East Jalyn\",\n          \"state\": \"Iowa\",\n          \"zip\": \"02504\",\n          \"country\": \"Liechtenstein\",\n          \"nickName\": \"Geneva Nitzsche\",\n          \"address2\": \"94322 Nestor Centers\",\n          \"address3\": \"3744 S Oak Street\",\n          \"phoneNumber\": \"345.359.5823\"\n        },\n        {\n          \"firstName\": \"Alta\",\n          \"lastName\": \"Ondricka\",\n          \"address1\": \"7470 Olen Orchard\",\n          \"city\": \"Greenfurt\",\n          \"state\": \"Louisiana\",\n          \"zip\": \"27394-1994\",\n          \"country\": \"Mali\",\n          \"nickName\": \"Miss Virginia Witting\",\n          \"address2\": \"64571 E Franklin Street\",\n          \"address3\": \"5523 Mervin Turnpike\",\n          \"phoneNumber\": \"(863) 220-3649 x811\"\n        }\n      ]\n    }\n  ],\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"discover\",\n      \"cardNumber\": \"viriliter\",\n      \"expirationDate\": {\n        \"month\": 516,\n        \"year\": 2013\n      },\n      \"cvv\": 576\n    }\n  },\n  \"tags\": [\n    \"reiciendis\",\n    \"tardus\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "Unauthorized",
+            "code": 401,
+            "header": [],
+            "cookie": [],
+            "_postman_previewlanguage": "text",
+            "item": []
+          }
+        ],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test(\"Status code is allowed (200,201,204,400,401,403,404,429)\", function () { pm.expect([200,201,204,400,401,403,404,429]).to.include(pm.response.code); });",
+                "pm.test(\"Response time < 1s\", function () { pm.expect(pm.response.responseTime).to.be.below(1000); });"
+              ]
+            }
+          }
+        ],
+        "protocolProfileBehavior": {
+          "disableBodyPruning": true
+        }
+      },
+      {
+        "id": "8409de0e-8799-4e32-ad42-dce5707ba989",
+        "name": "POST /jobs/single-pdf-split-addressCapture",
+        "request": {
+          "name": "Operation for /jobs/single-pdf-split-addressCapture",
+          "description": {},
+          "url": {
+            "path": [
+              "jobs",
+              "single-pdf-split-addressCapture"
+            ],
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "query": [],
+            "variable": [],
+            "raw": "{{baseUrl}}/jobs/single-pdf-split-addressCapture"
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Accept",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"documentSourceIdentifier\": \"aOI6BadmpW\",\n  \"embeddedExtractionSpecs\": [\n    {\n      \"startPage\": 60,\n      \"endPage\": 25,\n      \"addressRegion\": {\n        \"x\": 891.4,\n        \"y\": 151.08,\n        \"width\": \"qxR1F6Hi6O\",\n        \"height\": 415.82,\n        \"pageOffset\": 19\n      }\n    },\n    {\n      \"startPage\": 80,\n      \"endPage\": 41,\n      \"addressRegion\": {\n        \"x\": 621.62,\n        \"y\": 734.06,\n        \"width\": \"eXf4s3hnpD\",\n        \"height\": 963.53,\n        \"pageOffset\": 77\n      }\n    }\n  ],\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"mastercard\",\n      \"cardNumber\": \"adiuvo\",\n      \"expirationDate\": {\n        \"month\": 548,\n        \"year\": 2009\n      },\n      \"cvv\": 228\n    }\n  },\n  \"tags\": [\n    \"voluptatibus\",\n    \"adhuc\"\n  ]\n}",
+            "options": {
+              "raw": {
+                "headerFamily": "json",
+                "language": "json"
+              }
+            }
+          },
+          "auth": null,
+          "item": []
+        },
+        "response": [
+          {
+            "id": "907a52f6-aeee-4a16-9b8a-b17eb76df57e",
+            "name": "Success",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "jobs",
+                  "single-pdf-split-addressCapture"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/jobs/single-pdf-split-addressCapture"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"documentSourceIdentifier\": \"FrhTHyZuOt\",\n  \"embeddedExtractionSpecs\": [\n    {\n      \"startPage\": 45,\n      \"endPage\": 66,\n      \"addressRegion\": {\n        \"x\": 844.37,\n        \"y\": 239.62,\n        \"width\": \"QrpXtE08OQ\",\n        \"height\": 842.94,\n        \"pageOffset\": 58\n      }\n    },\n    {\n      \"startPage\": 52,\n      \"endPage\": 76,\n      \"addressRegion\": {\n        \"x\": 930.26,\n        \"y\": 276.59,\n        \"width\": \"fNX1ABiugM\",\n        \"height\": 191.76,\n        \"pageOffset\": 79\n      }\n    }\n  ],\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"mastercard\",\n      \"cardNumber\": \"delicate\",\n      \"expirationDate\": {\n        \"month\": 647,\n        \"year\": 2014\n      },\n      \"cvv\": 156\n    }\n  },\n  \"tags\": [\n    \"volubilis\",\n    \"ullam\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "OK",
+            "code": 200,
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": "{\n  \"status\": \"demitto\",\n  \"message\": 67,\n  \"jobId\": \"P0YRRmMJs3\"\n}",
+            "cookie": [],
+            "_postman_previewlanguage": "json",
+            "item": []
+          },
+          {
+            "id": "26d76359-551d-4860-a282-5b164f3f3024",
+            "name": "Invalid request",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "jobs",
+                  "single-pdf-split-addressCapture"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/jobs/single-pdf-split-addressCapture"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"documentSourceIdentifier\": \"ip9AcB83LM\",\n  \"embeddedExtractionSpecs\": [\n    {\n      \"startPage\": 25,\n      \"endPage\": 72,\n      \"addressRegion\": {\n        \"x\": 675.72,\n        \"y\": 113.75,\n        \"width\": \"eXkvjvdqmx\",\n        \"height\": 306.06,\n        \"pageOffset\": 73\n      }\n    },\n    {\n      \"startPage\": 68,\n      \"endPage\": 25,\n      \"addressRegion\": {\n        \"x\": 592.34,\n        \"y\": 63.76,\n        \"width\": \"v9hsdwd4ct\",\n        \"height\": 290.78,\n        \"pageOffset\": 45\n      }\n    }\n  ],\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"mastercard\",\n      \"cardNumber\": \"in\",\n      \"expirationDate\": {\n        \"month\": 591,\n        \"year\": 2009\n      },\n      \"cvv\": 835\n    }\n  },\n  \"tags\": [\n    \"sumptus\",\n    \"nemo\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "Bad Request",
+            "code": 400,
+            "header": [],
+            "cookie": [],
+            "_postman_previewlanguage": "text",
+            "item": []
+          },
+          {
+            "id": "4d4b6b0f-0706-46f7-b40f-b6463199e692",
+            "name": "Unauthorized",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "jobs",
+                  "single-pdf-split-addressCapture"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/jobs/single-pdf-split-addressCapture"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"documentSourceIdentifier\": \"TBlaENs27Q\",\n  \"embeddedExtractionSpecs\": [\n    {\n      \"startPage\": 34,\n      \"endPage\": 67,\n      \"addressRegion\": {\n        \"x\": 227.54,\n        \"y\": 535.83,\n        \"width\": \"8ohy8D4D8L\",\n        \"height\": 977.65,\n        \"pageOffset\": 57\n      }\n    },\n    {\n      \"startPage\": 27,\n      \"endPage\": 24,\n      \"addressRegion\": {\n        \"x\": 392.15,\n        \"y\": 718.13,\n        \"width\": \"vpdGq8QF7s\",\n        \"height\": 628.15,\n        \"pageOffset\": 78\n      }\n    }\n  ],\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"mastercard\",\n      \"cardNumber\": \"degero\",\n      \"expirationDate\": {\n        \"month\": 62,\n        \"year\": 2005\n      },\n      \"cvv\": 958\n    }\n  },\n  \"tags\": [\n    \"tricesimus\",\n    \"acervus\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "Unauthorized",
+            "code": 401,
+            "header": [],
+            "cookie": [],
+            "_postman_previewlanguage": "text",
+            "item": []
+          }
+        ],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test(\"Status code is allowed (200,201,204,400,401,403,404,429)\", function () { pm.expect([200,201,204,400,401,403,404,429]).to.include(pm.response.code); });",
+                "pm.test(\"Response time < 1s\", function () { pm.expect(pm.response.responseTime).to.be.below(1000); });"
+              ]
+            }
+          }
+        ],
+        "protocolProfileBehavior": {
+          "disableBodyPruning": true
+        }
+      },
+      {
+        "id": "e8b871ec-37f2-4117-b6e6-1bf7c1fdaa26",
+        "name": "POST /jobs/multi-pdf-address-capture",
+        "request": {
+          "name": "Operation for /jobs/multi-pdf-address-capture",
+          "description": {},
+          "url": {
+            "path": [
+              "jobs",
+              "multi-pdf-address-capture"
+            ],
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "query": [],
+            "variable": [],
+            "raw": "{{baseUrl}}/jobs/multi-pdf-address-capture"
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Accept",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"addressCapturePdfs\": [\n    {\n      \"documentSourceIdentifier\": \"rp9aeSIfdL\",\n      \"addressListRegion\": \"66693 N Church Street\",\n      \"delimiter\": \"textilis\",\n      \"tags\": [\n        \"verto\",\n        \"defleo\"\n      ]\n    },\n    {\n      \"documentSourceIdentifier\": \"83Q2g5CaeG\",\n      \"addressListRegion\": \"46072 Adell Ports\",\n      \"delimiter\": \"voluptates\",\n      \"tags\": [\n        \"stips\",\n        \"verus\"\n      ]\n    }\n  ],\n  \"jobTemplate\": \"sortitus\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"discover\",\n      \"cardNumber\": \"bibo\",\n      \"expirationDate\": {\n        \"month\": 307,\n        \"year\": 2011\n      },\n      \"cvv\": 162\n    }\n  },\n  \"tags\": [\n    \"apparatus\",\n    \"usitas\"\n  ]\n}",
+            "options": {
+              "raw": {
+                "headerFamily": "json",
+                "language": "json"
+              }
+            }
+          },
+          "auth": null,
+          "item": []
+        },
+        "response": [
+          {
+            "id": "608df64d-602a-41a8-bc6c-b0d1d7abafe7",
+            "name": "Success",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "jobs",
+                  "multi-pdf-address-capture"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/jobs/multi-pdf-address-capture"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"addressCapturePdfs\": [\n    {\n      \"documentSourceIdentifier\": \"3IyFY0nvV5\",\n      \"addressListRegion\": \"688 Noemy Flats\",\n      \"delimiter\": \"tergo\",\n      \"tags\": [\n        \"culpa\",\n        \"dolore\"\n      ]\n    },\n    {\n      \"documentSourceIdentifier\": \"Lk3xOIJlSN\",\n      \"addressListRegion\": \"49014 Ernestine Rest\",\n      \"delimiter\": \"volaticus\",\n      \"tags\": [\n        \"error\",\n        \"acsi\"\n      ]\n    }\n  ],\n  \"jobTemplate\": \"teneo\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"discover\",\n      \"cardNumber\": \"amplus\",\n      \"expirationDate\": {\n        \"month\": 400,\n        \"year\": 2017\n      },\n      \"cvv\": 452\n    }\n  },\n  \"tags\": [\n    \"reprehenderit\",\n    \"et\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "OK",
+            "code": 200,
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": "{\n  \"status\": \"tubineus\",\n  \"message\": 71,\n  \"jobId\": \"xJpbq9p0xQ\"\n}",
+            "cookie": [],
+            "_postman_previewlanguage": "json",
+            "item": []
+          },
+          {
+            "id": "c1414610-3ebb-4734-a74c-59c67b6736c7",
+            "name": "Invalid request",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "jobs",
+                  "multi-pdf-address-capture"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/jobs/multi-pdf-address-capture"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"addressCapturePdfs\": [\n    {\n      \"documentSourceIdentifier\": \"RnLA1IuGjr\",\n      \"addressListRegion\": \"925 Clotilde Ports\",\n      \"delimiter\": \"absconditus\",\n      \"tags\": [\n        \"vespillo\",\n        \"vesper\"\n      ]\n    },\n    {\n      \"documentSourceIdentifier\": \"L92xtvgV9r\",\n      \"addressListRegion\": \"446 Gorczany Squares\",\n      \"delimiter\": \"vestrum\",\n      \"tags\": [\n        \"concedo\",\n        \"volup\"\n      ]\n    }\n  ],\n  \"jobTemplate\": \"crebro\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"discover\",\n      \"cardNumber\": \"capto\",\n      \"expirationDate\": {\n        \"month\": 740,\n        \"year\": 2012\n      },\n      \"cvv\": 2\n    }\n  },\n  \"tags\": [\n    \"amplus\",\n    \"decerno\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "Bad Request",
+            "code": 400,
+            "header": [],
+            "cookie": [],
+            "_postman_previewlanguage": "text",
+            "item": []
+          },
+          {
+            "id": "14911559-526d-4d6c-b56e-58340580b6d3",
+            "name": "Unauthorized",
+            "originalRequest": {
+              "url": {
+                "path": [
+                  "jobs",
+                  "multi-pdf-address-capture"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": [],
+                "raw": "{{baseUrl}}/jobs/multi-pdf-address-capture"
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "description": {
+                    "content": "Added as a part of security scheme: bearer",
+                    "type": "text/plain"
+                  },
+                  "key": "Authorization",
+                  "value": "Bearer <token>"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"addressCapturePdfs\": [\n    {\n      \"documentSourceIdentifier\": \"PXaNbPWw3Y\",\n      \"addressListRegion\": \"500 Valley Road\",\n      \"delimiter\": \"cura\",\n      \"tags\": [\n        \"soluta\",\n        \"patrocinor\"\n      ]\n    },\n    {\n      \"documentSourceIdentifier\": \"zlZHZk6P5u\",\n      \"addressListRegion\": \"71812 S College Street\",\n      \"delimiter\": \"accedo\",\n      \"tags\": [\n        \"valens\",\n        \"vulgo\"\n      ]\n    }\n  ],\n  \"jobTemplate\": \"vinculum\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"discover\",\n      \"cardNumber\": \"cruentus\",\n      \"expirationDate\": {\n        \"month\": 731,\n        \"year\": 2001\n      },\n      \"cvv\": 665\n    }\n  },\n  \"tags\": [\n    \"error\",\n    \"utor\"\n  ]\n}",
+                "options": {
+                  "raw": {
+                    "headerFamily": "json",
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "status": "Unauthorized",
+            "code": 401,
+            "header": [],
+            "cookie": [],
+            "_postman_previewlanguage": "text",
+            "item": []
+          }
+        ],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test(\"Status code is allowed (200,201,204,400,401,403,404,429)\", function () { pm.expect([200,201,204,400,401,403,404,429]).to.include(pm.response.code); });",
+                "pm.test(\"Response time < 1s\", function () { pm.expect(pm.response.responseTime).to.be.below(1000); });"
+              ]
+            }
+          }
+        ],
+        "protocolProfileBehavior": {
+          "disableBodyPruning": true
+        }
+      }
+    ],
+    "event": [
+      {
+        "listen": "prerequest",
+        "script": {
+          "type": "text/javascript",
+          "exec": [
+            "// JWT Authentication Provider for C2M API",
+            "// Provider: JWT Two-Token System (Long-term + Short-term)",
+            "// This script automatically manages token refresh for C2M API requests",
+            "",
+            "// Configuration - Set these in your Postman environment",
+            "const config = {",
+            "    baseUrl: pm.environment.get('baseUrl') || 'http://localhost:4010',",
+            "    authUrl: pm.environment.get('authUrl') || pm.environment.get('baseUrl') || 'http://localhost:4010',",
+            "    clientId: pm.environment.get('clientId'),",
+            "    clientSecret: pm.environment.get('clientSecret'),",
+            "    longTokenVar: 'longTermToken',",
+            "    shortTokenVar: 'shortTermToken',",
+            "    tokenExpiryVar: 'tokenExpiry',",
+            "    tokenIdVar: 'currentTokenId'",
+            "};",
+            "",
+            "// Helper function to check if token is expired",
+            "function isTokenExpired(expiryTime) {",
+            "    if (!expiryTime) return true;",
+            "    const now = new Date().getTime();",
+            "    const expiry = new Date(expiryTime).getTime();",
+            "    const bufferTime = 60 * 1000; // 1 minute buffer",
+            "    return (expiry - now) <= bufferTime;",
+            "}",
+            "",
+            "// Helper function to get long-term token",
+            "async function getLongTermToken() {",
+            "    console.log('Obtaining new long-term token...');",
+            "    ",
+            "    const request = {",
+            "        url: `${config.authUrl}/auth/tokens/long`,",
+            "        method: 'POST',",
+            "        header: {",
+            "            'Content-Type': 'application/json',",
+            "            'X-Client-Id': config.clientId",
+            "        },",
+            "        body: {",
+            "            mode: 'raw',",
+            "            raw: JSON.stringify({",
+            "                grant_type: 'client_credentials',",
+            "                client_id: config.clientId,",
+            "                client_secret: config.clientSecret,",
+            "                scopes: ['jobs:submit', 'templates:read', 'tokens:revoke'],",
+            "                ttl_seconds: 2592000 // 30 days",
+            "            })",
+            "        }",
+            "    };",
+            "    ",
+            "    return new Promise((resolve, reject) => {",
+            "        pm.sendRequest(request, (err, response) => {",
+            "            if (err) {",
+            "                console.error('Failed to get long-term token:', err);",
+            "                reject(err);",
+            "                return;",
+            "            }",
+            "            ",
+            "            if (response.code === 200 || response.code === 201) {",
+            "                const data = response.json();",
+            "                pm.environment.set(config.longTokenVar, data.access_token);",
+            "                pm.environment.set('longTokenId', data.token_id);",
+            "                pm.environment.set('longTokenExpiry', data.expires_at);",
+            "                console.log(`Long-term token obtained: ${data.token_id}`);",
+            "                resolve(data.access_token);",
+            "            } else {",
+            "                console.error('Failed to get long-term token:', response.text());",
+            "                reject(new Error(`HTTP ${response.code}: ${response.text()}`));",
+            "            }",
+            "        });",
+            "    });",
+            "}",
+            "",
+            "// Helper function to get short-term token",
+            "async function getShortTermToken(longTermToken) {",
+            "    console.log('Exchanging for short-term token...');",
+            "    ",
+            "    const request = {",
+            "        url: `${config.authUrl}/auth/tokens/short`,",
+            "        method: 'POST',",
+            "        header: {",
+            "            'Authorization': `Bearer ${longTermToken}`,",
+            "            'Content-Type': 'application/json'",
+            "        },",
+            "        body: {",
+            "            mode: 'raw',",
+            "            raw: JSON.stringify({",
+            "                scopes: ['jobs:submit'] // Narrow scope for actual API calls",
+            "            })",
+            "        }",
+            "    };",
+            "    ",
+            "    return new Promise((resolve, reject) => {",
+            "        pm.sendRequest(request, (err, response) => {",
+            "            if (err) {",
+            "                console.error('Failed to get short-term token:', err);",
+            "                reject(err);",
+            "                return;",
+            "            }",
+            "            ",
+            "            if (response.code === 200 || response.code === 201) {",
+            "                const data = response.json();",
+            "                pm.environment.set(config.shortTokenVar, data.access_token);",
+            "                pm.environment.set(config.tokenExpiryVar, data.expires_at);",
+            "                pm.environment.set(config.tokenIdVar, data.token_id);",
+            "                console.log(`Short-term token obtained: ${data.token_id}, expires: ${data.expires_at}`);",
+            "                resolve(data.access_token);",
+            "            } else {",
+            "                console.error('Failed to get short-term token:', response.text());",
+            "                reject(new Error(`HTTP ${response.code}: ${response.text()}`));",
+            "            }",
+            "        });",
+            "    });",
+            "}",
+            "",
+            "// Main authentication flow",
+            "async function authenticate() {",
+            "    try {",
+            "        // Skip auth for token endpoints",
+            "        const currentPath = pm.request.url.getPath();",
+            "        if (currentPath.includes('/auth/tokens/')) {",
+            "            console.log('Skipping auth for token endpoint');",
+            "            return;",
+            "        }",
+            "        ",
+            "        // Check if we need client credentials",
+            "        if (!config.clientId || !config.clientSecret) {",
+            "            console.warn('Client credentials not configured. Set clientId and clientSecret in environment.');",
+            "            return;",
+            "        }",
+            "        ",
+            "        // Get current tokens from environment",
+            "        let longTermToken = pm.environment.get(config.longTokenVar);",
+            "        const shortTermToken = pm.environment.get(config.shortTokenVar);",
+            "        const tokenExpiry = pm.environment.get(config.tokenExpiryVar);",
+            "        ",
+            "        // Check if we need to refresh tokens",
+            "        if (!longTermToken) {",
+            "            // No long-term token, get one",
+            "            longTermToken = await getLongTermToken();",
+            "        }",
+            "        ",
+            "        if (!shortTermToken || isTokenExpired(tokenExpiry)) {",
+            "            // No short-term token or it's expired, get a new one",
+            "            await getShortTermToken(longTermToken);",
+            "        } else {",
+            "            console.log('Using existing valid short-term token');",
+            "        }",
+            "        ",
+            "        // Set the Authorization header with the short-term token",
+            "        const currentShortToken = pm.environment.get(config.shortTokenVar);",
+            "        pm.request.headers.add({",
+            "            key: 'Authorization',",
+            "            value: `Bearer ${currentShortToken}`",
+            "        });",
+            "        ",
+            "        console.log('Authentication complete, Authorization header set');",
+            "        ",
+            "    } catch (error) {",
+            "        console.error('Authentication failed:', error);",
+            "        throw error;",
+            "    }",
+            "}",
+            "",
+            "// Execute authentication",
+            "authenticate().catch(error => {",
+            "    // Set an error variable that tests can check",
+            "    pm.environment.set('authError', error.toString());",
+            "    console.error('Pre-request script failed:', error);",
+            "});",
+            "",
+            "// Utility functions for manual token management (can be called from Tests tab)",
+            "pm.globals.set('revokeCurrentToken', async function() {",
+            "    const tokenId = pm.environment.get(config.tokenIdVar);",
+            "    const token = pm.environment.get(config.shortTokenVar);",
+            "    ",
+            "    if (!tokenId || !token) {",
+            "        console.log('No token to revoke');",
+            "        return;",
+            "    }",
+            "    ",
+            "    const request = {",
+            "        url: `${config.authUrl}/auth/tokens/${tokenId}/revoke`,",
+            "        method: 'POST',",
+            "        header: {",
+            "            'Authorization': `Bearer ${token}`",
+            "        }",
+            "    };",
+            "    ",
+            "    pm.sendRequest(request, (err, response) => {",
+            "        if (err) {",
+            "            console.error('Failed to revoke token:', err);",
+            "        } else if (response.code === 200 || response.code === 204) {",
+            "            console.log(`Token ${tokenId} revoked successfully`);",
+            "            pm.environment.unset(config.shortTokenVar);",
+            "            pm.environment.unset(config.tokenExpiryVar);",
+            "            pm.environment.unset(config.tokenIdVar);",
+            "        } else {",
+            "            console.error('Failed to revoke token:', response.text());",
+            "        }",
+            "    });",
+            "});",
+            "",
+            "pm.globals.set('refreshTokens', async function() {",
+            "    try {",
+            "        const longTermToken = pm.environment.get(config.longTokenVar) || await getLongTermToken();",
+            "        await getShortTermToken(longTermToken);",
+            "        console.log('Tokens refreshed successfully');",
+            "    } catch (error) {",
+            "        console.error('Failed to refresh tokens:', error);",
+            "    }",
+            "});"
+          ]
+        }
+      }
+    ],
+    "variable": [
+      {
+        "key": "token",
+        "value": "eyJhbGciOiJub25lIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTczNjI5MjEyNH0.",
+        "type": "string"
+      },
+      {
+        "key": "baseUrl",
+        "value": "{{baseUrl}}",
+        "type": "string"
+      }
+    ]
+  }
+}

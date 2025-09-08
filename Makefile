@@ -442,6 +442,7 @@ postman-create-test-collection:
 	$(MAKE) fix-urls
 	$(MAKE) postman-test-collection-validate
 	$(MAKE) postman-test-collection-flatten-rename
+	$(MAKE) postman-test-collection-add-auth-examples || echo "⚠️  Skipping auth examples (optional step)."
 	$(MAKE) postman-test-collection-upload
 
 # Legacy test collection workflow with post-process flattening
@@ -991,6 +992,12 @@ postman-linked-collection-flatten:
 	@$(call guard-file,$(POSTMAN_COLLECTION_RAW))
 	@jq 'def all_items(i): (i // []) as $$a | [ $$a[] | if has("item") then all_items(.item)[] else . end ]; def req_name(r): (r.request.method // "REQ") as $$m | (r.request.url.path // []) as $$p | ($$p | join("/")) as $$path | if $$path == "" then $$m else ($$m + " /" + $$path) end; .item = (all_items(.item) | map( .name = req_name(.) ))' $(POSTMAN_COLLECTION_RAW) > $(POSTMAN_LINKED_COLLECTION_FLAT)
 	@echo "✅ Linked collection flattened with renamed requests"
+	@echo "🔐 Adding auth examples to linked collection..."
+	@node scripts/active/add_auth_examples.js $(POSTMAN_LINKED_COLLECTION_FLAT) $(POSTMAN_LINKED_COLLECTION_FLAT) || echo "⚠️  Skipping auth examples"
+	@echo "✅ Auth examples added"
+	@echo "📝 Adding pre-request script to collection..."
+	@node scripts/active/add_pre_request_script.js $(POSTMAN_LINKED_COLLECTION_FLAT) postman/scripts/jwt-pre-request.js $(POSTMAN_LINKED_COLLECTION_FLAT)
+	@echo "✅ Pre-request script added"
 
 # ========================================================================
 # POSTMAN COLLECTION UPLOAD
@@ -1246,6 +1253,21 @@ postman-test-collection-flatten-rename:
 	@jq 'def all_items(i): (i // []) as $$a | [ $$a[] | if has("item") then all_items(.item)[] else . end ]; def req_name(r): (r.request.method // "REQ") as $$m | (r.request.url.path // []) as $$p | ($$p | join("/")) as $$path | if $$path == "" then $$m else ($$m + " /" + $$path) end; .item = (all_items(.item) | map( .name = req_name(.) ))' $(POSTMAN_TEST_COLLECTION_FIXED) > $(POSTMAN_TEST_COLLECTION_FLAT)
 	@echo "✅ Collection flattened with renamed requests"
 
+# Apply auth examples to test collection (after flattening)
+.PHONY: postman-test-collection-add-auth-examples
+postman-test-collection-add-auth-examples:
+	@echo "🔐 Adding auth examples to test collection..."
+	@if [ ! -f "$(POSTMAN_TEST_COLLECTION_FLAT)" ]; then \
+		echo "⚠️  Flattened test collection not found. Skipping auth examples."; \
+		exit 0; \
+	fi
+	@if [ -f "$(SCRIPTS_DIR)/active/add_auth_examples.js" ]; then \
+		node $(SCRIPTS_DIR)/active/add_auth_examples.js $(POSTMAN_TEST_COLLECTION_FLAT) $(POSTMAN_TEST_COLLECTION_FLAT) || echo "⚠️  Failed to add auth examples"; \
+		echo "✅ Auth examples added to test collection"; \
+	else \
+		echo "⚠️  Auth examples script not found"; \
+	fi
+
 # ========================================================================
 # TEST COLLECTION UPLOAD
 # ========================================================================
@@ -1284,23 +1306,32 @@ postman-test-collection-upload:
 # ========================================================================
 # ENVIRONMENT CREATION
 # ========================================================================
-# Generate Postman environment file with mock URL
+# Generate Postman environment file with mock URL and auth fields
+# Auth flow: When clientId/clientSecret are populated, the pre-request script
+# will automatically fetch tokens from AWS and add them to API requests
 .PHONY: postman-env-create
 postman-env-create:
-	@echo "🧪 Generating Postman environment file..."
+	@echo "🧪 Generating Postman environment file with auth fields..."
 
 	@if [ ! -f $(POSTMAN_MOCK_URL_FILE) ]; then \
 			echo "⚠️  Missing mock URL file: $(POSTMAN_MOCK_URL_FILE)"; \
 			exit 1; \
 	fi
-	@MOCK_URL=$$(cat $(POSTMAN_MOCK_URL_FILE)); \
-	echo "🌐 Using mock URL: $$MOCK_URL"; \
-	jq -n \
-		--arg baseUrl "$$MOCK_URL" \
-		--arg token "$(TOKEN)" \
-		-f scripts/jq/env_template.jq \
-		> $(POSTMAN_ENV_FILE); \
-	echo "✅ Environment file written to $(POSTMAN_ENV_FILE) with baseUrl=$$MOCK_URL"
+	@echo "🔐 Fetching AWS credentials..."
+	@# Source credentials from AWS Secrets Manager (or use defaults)
+	@eval $$(USE_LOCAL_CREDS=true ./scripts/active/fetch_aws_credentials.sh) && \
+	export C2M_BASE_URL=$$(cat $(POSTMAN_MOCK_URL_FILE)) && \
+	export ENV_NAME="C2M API - Mock Server" && \
+	./scripts/active/generate_postman_env.sh "" $(POSTMAN_ENV_FILE)
+	@echo "✅ Mock environment file written to $(POSTMAN_ENV_FILE) with auth credentials"
+	
+	@echo "🌐 Creating AWS Dev environment for token testing..."
+	@mkdir -p postman/environments
+	@eval $$(USE_LOCAL_CREDS=true ./scripts/active/fetch_aws_credentials.sh) && \
+	export C2M_BASE_URL="$$C2M_BASE_URL" && \
+	export ENV_NAME="C2M API - AWS Dev" && \
+	./scripts/active/generate_postman_env.sh "" postman/environments/c2m-aws-dev.postman_environment.json
+	@echo "✅ AWS Dev environment file written to postman/environments/c2m-aws-dev.postman_environment.json"
 
 # ========================================================================
 # ENVIRONMENT UPLOAD
@@ -1308,7 +1339,7 @@ postman-env-create:
 # Upload environment to Postman workspace
 .PHONY: postman-env-upload
 postman-env-upload:
-	@echo "📤 Uploading Postman environment file to workspace $(POSTMAN_WS)..."
+	@echo "📤 Uploading Mock environment file to workspace $(POSTMAN_WS)..."
 	@$(call guard-file,$(POSTMAN_ENV_FILE))
 	@RESPONSE=$$(curl --silent --show-error --fail --location \
 		--request POST "$(POSTMAN_ENVIRONMENTS_URL)$(POSTMAN_Q)" \
@@ -1320,8 +1351,25 @@ postman-env-upload:
 		echo "❌ Failed to upload environment. See $(POSTMAN_ENV_UPLOAD_DEBUG)."; \
 		exit 1; \
 	else \
-		echo "✅ Environment uploaded with UID: $$POSTMAN_ENV_UID"; \
+		echo "✅ Mock environment uploaded with UID: $$POSTMAN_ENV_UID"; \
 		echo $$POSTMAN_ENV_UID > $(POSTMAN_ENV_UID_FILE); \
+	fi
+	
+	@echo "📤 Uploading AWS Dev environment file to workspace $(POSTMAN_WS)..."
+	@AWS_ENV_FILE="postman/environments/c2m-aws-dev.postman_environment.json"; \
+	if [ -f "$$AWS_ENV_FILE" ]; then \
+		RESPONSE=$$(curl --silent --show-error --fail --location \
+			--request POST "$(POSTMAN_ENVIRONMENTS_URL)$(POSTMAN_Q)" \
+			$(POSTMAN_CURL_HEADERS_XC) \
+			--data-binary "@$$AWS_ENV_FILE" || true); \
+		AWS_ENV_UID=$$(echo "$$RESPONSE" | jq -r '.environment.uid // empty'); \
+		if [ -z "$$AWS_ENV_UID" ]; then \
+			echo "⚠️  Failed to upload AWS Dev environment"; \
+		else \
+			echo "✅ AWS Dev environment uploaded with UID: $$AWS_ENV_UID"; \
+		fi \
+	else \
+		echo "⚠️  AWS Dev environment file not found: $$AWS_ENV_FILE"; \
 	fi
 
 # ========================================================================
@@ -1863,17 +1911,107 @@ generate-sdk: ## Generate SDK from OpenAPI specification
 		echo "   Run 'make openapi-build' first"; \
 		exit 1; \
 	fi
-	@if [ -x "$(SCRIPTS_DIR)/utilities/generate-sdk.sh" ]; then \
+	@if [ -x "$(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh" ]; then \
 		if [ -n "$(LANG)" ]; then \
-			$(SCRIPTS_DIR)/utilities/generate-sdk.sh $(LANG); \
+			$(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh $(LANG); \
 		else \
-			$(SCRIPTS_DIR)/utilities/generate-sdk.sh; \
+			$(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh; \
 		fi \
 	else \
 		echo "⚠️  SDK generation script not implemented yet"; \
-		echo "   TODO: Implement $(SCRIPTS_DIR)/utilities/generate-sdk.sh"; \
+		echo "   TODO: Implement $(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh"; \
 		echo "   Consider using OpenAPI Generator or similar tool"; \
 	fi
+
+# Generate Python SDK
+.PHONY: generate-sdk-python
+generate-sdk-python: ## Generate Python SDK
+	@echo "🐍 Generating Python SDK..."
+	@$(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh python sdk/python
+
+# Generate JavaScript/Node.js SDK
+.PHONY: generate-sdk-javascript
+generate-sdk-javascript: ## Generate JavaScript SDK
+	@echo "🟨 Generating JavaScript SDK..."
+	@$(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh javascript sdk/javascript
+
+# Generate TypeScript SDK
+.PHONY: generate-sdk-typescript
+generate-sdk-typescript: ## Generate TypeScript SDK
+	@echo "🔷 Generating TypeScript SDK..."
+	@$(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh typescript sdk/typescript
+
+# Generate Java SDK
+.PHONY: generate-sdk-java
+generate-sdk-java: ## Generate Java SDK
+	@echo "☕ Generating Java SDK..."
+	@$(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh java sdk/java
+
+# Generate Go SDK
+.PHONY: generate-sdk-go
+generate-sdk-go: ## Generate Go SDK
+	@echo "🐹 Generating Go SDK..."
+	@$(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh go sdk/go
+
+# Generate Ruby SDK
+.PHONY: generate-sdk-ruby
+generate-sdk-ruby: ## Generate Ruby SDK
+	@echo "💎 Generating Ruby SDK..."
+	@$(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh ruby sdk/ruby
+
+# Generate PHP SDK
+.PHONY: generate-sdk-php
+generate-sdk-php: ## Generate PHP SDK
+	@echo "🐘 Generating PHP SDK..."
+	@$(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh php sdk/php
+
+# Generate C# SDK
+.PHONY: generate-sdk-csharp
+generate-sdk-csharp: ## Generate C# SDK
+	@echo "🔷 Generating C# SDK..."
+	@$(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh csharp sdk/csharp
+
+# Generate Swift SDK (iOS)
+.PHONY: generate-sdk-swift
+generate-sdk-swift: ## Generate Swift SDK
+	@echo "🦉 Generating Swift SDK..."
+	@$(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh swift sdk/swift
+
+# Generate Kotlin SDK (Android)
+.PHONY: generate-sdk-kotlin
+generate-sdk-kotlin: ## Generate Kotlin SDK
+	@echo "🤖 Generating Kotlin SDK..."
+	@$(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh kotlin sdk/kotlin
+
+# Generate Rust SDK
+.PHONY: generate-sdk-rust
+generate-sdk-rust: ## Generate Rust SDK
+	@echo "🦀 Generating Rust SDK..."
+	@$(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh rust sdk/rust
+
+# Generate all SDKs
+.PHONY: generate-sdk-all
+generate-sdk-all: ## Generate SDKs for all supported languages
+	@echo "🌐 Generating SDKs for all languages..."
+	@$(MAKE) generate-sdk-python
+	@$(MAKE) generate-sdk-javascript
+	@$(MAKE) generate-sdk-typescript
+	@$(MAKE) generate-sdk-java
+	@$(MAKE) generate-sdk-go
+	@$(MAKE) generate-sdk-ruby
+	@$(MAKE) generate-sdk-php
+	@$(MAKE) generate-sdk-csharp
+	@$(MAKE) generate-sdk-swift
+	@$(MAKE) generate-sdk-kotlin
+	@$(MAKE) generate-sdk-rust
+	@echo "✅ All SDKs generated successfully!"
+
+# Clean generated SDKs
+.PHONY: clean-sdk
+clean-sdk: ## Clean all generated SDKs
+	@echo "🧹 Cleaning generated SDKs..."
+	@rm -rf sdk/
+	@echo "✅ SDKs cleaned"
 
 # ========================================================================
 # DOCUMENTATION DEPLOYMENT

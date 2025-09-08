@@ -1,6 +1,6 @@
 # c2m_api.AuthApi
 
-All URIs are relative to *https://api.c2m.com/v2*
+All URIs are relative to *https://api.example.com/v1*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
@@ -37,10 +37,10 @@ from c2m_api.models.long_token_response import LongTokenResponse
 from c2m_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to https://api.c2m.com/v2
+# Defining the host is optional and defaults to https://api.example.com/v1
 # See configuration.py for a list of all supported configuration parameters.
 configuration = c2m_api.Configuration(
-    host = "https://api.c2m.com/v2"
+    host = "https://api.example.com/v1"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -128,10 +128,10 @@ from c2m_api.models.short_token_response import ShortTokenResponse
 from c2m_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to https://api.c2m.com/v2
+# Defining the host is optional and defaults to https://api.example.com/v1
 # See configuration.py for a list of all supported configuration parameters.
 configuration = c2m_api.Configuration(
-    host = "https://api.c2m.com/v2"
+    host = "https://api.example.com/v1"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -209,10 +209,10 @@ import c2m_api
 from c2m_api.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to https://api.c2m.com/v2
+# Defining the host is optional and defaults to https://api.example.com/v1
 # See configuration.py for a list of all supported configuration parameters.
 configuration = c2m_api.Configuration(
-    host = "https://api.c2m.com/v2"
+    host = "https://api.example.com/v1"
 )
 
 # The client must configure the authentication and authorization parameters

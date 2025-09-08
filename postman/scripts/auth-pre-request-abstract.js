@@ -1,18 +1,18 @@
-// Abstract pre-request script that delegates to a configured auth provider
-// This allows swapping between different auth implementations (JWT, Cognito, etc.)
+// Abstract Authentication Pre-request Script for C2M API
+// This script delegates to a specific auth provider implementation
 
-// Get the auth provider script from collection variables
-const authProviderScript = pm.collectionVariables.get('authProviderScript');
-
-if (!authProviderScript) {
+// Check if auth provider script is available
+if (!pm.collectionVariables.get('authProviderScript')) {
     console.warn('No auth provider configured. Please run: make postman-auth-setup');
     return;
 }
 
-// Execute the auth provider script
+// Load and execute the provider-specific auth script
 try {
-    eval(authProviderScript);
+    // The actual provider script is injected by the build process
+    const authProvider = pm.collectionVariables.get('authProviderScript');
+    eval(authProvider);
 } catch (error) {
-    console.error('Auth provider script failed:', error);
+    console.error('Failed to execute auth provider script:', error);
     pm.environment.set('authError', error.toString());
 }
