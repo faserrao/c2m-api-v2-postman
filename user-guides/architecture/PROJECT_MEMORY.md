@@ -141,6 +141,28 @@ scripts/
 **Issue**: CI/CD published to wrong Postman workspace
 **Solution**: Implemented `.postman-target` file system
 
+### 7. GitHub Actions CI/CD Failures (2025-09-08)
+
+**Issue**: Multiple CI/CD pipeline failures preventing Postman publishing and docs deployment
+**Root Causes & Solutions**:
+
+a) **Postman CLI not found (Error 127)**
+   - Added explicit installation in GitHub Actions workflow:
+   ```yaml
+   curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
+   ```
+
+b) **Prism mock server fails in CI**
+   - Created CI-specific build targets that skip local testing:
+   - `postman-instance-build-only` (no prism-start or docs-serve)
+   - `rebuild-all-no-delete-ci` and `rebuild-all-with-delete-ci`
+   - Updated publish targets to use CI versions automatically
+
+c) **openapi-diff command hanging**
+   - npm version of openapi-diff behaves differently than brew version
+   - Temporarily disabled in Makefile (commented out line 691)
+   - TODO: Find compatible alternative or fix command flags
+
 ## Makefile Patterns
 
 ### Orchestration Philosophy

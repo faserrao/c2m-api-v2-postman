@@ -228,6 +228,13 @@ When the build succeeds, you'll see:
 - Verify your Postman API key is correct
 - Ensure you have repository access
 
+#### "GitHub Actions workflow failed"
+**Problem**: Red X on GitHub workflow
+**Common Causes & Solutions**:
+1. **Missing Postman API Key**: Make sure you added your API key as a GitHub secret
+2. **Wrong workspace**: Check that you have access to the Postman workspace
+3. **Network issues**: Try running the workflow again (temporary failures happen)
+
 #### "Postman API error"
 **Problem**: Can't connect to Postman
 **Solution**:

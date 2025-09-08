@@ -265,6 +265,15 @@ To set target: `echo "personal" > .postman-target`
 - Fixed OpenAPI spec double-encoding bug (was using `jq -Rs .` instead of `cat`)
 - Simplified publish targets to use orchestrator pattern (eliminated ~1000 lines)
 - Restored repo from broken state with auth integration mixed in
+- **2025-09-08**: Fixed CI/CD workflow issues:
+  - Postman CLI needs explicit installation in GitHub Actions
+  - Added CI-specific targets that skip local testing (prism-start, docs-serve)
+  - npm version of openapi-diff behaves differently than brew version
+- **2025-09-08**: Consolidated documentation from security repo:
+  - Created POSTMAN_COMPLETE_GUIDE.md merging all Postman docs
+  - Created AUTHENTICATION_GUIDE.md consolidating auth documentation
+  - Created CUSTOMER_ONBOARDING_GUIDE.md for new customers
+  - Established migration plan for remaining docs
 
 ## Project Memory & Key Patterns
 
@@ -293,6 +302,10 @@ make postman-workspace-debug
 2. **Workspace switching**: Use orchestrator pattern, not duplicate targets
 3. **Auth integration**: Keep in security repo, minimal hooks only
 4. **Test failures**: Check allowed status codes (now includes 403)
+5. **CI/CD issues**: 
+   - Postman CLI must be installed explicitly in GitHub Actions
+   - Use CI-specific targets that skip local servers
+   - openapi-diff npm version hangs (use npx, temporarily disabled)
 
 ### Repository Relationships
 - **Main repo**: c2m-api-repo (core API functionality)

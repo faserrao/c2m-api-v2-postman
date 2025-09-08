@@ -2,10 +2,11 @@
 
 ## 🚀 Most Used Commands
 ```bash
-make postman-instance-build-and-test    # Full pipeline test
+make postman-instance-build-and-test    # Full pipeline test (local dev)
 make postman-cleanup-all                # Clean slate
 make prism-mock-test                    # Test locally
 make postman-workspace-debug            # See what's in Postman
+make postman-publish                    # Publish to Postman (CI-safe)
 ```
 
 ## 📁 Key Files
@@ -65,6 +66,14 @@ make postman-publish
 4. Test before merging to main
 5. Makefile should be <2000 lines
 
+## 🚨 CI/CD Fixes (2025-09-08)
+- **Postman CLI**: Must be explicitly installed in GitHub Actions
+- **Local Testing**: Use CI-specific targets that skip prism/docs-serve
+- **openapi-diff**: npm version hangs, temporarily disabled
+- **New Targets**: 
+  - `postman-instance-build-only` (CI-safe)
+  - `rebuild-all-*-ci` variants
+
 ---
 *Last Updated: 2025-09-08*
-*Restoration Complete ✅*
+*CI/CD Fixed ✅*
