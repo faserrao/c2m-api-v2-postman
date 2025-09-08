@@ -520,6 +520,22 @@ postman-instance-build-and-test:
 	# Generate and serve documentation
 	$(MAKE) postman-docs-build-and-serve-up
 
+# CI version - skips local testing
+.PHONY: postman-instance-build-only
+postman-instance-build-only:
+	@echo "🚀 Starting Postman build (CI mode - no local testing)..."
+	# Authentication
+	$(MAKE) postman-login
+	# Import OpenAPI spec into Postman
+	$(MAKE) postman-import-openapi-spec
+	# Create standalone spec in Specs tab
+	$(MAKE) postman-spec-create-standalone
+	# Generate and link standard collection
+	$(MAKE) postman-create-linked-collection
+	$(MAKE) postman-create-test-collection
+	$(MAKE) postman-create-mock-and-env
+	# Skip local testing in CI
+
 # ---
 # TODO: Need to determine if there is a need for this.
 # Control variable for optional full publish
@@ -573,6 +589,18 @@ rebuild-all-no-delete:
 rebuild-all-with-delete:
 	$(MAKE) postman-cleanup-all
 	$(MAKE) rebuild-all-no-delete
+
+# CI versions - skip local testing
+.PHONY: rebuild-all-no-delete-ci
+rebuild-all-no-delete-ci:
+	$(MAKE) install
+	$(MAKE) generate-and-validate-openapi-spec
+	$(MAKE) postman-instance-build-only
+
+.PHONY: rebuild-all-with-delete-ci
+rebuild-all-with-delete-ci:
+	$(MAKE) postman-cleanup-all
+	$(MAKE) rebuild-all-no-delete-ci
 
 # ========================================================================
 # PYTHON VIRTUAL ENVIRONMENT
@@ -2167,7 +2195,7 @@ postman-publish-personal: ## Push complete suite to personal workspace
 	@echo "🔑 Using API key: POSTMAN_SERRAO_API_KEY"
 	@echo ""
 	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" \
-		$(MAKE) rebuild-all-with-delete
+		$(MAKE) rebuild-all-with-delete-ci
 
 .PHONY: postman-publish-team
 postman-publish-team: ## Push complete suite to team workspace
@@ -2180,7 +2208,7 @@ postman-publish-team: ## Push complete suite to team workspace
 	@echo "🔑 Using API key: POSTMAN_C2M_API_KEY"
 	@echo ""
 	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" \
-		$(MAKE) rebuild-all-with-delete
+		$(MAKE) rebuild-all-with-delete-ci
 
 .PHONY: postman-publish-both
 postman-publish-both: ## Push API + collection to BOTH workspaces
