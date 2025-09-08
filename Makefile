@@ -317,7 +317,7 @@ REDOCLY                          := npx @redocly/cli
 SPECTRAL                         := npx @stoplight/spectral-cli
 SWAGGER                          := npx swagger-cli
 WIDDERSHINS                      := npx widdershins
-OPENAPI_DIFF                     := openapi-diff
+OPENAPI_DIFF                     := npx openapi-diff
 
 # ========================================================================
 # POSTMAN WORKSPACE AND AUTHENTICATION
@@ -614,7 +614,6 @@ check-mock:
 # Install all required dependencies
 .PHONY: install
 install:
-	brew install openapi-diff || echo "✅ openapi-diff already installed or handled"
 	npm install \
 	openapi-to-postmanv2 \
 	@redocly/cli \
