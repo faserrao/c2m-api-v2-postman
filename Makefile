@@ -231,7 +231,12 @@ TEST_DATA_DIR                    := test-data
 REPORT_HTML                      := $(POSTMAN_DIR)/newman-report.html
 
 # Security scripts (for auth provider)
+# Check if running in CI (GitHub Actions sets CI environment variable)
+ifdef CI
+SECURITY_POSTMAN_SCRIPTS_DIR     := c2m-api-v2-security/postman/scripts
+else
 SECURITY_POSTMAN_SCRIPTS_DIR     := ../c2m-api-v2-security/postman/scripts
+endif
 
 # Default allowed status codes (comma-separated)
 POSTMAN_ALLOWED_CODES            ?= 200,201,204,400,401,403,404,429
