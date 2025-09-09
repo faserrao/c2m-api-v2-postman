@@ -47,10 +47,16 @@ Previously working workflows kept for reference.
 - Contains older versions of deployment and linting workflows
 - Useful for rollback or debugging
 
+## Security Repository Integration
+
+The workflows require access to the private `c2m-api-v2-security` repository for JWT authentication scripts. See [GITHUB_ACTIONS_SECURITY_REPO_INTEGRATION.md](./GITHUB_ACTIONS_SECURITY_REPO_INTEGRATION.md) for complete setup and troubleshooting guide.
+
 ## Workflow Dependencies
 
 ### Required Secrets
-- `POSTMAN_API_KEY` - For Postman API operations
+- `POSTMAN_SERRAO_API_KEY` - Postman API key for personal workspace
+- `POSTMAN_C2M_API_KEY` - Postman API key for team workspace
+- `SECURITY_REPO_TOKEN` - PAT for accessing private security repository
 - `GITHUB_TOKEN` - Automatically provided by GitHub
 
 ### Environment Variables
