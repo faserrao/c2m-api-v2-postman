@@ -68,6 +68,13 @@ jobs:
         with:
           fetch-depth: 0  # Full history for diff
 
+      - name: Checkout security repository
+        uses: actions/checkout@v4
+        with:
+          repository: faserrao/c2m-api-v2-security
+          path: ../c2m-api-v2-security
+          token: ${{ secrets.SECURITY_REPO_TOKEN }}  # PAT required for private repo access
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
