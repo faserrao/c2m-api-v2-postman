@@ -237,6 +237,7 @@ SECURITY_POSTMAN_SCRIPTS_DIR     := c2m-api-v2-security/postman/scripts
 else
 SECURITY_POSTMAN_SCRIPTS_DIR     := ../c2m-api-v2-security/postman/scripts
 endif
+# Token updated 2025-09-09
 
 # Default allowed status codes (comma-separated)
 POSTMAN_ALLOWED_CODES            ?= 200,201,204,400,401,403,404,429
