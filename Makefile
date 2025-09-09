@@ -2116,33 +2116,16 @@ git-save: ## Quick git save (requires MSG="commit message")
 postman-auth-setup: ## Configure authentication for Postman collection
 	@echo "🔐 Setting up authentication configuration..."
 	@if [ -f "$(SECURITY_POSTMAN_SCRIPTS_DIR)/jwt-auth-provider.js" ]; then \
-		echo "📋 Loading JWT auth provider script from security repo..."; \
-		AUTH_SCRIPT=$$(cat "$(SECURITY_POSTMAN_SCRIPTS_DIR)/jwt-auth-provider.js"); \
-		echo "✅ Adding auth provider as collection pre-request script..."; \
-		if [ -f "$(POSTMAN_TEST_COLLECTION_WITH_TESTS)" ]; then \
-			jq --arg script "$$AUTH_SCRIPT" \
-				'.event = (.event // []) | \
-				.event |= map(select(.listen != "prerequest")) + \
-				[{"listen": "prerequest", "script": {"type": "text/javascript", "exec": ($$script | split("\n"))}}]' \
-				"$(POSTMAN_TEST_COLLECTION_WITH_TESTS)" > "$(POSTMAN_TEST_COLLECTION_WITH_TESTS).tmp" && \
-			mv "$(POSTMAN_TEST_COLLECTION_WITH_TESTS).tmp" "$(POSTMAN_TEST_COLLECTION_WITH_TESTS)"; \
-			echo "✅ Auth provider script added to test collection"; \
-		else \
-			echo "⚠️  Test collection not found, skipping auth setup"; \
-		fi; \
+		echo "📋 Using JWT auth provider script from security repo..."; \
+		node scripts/active/add_pre_request_script.js "$(POSTMAN_TEST_COLLECTION_WITH_TESTS)" "$(SECURITY_POSTMAN_SCRIPTS_DIR)/jwt-auth-provider.js" "$(POSTMAN_TEST_COLLECTION_WITH_TESTS)" && \
+		echo "✅ Auth provider script added to test collection" || \
+		echo "❌ Failed to add auth provider script"; \
 	else \
 		echo "📋 Auth provider script not found in security repo, using local script..."; \
 		if [ -f "$(POSTMAN_DIR)/scripts/jwt-pre-request.js" ]; then \
-			AUTH_SCRIPT=$$(cat "$(POSTMAN_DIR)/scripts/jwt-pre-request.js"); \
-			if [ -f "$(POSTMAN_TEST_COLLECTION_WITH_TESTS)" ]; then \
-				jq --arg script "$$AUTH_SCRIPT" \
-					'.event = (.event // []) | \
-					.event |= map(select(.listen != "prerequest")) + \
-					[{"listen": "prerequest", "script": {"type": "text/javascript", "exec": ($$script | split("\n"))}}]' \
-					"$(POSTMAN_TEST_COLLECTION_WITH_TESTS)" > "$(POSTMAN_TEST_COLLECTION_WITH_TESTS).tmp" && \
-				mv "$(POSTMAN_TEST_COLLECTION_WITH_TESTS).tmp" "$(POSTMAN_TEST_COLLECTION_WITH_TESTS)"; \
-				echo "✅ Local auth provider script added to test collection"; \
-			fi; \
+			node scripts/active/add_pre_request_script.js "$(POSTMAN_TEST_COLLECTION_WITH_TESTS)" "$(POSTMAN_DIR)/scripts/jwt-pre-request.js" "$(POSTMAN_TEST_COLLECTION_WITH_TESTS)" && \
+			echo "✅ Local auth provider script added to test collection" || \
+			echo "❌ Failed to add local auth provider script"; \
 		else \
 			echo "⚠️  No auth provider script found"; \
 		fi; \
