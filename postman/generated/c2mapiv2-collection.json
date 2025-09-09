@@ -13,7 +13,7 @@
           "description": "",
           "item": [
             {
-              "id": "4753c27c-c853-48f8-8342-7224596700c0",
+              "id": "825f8aa4-2abe-483f-ad2e-bf40b99baf25",
               "name": "Operation for /jobs/single-doc-job-template",
               "request": {
                 "name": "Operation for /jobs/single-doc-job-template",
@@ -42,7 +42,7 @@
                 "method": "POST",
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"americanExpress\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                  "raw": "{\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"discover\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                   "options": {
                     "raw": {
                       "headerFamily": "json",
@@ -54,7 +54,7 @@
               },
               "response": [
                 {
-                  "id": "f48f1b5c-7771-4428-8a63-024b04f0c6f4",
+                  "id": "eeb839b5-6c39-42cb-9217-a93794f2b39f",
                   "name": "Success",
                   "originalRequest": {
                     "url": {
@@ -89,7 +89,7 @@
                     "method": "POST",
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"americanExpress\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                      "raw": "{\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"discover\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                       "options": {
                         "raw": {
                           "headerFamily": "json",
@@ -111,7 +111,7 @@
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "4d3f95a2-1c34-4a78-8048-4a4e1f79f1f2",
+                  "id": "4db32c5a-f8e4-422d-973b-81de6e632ecf",
                   "name": "Invalid request",
                   "originalRequest": {
                     "url": {
@@ -142,7 +142,7 @@
                     "method": "POST",
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"americanExpress\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                      "raw": "{\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"discover\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                       "options": {
                         "raw": {
                           "headerFamily": "json",
@@ -158,7 +158,7 @@
                   "_postman_previewlanguage": "text"
                 },
                 {
-                  "id": "d0a68b09-ff18-474b-a20f-7fbca65b9da2",
+                  "id": "204432ec-1aa9-46e3-b8a0-18fc083ceb05",
                   "name": "Unauthorized",
                   "originalRequest": {
                     "url": {
@@ -189,7 +189,7 @@
                     "method": "POST",
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"americanExpress\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                      "raw": "{\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"discover\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                       "options": {
                         "raw": {
                           "headerFamily": "json",
@@ -217,7 +217,7 @@
           "description": "",
           "item": [
             {
-              "id": "15477db5-084d-47a4-aab5-c786c9454e47",
+              "id": "cd17628f-8258-47d6-ad50-48fde69a2220",
               "name": "Operation for /jobs/multi-docs-job-template",
               "request": {
                 "name": "Operation for /jobs/multi-docs-job-template",
@@ -246,7 +246,7 @@
                 "method": "POST",
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"items\": [\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"discover\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                  "raw": "{\n  \"items\": [\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                   "options": {
                     "raw": {
                       "headerFamily": "json",
@@ -258,7 +258,7 @@
               },
               "response": [
                 {
-                  "id": "79f94783-d929-461b-9f1f-8b0b7b7fed3c",
+                  "id": "e3721df7-7cbb-4b48-afa5-b6aee92e03cf",
                   "name": "Success",
                   "originalRequest": {
                     "url": {
@@ -293,7 +293,7 @@
                     "method": "POST",
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"items\": [\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"discover\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                      "raw": "{\n  \"items\": [\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                       "options": {
                         "raw": {
                           "headerFamily": "json",
@@ -315,7 +315,7 @@
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "2d636453-4634-49af-9428-7247b77f69e4",
+                  "id": "78cf5685-cc7d-4ca9-870d-0cd407701378",
                   "name": "Invalid request",
                   "originalRequest": {
                     "url": {
@@ -346,7 +346,7 @@
                     "method": "POST",
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"items\": [\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"discover\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                      "raw": "{\n  \"items\": [\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                       "options": {
                         "raw": {
                           "headerFamily": "json",
@@ -362,7 +362,7 @@
                   "_postman_previewlanguage": "text"
                 },
                 {
-                  "id": "dc8e9905-cb9f-4bbd-8225-291e740a0ae9",
+                  "id": "deadc37b-fff0-405b-acd0-c0c1d8345c10",
                   "name": "Unauthorized",
                   "originalRequest": {
                     "url": {
@@ -393,7 +393,7 @@
                     "method": "POST",
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"items\": [\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"discover\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                      "raw": "{\n  \"items\": [\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                       "options": {
                         "raw": {
                           "headerFamily": "json",
@@ -421,7 +421,7 @@
           "description": "",
           "item": [
             {
-              "id": "dae79503-3a80-48df-a58a-7111a64cc083",
+              "id": "4f1eb078-f4ae-4b30-8208-dab43f45a00d",
               "name": "Operation for /jobs/multi-doc-merge-job-template",
               "request": {
                 "name": "Operation for /jobs/multi-doc-merge-job-template",
@@ -450,7 +450,7 @@
                 "method": "POST",
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"documentsToMerge\": [\n    \"<integer>\",\n    \"<integer>\"\n  ],\n  \"recipientAddressSource\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"nickName\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\",\n    \"phoneNumber\": \"<string>\"\n  },\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"americanExpress\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                  "raw": "{\n  \"documentsToMerge\": [\n    \"<integer>\",\n    \"<integer>\"\n  ],\n  \"recipientAddressSource\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"nickName\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\",\n    \"phoneNumber\": \"<string>\"\n  },\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                   "options": {
                     "raw": {
                       "headerFamily": "json",
@@ -462,7 +462,7 @@
               },
               "response": [
                 {
-                  "id": "eb9c0728-04be-44c9-b2fe-0fc517efdeeb",
+                  "id": "f8340a4e-429a-44ce-92e6-06e270f369e7",
                   "name": "Success",
                   "originalRequest": {
                     "url": {
@@ -497,7 +497,7 @@
                     "method": "POST",
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"documentsToMerge\": [\n    \"<integer>\",\n    \"<integer>\"\n  ],\n  \"recipientAddressSource\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"nickName\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\",\n    \"phoneNumber\": \"<string>\"\n  },\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"americanExpress\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                      "raw": "{\n  \"documentsToMerge\": [\n    \"<integer>\",\n    \"<integer>\"\n  ],\n  \"recipientAddressSource\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"nickName\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\",\n    \"phoneNumber\": \"<string>\"\n  },\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                       "options": {
                         "raw": {
                           "headerFamily": "json",
@@ -519,7 +519,7 @@
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "1bd5315e-4dff-4b3f-8ba7-ff05a762fa31",
+                  "id": "cf1f6f97-9551-49cb-a5d5-ea6d37c32740",
                   "name": "Invalid request",
                   "originalRequest": {
                     "url": {
@@ -550,7 +550,7 @@
                     "method": "POST",
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"documentsToMerge\": [\n    \"<integer>\",\n    \"<integer>\"\n  ],\n  \"recipientAddressSource\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"nickName\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\",\n    \"phoneNumber\": \"<string>\"\n  },\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"americanExpress\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                      "raw": "{\n  \"documentsToMerge\": [\n    \"<integer>\",\n    \"<integer>\"\n  ],\n  \"recipientAddressSource\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"nickName\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\",\n    \"phoneNumber\": \"<string>\"\n  },\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                       "options": {
                         "raw": {
                           "headerFamily": "json",
@@ -566,7 +566,7 @@
                   "_postman_previewlanguage": "text"
                 },
                 {
-                  "id": "93e6d9d9-efb3-421c-b7f3-ba400dcd863e",
+                  "id": "771b92fc-62f9-494a-b531-0eb3a77a327b",
                   "name": "Unauthorized",
                   "originalRequest": {
                     "url": {
@@ -597,7 +597,7 @@
                     "method": "POST",
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"documentsToMerge\": [\n    \"<integer>\",\n    \"<integer>\"\n  ],\n  \"recipientAddressSource\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"nickName\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\",\n    \"phoneNumber\": \"<string>\"\n  },\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"americanExpress\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                      "raw": "{\n  \"documentsToMerge\": [\n    \"<integer>\",\n    \"<integer>\"\n  ],\n  \"recipientAddressSource\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"nickName\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\",\n    \"phoneNumber\": \"<string>\"\n  },\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                       "options": {
                         "raw": {
                           "headerFamily": "json",
@@ -625,7 +625,7 @@
           "description": "",
           "item": [
             {
-              "id": "f21c8e90-c882-418e-81b5-dac8375a9fe3",
+              "id": "8426e4d8-aa4a-4909-b274-577bdde7a7e1",
               "name": "Operation for /jobs/single-doc",
               "request": {
                 "name": "Operation for /jobs/single-doc",
@@ -654,7 +654,7 @@
                 "method": "POST",
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"documentSourceIdentifier\": \"<integer>\",\n  \"recipientAddressSources\": [\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    },\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"personalLetter\",\n    \"layout\": \"landscape\",\n    \"mailclass\": \"firstClassMail\",\n    \"paperType\": \"postcard\",\n    \"printOption\": \"color\",\n    \"envelope\": \"letter\"\n  },\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                  "raw": "{\n  \"documentSourceIdentifier\": \"<integer>\",\n  \"recipientAddressSources\": [\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    },\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"personalLetter\",\n    \"layout\": \"landscape\",\n    \"mailclass\": \"priorityMail\",\n    \"paperType\": \"legal\",\n    \"printOption\": \"grayscale\",\n    \"envelope\": \"flat\"\n  },\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"americanExpress\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                   "options": {
                     "raw": {
                       "headerFamily": "json",
@@ -666,7 +666,7 @@
               },
               "response": [
                 {
-                  "id": "2a7b96ce-cdca-49d1-a153-b8c914a4b28b",
+                  "id": "29bdf0bf-dece-4a21-802b-ac27ebe798a7",
                   "name": "Success",
                   "originalRequest": {
                     "url": {
@@ -701,7 +701,7 @@
                     "method": "POST",
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"documentSourceIdentifier\": \"<integer>\",\n  \"recipientAddressSources\": [\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    },\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"personalLetter\",\n    \"layout\": \"landscape\",\n    \"mailclass\": \"firstClassMail\",\n    \"paperType\": \"postcard\",\n    \"printOption\": \"color\",\n    \"envelope\": \"letter\"\n  },\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                      "raw": "{\n  \"documentSourceIdentifier\": \"<integer>\",\n  \"recipientAddressSources\": [\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    },\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"personalLetter\",\n    \"layout\": \"landscape\",\n    \"mailclass\": \"priorityMail\",\n    \"paperType\": \"legal\",\n    \"printOption\": \"grayscale\",\n    \"envelope\": \"flat\"\n  },\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"americanExpress\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                       "options": {
                         "raw": {
                           "headerFamily": "json",
@@ -723,7 +723,7 @@
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "64afb7dc-9238-4623-9168-3105fb9991ea",
+                  "id": "e29b8959-b775-424c-ab85-2008c6fd8ad0",
                   "name": "Invalid request",
                   "originalRequest": {
                     "url": {
@@ -754,7 +754,7 @@
                     "method": "POST",
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"documentSourceIdentifier\": \"<integer>\",\n  \"recipientAddressSources\": [\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    },\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"personalLetter\",\n    \"layout\": \"landscape\",\n    \"mailclass\": \"firstClassMail\",\n    \"paperType\": \"postcard\",\n    \"printOption\": \"color\",\n    \"envelope\": \"letter\"\n  },\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                      "raw": "{\n  \"documentSourceIdentifier\": \"<integer>\",\n  \"recipientAddressSources\": [\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    },\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"personalLetter\",\n    \"layout\": \"landscape\",\n    \"mailclass\": \"priorityMail\",\n    \"paperType\": \"legal\",\n    \"printOption\": \"grayscale\",\n    \"envelope\": \"flat\"\n  },\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"americanExpress\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                       "options": {
                         "raw": {
                           "headerFamily": "json",
@@ -770,7 +770,7 @@
                   "_postman_previewlanguage": "text"
                 },
                 {
-                  "id": "22c2942e-5cd7-49b6-91db-614a142b901f",
+                  "id": "af37d2ee-3af6-48c8-a878-bc89c9d3f40d",
                   "name": "Unauthorized",
                   "originalRequest": {
                     "url": {
@@ -801,7 +801,7 @@
                     "method": "POST",
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"documentSourceIdentifier\": \"<integer>\",\n  \"recipientAddressSources\": [\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    },\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"personalLetter\",\n    \"layout\": \"landscape\",\n    \"mailclass\": \"firstClassMail\",\n    \"paperType\": \"postcard\",\n    \"printOption\": \"color\",\n    \"envelope\": \"letter\"\n  },\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                      "raw": "{\n  \"documentSourceIdentifier\": \"<integer>\",\n  \"recipientAddressSources\": [\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    },\n    {\n      \"firstName\": \"<string>\",\n      \"lastName\": \"<string>\",\n      \"address1\": \"<string>\",\n      \"city\": \"<string>\",\n      \"state\": \"<string>\",\n      \"zip\": \"<string>\",\n      \"country\": \"<string>\",\n      \"nickName\": \"<string>\",\n      \"address2\": \"<string>\",\n      \"address3\": \"<string>\",\n      \"phoneNumber\": \"<string>\"\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"personalLetter\",\n    \"layout\": \"landscape\",\n    \"mailclass\": \"priorityMail\",\n    \"paperType\": \"legal\",\n    \"printOption\": \"grayscale\",\n    \"envelope\": \"flat\"\n  },\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"americanExpress\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                       "options": {
                         "raw": {
                           "headerFamily": "json",
@@ -829,7 +829,7 @@
           "description": "",
           "item": [
             {
-              "id": "f1982dc0-81de-4816-9fc8-3cfb65a968f7",
+              "id": "5509785c-711c-49d7-934c-dc472b9913c5",
               "name": "Operation for /jobs/multi-doc",
               "request": {
                 "name": "Operation for /jobs/multi-doc",
@@ -858,7 +858,7 @@
                 "method": "POST",
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"items\": [\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"personalLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"firstClassMail\",\n    \"paperType\": \"letter\",\n    \"printOption\": \"grayscale\",\n    \"envelope\": \"flat\"\n  },\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"mastercard\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                  "raw": "{\n  \"items\": [\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"businessLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"firstClassMail\",\n    \"paperType\": \"letter\",\n    \"printOption\": \"color\",\n    \"envelope\": \"windowedFlat\"\n  },\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                   "options": {
                     "raw": {
                       "headerFamily": "json",
@@ -870,7 +870,7 @@
               },
               "response": [
                 {
-                  "id": "abcdab03-1572-4777-aa5a-e1d2bace41cb",
+                  "id": "804c5415-d6f3-4246-8af7-9e18e7366cc9",
                   "name": "Success",
                   "originalRequest": {
                     "url": {
@@ -905,7 +905,7 @@
                     "method": "POST",
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"items\": [\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"personalLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"firstClassMail\",\n    \"paperType\": \"letter\",\n    \"printOption\": \"grayscale\",\n    \"envelope\": \"flat\"\n  },\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"mastercard\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                      "raw": "{\n  \"items\": [\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"businessLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"firstClassMail\",\n    \"paperType\": \"letter\",\n    \"printOption\": \"color\",\n    \"envelope\": \"windowedFlat\"\n  },\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                       "options": {
                         "raw": {
                           "headerFamily": "json",
@@ -927,7 +927,7 @@
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "5f3091d2-c309-4d29-8dc5-db83ea476eee",
+                  "id": "d6276052-6949-46bf-8298-8ac19315d96f",
                   "name": "Invalid request",
                   "originalRequest": {
                     "url": {
@@ -958,7 +958,7 @@
                     "method": "POST",
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"items\": [\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"personalLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"firstClassMail\",\n    \"paperType\": \"letter\",\n    \"printOption\": \"grayscale\",\n    \"envelope\": \"flat\"\n  },\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"mastercard\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                      "raw": "{\n  \"items\": [\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"businessLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"firstClassMail\",\n    \"paperType\": \"letter\",\n    \"printOption\": \"color\",\n    \"envelope\": \"windowedFlat\"\n  },\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                       "options": {
                         "raw": {
                           "headerFamily": "json",
@@ -974,7 +974,7 @@
                   "_postman_previewlanguage": "text"
                 },
                 {
-                  "id": "b591a293-c845-46fd-92f5-93570c639269",
+                  "id": "59a9f9f3-8104-45c7-98fb-4a46763e1986",
                   "name": "Unauthorized",
                   "originalRequest": {
                     "url": {
@@ -1005,7 +1005,7 @@
                     "method": "POST",
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"items\": [\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"personalLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"firstClassMail\",\n    \"paperType\": \"letter\",\n    \"printOption\": \"grayscale\",\n    \"envelope\": \"flat\"\n  },\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"mastercard\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                      "raw": "{\n  \"items\": [\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    },\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"recipientAddressSource\": {\n        \"firstName\": \"<string>\",\n        \"lastName\": \"<string>\",\n        \"address1\": \"<string>\",\n        \"city\": \"<string>\",\n        \"state\": \"<string>\",\n        \"zip\": \"<string>\",\n        \"country\": \"<string>\",\n        \"nickName\": \"<string>\",\n        \"address2\": \"<string>\",\n        \"address3\": \"<string>\",\n        \"phoneNumber\": \"<string>\"\n      }\n    }\n  ],\n  \"jobOptions\": {\n    \"documentClass\": \"businessLetter\",\n    \"layout\": \"portrait\",\n    \"mailclass\": \"firstClassMail\",\n    \"paperType\": \"letter\",\n    \"printOption\": \"color\",\n    \"envelope\": \"windowedFlat\"\n  },\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                       "options": {
                         "raw": {
                           "headerFamily": "json",
@@ -1033,7 +1033,7 @@
           "description": "",
           "item": [
             {
-              "id": "bd4e11f9-24a5-4bf4-a511-4c80cc0d70a5",
+              "id": "22f74952-d904-4b10-997f-ac2173b9e844",
               "name": "Operation for /jobs/multi-doc-merge",
               "request": {
                 "name": "Operation for /jobs/multi-doc-merge",
@@ -1074,7 +1074,7 @@
               },
               "response": [
                 {
-                  "id": "6f391214-d099-4e7b-a239-084a3a90fedb",
+                  "id": "df191b92-4952-411c-aa01-61439e425b9c",
                   "name": "Success",
                   "originalRequest": {
                     "url": {
@@ -1131,7 +1131,7 @@
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "3b209671-4230-459a-aa0d-b15480acf3f5",
+                  "id": "48cf9132-9afe-487b-ba34-7e37398a5693",
                   "name": "Invalid request",
                   "originalRequest": {
                     "url": {
@@ -1178,7 +1178,7 @@
                   "_postman_previewlanguage": "text"
                 },
                 {
-                  "id": "61acc910-276a-4d26-8b81-510138d3d8f3",
+                  "id": "c7400fa2-8a93-4622-a065-b8d0d199ffd7",
                   "name": "Unauthorized",
                   "originalRequest": {
                     "url": {
@@ -1237,7 +1237,7 @@
           "description": "",
           "item": [
             {
-              "id": "3fa59865-0ab0-483d-a448-ef80086a4609",
+              "id": "f8579818-bd64-4c8b-aaf6-c1abba213161",
               "name": "Operation for /jobs/single-pdf-split",
               "request": {
                 "name": "Operation for /jobs/single-pdf-split",
@@ -1266,7 +1266,7 @@
                 "method": "POST",
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"documentSourceIdentifier\": \"<integer>\",\n  \"items\": [\n    {\n      \"pageRange\": {\n        \"startPage\": \"<integer>\",\n        \"endPage\": \"<integer>\"\n      },\n      \"recipientAddressSources\": [\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        },\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        }\n      ]\n    },\n    {\n      \"pageRange\": {\n        \"startPage\": \"<integer>\",\n        \"endPage\": \"<integer>\"\n      },\n      \"recipientAddressSources\": [\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        },\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        }\n      ]\n    }\n  ],\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"mastercard\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                  "raw": "{\n  \"documentSourceIdentifier\": \"<integer>\",\n  \"items\": [\n    {\n      \"pageRange\": {\n        \"startPage\": \"<integer>\",\n        \"endPage\": \"<integer>\"\n      },\n      \"recipientAddressSources\": [\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        },\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        }\n      ]\n    },\n    {\n      \"pageRange\": {\n        \"startPage\": \"<integer>\",\n        \"endPage\": \"<integer>\"\n      },\n      \"recipientAddressSources\": [\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        },\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        }\n      ]\n    }\n  ],\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                   "options": {
                     "raw": {
                       "headerFamily": "json",
@@ -1278,7 +1278,7 @@
               },
               "response": [
                 {
-                  "id": "da6ab3a0-b4c1-47d0-a7f6-659be9933a31",
+                  "id": "0499a659-4165-4ddc-bf9d-458c78b48dcd",
                   "name": "Success",
                   "originalRequest": {
                     "url": {
@@ -1313,7 +1313,7 @@
                     "method": "POST",
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"documentSourceIdentifier\": \"<integer>\",\n  \"items\": [\n    {\n      \"pageRange\": {\n        \"startPage\": \"<integer>\",\n        \"endPage\": \"<integer>\"\n      },\n      \"recipientAddressSources\": [\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        },\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        }\n      ]\n    },\n    {\n      \"pageRange\": {\n        \"startPage\": \"<integer>\",\n        \"endPage\": \"<integer>\"\n      },\n      \"recipientAddressSources\": [\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        },\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        }\n      ]\n    }\n  ],\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"mastercard\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                      "raw": "{\n  \"documentSourceIdentifier\": \"<integer>\",\n  \"items\": [\n    {\n      \"pageRange\": {\n        \"startPage\": \"<integer>\",\n        \"endPage\": \"<integer>\"\n      },\n      \"recipientAddressSources\": [\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        },\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        }\n      ]\n    },\n    {\n      \"pageRange\": {\n        \"startPage\": \"<integer>\",\n        \"endPage\": \"<integer>\"\n      },\n      \"recipientAddressSources\": [\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        },\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        }\n      ]\n    }\n  ],\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                       "options": {
                         "raw": {
                           "headerFamily": "json",
@@ -1335,7 +1335,7 @@
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "a396dae0-e85c-42a9-8e75-c04fd4ee04aa",
+                  "id": "6bacb76d-5410-41e9-91ed-f4e8c58abea0",
                   "name": "Invalid request",
                   "originalRequest": {
                     "url": {
@@ -1366,7 +1366,7 @@
                     "method": "POST",
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"documentSourceIdentifier\": \"<integer>\",\n  \"items\": [\n    {\n      \"pageRange\": {\n        \"startPage\": \"<integer>\",\n        \"endPage\": \"<integer>\"\n      },\n      \"recipientAddressSources\": [\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        },\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        }\n      ]\n    },\n    {\n      \"pageRange\": {\n        \"startPage\": \"<integer>\",\n        \"endPage\": \"<integer>\"\n      },\n      \"recipientAddressSources\": [\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        },\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        }\n      ]\n    }\n  ],\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"mastercard\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                      "raw": "{\n  \"documentSourceIdentifier\": \"<integer>\",\n  \"items\": [\n    {\n      \"pageRange\": {\n        \"startPage\": \"<integer>\",\n        \"endPage\": \"<integer>\"\n      },\n      \"recipientAddressSources\": [\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        },\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        }\n      ]\n    },\n    {\n      \"pageRange\": {\n        \"startPage\": \"<integer>\",\n        \"endPage\": \"<integer>\"\n      },\n      \"recipientAddressSources\": [\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        },\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        }\n      ]\n    }\n  ],\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                       "options": {
                         "raw": {
                           "headerFamily": "json",
@@ -1382,7 +1382,7 @@
                   "_postman_previewlanguage": "text"
                 },
                 {
-                  "id": "a6c5bb91-9050-4da0-9b92-eb2fd5b015a4",
+                  "id": "302df0aa-2cc6-4f15-88c1-0467478991f2",
                   "name": "Unauthorized",
                   "originalRequest": {
                     "url": {
@@ -1413,7 +1413,7 @@
                     "method": "POST",
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"documentSourceIdentifier\": \"<integer>\",\n  \"items\": [\n    {\n      \"pageRange\": {\n        \"startPage\": \"<integer>\",\n        \"endPage\": \"<integer>\"\n      },\n      \"recipientAddressSources\": [\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        },\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        }\n      ]\n    },\n    {\n      \"pageRange\": {\n        \"startPage\": \"<integer>\",\n        \"endPage\": \"<integer>\"\n      },\n      \"recipientAddressSources\": [\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        },\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        }\n      ]\n    }\n  ],\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"mastercard\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                      "raw": "{\n  \"documentSourceIdentifier\": \"<integer>\",\n  \"items\": [\n    {\n      \"pageRange\": {\n        \"startPage\": \"<integer>\",\n        \"endPage\": \"<integer>\"\n      },\n      \"recipientAddressSources\": [\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        },\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        }\n      ]\n    },\n    {\n      \"pageRange\": {\n        \"startPage\": \"<integer>\",\n        \"endPage\": \"<integer>\"\n      },\n      \"recipientAddressSources\": [\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        },\n        {\n          \"firstName\": \"<string>\",\n          \"lastName\": \"<string>\",\n          \"address1\": \"<string>\",\n          \"city\": \"<string>\",\n          \"state\": \"<string>\",\n          \"zip\": \"<string>\",\n          \"country\": \"<string>\",\n          \"nickName\": \"<string>\",\n          \"address2\": \"<string>\",\n          \"address3\": \"<string>\",\n          \"phoneNumber\": \"<string>\"\n        }\n      ]\n    }\n  ],\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                       "options": {
                         "raw": {
                           "headerFamily": "json",
@@ -1441,7 +1441,7 @@
           "description": "",
           "item": [
             {
-              "id": "98ae9ec3-ae2a-4e83-ade4-ea4203d7a660",
+              "id": "cb0501af-32b3-46a7-af60-366e8813a3a6",
               "name": "Operation for /jobs/single-pdf-split-addressCapture",
               "request": {
                 "name": "Operation for /jobs/single-pdf-split-addressCapture",
@@ -1482,7 +1482,7 @@
               },
               "response": [
                 {
-                  "id": "19312d0f-a480-4420-a404-eb10f6939008",
+                  "id": "3a2e528c-331c-4e03-bbd0-25b4389d54d4",
                   "name": "Success",
                   "originalRequest": {
                     "url": {
@@ -1539,7 +1539,7 @@
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "279aa9ae-9c75-4c25-b93e-387cc7e10c17",
+                  "id": "5e692c84-cc03-4b1e-b617-6362312278f0",
                   "name": "Invalid request",
                   "originalRequest": {
                     "url": {
@@ -1586,7 +1586,7 @@
                   "_postman_previewlanguage": "text"
                 },
                 {
-                  "id": "af383258-8121-4a23-83c2-8d920b17dbe7",
+                  "id": "a74e5b9c-d281-4393-bfd4-24b6dc887d20",
                   "name": "Unauthorized",
                   "originalRequest": {
                     "url": {
@@ -1645,7 +1645,7 @@
           "description": "",
           "item": [
             {
-              "id": "34f4a8db-88f6-4f8f-8d68-6ef10816d460",
+              "id": "963a1483-f526-4b28-8a2e-405a25fde707",
               "name": "Operation for /jobs/multi-pdf-address-capture",
               "request": {
                 "name": "Operation for /jobs/multi-pdf-address-capture",
@@ -1674,7 +1674,7 @@
                 "method": "POST",
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"addressCapturePdfs\": [\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"addressListRegion\": \"<string>\",\n      \"delimiter\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    },\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"addressListRegion\": \"<string>\",\n      \"delimiter\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                  "raw": "{\n  \"addressCapturePdfs\": [\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"addressListRegion\": \"<string>\",\n      \"delimiter\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    },\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"addressListRegion\": \"<string>\",\n      \"delimiter\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"discover\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                   "options": {
                     "raw": {
                       "headerFamily": "json",
@@ -1686,7 +1686,7 @@
               },
               "response": [
                 {
-                  "id": "e2940dbf-3e22-47fe-a673-9d1c594971d7",
+                  "id": "8767e40c-989d-4ae5-98f5-28f410003a38",
                   "name": "Success",
                   "originalRequest": {
                     "url": {
@@ -1721,7 +1721,7 @@
                     "method": "POST",
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"addressCapturePdfs\": [\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"addressListRegion\": \"<string>\",\n      \"delimiter\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    },\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"addressListRegion\": \"<string>\",\n      \"delimiter\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                      "raw": "{\n  \"addressCapturePdfs\": [\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"addressListRegion\": \"<string>\",\n      \"delimiter\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    },\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"addressListRegion\": \"<string>\",\n      \"delimiter\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"discover\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                       "options": {
                         "raw": {
                           "headerFamily": "json",
@@ -1743,7 +1743,7 @@
                   "_postman_previewlanguage": "json"
                 },
                 {
-                  "id": "07664943-28ef-4011-983e-6ee7e6a21290",
+                  "id": "787f7236-9d07-4d83-8807-55e21a6e4953",
                   "name": "Invalid request",
                   "originalRequest": {
                     "url": {
@@ -1774,7 +1774,7 @@
                     "method": "POST",
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"addressCapturePdfs\": [\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"addressListRegion\": \"<string>\",\n      \"delimiter\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    },\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"addressListRegion\": \"<string>\",\n      \"delimiter\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                      "raw": "{\n  \"addressCapturePdfs\": [\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"addressListRegion\": \"<string>\",\n      \"delimiter\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    },\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"addressListRegion\": \"<string>\",\n      \"delimiter\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"discover\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                       "options": {
                         "raw": {
                           "headerFamily": "json",
@@ -1790,7 +1790,7 @@
                   "_postman_previewlanguage": "text"
                 },
                 {
-                  "id": "9f3dc8bb-c196-4f90-87a5-dbb0eb6ae416",
+                  "id": "72a91ef3-642c-4fdd-83c9-d69e32ccfab0",
                   "name": "Unauthorized",
                   "originalRequest": {
                     "url": {
@@ -1821,7 +1821,7 @@
                     "method": "POST",
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n  \"addressCapturePdfs\": [\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"addressListRegion\": \"<string>\",\n      \"delimiter\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    },\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"addressListRegion\": \"<string>\",\n      \"delimiter\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"visa\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+                      "raw": "{\n  \"addressCapturePdfs\": [\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"addressListRegion\": \"<string>\",\n      \"delimiter\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    },\n    {\n      \"documentSourceIdentifier\": \"<integer>\",\n      \"addressListRegion\": \"<string>\",\n      \"delimiter\": \"<string>\",\n      \"tags\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": {\n    \"creditCardDetails\": {\n      \"cardType\": \"discover\",\n      \"cardNumber\": \"<string>\",\n      \"expirationDate\": {\n        \"month\": \"<integer>\",\n        \"year\": \"<integer>\"\n      },\n      \"cvv\": \"<integer>\"\n    }\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
                       "options": {
                         "raw": {
                           "headerFamily": "json",
@@ -1859,7 +1859,7 @@
               "description": "",
               "item": [
                 {
-                  "id": "60a62995-f588-41a7-82b2-1da9eb055927",
+                  "id": "8c54dd3b-0196-47fa-9518-4856f98eb2ef",
                   "name": "Issue a short-term access token",
                   "request": {
                     "name": "Issue a short-term access token",
@@ -1912,7 +1912,7 @@
                   },
                   "response": [
                     {
-                      "id": "0b5b6433-b112-4854-8aed-797fe491c025",
+                      "id": "c2bab80b-5065-4ad6-be76-bffc2d110ced",
                       "name": "Short-term token issued",
                       "originalRequest": {
                         "url": {
@@ -1970,7 +1970,7 @@
                       "_postman_previewlanguage": "json"
                     },
                     {
-                      "id": "fde9c8cf-8d97-4bc3-b678-e8b615995df9",
+                      "id": "821902c5-e487-4700-a587-f6db5d0a41d6",
                       "name": "Bad request",
                       "originalRequest": {
                         "url": {
@@ -2028,7 +2028,7 @@
                       "_postman_previewlanguage": "json"
                     },
                     {
-                      "id": "53629928-7b18-455f-b322-236199ba88ae",
+                      "id": "3ea13fcb-37f1-4d68-910f-a3d40d0bc43b",
                       "name": "Unauthorized",
                       "originalRequest": {
                         "url": {
@@ -2086,7 +2086,7 @@
                       "_postman_previewlanguage": "json"
                     },
                     {
-                      "id": "9e265c54-de9e-42f0-b405-048a5fc6afbc",
+                      "id": "6372a131-94d2-4d39-8f35-e6c4ea973904",
                       "name": "Too Many Requests",
                       "originalRequest": {
                         "url": {
@@ -2156,7 +2156,7 @@
               "description": "",
               "item": [
                 {
-                  "id": "6849d123-f1bd-402d-a338-caba940fa444",
+                  "id": "4bbaf88e-2a0a-4a62-be1a-fad38c6837a0",
                   "name": "Issue or rotate a long-term token",
                   "request": {
                     "name": "Issue or rotate a long-term token",
@@ -2209,7 +2209,7 @@
                   },
                   "response": [
                     {
-                      "id": "f1ded0b4-fa09-4f52-9fcb-9e55a2e1985b",
+                      "id": "2c9fb746-02ba-4ab5-9a84-469880ae174d",
                       "name": "Long-term token issued",
                       "originalRequest": {
                         "url": {
@@ -2276,7 +2276,7 @@
                       "_postman_previewlanguage": "json"
                     },
                     {
-                      "id": "ab00dede-8bba-4bd6-ae97-c9afa588ff61",
+                      "id": "8bec102c-70f1-4003-82b8-5005aa89dc8c",
                       "name": "Bad request",
                       "originalRequest": {
                         "url": {
@@ -2334,7 +2334,7 @@
                       "_postman_previewlanguage": "json"
                     },
                     {
-                      "id": "59fd49d1-ef59-4374-99c1-1571ec79a8eb",
+                      "id": "42d2d3f5-823e-4fab-ad01-0b16b249ce64",
                       "name": "Unauthorized",
                       "originalRequest": {
                         "url": {
@@ -2392,7 +2392,7 @@
                       "_postman_previewlanguage": "json"
                     },
                     {
-                      "id": "2acfc805-d24f-4be8-b16b-4f0556a4cf4c",
+                      "id": "3ce2fe29-21bd-4f79-8cc1-a51005d31d8a",
                       "name": "Forbidden",
                       "originalRequest": {
                         "url": {
@@ -2450,7 +2450,7 @@
                       "_postman_previewlanguage": "json"
                     },
                     {
-                      "id": "46a4b877-e83d-42f2-8f3f-8800492de85a",
+                      "id": "3d6bfe7f-389a-4d85-b477-400d826cf170",
                       "name": "Too Many Requests",
                       "originalRequest": {
                         "url": {
@@ -2524,7 +2524,7 @@
                   "description": "",
                   "item": [
                     {
-                      "id": "2f022f24-9382-41cf-9529-4ad5410c03d6",
+                      "id": "d9ca69d8-66a4-455f-a245-e3bb93c21d96",
                       "name": "Revoke a token",
                       "request": {
                         "name": "Revoke a token",
@@ -2576,7 +2576,7 @@
                       },
                       "response": [
                         {
-                          "id": "00f32ee0-528f-441f-beac-d9eda27eb869",
+                          "id": "5e8372f9-0619-42df-ae3a-ec484a9c0ae7",
                           "name": "Revoked (idempotent)",
                           "originalRequest": {
                             "url": {
@@ -2612,7 +2612,7 @@
                           "_postman_previewlanguage": "text"
                         },
                         {
-                          "id": "1764b593-a608-4db2-b830-50cb1604636e",
+                          "id": "7075dc3c-94b1-4d2f-a841-f13de9fcfb93",
                           "name": "Unauthorized",
                           "originalRequest": {
                             "url": {
@@ -2658,7 +2658,7 @@
                           "_postman_previewlanguage": "json"
                         },
                         {
-                          "id": "e3733aca-fde6-4d42-a60b-5c9cc6e731a1",
+                          "id": "edd965e6-f4e0-45dd-bcb3-27445585a88e",
                           "name": "Not found",
                           "originalRequest": {
                             "url": {

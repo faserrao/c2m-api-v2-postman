@@ -15,19 +15,12 @@
    - Modified `.github/workflows/api-ci-cd.yml` to checkout security repo
    - Configured to use `SECURITY_REPO_TOKEN` for authentication
 
-## ACTION REQUIRED: Create Personal Access Token
+## ACTION REQUIRED: Add Your Existing PAT to Repository Secrets
 
-Since the security repo is private, you need to create a Personal Access Token (PAT) for the CI/CD workflow to access it:
+Since the security repo is private, you need to add your existing Personal Access Token (PAT) to the repository secrets for the CI/CD workflow to access it.
 
-### Step 1: Create the PAT
-1. Go to GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
-2. Click "Generate new token" → "Generate new token (classic)"
-3. Name: `C2M Security Repo Access`
-4. Expiration: Choose appropriate expiration (90 days recommended)
-5. Select scopes:
-   - ✅ `repo` (Full control of private repositories)
-6. Click "Generate token"
-7. **COPY THE TOKEN IMMEDIATELY** (you won't see it again)
+### Step 1: Use Your Existing PAT
+You already have a PAT configured (the one you use with Claude Code to access GitHub). You'll use this same token.
 
 ### Step 2: Add PAT to Main Repo Secrets
 1. Go to https://github.com/faserrao/c2m-api-repo/settings/secrets/actions
