@@ -73,7 +73,7 @@ jobs:
         with:
           repository: faserrao/c2m-api-v2-security
           path: c2m-api-v2-security
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.SECURITY_REPO_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
