@@ -10,6 +10,7 @@ Essential guides for new users and customers
 - Quick reference guide  
 - Build instructions
 - V1 to V2 migration
+- **[Project Accomplishments](./project-reports/PROJECT_ACCOMPLISHMENTS_SUMMARY.md)** - Complete functionality overview
 
 ### [🔐 Authentication](./authentication/)
 Complete authentication documentation
