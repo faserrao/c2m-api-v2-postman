@@ -289,6 +289,114 @@
   </style>
   {{{redocHead}}}
   {{#unless disableGoogleFont}}<link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet">{{/unless}}
+  
+  <!-- SDK Download Styles -->
+  <style>
+    .sdk-download-section {
+      background: #f5f5f5;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      border: 1px solid #e0e0e0;
+    }
+    
+    .sdk-download-section h4 {
+      margin: 0 0 15px 0;
+      color: #333;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    .sdk-language-selector {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .sdk-language-btn {
+      padding: 8px 16px;
+      border: 2px solid #667eea;
+      background: white;
+      color: #667eea;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .sdk-language-btn:hover {
+      background: #667eea;
+      color: white;
+    }
+    
+    .sdk-language-btn.active {
+      background: #667eea;
+      color: white;
+    }
+    
+    .sdk-code-preview {
+      background: #263238;
+      color: #aed581;
+      padding: 20px;
+      border-radius: 5px;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      max-height: 500px;
+      overflow-y: auto;
+      position: relative;
+    }
+    
+    .sdk-code-preview pre {
+      margin: 0;
+      white-space: pre;
+    }
+    
+    .sdk-download-btn {
+      background: #48bb78;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 15px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s;
+    }
+    
+    .sdk-download-btn:hover {
+      background: #38a169;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #48bb78;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.3s;
+    }
+    
+    .copy-btn:hover {
+      background: #38a169;
+    }
+    
+    .copy-btn.copied {
+      background: #38a169;
+    }
+  </style>
 </head>
 <body>
   {{{redocHTML}}}
@@ -495,6 +603,363 @@
         }
       }
     });
+    
+    // SDK Download functionality
+    function injectSDKDownload() {
+      // Find the download section
+      const downloadSection = Array.from(document.querySelectorAll('p')).find(p => 
+        p.textContent.includes('Download OpenAPI specification')
+      );
+      
+      if (downloadSection && !document.querySelector('.sdk-download-section')) {
+        // Create SDK download section
+        const sdkSection = document.createElement('div');
+        sdkSection.className = 'sdk-download-section';
+        sdkSection.innerHTML = `
+          <h4>Download SDK Sample Code:</h4>
+          <div class="sdk-language-selector">
+            <button class="sdk-language-btn active" data-lang="python">Python</button>
+            <button class="sdk-language-btn" data-lang="javascript">JavaScript</button>
+          </div>
+          <div class="sdk-code-preview">
+            <button class="copy-btn">Copy</button>
+            <pre id="sdk-code"></pre>
+          </div>
+          <button class="sdk-download-btn">
+            <span>↓</span> Download sample.py
+          </button>
+        `;
+        
+        // Replace the original download section
+        downloadSection.parentNode.replaceChild(sdkSection, downloadSection);
+        
+        // Set up language switching
+        const langButtons = sdkSection.querySelectorAll('.sdk-language-btn');
+        const codePreview = sdkSection.querySelector('#sdk-code');
+        const downloadBtn = sdkSection.querySelector('.sdk-download-btn');
+        const copyBtn = sdkSection.querySelector('.copy-btn');
+        
+        let currentLang = 'python';
+        let currentCode = '';
+        
+        // SDK code templates
+        const sdkTemplates = {
+          python: {
+            filename: 'c2m_api_sample.py',
+            code: `#!/usr/bin/env python3
+"""
+C2M API Python SDK Example with JWT Authentication
+"""
+
+import c2m_api
+from c2m_api.rest import ApiException
+import requests
+import time
+from datetime import datetime, timedelta
+
+class C2MClient:
+    def __init__(self, client_id, client_secret, base_url="https://api.c2m.com/v2"):
+        self.client_id = client_id
+        self.client_secret = client_secret
+        self.base_url = base_url
+        self.auth_url = base_url
+        self.long_token = None
+        self.short_token = None
+        self.token_expiry = None
+        
+    def get_long_token(self):
+        """Get long-term token from auth service"""
+        response = requests.post(
+            f"{self.auth_url}/auth/tokens/long",
+            json={
+                "grant_type": "client_credentials",
+                "client_id": self.client_id,
+                "client_secret": self.client_secret,
+                "scopes": ["jobs:submit", "jobs:read", "templates:read"],
+                "ttl_seconds": 2592000  # 30 days
+            }
+        )
+        response.raise_for_status()
+        data = response.json()
+        self.long_token = data["access_token"]
+        print(f"Long-term token obtained: {data['token_id']}")
+        return self.long_token
+        
+    def get_short_token(self):
+        """Exchange long token for short-term token"""
+        if not self.long_token:
+            self.get_long_token()
+            
+        response = requests.post(
+            f"{self.auth_url}/auth/tokens/short",
+            headers={"Authorization": f"Bearer {self.long_token}"},
+            json={"scopes": ["jobs:submit"]}
+        )
+        response.raise_for_status()
+        data = response.json()
+        self.short_token = data["access_token"]
+        self.token_expiry = datetime.fromisoformat(data["expires_at"].replace('Z', '+00:00'))
+        print(f"Short-term token obtained: {data['token_id']}")
+        return self.short_token
+        
+    def ensure_authenticated(self):
+        """Ensure we have a valid token"""
+        if not self.short_token or datetime.now() >= self.token_expiry - timedelta(minutes=1):
+            self.get_short_token()
+        return self.short_token
+        
+    def create_api_client(self):
+        """Create configured API client"""
+        token = self.ensure_authenticated()
+        
+        configuration = c2m_api.Configuration()
+        configuration.host = self.base_url
+        configuration.api_key['bearerAuth'] = token
+        configuration.api_key_prefix['bearerAuth'] = 'Bearer'
+        
+        return c2m_api.ApiClient(configuration)
+    
+    def submit_job(self, job_params):
+        """Submit a job using the SDK"""
+        with self.create_api_client() as api_client:
+            jobs_api = c2m_api.DefaultApi(api_client)
+            
+            try:
+                response = jobs_api.submit_single_doc_with_template_params(job_params)
+                return response
+            except ApiException as e:
+                if e.status in [401, 403]:
+                    # Token expired, refresh and retry
+                    self.short_token = None
+                    with self.create_api_client() as api_client:
+                        jobs_api = c2m_api.DefaultApi(api_client)
+                        response = jobs_api.submit_single_doc_with_template_params(job_params)
+                        return response
+                raise
+
+# Usage example
+if __name__ == "__main__":
+    # Initialize client
+    client = C2MClient(
+        client_id="your-client-id",
+        client_secret="your-client-secret"
+    )
+    
+    # Submit a job with template
+    job_params = {
+        "jobTemplate": "standard-letter",
+        "documentSourceIdentifier": {"documentId": 12345},
+        "paymentDetails": {
+            "creditCardDetails": {
+                "cardType": "visa",
+                "cardNumber": "4111111111111111",
+                "expirationDate": {"month": 12, "year": 2025},
+                "cvv": 123
+            }
+        }
+    }
+    
+    try:
+        result = client.submit_job(job_params)
+        print(f"Job submitted successfully: {result}")
+    except Exception as e:
+        print(f"Error: {e}")
+`
+          },
+          javascript: {
+            filename: 'c2m_api_sample.js',
+            code: `/**
+ * C2M API JavaScript SDK Example with JWT Authentication
+ */
+
+const C2mApi = require('c2m_api');
+const axios = require('axios');
+
+class C2MClient {
+    constructor(clientId, clientSecret, baseUrl = 'https://api.c2m.com/v2') {
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
+        this.baseUrl = baseUrl;
+        this.authUrl = baseUrl;
+        this.longToken = null;
+        this.shortToken = null;
+        this.tokenExpiry = null;
+    }
+    
+    async getLongToken() {
+        const response = await axios.post(\`\${this.authUrl}/auth/tokens/long\`, {
+            grant_type: 'client_credentials',
+            client_id: this.clientId,
+            client_secret: this.clientSecret,
+            scopes: ['jobs:submit', 'jobs:read', 'templates:read'],
+            ttl_seconds: 2592000 // 30 days
+        });
+        
+        this.longToken = response.data.access_token;
+        console.log(\`Long-term token obtained: \${response.data.token_id}\`);
+        return this.longToken;
+    }
+    
+    async getShortToken() {
+        if (!this.longToken) {
+            await this.getLongToken();
+        }
+        
+        const response = await axios.post(
+            \`\${this.authUrl}/auth/tokens/short\`,
+            { scopes: ['jobs:submit'] },
+            { headers: { Authorization: \`Bearer \${this.longToken}\` } }
+        );
+        
+        this.shortToken = response.data.access_token;
+        this.tokenExpiry = new Date(response.data.expires_at);
+        console.log(\`Short-term token obtained: \${response.data.token_id}\`);
+        return this.shortToken;
+    }
+    
+    async ensureAuthenticated() {
+        const now = new Date();
+        const buffer = new Date(now.getTime() + 60000); // 1 minute buffer
+        
+        if (!this.shortToken || buffer >= this.tokenExpiry) {
+            await this.getShortToken();
+        }
+        
+        return this.shortToken;
+    }
+    
+    async configureClient() {
+        const token = await this.ensureAuthenticated();
+        
+        const defaultClient = C2mApi.ApiClient.instance;
+        const bearerAuth = defaultClient.authentications['bearerAuth'];
+        bearerAuth.accessToken = token;
+        defaultClient.basePath = this.baseUrl;
+        
+        return defaultClient;
+    }
+    
+    async submitJob(jobParams) {
+        await this.configureClient();
+        const jobsApi = new C2mApi.DefaultApi();
+        
+        try {
+            return await jobsApi.submitSingleDocWithTemplateParams(jobParams);
+        } catch (error) {
+            if (error.status === 401 || error.status === 403) {
+                // Token expired, refresh and retry
+                this.shortToken = null;
+                await this.configureClient();
+                return await jobsApi.submitSingleDocWithTemplateParams(jobParams);
+            }
+            throw error;
+        }
+    }
+}
+
+// Usage example
+async function main() {
+    const client = new C2MClient(
+        'your-client-id',
+        'your-client-secret'
+    );
+    
+    const jobParams = {
+        jobTemplate: 'standard-letter',
+        documentSourceIdentifier: { documentId: 12345 },
+        paymentDetails: {
+            creditCardDetails: {
+                cardType: 'visa',
+                cardNumber: '4111111111111111',
+                expirationDate: { month: 12, year: 2025 },
+                cvv: 123
+            }
+        }
+    };
+    
+    try {
+        const result = await client.submitJob(jobParams);
+        console.log('Job submitted successfully:', result);
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+// Run if called directly
+if (require.main === module) {
+    main();
+}
+
+module.exports = C2MClient;
+`
+          }
+        };
+        
+        // Function to update code display
+        function updateCode(lang) {
+          currentLang = lang;
+          currentCode = sdkTemplates[lang].code;
+          codePreview.textContent = currentCode;
+          downloadBtn.innerHTML = `<span>↓</span> Download ${sdkTemplates[lang].filename}`;
+          
+          // Update active button
+          langButtons.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.lang === lang);
+          });
+        }
+        
+        // Set up language button clicks
+        langButtons.forEach(btn => {
+          btn.addEventListener('click', () => {
+            updateCode(btn.dataset.lang);
+          });
+        });
+        
+        // Set up copy button
+        copyBtn.addEventListener('click', () => {
+          navigator.clipboard.writeText(currentCode).then(() => {
+            copyBtn.textContent = 'Copied!';
+            copyBtn.classList.add('copied');
+            setTimeout(() => {
+              copyBtn.textContent = 'Copy';
+              copyBtn.classList.remove('copied');
+            }, 2000);
+          });
+        });
+        
+        // Set up download button
+        downloadBtn.addEventListener('click', () => {
+          const blob = new Blob([currentCode], { type: 'text/plain' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = sdkTemplates[currentLang].filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        });
+        
+        // Initialize with Python
+        updateCode('python');
+      }
+    }
+    
+    // Add SDK download injection to the observer
+    const originalInjectBanner = injectBanner;
+    injectBanner = function() {
+      originalInjectBanner();
+      setTimeout(injectSDKDownload, 100);
+    };
+    
+    // Also run SDK injection on page load
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(injectSDKDownload, 1000);
+      });
+    } else {
+      setTimeout(injectSDKDownload, 1000);
+    }
   </script>
 </body>
 </html>
