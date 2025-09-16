@@ -692,17 +692,8 @@ generate-openapi-spec-from-ebnf-dd:
 .PHONY: openapi-merge-overlays
 openapi-merge-overlays: $(C2MAPIV2_OPENAPI_SPEC_BASE) $(OPENAPI_AUTH_OVERLAY)
 	@echo "🔗 Merging auth overlay into generated OpenAPI..."
-	@if command -v yq >/dev/null 2>&1; then \
-		yq ea -o=yaml 'select(fileIndex == 0) *+ select(fileIndex == 1)' \
-			$(C2MAPIV2_OPENAPI_SPEC_BASE) $(OPENAPI_AUTH_OVERLAY) > $(C2MAPIV2_OPENAPI_SPEC); \
-		echo "✅ Wrote $(C2MAPIV2_OPENAPI_SPEC)"; \
-	else \
-		echo "⚠️  yq not found. Installing via pip..."; \
-		$(VENV_PIP) install yq; \
-		$(VENV_DIR)/bin/yq ea -o=yaml 'select(fileIndex == 0) *+ select(fileIndex == 1)' \
-			$(C2MAPIV2_OPENAPI_SPEC_BASE) $(OPENAPI_AUTH_OVERLAY) > $(C2MAPIV2_OPENAPI_SPEC); \
-		echo "✅ Wrote $(C2MAPIV2_OPENAPI_SPEC)"; \
-	fi
+	@$(VENV_PYTHON) scripts/active/merge_openapi_overlays.py \
+		$(C2MAPIV2_OPENAPI_SPEC_BASE) $(OPENAPI_AUTH_OVERLAY) $(C2MAPIV2_OPENAPI_SPEC)
 
 
 # ========================================================================

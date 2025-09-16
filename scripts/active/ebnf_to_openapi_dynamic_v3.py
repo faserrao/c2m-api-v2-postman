@@ -480,10 +480,16 @@ class EBNFToOpenAPITranslator:
             expr_type = expr.get('type')
             
             if expr_type == 'concatenation':
+                items = expr.get('items', [])
+                
+                # Check if first item is an alternation (pattern like (A | B | C) + D + E)
+                if (items and isinstance(items[0], dict) and items[0].get('type') == 'alternation'):
+                    return self._handle_alternation_plus_concatenation(items, context)
+                
                 # This is an object with required properties
                 schema = {"type": "object", "properties": {}, "required": []}
                 
-                for item in expr.get('items', []):
+                for item in items:
                     if isinstance(item, dict):
                         item_type = item.get('type')
                         
@@ -521,6 +527,10 @@ class EBNFToOpenAPITranslator:
                                             "items": {"$ref": f"#/components/schemas/{prop_name}"} if prop_name in self.productions else self._get_field_type(prop_name)
                                         }
                                         schema['required'].append(prop_name + 's')
+                        
+                        elif item_type == 'alternation':
+                            # Skip alternations for now - we'll handle them specially
+                            pass
                 
                 # Remove empty required array
                 if 'required' in schema and len(schema['required']) == 0:
@@ -676,6 +686,111 @@ class EBNFToOpenAPITranslator:
         type_info = TypeInfo(openapi_type="string")
         self.type_cache[name] = type_info
         return type_info
+    
+    def _handle_alternation_plus_concatenation(self, items: List[Any], context: str) -> Dict[str, Any]:
+        """Handle pattern where concatenation starts with alternation: (A | B | C) + D + E"""
+        alternation = items[0]
+        rest_items = items[1:]
+        
+        # First, build the base schema from the rest of the concatenation
+        base_schema = {"type": "object", "properties": {}, "required": []}
+        
+        for item in rest_items:
+            if isinstance(item, dict):
+                item_type = item.get('type')
+                
+                if item_type == 'symbol':
+                    prop_name = item.get('name')
+                    if prop_name:
+                        base_schema['properties'][prop_name] = self._get_field_type(prop_name)
+                        base_schema['required'].append(prop_name)
+                
+                elif item_type == 'optional':
+                    opt_expr = item.get('expression')
+                    if opt_expr and isinstance(opt_expr, dict) and opt_expr.get('type') == 'symbol':
+                        prop_name = opt_expr.get('name')
+                        if prop_name:
+                            base_schema['properties'][prop_name] = self._get_field_type(prop_name)
+                
+                elif item_type == 'repeat':
+                    repeat_expr = item.get('expression')
+                    if repeat_expr and isinstance(repeat_expr, dict) and repeat_expr.get('type') == 'symbol':
+                        prop_name = repeat_expr.get('name')
+                        if prop_name:
+                            base_schema['properties'][prop_name + 's'] = {
+                                "type": "array",
+                                "items": {"$ref": f"#/components/schemas/{prop_name}"}
+                            }
+                            base_schema['required'].append(prop_name + 's')
+        
+        # Now handle the alternation choices
+        choices = alternation.get('choices', [])
+        schemas = []
+        
+        for choice in choices:
+            # Create a schema that combines this choice with the base properties
+            choice_schema = {
+                "type": "object",
+                "properties": dict(base_schema['properties']),  # Copy base properties
+                "required": list(base_schema['required'])  # Copy base required
+            }
+            
+            if isinstance(choice, dict):
+                choice_type = choice.get('type')
+                
+                if choice_type == 'symbol':
+                    # Single field option
+                    prop_name = choice.get('name')
+                    if prop_name:
+                        choice_schema['properties'][prop_name] = self._get_field_type(prop_name)
+                        choice_schema['required'].append(prop_name)
+                
+                elif choice_type == 'repeat':
+                    # Array field option (e.g., { recipientAddressSource })
+                    repeat_expr = choice.get('expression')
+                    if repeat_expr and isinstance(repeat_expr, dict) and repeat_expr.get('type') == 'symbol':
+                        prop_name = repeat_expr.get('name')
+                        if prop_name:
+                            choice_schema['properties'][prop_name + 's'] = {
+                                "type": "array",
+                                "items": {"$ref": f"#/components/schemas/{prop_name}"}
+                            }
+                            choice_schema['required'].append(prop_name + 's')
+                
+                elif choice_type == 'concatenation':
+                    # Combined fields option (e.g., documentSourceIdentifier + { recipientAddressSource })
+                    for sub_item in choice.get('items', []):
+                        if isinstance(sub_item, dict):
+                            sub_type = sub_item.get('type')
+                            
+                            if sub_type == 'symbol':
+                                prop_name = sub_item.get('name')
+                                if prop_name:
+                                    choice_schema['properties'][prop_name] = self._get_field_type(prop_name)
+                                    choice_schema['required'].append(prop_name)
+                            
+                            elif sub_type == 'repeat':
+                                repeat_expr = sub_item.get('expression')
+                                if repeat_expr and isinstance(repeat_expr, dict) and repeat_expr.get('type') == 'symbol':
+                                    prop_name = repeat_expr.get('name')
+                                    if prop_name:
+                                        choice_schema['properties'][prop_name + 's'] = {
+                                            "type": "array",
+                                            "items": {"$ref": f"#/components/schemas/{prop_name}"}
+                                        }
+                                        choice_schema['required'].append(prop_name + 's')
+            
+            # Clean up empty required arrays
+            if not choice_schema.get('required'):
+                del choice_schema['required']
+            
+            schemas.append(choice_schema)
+        
+        # Return the oneOf schema
+        if len(schemas) == 1:
+            return schemas[0]
+        else:
+            return {"oneOf": schemas}
     
     def _generate_parameters(self) -> OrderedDict:
         """Generate common parameters"""

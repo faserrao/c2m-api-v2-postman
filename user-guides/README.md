@@ -1,105 +1,90 @@
-# C2M API V2 Documentation Index
+# C2M API V2 User Guides
 
-> **Updated 2025-09-08**: Documentation reorganized into subject-based folders for better navigation.
+This directory contains comprehensive documentation for understanding and working with the C2M API v2 build system and infrastructure.
 
-## 📁 Documentation by Category
+## 📚 Documentation Overview
 
-### [🚀 Getting Started](./getting-started/)
-Essential guides for new users and customers
-- Customer onboarding
-- Quick reference guide  
-- Build instructions
-- V1 to V2 migration
-- **[Project Accomplishments](./project-reports/PROJECT_ACCOMPLISHMENTS_SUMMARY.md)** - Complete functionality overview
+### Core Documentation
 
-### [🔐 Authentication](./authentication/)
-Complete authentication documentation
-- Consolidated auth guide (replaces 7 docs)
-- JWT examples and security
-- Provider interface design
+#### [BUILD_INFRASTRUCTURE_GUIDE.md](./BUILD_INFRASTRUCTURE_GUIDE.md)
+The complete technical reference for the C2M API v2 build system. This guide explains:
+- How the build pipeline transforms EBNF to a complete API ecosystem
+- All Makefile targets and their purposes
+- GitHub Actions CI/CD workflows
+- Dynamic resource management for Postman
+- Test generation and execution
+- Documentation and SDK generation processes
 
-### [🛠️ Development](./development/)
-Tools, SDKs, and development resources
-- SDK generation guide
-- Postman complete guide
-- Component documentation
-- CI/CD setup
+### Additional Guides
 
-### [📋 API Reference](./api-reference/)
-API-specific documentation
-- Template endpoints guide
-- Job tracking (future)
+#### Security Setup
+- **SECURITY_REPO_GITHUB_SETUP.md** - Instructions for configuring the security repository integration
 
-### [🧪 Testing](./testing/)
-Testing frameworks and strategies
-- Currently being organized
-- See development folder for now
+#### File Inspection Tools
+- **finspect-README.md** - Documentation for the file inspection utility
+- **finspect-file-type-detection-methods.md** - Technical details on file type detection
 
-### [🏗️ Architecture](./architecture/)
-System design and project context
-- Project memory (comprehensive knowledge base)
-- Claude AI context
+## 🚀 Getting Started
 
-### [📊 Project Reports](./project-reports/)
-Status reports and analysis
-- Restoration reports
-- Documentation migration summaries
-- Next steps
+For developers new to the C2M API v2 build system:
 
-### [🗄️ Archive](./archive/)
-Historical documentation (19 documents)
-- Superseded authentication docs
-- Old SDK documentation
-- Makefile analysis reports
+1. **Read the BUILD_INFRASTRUCTURE_GUIDE** to understand the complete system
+2. **Run `make check-env`** to verify your local setup
+3. **Execute `make pipeline`** to run the complete build
+4. **Check generated artifacts** in `dist/`, `docs/`, and `postman/` directories
 
-## 🎯 Quick Navigation by Audience
+## 🔧 Key Concepts
 
-### For New Customers
-1. Start here: [getting-started/CUSTOMER_ONBOARDING_GUIDE.md](./getting-started/CUSTOMER_ONBOARDING_GUIDE.md)
-2. Then read: [authentication/AUTHENTICATION_CONSOLIDATED.md](./authentication/AUTHENTICATION_CONSOLIDATED.md)
-3. Try examples: [api-reference/TEMPLATE_ENDPOINTS_QUICKSTART.md](./api-reference/TEMPLATE_ENDPOINTS_QUICKSTART.md)
+### Build Pipeline
+The system follows a linear transformation pipeline:
+```
+EBNF → OpenAPI → Postman → Tests → Docs/SDKs
+```
 
-### For Internal Team
-1. Context: [architecture/PROJECT_MEMORY.md](./architecture/PROJECT_MEMORY.md)
-2. Tools: [development/POSTMAN_COMPLETE_GUIDE.md](./development/POSTMAN_COMPLETE_GUIDE.md)
-3. Quick ref: [getting-started/QUICK_REFERENCE.md](./getting-started/QUICK_REFERENCE.md)
+### Dynamic Resources
+All Postman collections, mock servers, and environments are created dynamically during the build process. The system tracks these using UID files that persist between builds.
 
-### For Frank
-1. Your context: [architecture/CLAUDE.md](./architecture/CLAUDE.md)
-2. Project knowledge: [architecture/PROJECT_MEMORY.md](./architecture/PROJECT_MEMORY.md)
-3. Current status: [project-reports/](./project-reports/)
+### Environment Agnostic
+The same Makefile targets work both locally and in CI/CD, with appropriate adaptations for each environment.
 
-## 📈 Organization Statistics
+## 📁 Related Directories
 
-- **Active Documents**: ~25 (organized by topic)
-- **Archived Documents**: 19 (in archive folder)
-- **Categories**: 7 subject-based folders
-- **Consolidation**: 
-  - Auth: 7→1 document
-  - SDK: 6→1 document
+- `/openapi` - OpenAPI specifications and schemas
+- `/postman` - Postman collections and test results  
+- `/scripts` - Build scripts and utilities
+- `/docs` - Generated API documentation
+- `/dist` - Build artifacts and SDKs
+- `/.github/workflows` - CI/CD configurations
 
-## 🔄 Recent Changes
+## 🔄 Build Commands
 
-### Documentation Reorganization (2025-09-08)
-- Created subject-based folder structure
-- Moved documents into appropriate categories
-- Added README for each folder
-- Preserved all documents (nothing deleted)
+Quick reference for common operations:
 
-### Previous Consolidation
-- Merged authentication documents
-- Consolidated SDK documentation
-- Migrated user docs from security repo
+```bash
+# Complete build pipeline
+make pipeline
 
-## 💡 Tips
+# Check environment setup
+make check-env
 
-- Each folder has its own README with document descriptions
-- Star (⭐) indicates primary/recommended documents
-- Cross-references updated to new locations
-- Use browser search (Ctrl+F) to find specific topics
+# Clean all artifacts
+make clean-all
+
+# Run tests only
+make postman-test
+
+# Generate documentation
+make docs-build
+
+# Create SDKs
+make sdks-generate
+```
+
+## 📝 Archive
+
+Previous versions of documentation are preserved in the `archive/` subdirectory for historical reference.
 
 ---
 
-*Organization completed: 2025-09-08*
-*Structure: Subject-based folders for better navigation*
-*Next review: When adding new documentation*
+*Last Updated: 2025-09-15*  
+*Version: 2.0 - Post-consolidation and accuracy improvements*

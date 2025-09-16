@@ -1,423 +1,444 @@
 # C2M API V2 Customer Onboarding Guide
 
-This guide walks new customers through the process of getting started with the C2M API V2, from obtaining credentials to making your first API call.
+This guide provides a comprehensive framework for onboarding new customers to the C2M API V2 system.
 
 ## Table of Contents
 - [Overview](#overview)
-- [Getting Started](#getting-started)
-- [Account Setup](#account-setup)
-- [Authentication Setup](#authentication-setup)
-- [Environment Configuration](#environment-configuration)
-- [Making Your First API Call](#making-your-first-api-call)
-- [Next Steps](#next-steps)
-- [Support](#support)
+- [Onboarding Process](#onboarding-process)
+- [Account Architecture](#account-architecture)
+- [Authentication System](#authentication-system)
+- [Environment Strategy](#environment-strategy)
+- [Integration Patterns](#integration-patterns)
+- [Testing Framework](#testing-framework)
+- [Production Readiness](#production-readiness)
+- [Support Structure](#support-structure)
 
 ---
 
 ## Overview
 
-Welcome to the C2M API V2! This API allows you to programmatically submit documents for printing and mailing. Each customer receives:
+The C2M API V2 customer onboarding process is designed to ensure secure, scalable, and successful API integration. Each customer receives a fully isolated environment with customized configurations based on their subscription tier.
 
-- **Unique API Credentials** - Secure client ID and secret
-- **Isolated Environment** - Complete separation from other customers
-- **Multiple Environments** - Development, staging, and production
-- **Customized Rate Limits** - Based on your subscription plan
+### Onboarding Principles
 
-### Available Plans
+1. **Security First**: Credentials are generated securely and delivered through encrypted channels
+2. **Isolation**: Complete separation between customer environments
+3. **Scalability**: Resources allocated based on subscription tier
+4. **Support**: Guided onboarding with technical assistance
 
-| Plan | Rate Limit | Max Recipients | Environments | Features |
-|------|------------|----------------|--------------|----------|
-| **Basic** | 100/hour | 100/request | Dev + Prod | Standard templates |
-| **Premium** | 1000/hour | 1000/request | Dev + Stage + Prod | Custom templates, bulk operations |
-| **Enterprise** | Unlimited | 10000/request | Unlimited | All features, dedicated support |
+### Subscription Tiers
 
----
-
-## Getting Started
-
-### Prerequisites
-
-Before beginning onboarding:
-1. Signed contract with C2M
-2. Designated technical contact
-3. Basic understanding of REST APIs
-4. Development environment ready
-
-### What You'll Receive
-
-After onboarding, you'll receive:
-1. **Welcome Email** with secure credential link
-2. **API Documentation** access
-3. **Postman Collection** for testing
-4. **Support Contact** information
+The system supports multiple subscription tiers:
+- **Basic**: Entry-level access with standard rate limits
+- **Premium**: Enhanced limits and staging environment
+- **Enterprise**: Unlimited access with dedicated support
 
 ---
 
-## Account Setup
+## Onboarding Process
 
-### Step 1: Initial Contact
+### Phase 1: Initial Setup
 
-Your account manager will gather:
-- Company name and details
-- Technical contact information
-- Subscription plan selection
-- Initial use case requirements
-- Preferred environments (dev/staging/prod)
+The onboarding process begins when a customer signs a contract:
 
-### Step 2: Credential Generation
+1. **Contract Execution**
+   - Sales team finalizes agreement
+   - Technical requirements documented
+   - Subscription tier determined
 
-Within 24 hours, you'll receive:
-- Secure link to download credentials (expires in 24 hours)
-- Quick start guide
-- Postman environment file
+2. **Account Provisioning**
+   - Customer ID generated
+   - Infrastructure allocated
+   - Security policies applied
 
-### Step 3: Credential Storage
+3. **Credential Generation**
+   - Unique client credentials created
+   - Environment-specific keys generated
+   - Secure delivery prepared
 
-**Important Security Steps:**
-1. Download credentials immediately
-2. Store in secure location (password manager, vault)
-3. Never commit to source control
-4. Set up environment variables
+### Phase 2: Technical Onboarding
 
-Example credential structure:
-```json
-{
-  "customerId": "CUST-acme-corp-a1b2c3",
-  "environments": {
-    "development": {
-      "clientId": "c2m-acme-corp-dev",
-      "clientSecret": "dev-secret-key-here",
-      "apiUrl": "https://dev-api.c2m.example.com"
-    },
-    "production": {
-      "clientId": "c2m-acme-corp-prod",
-      "clientSecret": "prod-secret-key-here",
-      "apiUrl": "https://api.c2m.example.com"
-    }
-  }
-}
+Technical onboarding ensures successful integration:
+
+1. **Welcome Package**
+   - Secure credential delivery
+   - Documentation access
+   - Quick start guides
+
+2. **Environment Setup**
+   - Development environment ready
+   - Testing resources allocated
+   - Monitoring configured
+
+3. **Initial Validation**
+   - Credential testing
+   - API connectivity verification
+   - Support channel confirmation
+
+### Phase 3: Integration Support
+
+Ongoing support during integration:
+
+1. **Technical Assistance**
+   - Architecture review
+   - Best practices guidance
+   - Code examples
+
+2. **Testing Support**
+   - Test data provisioning
+   - Mock server access
+   - Validation tools
+
+3. **Go-Live Preparation**
+   - Production readiness review
+   - Performance testing
+   - Cutover planning
+
+---
+
+## Account Architecture
+
+### Customer Isolation
+
+Each customer receives:
+- **Unique namespace**: Prevents cross-customer access
+- **Dedicated credentials**: Customer-specific authentication
+- **Resource quotas**: Based on subscription tier
+- **Audit trails**: Complete activity logging
+
+### Multi-Environment Strategy
+
+Customers can access multiple environments:
+
+```
+Production Environment
+├── Full rate limits
+├── Real processing
+└── Production SLAs
+
+Staging Environment (Premium+)
+├── Production mirror
+├── Test processing
+└── Load testing allowed
+
+Development Environment
+├── Limited rate limits
+├── Simulated processing
+└── Enhanced debugging
 ```
 
----
+### Security Architecture
 
-## Authentication Setup
-
-### Understanding the Token Flow
-
-The C2M API uses a two-tier JWT authentication system:
-
-1. **Long-term token** (30-90 days) - Obtained with your credentials
-2. **Short-term token** (15 minutes) - Used for actual API calls
-
-### Quick Test
-
-Test your credentials immediately:
-
-```bash
-# Set your credentials
-CLIENT_ID="your-client-id"
-CLIENT_SECRET="your-client-secret"
-AUTH_URL="https://auth.c2m.example.com"
-
-# Get a long-term token
-curl -X POST "$AUTH_URL/auth/tokens/long" \
-  -H "Content-Type: application/json" \
-  -H "X-Client-Id: $CLIENT_ID" \
-  -d "{
-    \"grant_type\": \"client_credentials\",
-    \"client_id\": \"$CLIENT_ID\",
-    \"client_secret\": \"$CLIENT_SECRET\"
-  }"
-```
-
-Expected response:
-```json
-{
-  "access_token": "eyJ...",
-  "token_type": "Bearer",
-  "expires_in": 2592000,
-  "expires_at": "2024-02-29T12:00:00Z"
-}
-```
-
-### Integration Options
-
-Choose your integration approach:
-
-1. **Postman** (Easiest for testing)
-   - Import provided environment file
-   - Pre-request scripts handle auth automatically
-   - [Postman Setup Guide](./POSTMAN_COMPLETE_GUIDE.md)
-
-2. **SDK** (Recommended for production)
-   - Available in Python, JavaScript, Java
-   - Built-in token management
-   - [SDK Documentation](../sdk/)
-
-3. **Direct API** (Full control)
-   - Implement token management yourself
-   - [Authentication Guide](./AUTHENTICATION_GUIDE.md)
+Security layers include:
+- **Credential encryption**: At rest and in transit
+- **Network isolation**: VPC-based separation
+- **Access controls**: Role-based permissions
+- **Audit logging**: Comprehensive tracking
 
 ---
 
-## Environment Configuration
+## Authentication System
+
+### Two-Token Architecture
+
+The authentication system uses a two-token approach:
+
+1. **Long-term Tokens**
+   - Used for authentication only
+   - Never sent to API endpoints
+   - Configurable lifetime (30-90 days)
+
+2. **Short-term Tokens**
+   - Used for API calls
+   - Auto-refreshed as needed
+   - Fixed 15-minute lifetime
+
+### Token Management Flow
+
+```
+Client Credentials
+       ↓
+Long-term Token (stored securely)
+       ↓
+Short-term Token (auto-refreshed)
+       ↓
+API Calls
+```
+
+### Security Features
+
+- **Token isolation**: Different tokens for different purposes
+- **Automatic refresh**: No manual intervention needed
+- **Revocation support**: Immediate invalidation possible
+- **Scope management**: Granular permissions
+
+---
+
+## Environment Strategy
 
 ### Development Environment
 
-Start with development for initial integration:
-- Lower rate limits for safety
-- Test data only
-- Full API functionality
+Purpose: Initial integration and testing
+
+Features:
+- Safe testing environment
 - Detailed error messages
+- Lower rate limits
+- Simulated mail processing
 
-### Staging Environment (Premium/Enterprise)
+Use cases:
+- Initial integration
+- Feature development
+- Debugging
+- Training
 
-Use for pre-production testing:
-- Production-equivalent performance
+### Staging Environment
+
+Purpose: Pre-production validation (Premium+ tiers)
+
+Features:
+- Production configuration mirror
+- Full rate limits
+- Real processing simulation
+- Performance testing allowed
+
+Use cases:
 - Integration testing
-- Load testing allowed
-- Mirrors production configuration
+- Load testing
+- UAT
+- Deployment validation
 
 ### Production Environment
 
-For live operations:
-- Full rate limits
-- Real document processing
-- Production SLAs apply
-- Monitoring and alerts active
+Purpose: Live operations
 
-### Environment Variables
+Features:
+- Full processing capabilities
+- Production SLAs
+- Real-time monitoring
+- 24/7 support (Enterprise)
 
-Set up your application environment:
-
-```bash
-# Development
-export C2M_CLIENT_ID_DEV="c2m-acme-corp-dev"
-export C2M_CLIENT_SECRET_DEV="dev-secret-here"
-export C2M_API_URL_DEV="https://dev-api.c2m.example.com"
-export C2M_AUTH_URL_DEV="https://dev-auth.c2m.example.com"
-
-# Production
-export C2M_CLIENT_ID_PROD="c2m-acme-corp-prod"
-export C2M_CLIENT_SECRET_PROD="prod-secret-here"
-export C2M_API_URL_PROD="https://api.c2m.example.com"
-export C2M_AUTH_URL_PROD="https://auth.c2m.example.com"
-```
+Requirements:
+- Approved go-live
+- Tested integration
+- Error handling
+- Monitoring setup
 
 ---
 
-## Making Your First API Call
+## Integration Patterns
 
-### Step 1: Get Authentication Tokens
+### SDK Integration
 
-```python
-import requests
-import os
+Recommended for most implementations:
 
-# Configuration
-client_id = os.environ['C2M_CLIENT_ID_DEV']
-client_secret = os.environ['C2M_CLIENT_SECRET_DEV']
-auth_url = os.environ['C2M_AUTH_URL_DEV']
+Benefits:
+- Built-in token management
+- Automatic retries
+- Type safety
+- Error handling
 
-# Get long-term token
-response = requests.post(
-    f"{auth_url}/auth/tokens/long",
-    json={
-        "grant_type": "client_credentials",
-        "client_id": client_id,
-        "client_secret": client_secret
-    },
-    headers={"X-Client-Id": client_id}
-)
-long_token = response.json()['access_token']
+Available languages:
+- Python
+- JavaScript/TypeScript
+- Java
+- C#
+- Go
 
-# Exchange for short-term token
-response = requests.post(
-    f"{auth_url}/auth/tokens/short",
-    headers={"Authorization": f"Bearer {long_token}"}
-)
-short_token = response.json()['access_token']
-```
+### Direct API Integration
 
-### Step 2: Submit a Test Document
+For custom requirements:
 
-```python
-# Submit a simple letter
-api_url = os.environ['C2M_API_URL_DEV']
+Considerations:
+- Implement token management
+- Handle retries
+- Manage rate limits
+- Monitor errors
 
-response = requests.post(
-    f"{api_url}/jobs/submit/templates/business-letter",
-    json={
-        "templateData": {
-            "date": "2024-01-29",
-            "recipientName": "Test Recipient",
-            "body": "This is a test letter from the C2M API."
-        },
-        "recipientAddress": {
-            "firstName": "Test",
-            "lastName": "Recipient",
-            "address1": "123 Test Street",
-            "city": "Test City",
-            "state": "CA",
-            "zip": "12345"
-        }
-    },
-    headers={"Authorization": f"Bearer {short_token}"}
-)
+### Webhook Integration
 
-job = response.json()
-print(f"Job submitted! ID: {job['jobId']}")
-print(f"Track at: {job['trackingUrl']}")
-```
+For event-driven architectures:
 
-### Step 3: Check Job Status
-
-```python
-job_id = job['jobId']
-
-response = requests.get(
-    f"{api_url}/jobs/{job_id}/status",
-    headers={"Authorization": f"Bearer {short_token}"}
-)
-
-status = response.json()
-print(f"Status: {status['status']}")
-print(f"Progress: {status['progress']}")
-```
+Events available:
+- Job status changes
+- Processing milestones
+- Delivery confirmations
+- Error notifications
 
 ---
 
-## Next Steps
+## Testing Framework
 
-### 1. Explore Available Endpoints
+### Test Data Management
 
-Key endpoints to try:
-- **Templates**: `GET /templates` - List available templates
-- **Single Document**: `POST /jobs/submit/single/doc` - Submit one document
-- **Bulk Submit**: `POST /jobs/submit/bulk` - Submit multiple documents
-- **Job Tracking**: `GET /jobs/{jobId}/tracking` - Real-time tracking
+Development environment provides:
+- Sample documents
+- Test addresses
+- Mock responses
+- Simulated delays
 
-### 2. Set Up Webhooks (Optional)
+### Integration Testing
 
-Receive real-time notifications:
-```json
-{
-  "webhookUrl": "https://your-app.com/webhooks/c2m",
-  "events": ["job.completed", "job.failed", "mail.delivered"]
-}
-```
+Key test scenarios:
+1. **Authentication flow**
+2. **Document submission**
+3. **Status tracking**
+4. **Error handling**
+5. **Rate limit behavior**
 
-### 3. Implement Error Handling
+### Performance Testing
 
-Common patterns:
-```python
-try:
-    response = make_api_call()
-    response.raise_for_status()
-except requests.exceptions.HTTPError as e:
-    if e.response.status_code == 401:
-        # Token expired, refresh and retry
-        refresh_tokens()
-        response = make_api_call()
-    elif e.response.status_code == 429:
-        # Rate limited, wait and retry
-        time.sleep(60)
-        response = make_api_call()
-    else:
-        # Log error and handle appropriately
-        log_error(e)
-        raise
-```
+Guidelines for load testing:
+- Use staging environment only
+- Coordinate with support team
+- Monitor resource usage
+- Respect rate limits
 
-### 4. Plan for Production
+### Validation Checklist
 
-Before going live:
-- [ ] Test error scenarios
-- [ ] Implement retry logic
-- [ ] Set up monitoring
-- [ ] Plan credential rotation
-- [ ] Review security checklist
-- [ ] Load test within limits
+Before production:
+- [ ] Authentication working
+- [ ] Error handling implemented
+- [ ] Retry logic in place
+- [ ] Monitoring configured
+- [ ] Rate limits understood
+- [ ] Support contacts documented
 
 ---
 
-## Support
+## Production Readiness
 
-### Resources
+### Pre-Production Checklist
+
+Technical requirements:
+- [ ] Integration fully tested
+- [ ] Error scenarios handled
+- [ ] Monitoring implemented
+- [ ] Credentials secured
+- [ ] Backup plans ready
+
+### Go-Live Process
+
+1. **Readiness Review**
+   - Technical validation
+   - Security audit
+   - Performance verification
+
+2. **Production Access**
+   - Credentials activated
+   - Monitoring enabled
+   - Support notified
+
+3. **Initial Monitoring**
+   - Close observation
+   - Quick issue resolution
+   - Performance tracking
+
+### Post-Launch Support
+
+Ongoing assistance:
+- Performance optimization
+- Feature guidance
+- Issue resolution
+- Upgrade planning
+
+---
+
+## Support Structure
+
+### Support Tiers
+
+**Basic Tier**
+- Email support
+- Business hours
+- 24-hour response
+
+**Premium Tier**
+- Email + Slack
+- Extended hours
+- 4-hour response
+
+**Enterprise Tier**
+- Dedicated support
+- 24/7 availability
+- 1-hour response
+
+### Support Channels
 
 1. **Documentation**
-   - [API Reference](../README.md)
-   - [Authentication Guide](./AUTHENTICATION_GUIDE.md)
-   - [Postman Guide](./POSTMAN_COMPLETE_GUIDE.md)
+   - API reference
+   - Integration guides
+   - Best practices
+   - FAQs
 
-2. **Testing Tools**
-   - [Postman Collection](../postman/)
-   - [SDK Examples](../sdk/)
-   - [Code Samples](../examples/)
+2. **Technical Support**
+   - Email ticketing
+   - Slack (Premium+)
+   - Phone (Enterprise)
+   - Emergency hotline
 
-3. **Support Channels**
-   - **Email**: api-support@c2m.example.com
-   - **Slack**: [Customer workspace]
-   - **Phone**: Available for Enterprise customers
+3. **Resources**
+   - Status page
+   - Release notes
+   - Maintenance schedule
+   - Community forum
 
-### Common Questions
+### Escalation Process
 
-**Q: How do I rotate credentials?**
-A: Contact support 7 days before rotation. We'll provide new credentials with an overlap period.
+Issue severity levels:
+1. **Critical**: Production down
+2. **High**: Major functionality impaired
+3. **Medium**: Minor functionality issues
+4. **Low**: Questions or enhancements
 
-**Q: Can I increase my rate limits?**
-A: Yes, contact your account manager to discuss plan upgrades.
-
-**Q: What happens if I exceed rate limits?**
-A: You'll receive 429 responses. Implement exponential backoff to handle gracefully.
-
-**Q: How do I test without sending real mail?**
-A: Use the development environment - all mail is simulated.
-
-**Q: Can I white-label the mail pieces?**
-A: Yes, available for Premium and Enterprise plans.
-
-### Emergency Contacts
-
-For production issues:
-- **Critical Issues**: emergency@c2m.example.com
-- **Enterprise Hotline**: +1-800-C2M-HELP
-- **Status Page**: https://status.c2m.example.com
+Response times vary by tier and severity.
 
 ---
 
-## Appendix: Quick Reference
+## Best Practices
 
-### Authentication Flow
-```
-Credentials → Long Token (30 days) → Short Token (15 min) → API Calls
-```
+### Security
 
-### Environment URLs
-| Environment | Auth URL | API URL |
-|-------------|----------|---------|
-| Development | https://dev-auth.c2m.example.com | https://dev-api.c2m.example.com |
-| Staging | https://stage-auth.c2m.example.com | https://stage-api.c2m.example.com |
-| Production | https://auth.c2m.example.com | https://api.c2m.example.com |
+1. **Credential Management**
+   - Use environment variables
+   - Rotate regularly
+   - Never commit to code
+   - Monitor usage
 
-### Rate Limits by Plan
-| Plan | Per Hour | Per Day | Per Month |
-|------|----------|---------|-----------|
-| Basic | 100 | 1,000 | 10,000 |
-| Premium | 1,000 | 10,000 | 100,000 |
-| Enterprise | Unlimited | Unlimited | Unlimited |
+2. **Token Handling**
+   - Store securely
+   - Refresh proactively
+   - Handle expiration
+   - Log carefully
 
-### Required Scopes
-| Operation | Required Scope |
-|-----------|----------------|
-| Submit jobs | `jobs:submit` |
-| Read job status | `jobs:read` |
-| Use templates | `templates:read` |
-| Manage templates | `templates:write` |
-| Bulk operations | `bulk:operations` |
+### Performance
+
+1. **Rate Limit Management**
+   - Implement backoff
+   - Monitor usage
+   - Plan capacity
+   - Cache when possible
+
+2. **Error Handling**
+   - Retry transient errors
+   - Log comprehensively
+   - Alert on patterns
+   - Fail gracefully
+
+### Operations
+
+1. **Monitoring**
+   - Track success rates
+   - Monitor latency
+   - Alert on anomalies
+   - Review regularly
+
+2. **Maintenance**
+   - Plan for updates
+   - Test changes
+   - Communicate clearly
+   - Document thoroughly
 
 ---
 
-*Welcome to C2M API V2! We're excited to help you automate your mail operations.*
-
-*Last Updated: 2025-09-08*
+*This guide provides the framework for successful C2M API V2 integration. For specific implementation details, refer to the technical documentation and work with your support team.*

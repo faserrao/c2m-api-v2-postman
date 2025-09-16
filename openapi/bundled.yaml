@@ -96,16 +96,53 @@ components:
     height:
       type: number
     submitSingleDocWithTemplateParams:
-      type: object
-      properties:
-        jobTemplate:
-          $ref: '#/components/schemas/jobTemplate'
-        paymentDetails:
-          $ref: '#/components/schemas/paymentDetails'
-        tags:
-          $ref: '#/components/schemas/tags'
-      required:
-        - jobTemplate
+      oneOf:
+        - type: object
+          properties:
+            jobTemplate:
+              $ref: '#/components/schemas/jobTemplate'
+            paymentDetails:
+              $ref: '#/components/schemas/paymentDetails'
+            tags:
+              $ref: '#/components/schemas/tags'
+            documentSourceIdentifier:
+              $ref: '#/components/schemas/documentSourceIdentifier'
+          required:
+            - jobTemplate
+            - documentSourceIdentifier
+        - type: object
+          properties:
+            jobTemplate:
+              $ref: '#/components/schemas/jobTemplate'
+            paymentDetails:
+              $ref: '#/components/schemas/paymentDetails'
+            tags:
+              $ref: '#/components/schemas/tags'
+            recipientAddressSources:
+              type: array
+              items:
+                $ref: '#/components/schemas/recipientAddressSource'
+          required:
+            - jobTemplate
+            - recipientAddressSources
+        - type: object
+          properties:
+            jobTemplate:
+              $ref: '#/components/schemas/jobTemplate'
+            paymentDetails:
+              $ref: '#/components/schemas/paymentDetails'
+            tags:
+              $ref: '#/components/schemas/tags'
+            documentSourceIdentifier:
+              $ref: '#/components/schemas/documentSourceIdentifier'
+            recipientAddressSources:
+              type: array
+              items:
+                $ref: '#/components/schemas/recipientAddressSource'
+          required:
+            - jobTemplate
+            - documentSourceIdentifier
+            - recipientAddressSources
     submitMultiDocWithTemplateParams:
       type: object
       properties:
@@ -146,7 +183,6 @@ components:
           $ref: '#/components/schemas/tags'
       required:
         - documentsToMerge
-        - recipientAddressSource
         - jobTemplate
     singleDocJobParams:
       type: object
@@ -298,15 +334,12 @@ components:
       properties:
         addressCapturePdfs:
           $ref: '#/components/schemas/addressCapturePdfs'
-        jobTemplate:
-          $ref: '#/components/schemas/jobTemplate'
         paymentDetails:
           $ref: '#/components/schemas/paymentDetails'
         tags:
           $ref: '#/components/schemas/tags'
       required:
         - addressCapturePdfs
-        - jobTemplate
     addressCapturePdfs:
       type: array
       items:
@@ -856,16 +889,53 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                jobTemplate:
-                  $ref: '#/components/schemas/jobTemplate'
-                paymentDetails:
-                  $ref: '#/components/schemas/paymentDetails'
-                tags:
-                  $ref: '#/components/schemas/tags'
-              required:
-                - jobTemplate
+              oneOf:
+                - type: object
+                  properties:
+                    jobTemplate:
+                      $ref: '#/components/schemas/jobTemplate'
+                    paymentDetails:
+                      $ref: '#/components/schemas/paymentDetails'
+                    tags:
+                      $ref: '#/components/schemas/tags'
+                    documentSourceIdentifier:
+                      $ref: '#/components/schemas/documentSourceIdentifier'
+                  required:
+                    - jobTemplate
+                    - documentSourceIdentifier
+                - type: object
+                  properties:
+                    jobTemplate:
+                      $ref: '#/components/schemas/jobTemplate'
+                    paymentDetails:
+                      $ref: '#/components/schemas/paymentDetails'
+                    tags:
+                      $ref: '#/components/schemas/tags'
+                    recipientAddressSources:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/recipientAddressSource'
+                  required:
+                    - jobTemplate
+                    - recipientAddressSources
+                - type: object
+                  properties:
+                    jobTemplate:
+                      $ref: '#/components/schemas/jobTemplate'
+                    paymentDetails:
+                      $ref: '#/components/schemas/paymentDetails'
+                    tags:
+                      $ref: '#/components/schemas/tags'
+                    documentSourceIdentifier:
+                      $ref: '#/components/schemas/documentSourceIdentifier'
+                    recipientAddressSources:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/recipientAddressSource'
+                  required:
+                    - jobTemplate
+                    - documentSourceIdentifier
+                    - recipientAddressSources
       responses:
         '200':
           description: Success
@@ -944,7 +1014,6 @@ paths:
                   $ref: '#/components/schemas/tags'
               required:
                 - documentsToMerge
-                - recipientAddressSource
                 - jobTemplate
       responses:
         '200':
@@ -1160,15 +1229,12 @@ paths:
               properties:
                 addressCapturePdfs:
                   $ref: '#/components/schemas/addressCapturePdfs'
-                jobTemplate:
-                  $ref: '#/components/schemas/jobTemplate'
                 paymentDetails:
                   $ref: '#/components/schemas/paymentDetails'
                 tags:
                   $ref: '#/components/schemas/tags'
               required:
                 - addressCapturePdfs
-                - jobTemplate
       responses:
         '200':
           description: Success

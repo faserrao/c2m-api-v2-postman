@@ -6,17 +6,9 @@
 (***********************************)
 
 (* 
-  Use Case 1: I have a document, recipient addresses & a job template.
+  Use Case 1: I have a single document, some recipients, and a job template.
   Endpoint: POST /jobs/single-doc-job-template
-submitSingleDocWithTemplateParams = 
-      documentSourceIdentifier 
-    + [ { recipientAddressSource } ] 
-    + jobTemplate 
-    + [ paymentDetails ] 
-    + [ tags ] ;
 *)
-
-
 submitSingleDocWithTemplateParams =
       ( documentSourceIdentifier
       | { recipientAddressSource }
@@ -41,7 +33,7 @@ submitMultiDocWithTemplateParams =
 *)
 mergeMultiDocWithTemplateParams = 
       documentsToMerge 
-    + recipientAddressSource 
+    + [ recipientAddressSource ] 
     + jobTemplate 
     + [ paymentDetails ] 
     + [ tags ] ;
@@ -56,7 +48,7 @@ singleDocJobParams =
     + { recipientAddressSource }            (* One or more recipients, each defined or referenced *)
     + jobOptions                            (* Layout, print, delivery preferences *)
     + [ paymentDetails ]                    (* Optional billing info, depending on configuration *)
-    + [ tags ] ;                         (* Optional metadata tags, e.g., campaign identifiers *)
+    + [ tags ] ;                            (* Optional metadata tags, e.g., campaign identifiers *)
 
 (* 
   Use Case 5: I have multiple documents; each goes to a different recipient address.
@@ -128,7 +120,6 @@ pageOffset = integer ; (* New as of 07082025 *)
 *)
 multiPdfWithCaptureParams = 
       addressCapturePdfs 
-    + jobTemplate 
     + [ paymentDetails ] 
     + [ tags ] ;
 
@@ -281,6 +272,7 @@ checkDigit       = integer ;
 invoiceNumber    = string ;
 amountDue        = number ;
 
+jobTemplate          = string;
 addressListId        = id; (* New as of 07082025 *)
 addressId            = id;
 documentName         = string ;
