@@ -2133,6 +2133,7 @@ postman-auth-setup: ## Configure authentication for Postman collection
 
 .PHONY: openapi-build
 openapi-build: generate-openapi-spec-from-ebnf-dd ## Build OpenAPI from EBNF + overlays + lint [CI alias]
+	$(MAKE) openapi-merge-overlays
 	$(MAKE) openapi-spec-lint
 
 .PHONY: postman-collection-build
