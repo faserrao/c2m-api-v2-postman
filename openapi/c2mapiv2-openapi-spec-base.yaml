@@ -109,6 +109,7 @@ components:
             $ref: '#/components/schemas/documentSourceIdentifier'
         required:
         - jobTemplate
+        - paymentDetails
         - documentSourceIdentifier
       - type: object
         properties:
@@ -124,6 +125,7 @@ components:
               $ref: '#/components/schemas/recipientAddressSource'
         required:
         - jobTemplate
+        - paymentDetails
         - recipientAddressSources
       - type: object
         properties:
@@ -141,6 +143,7 @@ components:
               $ref: '#/components/schemas/recipientAddressSource'
         required:
         - jobTemplate
+        - paymentDetails
         - documentSourceIdentifier
         - recipientAddressSources
     submitMultiDocWithTemplateParams:
@@ -184,6 +187,7 @@ components:
       required:
       - documentsToMerge
       - jobTemplate
+      - paymentDetails
     singleDocJobParams:
       type: object
       properties:
@@ -203,6 +207,7 @@ components:
       - documentSourceIdentifier
       - recipientAddressSources
       - jobOptions
+      - paymentDetails
     submitMultiDocParams:
       type: object
       properties:
@@ -227,6 +232,7 @@ components:
       required:
       - items
       - jobOptions
+      - paymentDetails
     mergeMultiDocParams:
       type: object
       properties:
@@ -234,11 +240,14 @@ components:
           $ref: '#/components/schemas/documentsToMerge'
         recipientAddressSource:
           $ref: '#/components/schemas/recipientAddressSource'
+        paymentDetails:
+          $ref: '#/components/schemas/paymentDetails'
         tags:
           $ref: '#/components/schemas/tags'
       required:
       - documentsToMerge
       - recipientAddressSource
+      - paymentDetails
     documentsToMerge:
       type: array
       items:
@@ -269,6 +278,7 @@ components:
       required:
       - documentSourceIdentifier
       - items
+      - paymentDetails
     pageRange:
       type: object
       properties:
@@ -293,6 +303,7 @@ components:
       required:
       - documentSourceIdentifier
       - embeddedExtractionSpecs
+      - paymentDetails
     embeddedExtractionSpecs:
       type: array
       items:
@@ -340,6 +351,7 @@ components:
           $ref: '#/components/schemas/tags'
       required:
       - addressCapturePdfs
+      - paymentDetails
     addressCapturePdfs:
       type: array
       items:
@@ -703,6 +715,7 @@ paths:
                     $ref: '#/components/schemas/documentSourceIdentifier'
                 required:
                 - jobTemplate
+                - paymentDetails
                 - documentSourceIdentifier
               - type: object
                 properties:
@@ -718,6 +731,7 @@ paths:
                       $ref: '#/components/schemas/recipientAddressSource'
                 required:
                 - jobTemplate
+                - paymentDetails
                 - recipientAddressSources
               - type: object
                 properties:
@@ -735,6 +749,7 @@ paths:
                       $ref: '#/components/schemas/recipientAddressSource'
                 required:
                 - jobTemplate
+                - paymentDetails
                 - documentSourceIdentifier
                 - recipientAddressSources
       responses:
@@ -816,6 +831,7 @@ paths:
               required:
               - documentsToMerge
               - jobTemplate
+              - paymentDetails
       responses:
         '200':
           description: Success
@@ -854,6 +870,7 @@ paths:
               - documentSourceIdentifier
               - recipientAddressSources
               - jobOptions
+              - paymentDetails
       responses:
         '200':
           description: Success
@@ -897,6 +914,7 @@ paths:
               required:
               - items
               - jobOptions
+              - paymentDetails
       responses:
         '200':
           description: Success
@@ -923,11 +941,14 @@ paths:
                   $ref: '#/components/schemas/documentsToMerge'
                 recipientAddressSource:
                   $ref: '#/components/schemas/recipientAddressSource'
+                paymentDetails:
+                  $ref: '#/components/schemas/paymentDetails'
                 tags:
                   $ref: '#/components/schemas/tags'
               required:
               - documentsToMerge
               - recipientAddressSource
+              - paymentDetails
       responses:
         '200':
           description: Success
@@ -973,6 +994,7 @@ paths:
               required:
               - documentSourceIdentifier
               - items
+              - paymentDetails
       responses:
         '200':
           description: Success
@@ -1006,6 +1028,7 @@ paths:
               required:
               - documentSourceIdentifier
               - embeddedExtractionSpecs
+              - paymentDetails
       responses:
         '200':
           description: Success
@@ -1036,6 +1059,7 @@ paths:
                   $ref: '#/components/schemas/tags'
               required:
               - addressCapturePdfs
+              - paymentDetails
       responses:
         '200':
           description: Success
