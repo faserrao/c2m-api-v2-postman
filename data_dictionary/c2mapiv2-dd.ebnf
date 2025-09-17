@@ -14,7 +14,7 @@ submitSingleDocWithTemplateParams =
       | { recipientAddressSource }
       | (documentSourceIdentifier + { recipientAddressSource}) )
     + jobTemplate
-    + [ paymentDetails ]
+    + paymentDetails 
     + [ tags ] ;
 
 (* 
@@ -35,7 +35,7 @@ mergeMultiDocWithTemplateParams =
       documentsToMerge 
     + [ recipientAddressSource ] 
     + jobTemplate 
-    + [ paymentDetails ] 
+    + paymentDetails 
     + [ tags ] ;
 
 (* 
@@ -47,7 +47,7 @@ singleDocJobParams =
       documentSourceIdentifier 
     + { recipientAddressSource }            (* One or more recipients, each defined or referenced *)
     + jobOptions                            (* Layout, print, delivery preferences *)
-    + [ paymentDetails ]                    (* Optional billing info, depending on configuration *)
+    + paymentDetails                    (* Optional billing info, depending on configuration *)
     + [ tags ] ;                            (* Optional metadata tags, e.g., campaign identifiers *)
 
 (* 
@@ -58,7 +58,7 @@ singleDocJobParams =
 submitMultiDocParams = 
       { documentSourceIdentifier + recipientAddressSource } 
     + jobOptions 
-    + [ paymentDetails ] 
+    + paymentDetails
     + [ tags ] ;
 
 (*
@@ -69,6 +69,7 @@ submitMultiDocParams =
 mergeMultiDocParams = 
       documentsToMerge 
     + recipientAddressSource 
+    + paymentDetails
     + [ tags ] ;
 
 documentsToMerge = { documentSourceIdentifier };        (* One or more documents to be merged in order *)
@@ -81,7 +82,7 @@ documentsToMerge = { documentSourceIdentifier };        (* One or more documents
 splitPdfParams = 
       documentSourceIdentifier 
     + { pageRange + { recipientAddressSource } } (* Multiple ranges and recipients.  Mulitple recipients allowed per pdf. *) 
-    + [ paymentDetails ] 
+    + paymentDetails 
     + [ tags ] ;
 
 pageRange = startPage + endPage ;
@@ -96,7 +97,7 @@ endPage   = integer ;
 splitPdfWithCaptureParams = 
       documentSourceIdentifier 
     + embeddedExtractionSpecs 
-    + [ paymentDetails ] 
+    + paymentDetails 
     + [ tags ] ;
 
 embeddedExtractionSpecs = { extractionSpec } ;
@@ -120,7 +121,7 @@ pageOffset = integer ; (* New as of 07082025 *)
 *)
 multiPdfWithCaptureParams = 
       addressCapturePdfs 
-    + [ paymentDetails ] 
+    + paymentDetails
     + [ tags ] ;
 
 addressCapturePdfs = { addressListPdf } ;
@@ -212,7 +213,7 @@ applePayPayment =
     + applePaymentDetails ;
 
 googlePayPayment =
-      "GOOGLE_PAY"                       (* Immediate payment using Apple Pay *)
+      "GOOGLE_PAY"                       (* Immediate payment using Google Pay *)
     + googlePaymentDetails ;
 
 creditCardPayment =
