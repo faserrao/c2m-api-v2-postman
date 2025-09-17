@@ -10,11 +10,11 @@
   Endpoint: POST /jobs/single-doc-job-template
 *)
 submitSingleDocWithTemplateParams =
-      ( documentSourceIdentifier
-      | { recipientAddressSource }
+      ( ("TEMPLATE" | documentSourceIdentifier) + { recipientAddressSource }
+      | ("TEMPLATE" | { recipientAddressSource }) + documentSourceIdentifier
       | (documentSourceIdentifier + { recipientAddressSource}) )
     + jobTemplate
-    + paymentDetails 
+    + paymentDetails
     + [ tags ] ;
 
 (* 
@@ -33,7 +33,7 @@ submitMultiDocWithTemplateParams =
 *)
 mergeMultiDocWithTemplateParams = 
       documentsToMerge 
-    + [ recipientAddressSource ] 
+    + [ ("TEMPLATE" | recipientAddressSource) ] 
     + jobTemplate 
     + paymentDetails 
     + [ tags ] ;
