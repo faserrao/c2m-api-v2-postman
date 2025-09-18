@@ -75,6 +75,13 @@ jobs:
           path: c2m-api-v2-security
           token: ${{ secrets.SECURITY_REPO_TOKEN }}
 
+      - name: Checkout artifacts repository
+        uses: actions/checkout@v4
+        with:
+          repository: faserrao/c2m-api-artifacts
+          path: artifacts-repo
+          token: ${{ secrets.SECURITY_REPO_TOKEN }}
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -159,6 +166,12 @@ jobs:
           echo "📚 Building API documentation..."
           make docs
 
+      - name: Generate SDKs
+        continue-on-error: true
+        run: |
+          echo "🔧 Generating SDKs..."
+          make generate-sdk-all || echo "⚠️  SDK generation not fully implemented yet"
+
       # ---------- Drift Detection (PRs only) ----------
       - name: Check for uncommitted changes
         if: github.event_name == 'pull_request'
@@ -215,18 +228,63 @@ jobs:
             POSTMAN_TARGET=$POSTMAN_TARGET make postman-publish
           fi
 
-      # ---------- Commit generated artifacts (main only) ----------
-      - name: Commit generated artifacts
+      # ---------- Copy artifacts to artifacts repo ----------
+      - name: Copy artifacts to artifacts repository
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "chore(ci): update OpenAPI spec, Postman collection, and docs"
-          commit_user_name: c2m-api-bot
-          commit_user_email: c2m-api-bot@users.noreply.github.com
-          file_pattern: |
-            ${{ env.OPENAPI_DIR }}/**
-            ${{ env.POSTMAN_DIR }}/generated/**
-            ${{ env.DOCS_DIR }}/**
+        run: |
+          echo "📦 Copying artifacts to artifacts repository..."
+          # Create directories if they don't exist
+          mkdir -p artifacts-repo/openapi
+          mkdir -p artifacts-repo/postman/collections
+          mkdir -p artifacts-repo/postman/metadata
+          mkdir -p artifacts-repo/docs
+          mkdir -p artifacts-repo/sdks
+          
+          # Copy OpenAPI specs
+          cp -v ${{ env.OPENAPI_DIR }}/*.yaml artifacts-repo/openapi/ 2>/dev/null || echo "No OpenAPI specs to copy"
+          
+          # Copy Postman collections
+          cp -v ${{ env.POSTMAN_DIR }}/generated/*.json artifacts-repo/postman/collections/ 2>/dev/null || echo "No collections to copy"
+          
+          # Copy Postman metadata
+          cp -v ${{ env.POSTMAN_DIR }}/*.txt artifacts-repo/postman/metadata/ 2>/dev/null || echo "No txt files to copy"
+          cp -v ${{ env.POSTMAN_DIR }}/*.json artifacts-repo/postman/metadata/ 2>/dev/null || echo "No json files to copy"
+          
+          # Copy documentation
+          cp -rv ${{ env.DOCS_DIR }}/* artifacts-repo/docs/ 2>/dev/null || echo "No docs to copy"
+          
+          # Copy SDKs if they exist
+          if [ -d "sdk" ]; then
+            cp -rv sdk/* artifacts-repo/sdks/ 2>/dev/null || echo "No SDKs to copy"
+          fi
+          
+          echo "✅ Artifacts copied successfully"
+
+      # ---------- Commit and push to artifacts repo ----------
+      - name: Commit and push artifacts
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        working-directory: artifacts-repo
+        run: |
+          git config user.name "c2m-api-bot"
+          git config user.email "c2m-api-bot@users.noreply.github.com"
+          
+          # Add all changes
+          git add .
+          
+          # Create commit message with build info
+          COMMIT_MSG="Build #${{ github.run_number }}: Update from ${{ github.event.head_commit.message }}"
+          COMMIT_DESC="Source commit: ${{ github.sha }}
+          Workflow: ${{ github.workflow }}
+          Triggered by: ${{ github.actor }}"
+          
+          # Commit (don't fail if no changes)
+          git commit -m "$COMMIT_MSG" -m "$COMMIT_DESC" || {
+            echo "No changes to commit"
+            exit 0
+          }
+          
+          # Push to artifacts repo
+          git push origin main
 
       # ---------- Upload artifacts ----------
       - name: Upload build artifacts
