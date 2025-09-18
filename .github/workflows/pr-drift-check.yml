@@ -1,4 +1,4 @@
-name: PR Drift Check
+name: PR Build Validation
 
 on:
   pull_request:
@@ -15,8 +15,8 @@ permissions:
   pull-requests: write
 
 jobs:
-  drift-check:
-    name: Check for uncommitted generated files
+  build-validation:
+    name: Validate PR builds successfully
     runs-on: ubuntu-latest
     
     steps:
@@ -43,65 +43,76 @@ jobs:
             pip install -r scripts/python_env/requirements.txt
           fi
 
-      - name: Generate artifacts
+      - name: Validate build process
+        id: build_check
         run: |
-          echo "🔨 Generating artifacts..."
-          make openapi-build
-          make postman-collection-build
-          make docs
-
-      - name: Check for drift
-        id: drift_check
-        run: |
-          echo "🔍 Checking for uncommitted changes..."
+          echo "🔨 Validating build process..."
           
-          # Check if there are any changes
-          if git diff --quiet openapi/ postman/generated/ docs/; then
-            echo "✅ All generated files are up to date!"
-            echo "drift_found=false" >> $GITHUB_OUTPUT
+          # Test that all build targets work
+          if make openapi-build && make postman-collection-build && make docs; then
+            echo "✅ All build targets completed successfully!"
+            echo "build_success=true" >> $GITHUB_OUTPUT
           else
-            echo "❌ Generated files are out of sync!"
-            echo "drift_found=true" >> $GITHUB_OUTPUT
-            
-            # Capture the diff for the PR comment
-            echo 'diff<<EOF' >> $GITHUB_OUTPUT
-            git diff --stat openapi/ postman/generated/ docs/ >> $GITHUB_OUTPUT
-            echo 'EOF' >> $GITHUB_OUTPUT
-            
-            # Show detailed changes
-            echo ""
-            echo "Files changed:"
-            git diff --name-only openapi/ postman/generated/ docs/
-            
+            echo "❌ Build failed!"
+            echo "build_success=false" >> $GITHUB_OUTPUT
             exit 1
           fi
 
-      - name: Comment on PR
-        if: failure() && steps.drift_check.outputs.drift_found == 'true'
+      - name: Comment on PR success
+        if: success()
         uses: actions/github-script@v7
         with:
           script: |
-            const output = `
-            ## ⚠️ Generated Files Out of Sync
+            // Check if we already commented
+            const comments = await github.rest.issues.listComments({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
             
-            Your changes require regenerating some files. Please run these commands locally and commit the changes:
+            const botComment = comments.data.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('Build Validation')
+            );
             
-            \`\`\`bash
-            make openapi-build
-            make postman-collection-build
-            make docs
-            git add openapi/ postman/generated/ docs/
-            git commit -m "chore: update generated files"
-            \`\`\`
+            const output = `## ✅ Build Validation Passed
             
-            <details>
-            <summary>📊 Files that need updating</summary>
+            All build targets completed successfully. When this PR is merged to main:
+            - Generated artifacts will be pushed to the [c2m-api-artifacts](https://github.com/faserrao/c2m-api-artifacts) repository
+            - Postman workspaces will be updated automatically
+            `;
             
-            \`\`\`
-            ${{ steps.drift_check.outputs.diff }}
-            \`\`\`
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: output
+              });
+            } else {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: output
+              });
+            }
+
+      - name: Comment on PR failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const output = `## ❌ Build Validation Failed
             
-            </details>
+            The build process failed. Please check the workflow logs for details.
+            
+            Common issues:
+            - Missing dependencies
+            - Syntax errors in EBNF data dictionary
+            - Invalid OpenAPI overlays
+            
+            Please fix the issues and push an update to this PR.
             `;
             
             github.rest.issues.createComment({
