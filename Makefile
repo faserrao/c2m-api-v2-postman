@@ -2262,5 +2262,80 @@ print-vars:
 		$(info $(v) = $($(v))))
 
 # ========================================================================
+# TWO-REPO LOCAL DEVELOPMENT SUPPORT
+# ========================================================================
+# Support for the two-repository architecture where generated artifacts
+# are stored in a separate repository
+
+# Path to local artifacts repository (can be overridden)
+ARTIFACTS_REPO ?= ../c2m-api-artifacts
+
+.PHONY: local-sync
+local-sync: ## Sync generated files to local artifacts repo
+	@echo "📦 Syncing artifacts to $(ARTIFACTS_REPO)..."
+	@if [ ! -d "$(ARTIFACTS_REPO)" ]; then \
+		echo "❌ Artifacts repo not found at $(ARTIFACTS_REPO)"; \
+		echo "   Clone it with: git clone https://github.com/faserrao/c2m-api-artifacts.git $(ARTIFACTS_REPO)"; \
+		exit 1; \
+	fi
+	@echo "📁 Creating directories..."
+	@mkdir -p $(ARTIFACTS_REPO)/openapi
+	@mkdir -p $(ARTIFACTS_REPO)/postman/collections
+	@mkdir -p $(ARTIFACTS_REPO)/postman/metadata
+	@mkdir -p $(ARTIFACTS_REPO)/docs
+	@mkdir -p $(ARTIFACTS_REPO)/sdks
+	@echo "📄 Copying OpenAPI specs..."
+	@cp -v openapi/*.yaml $(ARTIFACTS_REPO)/openapi/ 2>/dev/null || echo "   No OpenAPI specs found"
+	@echo "📮 Copying Postman collections..."
+	@cp -v postman/generated/*.json $(ARTIFACTS_REPO)/postman/collections/ 2>/dev/null || echo "   No collections found"
+	@echo "📋 Copying Postman metadata..."
+	@cp -v postman/*.txt postman/*.json $(ARTIFACTS_REPO)/postman/metadata/ 2>/dev/null || echo "   No metadata found"
+	@echo "📚 Copying documentation..."
+	@cp -rv docs/* $(ARTIFACTS_REPO)/docs/ 2>/dev/null || echo "   No documentation found"
+	@echo "🔧 Copying SDKs..."
+	@if [ -d "sdk" ]; then \
+		cp -rv sdk/* $(ARTIFACTS_REPO)/sdks/ 2>/dev/null || echo "   No SDKs found"; \
+	else \
+		echo "   SDK directory not found"; \
+	fi
+	@echo "✅ Sync complete!"
+
+.PHONY: local-full-build
+local-full-build: ## Full build with artifacts sync
+	@echo "🚀 Running full local build with artifacts sync..."
+	@$(MAKE) openapi-build
+	@$(MAKE) postman-collection-build
+	@$(MAKE) docs-build
+	@$(MAKE) generate-sdk-all || echo "⚠️  SDK generation skipped"
+	@$(MAKE) local-sync
+	@echo "✅ Full build complete!"
+
+.PHONY: local-test-pipeline
+local-test-pipeline: ## Test the full two-repo pipeline locally
+	@echo "🧪 Testing full pipeline locally..."
+	@echo "🧹 Cleaning previous builds..."
+	@$(MAKE) clean
+	@echo "🏗️  Running full build..."
+	@$(MAKE) local-full-build
+	@echo "📊 Checking artifacts repo for changes..."
+	@cd $(ARTIFACTS_REPO) && \
+		git add . && \
+		git diff --staged --stat && \
+		echo "✅ Pipeline test complete! (Changes not committed)"
+
+.PHONY: artifacts-status
+artifacts-status: ## Check status of artifacts repo
+	@echo "📊 Artifacts repository status..."
+	@if [ ! -d "$(ARTIFACTS_REPO)" ]; then \
+		echo "❌ Artifacts repo not found at $(ARTIFACTS_REPO)"; \
+		exit 1; \
+	fi
+	@cd $(ARTIFACTS_REPO) && \
+		echo "📍 Location: $$(pwd)" && \
+		echo "🌿 Branch: $$(git branch --show-current)" && \
+		echo "📝 Status:" && \
+		git status --short
+
+# ========================================================================
 # END OF MAKEFILE
 # ========================================================================
