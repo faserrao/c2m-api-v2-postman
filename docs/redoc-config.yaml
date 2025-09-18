@@ -1,0 +1,57 @@
+# Redoc configuration for C2M API documentation
+theme:
+  colors:
+    primary:
+      main: '#667eea'
+  typography:
+    fontSize: '14px'
+    lineHeight: '1.5em'
+    code:
+      fontSize: '13px'
+  
+# Enable code samples
+showExtensions: true
+hideSingleRequestSampleTab: false
+nativeScrollbars: false
+requiredPropsFirst: true
+sortPropsAlphabetically: false
+payloadSampleIdx: 0
+
+# Code sample settings
+codeSample:
+  languages:
+    - lang: curl
+      label: cURL
+    - lang: python
+      label: Python
+    - lang: javascript
+      label: JavaScript
+    - lang: java
+      label: Java
+    - lang: csharp
+      label: C#
+    - lang: go
+      label: Go
+    - lang: ruby
+      label: Ruby
+    - lang: php
+      label: PHP
+
+# Sidebar settings
+sidebar:
+  showDownloadButton: true
+  
+# Search settings
+searchMode:
+  enable: true
+  
+# Schema settings  
+jsonSampleExpandLevel: 2
+generateCodeSamples:
+  languages:
+    - curl
+    - python
+    - javascript
+    - java
+    - csharp
+    - go

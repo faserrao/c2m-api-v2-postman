@@ -1602,7 +1602,13 @@ postman-link-env-to-mock-server:
 .PHONY: docs-build
 docs-build:
 	@echo "📚 Building API documentation with Redoc..."
-	$(REDOCLY) build-docs $(C2MAPIV2_OPENAPI_SPEC) -o $(REDOC_HTML_OUTPUT) -t $(DOCS_DIR)/custom-redoc-template.hbs
+	@echo "🔧 Adding SDK code samples to OpenAPI spec..."
+	@if [ -f "$(VENV_PYTHON)" ]; then \
+		$(VENV_PYTHON) $(SCRIPTS_DIR)/utilities/add-sdk-samples-to-spec.py $(C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES); \
+	else \
+		python3 $(SCRIPTS_DIR)/utilities/add-sdk-samples-to-spec.py $(C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES); \
+	fi
+	$(REDOCLY) build-docs $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES) -o $(REDOC_HTML_OUTPUT) -t $(DOCS_DIR)/custom-redoc-template.hbs
 	$(SWAGGER) bundle $(C2MAPIV2_OPENAPI_SPEC) --outfile $(OPENAPI_BUNDLED_FILE) --type yaml
 
 # Serve documentation in background

@@ -1,6 +1,16 @@
-# Documentation Directory
+# C2M API Documentation
 
-This directory contains the generated API documentation, templates, and assets for the C2M API. The documentation is auto-generated from the OpenAPI specification and served using multiple documentation tools.
+Welcome to the C2M API v2 documentation! This directory contains the interactive API reference with multi-language SDK examples.
+
+## 🎯 Template Endpoints Featured!
+
+Our documentation prominently features **template-based endpoints** that allow you to:
+- Configure mailing settings once
+- Reuse configurations across multiple API calls  
+- Reduce payload size and complexity
+- Maintain consistency across mailings
+
+Look for the **"Start with Template Endpoints!"** banner at the top of the documentation.
 
 ## Directory Structure
 

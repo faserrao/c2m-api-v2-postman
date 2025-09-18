@@ -296,14 +296,7 @@ phoneNumber          = string ;
 tags                 = { tags } ; (* New as of 07102025 *)
 tag                  = string ;  (* Optional metadata tags for analytics or categorization *)
 
-(* Basic lexical types *)
 id = integer;
-integer = number ;                          (* Any whole number *)
-string  = { character } ; (* any printable ASCII character except double quote or backslash *)
-number  = {digit} ;
-digit   = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
-
-
 
 (*************************)
 (*       ENUM DEFINITIONS     *)
