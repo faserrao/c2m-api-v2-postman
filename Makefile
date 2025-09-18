@@ -711,12 +711,15 @@ openapi-spec-diff:
 	@echo "📤 Fetching latest from origin/main…"
 	git fetch origin
 	@echo "🧾 Checking out previous version of spec for diff comparison…"
-	git show $(C2MAPIV2_MAIN_SPEC_PATH) > $(PREVIOUS_C2MAPIV2_OPENAPI_SPEC)
-	@echo "🔍 Running openapi-diff…"
-	# TODO: Fix hanging issue with npm version of openapi-diff
-	# Was working with brew version, but npm version hangs
-	# -$(OPENAPI_DIFF) $(PREVIOUS_C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC)
-	@echo "⚠️  openapi-diff temporarily disabled due to hanging issue"
+	# Check if the file exists in origin/main before trying to show it
+	@if git ls-tree -r origin/main --name-only | grep -q "^$(C2MAPIV2_OPENAPI_SPEC)$$"; then \
+		git show $(C2MAPIV2_MAIN_SPEC_PATH) > $(PREVIOUS_C2MAPIV2_OPENAPI_SPEC); \
+		echo "🔍 Running openapi-diff…"; \
+		echo "⚠️  openapi-diff temporarily disabled due to hanging issue"; \
+	else \
+		echo "ℹ️  No previous spec found in origin/main (this is normal for two-repo architecture)"; \
+		echo "✅ Skipping diff comparison"; \
+	fi
 
 # Clean up diff temporary files
 .PHONY: clean-openapi-spec-diff
