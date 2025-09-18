@@ -997,7 +997,8 @@ postman-api-full-publish:
 
 # Generate Postman collection from OpenAPI spec and add metadata
 .PHONY: postman-api-linked-collection-generate
-postman-api-linked-collection-generate: | $(POSTMAN_DIR) $(POSTMAN_GENERATED_DIR)
+postman-api-linked-collection-generate: | $(POSTMAN_DIR)
+	@mkdir -p $(POSTMAN_GENERATED_DIR)
 	@echo "📦 Generating Postman collection from $(C2MAPIV2_OPENAPI_SPEC)..."
 	$(GENERATOR_OFFICIAL) -s $(C2MAPIV2_OPENAPI_SPEC) -o $(POSTMAN_COLLECTION_RAW) -p
 	@echo "🛠 Adding 'info' block to collection..."
