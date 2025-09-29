@@ -253,6 +253,28 @@ To set target: `echo "personal" > .postman-target`
 - `merge_yaml_files.py` - Merge multiple YAML specs
 - `api_client_generator.py` - Generate Python client from OpenAPI
 
+## Session History - 2025-09-29
+
+### Critical Fixes Applied Today
+1. **JWT Pre-request Script - Mock Server Detection**
+   - Fixed issue where Authorization header was being sent to mock servers causing HTML errors
+   - Solution: Detect mock server URLs and skip Authorization header
+   - Files modified:
+     - `postman/scripts/jwt-pre-request.js`
+     - `scripts/active/generate_use_case_collection.py`
+   - Both Real World and Test collections share the same mock server
+
+2. **OpenAPI Validation Errors**
+   - Fixed "application~1json" errors by removing duplicate 'example' fields
+   - Modified `scripts/active/add_response_examples.py` to only use 'examples' not 'example'
+   - Added descriptions and tags to all job endpoints
+
+3. **GitHub Actions Workflow**
+   - Fixed dependency order - docs build must come after Postman collection build
+   - Added use case collection generation to CI flow (required for mock server)
+   - Fixed shell syntax error in artifacts commit step
+   - Added rule to generate `with-examples.yaml` file as dependency
+
 ## Learning Memories
 
 - `learn`: Placeholder for learning memories related to the project
