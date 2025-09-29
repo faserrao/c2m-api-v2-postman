@@ -44,13 +44,8 @@ def add_response_examples(spec):
                                     if 'StandardResponse' in json_response['schema']['$ref']:
                                         # Create endpoint-specific example
                                         endpoint_name = path.split('/')[-1].replace('-', '_')
-                                        json_response['example'] = {
-                                            'status': 'success',
-                                            'message': f'{endpoint_name} job created successfully',
-                                            'jobId': f'job_{datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")}'
-                                        }
                                         
-                                        # Also add multiple examples
+                                        # Only add 'examples' (not 'example') to avoid validation issues
                                         json_response['examples'] = {
                                             'success': {
                                                 'summary': 'Successful job creation',
