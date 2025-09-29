@@ -273,10 +273,12 @@ jobs:
           
           # Create commit message with build info
           COMMIT_MSG="Build #${{ github.run_number }}: Update from ${{ github.event.head_commit.message }}"
-          COMMIT_DESC="Source commit: ${{ github.sha }}"$'\n'"Workflow: ${{ github.workflow }}"$'\n'"Triggered by: ${{ github.actor }}"
           
           # Commit (don't fail if no changes)
-          git commit -m "$COMMIT_MSG" -m "$COMMIT_DESC" || {
+          git commit -m "$COMMIT_MSG" \
+            -m "Source commit: ${{ github.sha }}" \
+            -m "Workflow: ${{ github.workflow }}" \
+            -m "Triggered by: ${{ github.actor }}" || {
             echo "No changes to commit"
             exit 0
           }
