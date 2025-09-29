@@ -24,30 +24,8 @@ def add_response_examples(spec):
                 'jobId': 'job_20241227_123456'
             }
         
-        # Add more specific examples for different response types
-        schemas['StandardResponse']['examples'] = {
-            'success': {
-                'value': {
-                    'status': 'success',
-                    'message': 'Job created successfully',
-                    'jobId': 'job_20241227_123456'
-                }
-            },
-            'processing': {
-                'value': {
-                    'status': 'processing',
-                    'message': 'Job is being processed',
-                    'jobId': 'job_20241227_789012'
-                }
-            },
-            'completed': {
-                'value': {
-                    'status': 'completed',
-                    'message': 'Job completed successfully',
-                    'jobId': 'job_20241227_345678'
-                }
-            }
-        }
+        # Don't add 'examples' to schema level - only 'example' is valid
+        # Multiple examples should be added at the media type level, not schema level
     
     # Add examples to all job endpoints
     if 'paths' in spec:
