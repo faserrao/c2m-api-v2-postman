@@ -147,12 +147,22 @@ async function authenticate() {
         
         // Set the Authorization header with the short-term token
         const currentShortToken = pm.environment.get(config.shortTokenVar);
-        pm.request.headers.add({
-            key: 'Authorization',
-            value: `Bearer ${currentShortToken}`
-        });
         
-        console.log('Authentication complete, Authorization header set');
+        // Check if we're using a mock server - if so, skip adding the Authorization header
+        const baseUrl = pm.environment.get('baseUrl') || '';
+        const isMockServer = baseUrl.includes('mock.pstmn.io') || 
+                           baseUrl.includes('localhost:4010') ||
+                           pm.environment.get('isMockServer') === 'true';
+        
+        if (!isMockServer) {
+            pm.request.headers.add({
+                key: 'Authorization',
+                value: `Bearer ${currentShortToken}`
+            });
+            console.log('Authentication complete, Authorization header set');
+        } else {
+            console.log('Mock server detected - skipping Authorization header');
+        }
         
     } catch (error) {
         console.error('Authentication failed:', error);
