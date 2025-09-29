@@ -542,6 +542,9 @@ postman-instance-build-only:
 	$(MAKE) postman-spec-create-standalone
 	# Generate and link standard collection
 	$(MAKE) postman-create-linked-collection
+	# Generate and upload use case collection (needed for mock server)
+	$(MAKE) postman-generate-use-case-collection
+	$(MAKE) postman-upload-use-case-collection
 	$(MAKE) postman-create-test-collection
 	$(MAKE) postman-create-mock-and-env
 	# Skip local testing in CI
