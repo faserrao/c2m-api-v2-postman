@@ -1011,9 +1011,18 @@ postman-api-full-publish:
 # POSTMAN COLLECTION GENERATION
 # ========================================================================
 
+# Generate OpenAPI spec with SDK examples
+$(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES): $(C2MAPIV2_OPENAPI_SPEC)
+	@echo "🔧 Adding SDK code samples to OpenAPI spec..."
+	@if command -v $(VENV_PYTHON) >/dev/null 2>&1; then \
+		$(VENV_PYTHON) $(SCRIPTS_DIR)/utilities/add-sdk-samples-to-spec.py $(C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES); \
+	else \
+		python3 $(SCRIPTS_DIR)/utilities/add-sdk-samples-to-spec.py $(C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES); \
+	fi
+
 # Generate Postman collection from OpenAPI spec and add metadata
 .PHONY: postman-api-linked-collection-generate
-postman-api-linked-collection-generate: | $(POSTMAN_DIR)
+postman-api-linked-collection-generate: $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES) | $(POSTMAN_DIR)
 	@mkdir -p $(POSTMAN_GENERATED_DIR)
 	@echo "📦 Generating Postman collection from $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES)..."
 	$(GENERATOR_OFFICIAL) -s $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES) -o $(POSTMAN_COLLECTION_RAW) -p

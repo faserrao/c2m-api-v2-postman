@@ -161,16 +161,16 @@ jobs:
           echo "📊 Comparing OpenAPI spec changes..."
           make diff || echo "ℹ️  Diff completed"
 
-      - name: Build Documentation
-        run: |
-          echo "📚 Building API documentation..."
-          make docs
-
       - name: Generate SDKs
         continue-on-error: true
         run: |
           echo "🔧 Generating SDKs..."
           make generate-sdk-all || echo "⚠️  SDK generation not fully implemented yet"
+
+      - name: Build Documentation
+        run: |
+          echo "📚 Building API documentation..."
+          make docs
 
       # ---------- Drift Detection (PRs only) ----------
       - name: Check for uncommitted changes
