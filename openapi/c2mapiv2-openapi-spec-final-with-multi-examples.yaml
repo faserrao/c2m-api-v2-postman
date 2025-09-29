@@ -1,0 +1,2064 @@
+openapi: 3.0.3
+info:
+  title: C2M API v2 - Auth Overlay
+  version: 2.0.0
+  description: API for submitting documents with various routing options
+servers:
+- url: https://api.example.com/v1
+  description: Production server
+- url: http://localhost:4010
+  description: Mock server
+components:
+  schemas:
+    documentName:
+      type: string
+      example: Sample Name
+    firstName:
+      type: string
+      example: John
+    lastName:
+      type: string
+      example: Doe
+    nickName:
+      type: string
+      example: Sample Name
+    address1:
+      type: string
+      example: 123 Main Street
+    address2:
+      type: string
+      example: Suite 100
+    address3:
+      type: string
+      example: 123 Example Street
+    city:
+      type: string
+      example: string_value
+    state:
+      type: string
+      example: string_value
+    country:
+      type: string
+      example: USA
+    zip:
+      type: string
+      example: string_value
+    phoneNumber:
+      type: string
+      example: +1-555-123-4567
+    externalUrl:
+      type: string
+      format: uri
+      example: https://api.example.com/v1/resource
+    tag:
+      type: string
+      example: string_value
+    tags:
+      type: array
+      items:
+        type: string
+        example: string_value
+      example:
+      - string_value
+    jobTemplate:
+      type: string
+      example: string_value
+    invoiceNumber:
+      type: string
+      example: string_value
+    routingNumber:
+      type: string
+      example: string_value
+    accountNumber:
+      type: string
+      example: string_value
+    cardNumber:
+      type: string
+      example: string_value
+    delimiter:
+      type: string
+      example: string_value
+    tbd:
+      type: string
+      example: string_value
+    documentId:
+      type: integer
+      example: 12345
+    addressId:
+      type: integer
+      example: 12345
+    addressListId:
+      type: integer
+      example: 12345
+    uploadRequestId:
+      type: integer
+      example: 12345
+    zipId:
+      type: integer
+      example: 12345
+    startPage:
+      type: integer
+      example: 1
+    endPage:
+      type: integer
+      example: 1
+    month:
+      type: integer
+      minimum: 1
+      maximum: 12
+      example: 12
+    year:
+      type: integer
+      example: 2024
+    cvv:
+      type: integer
+      example: 123
+    checkDigit:
+      type: integer
+      example: 7
+    pageOffset:
+      type: integer
+      example: 1
+    amountDue:
+      type: number
+      example: 99.99
+    amount:
+      type: number
+      example: 99.99
+    x:
+      type: number
+      example: 123.45
+    y:
+      type: number
+      example: 123.45
+    width:
+      type: number
+      example: 123.45
+    height:
+      type: number
+      example: 123.45
+    submitSingleDocWithTemplateParams:
+      oneOf:
+      - type: object
+        properties:
+          jobTemplate:
+            $ref: '#/components/schemas/jobTemplate'
+          paymentDetails:
+            $ref: '#/components/schemas/paymentDetails'
+          tags:
+            $ref: '#/components/schemas/tags'
+          documentSourceIdentifier:
+            $ref: '#/components/schemas/documentSourceIdentifier'
+        required:
+        - jobTemplate
+        - documentSourceIdentifier
+      - type: object
+        properties:
+          jobTemplate:
+            $ref: '#/components/schemas/jobTemplate'
+          paymentDetails:
+            $ref: '#/components/schemas/paymentDetails'
+          tags:
+            $ref: '#/components/schemas/tags'
+          recipientAddressSources:
+            type: array
+            items:
+              $ref: '#/components/schemas/recipientAddressSource'
+        required:
+        - jobTemplate
+        - recipientAddressSources
+      - type: object
+        properties:
+          jobTemplate:
+            $ref: '#/components/schemas/jobTemplate'
+          paymentDetails:
+            $ref: '#/components/schemas/paymentDetails'
+          tags:
+            $ref: '#/components/schemas/tags'
+          documentSourceIdentifier:
+            $ref: '#/components/schemas/documentSourceIdentifier'
+          recipientAddressSources:
+            type: array
+            items:
+              $ref: '#/components/schemas/recipientAddressSource'
+        required:
+        - jobTemplate
+        - documentSourceIdentifier
+        - recipientAddressSources
+      examples:
+        variant1:
+          summary: Example using variant1
+          value: &id001
+            jobTemplate: string_value
+            paymentDetails:
+              creditCardDetails:
+                cardType: visa
+                cardNumber: string_value
+                expirationDate:
+                  month: 12
+                  year: 2024
+                cvv: 123
+            tags:
+            - string_value
+            documentSourceIdentifier: 1234
+        variant2:
+          summary: Example using variant2
+          value:
+            jobTemplate: string_value
+            paymentDetails:
+              creditCardDetails:
+                cardType: visa
+                cardNumber: string_value
+                expirationDate:
+                  month: 12
+                  year: 2024
+                cvv: 123
+            tags:
+            - string_value
+            recipientAddressSources: []
+        variant3:
+          summary: Example using variant3
+          value:
+            jobTemplate: string_value
+            paymentDetails:
+              creditCardDetails:
+                cardType: visa
+                cardNumber: string_value
+                expirationDate:
+                  month: 12
+                  year: 2024
+                cvv: 123
+            tags:
+            - string_value
+            documentSourceIdentifier: 1234
+            recipientAddressSources: []
+      example: *id001
+    submitMultiDocWithTemplateParams:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              documentSourceIdentifier:
+                $ref: '#/components/schemas/documentSourceIdentifier'
+              recipientAddressSource:
+                $ref: '#/components/schemas/recipientAddressSource'
+            required:
+            - documentSourceIdentifier
+            - recipientAddressSource
+            example: &id002
+              documentSourceIdentifier: 1234
+              recipientAddressSource: 123 Example Street
+          example: &id003
+          - *id002
+        jobTemplate:
+          $ref: '#/components/schemas/jobTemplate'
+        paymentDetails:
+          $ref: '#/components/schemas/paymentDetails'
+        tags:
+          $ref: '#/components/schemas/tags'
+      required:
+      - items
+      - jobTemplate
+      - paymentDetails
+      example:
+        items: *id003
+        jobTemplate: string_value
+        paymentDetails:
+          creditCardDetails:
+            cardType: visa
+            cardNumber: string_value
+            expirationDate:
+              month: 12
+              year: 2024
+            cvv: 123
+        tags:
+        - string_value
+    mergeMultiDocWithTemplateParams:
+      type: object
+      properties:
+        documentsToMerge:
+          $ref: '#/components/schemas/documentsToMerge'
+        recipientAddressSource:
+          $ref: '#/components/schemas/recipientAddressSource'
+        jobTemplate:
+          $ref: '#/components/schemas/jobTemplate'
+        paymentDetails:
+          $ref: '#/components/schemas/paymentDetails'
+        tags:
+          $ref: '#/components/schemas/tags'
+      required:
+      - documentsToMerge
+      - recipientAddressSource
+      - jobTemplate
+      example:
+        documentsToMerge: []
+        recipientAddressSource: 123 Example Street
+        jobTemplate: string_value
+        paymentDetails:
+          creditCardDetails:
+            cardType: visa
+            cardNumber: string_value
+            expirationDate:
+              month: 12
+              year: 2024
+            cvv: 123
+        tags:
+        - string_value
+    singleDocJobParams:
+      type: object
+      properties:
+        documentSourceIdentifier:
+          $ref: '#/components/schemas/documentSourceIdentifier'
+        recipientAddressSources:
+          type: array
+          items:
+            $ref: '#/components/schemas/recipientAddressSource'
+        jobOptions:
+          $ref: '#/components/schemas/jobOptions'
+        paymentDetails:
+          $ref: '#/components/schemas/paymentDetails'
+        tags:
+          $ref: '#/components/schemas/tags'
+      required:
+      - documentSourceIdentifier
+      - recipientAddressSources
+      - jobOptions
+      - paymentDetails
+      example:
+        documentSourceIdentifier: 1234
+        recipientAddressSources: []
+        jobOptions:
+          documentClass: businessLetter
+          layout: portrait
+          mailclass: firstClassMail
+          paperType: letter
+          printOption: none
+          envelope: flat
+        paymentDetails:
+          creditCardDetails:
+            cardType: visa
+            cardNumber: string_value
+            expirationDate:
+              month: 12
+              year: 2024
+            cvv: 123
+        tags:
+        - string_value
+    submitMultiDocParams:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              documentSourceIdentifier:
+                $ref: '#/components/schemas/documentSourceIdentifier'
+              recipientAddressSource:
+                $ref: '#/components/schemas/recipientAddressSource'
+            required:
+            - documentSourceIdentifier
+            - recipientAddressSource
+            example: &id004
+              documentSourceIdentifier: 1234
+              recipientAddressSource: 123 Example Street
+          example: &id005
+          - *id004
+        jobOptions:
+          $ref: '#/components/schemas/jobOptions'
+        paymentDetails:
+          $ref: '#/components/schemas/paymentDetails'
+        tags:
+          $ref: '#/components/schemas/tags'
+      required:
+      - items
+      - jobOptions
+      - paymentDetails
+      example:
+        items: *id005
+        jobOptions:
+          documentClass: businessLetter
+          layout: portrait
+          mailclass: firstClassMail
+          paperType: letter
+          printOption: none
+          envelope: flat
+        paymentDetails:
+          creditCardDetails:
+            cardType: visa
+            cardNumber: string_value
+            expirationDate:
+              month: 12
+              year: 2024
+            cvv: 123
+        tags:
+        - string_value
+    mergeMultiDocParams:
+      type: object
+      properties:
+        documentsToMerge:
+          $ref: '#/components/schemas/documentsToMerge'
+        recipientAddressSource:
+          $ref: '#/components/schemas/recipientAddressSource'
+        paymentDetails:
+          $ref: '#/components/schemas/paymentDetails'
+        tags:
+          $ref: '#/components/schemas/tags'
+      required:
+      - documentsToMerge
+      - recipientAddressSource
+      - paymentDetails
+      example:
+        documentsToMerge: []
+        recipientAddressSource: 123 Example Street
+        paymentDetails:
+          creditCardDetails:
+            cardType: visa
+            cardNumber: string_value
+            expirationDate:
+              month: 12
+              year: 2024
+            cvv: 123
+        tags:
+        - string_value
+    documentsToMerge:
+      type: array
+      items:
+        $ref: '#/components/schemas/documentSourceIdentifier'
+    splitPdfParams:
+      type: object
+      properties:
+        documentSourceIdentifier:
+          $ref: '#/components/schemas/documentSourceIdentifier'
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              pageRange:
+                $ref: '#/components/schemas/pageRange'
+              recipientAddressSources:
+                type: array
+                items:
+                  $ref: '#/components/schemas/recipientAddressSource'
+            required:
+            - pageRange
+            - recipientAddressSources
+            example: &id006
+              pageRange:
+                startPage: 1
+                endPage: 1
+              recipientAddressSources: []
+          example: &id007
+          - *id006
+        paymentDetails:
+          $ref: '#/components/schemas/paymentDetails'
+        tags:
+          $ref: '#/components/schemas/tags'
+      required:
+      - documentSourceIdentifier
+      - items
+      - paymentDetails
+      example:
+        documentSourceIdentifier: 1234
+        items: *id007
+        paymentDetails:
+          creditCardDetails:
+            cardType: visa
+            cardNumber: string_value
+            expirationDate:
+              month: 12
+              year: 2024
+            cvv: 123
+        tags:
+        - string_value
+    pageRange:
+      type: object
+      properties:
+        startPage:
+          $ref: '#/components/schemas/startPage'
+        endPage:
+          $ref: '#/components/schemas/endPage'
+      required:
+      - startPage
+      - endPage
+      example:
+        startPage: 1
+        endPage: 1
+    splitPdfWithCaptureParams:
+      type: object
+      properties:
+        documentSourceIdentifier:
+          $ref: '#/components/schemas/documentSourceIdentifier'
+        embeddedExtractionSpecs:
+          $ref: '#/components/schemas/embeddedExtractionSpecs'
+        paymentDetails:
+          $ref: '#/components/schemas/paymentDetails'
+        tags:
+          $ref: '#/components/schemas/tags'
+      required:
+      - documentSourceIdentifier
+      - embeddedExtractionSpecs
+      - paymentDetails
+      example:
+        documentSourceIdentifier: 1234
+        embeddedExtractionSpecs: []
+        paymentDetails:
+          creditCardDetails:
+            cardType: visa
+            cardNumber: string_value
+            expirationDate:
+              month: 12
+              year: 2024
+            cvv: 123
+        tags:
+        - string_value
+    embeddedExtractionSpecs:
+      type: array
+      items:
+        $ref: '#/components/schemas/extractionSpec'
+    extractionSpec:
+      type: object
+      properties:
+        startPage:
+          $ref: '#/components/schemas/startPage'
+        endPage:
+          $ref: '#/components/schemas/endPage'
+        addressRegion:
+          $ref: '#/components/schemas/addressRegion'
+      required:
+      - startPage
+      - endPage
+      - addressRegion
+      example:
+        startPage: 1
+        endPage: 1
+        addressRegion:
+          x: 123.45
+          y: 123.45
+          width: 123.45
+          height: 123.45
+          pageOffset: 1
+    addressRegion:
+      type: object
+      properties:
+        x:
+          $ref: '#/components/schemas/x'
+        y:
+          $ref: '#/components/schemas/y'
+        width:
+          $ref: '#/components/schemas/width'
+        height:
+          $ref: '#/components/schemas/height'
+        pageOffset:
+          $ref: '#/components/schemas/pageOffset'
+      required:
+      - x
+      - y
+      - width
+      - height
+      - pageOffset
+      example:
+        x: 123.45
+        y: 123.45
+        width: 123.45
+        height: 123.45
+        pageOffset: 1
+    multiPdfWithCaptureParams:
+      type: object
+      properties:
+        addressCapturePdfs:
+          $ref: '#/components/schemas/addressCapturePdfs'
+        paymentDetails:
+          $ref: '#/components/schemas/paymentDetails'
+        tags:
+          $ref: '#/components/schemas/tags'
+      required:
+      - addressCapturePdfs
+      - paymentDetails
+      example:
+        addressCapturePdfs: []
+        paymentDetails:
+          creditCardDetails:
+            cardType: visa
+            cardNumber: string_value
+            expirationDate:
+              month: 12
+              year: 2024
+            cvv: 123
+        tags:
+        - string_value
+    addressCapturePdfs:
+      type: array
+      items:
+        $ref: '#/components/schemas/addressListPdf'
+    addressListPdf:
+      type: object
+      properties:
+        documentSourceIdentifier:
+          $ref: '#/components/schemas/documentSourceIdentifier'
+        addressListRegion:
+          $ref: '#/components/schemas/addressListRegion'
+        delimiter:
+          $ref: '#/components/schemas/delimiter'
+        tags:
+          $ref: '#/components/schemas/tags'
+      required:
+      - documentSourceIdentifier
+      - addressListRegion
+      example:
+        documentSourceIdentifier: 1234
+        addressListRegion: 123 Example Street
+        delimiter: string_value
+        tags:
+        - string_value
+    addressListRegion:
+      $ref: '#/components/schemas/tbd'
+    documentSourceIdentifier:
+      oneOf:
+      - $ref: '#/components/schemas/documentId'
+      - $ref: '#/components/schemas/externalUrl'
+      - type: object
+        properties:
+          uploadRequestId:
+            $ref: '#/components/schemas/uploadRequestId'
+          documentName:
+            $ref: '#/components/schemas/documentName'
+        required:
+        - uploadRequestId
+        - documentName
+      - type: object
+        properties:
+          uploadRequestId:
+            $ref: '#/components/schemas/uploadRequestId'
+          zipId:
+            $ref: '#/components/schemas/zipId'
+          documentName:
+            $ref: '#/components/schemas/documentName'
+        required:
+        - uploadRequestId
+        - zipId
+        - documentName
+      - type: object
+        properties:
+          zipId:
+            $ref: '#/components/schemas/zipId'
+          documentName:
+            $ref: '#/components/schemas/documentName'
+        required:
+        - zipId
+        - documentName
+      examples:
+        justDocumentId:
+          summary: Example using justDocumentId
+          value: 1234
+        justExternalUrl:
+          summary: Example using justExternalUrl
+          value: https://api.example.com/v1/documents/5678
+        uploadRequestWithDocument:
+          summary: Example using uploadRequestWithDocument
+          value:
+            uploadRequestId: 100
+            documentName: invoice_2024_01.pdf
+        uploadRequestWithZip:
+          summary: Example using uploadRequestWithZip
+          value:
+            uploadRequestId: 200
+            zipId: 10
+            documentName: statement_jan.pdf
+        justZipWithDocument:
+          summary: Example using justZipWithDocument
+          value:
+            zipId: 20
+            documentName: report_q1_2024.pdf
+      example: 1234
+    recipientAddressSource:
+      oneOf:
+      - $ref: '#/components/schemas/exactlyOneNewAddress'
+      - $ref: '#/components/schemas/exactlyOneListId'
+      - $ref: '#/components/schemas/exactlyOneId'
+    exactlyOneNewAddress:
+      $ref: '#/components/schemas/recipientAddress'
+    exactlyOneListId:
+      $ref: '#/components/schemas/addressListId'
+    exactlyOneId:
+      $ref: '#/components/schemas/addressId'
+    recipientAddress:
+      type: object
+      properties:
+        firstName:
+          $ref: '#/components/schemas/firstName'
+        lastName:
+          $ref: '#/components/schemas/lastName'
+        address1:
+          $ref: '#/components/schemas/address1'
+        city:
+          $ref: '#/components/schemas/city'
+        state:
+          $ref: '#/components/schemas/state'
+        zip:
+          $ref: '#/components/schemas/zip'
+        country:
+          $ref: '#/components/schemas/country'
+        nickName:
+          $ref: '#/components/schemas/nickName'
+        address2:
+          $ref: '#/components/schemas/address2'
+        address3:
+          $ref: '#/components/schemas/address3'
+        phoneNumber:
+          $ref: '#/components/schemas/phoneNumber'
+      required:
+      - firstName
+      - lastName
+      - address1
+      - city
+      - state
+      - zip
+      - country
+      example:
+        firstName: John
+        lastName: Doe
+        address1: 123 Main Street
+        city: string_value
+        state: string_value
+        zip: string_value
+        country: USA
+        nickName: Sample Name
+        address2: Suite 100
+        address3: 123 Example Street
+        phoneNumber: +1-555-123-4567
+    jobOptions:
+      type: object
+      properties:
+        documentClass:
+          $ref: '#/components/schemas/documentClass'
+        layout:
+          $ref: '#/components/schemas/layout'
+        mailclass:
+          $ref: '#/components/schemas/mailclass'
+        paperType:
+          $ref: '#/components/schemas/paperType'
+        printOption:
+          $ref: '#/components/schemas/printOption'
+        envelope:
+          $ref: '#/components/schemas/envelope'
+      required:
+      - documentClass
+      - layout
+      - mailclass
+      - paperType
+      - printOption
+      - envelope
+      example:
+        documentClass: businessLetter
+        layout: portrait
+        mailclass: firstClassMail
+        paperType: letter
+        printOption: none
+        envelope: flat
+    paymentDetails:
+      oneOf:
+      - $ref: '#/components/schemas/creditCardPayment'
+      - $ref: '#/components/schemas/invoicePayment'
+      - $ref: '#/components/schemas/achPayment'
+      - $ref: '#/components/schemas/userCreditPayment'
+      - $ref: '#/components/schemas/applePayPayment'
+      - $ref: '#/components/schemas/googlePayPayment'
+      examples:
+        creditCard:
+          summary: Example using creditCard
+          value: &id008
+            creditCardDetails:
+              cardType: visa
+              cardNumber: string_value
+              expirationDate:
+                month: 12
+                year: 2024
+              cvv: 123
+        invoice:
+          summary: Example using invoice
+          value:
+            invoiceDetails:
+              invoiceNumber: string_value
+              amountDue: 99.99
+        ach:
+          summary: Example using ach
+          value:
+            achDetails:
+              routingNumber: string_value
+              accountNumber: string_value
+              checkDigit: 7
+        userCredit:
+          summary: Example using userCredit
+          value:
+            creditAmount:
+              amount: 99.99
+              currency: USD
+        applePay:
+          summary: Example using applePay
+          value:
+            applePaymentDetails: {}
+        googlePay:
+          summary: Example using googlePay
+          value:
+            googlePaymentDetails: {}
+      example: *id008
+    applePayPayment:
+      type: object
+      properties:
+        applePaymentDetails:
+          $ref: '#/components/schemas/applePaymentDetails'
+      required:
+      - applePaymentDetails
+      example:
+        applePaymentDetails: {}
+    googlePayPayment:
+      type: object
+      properties:
+        googlePaymentDetails:
+          $ref: '#/components/schemas/googlePaymentDetails'
+      required:
+      - googlePaymentDetails
+      example:
+        googlePaymentDetails: {}
+    creditCardPayment:
+      type: object
+      properties:
+        creditCardDetails:
+          $ref: '#/components/schemas/creditCardDetails'
+      required:
+      - creditCardDetails
+      example:
+        creditCardDetails:
+          cardType: visa
+          cardNumber: string_value
+          expirationDate:
+            month: 12
+            year: 2024
+          cvv: 123
+    invoicePayment:
+      type: object
+      properties:
+        invoiceDetails:
+          $ref: '#/components/schemas/invoiceDetails'
+      required:
+      - invoiceDetails
+      example:
+        invoiceDetails:
+          invoiceNumber: string_value
+          amountDue: 99.99
+    achPayment:
+      type: object
+      properties:
+        achDetails:
+          $ref: '#/components/schemas/achDetails'
+      required:
+      - achDetails
+      example:
+        achDetails:
+          routingNumber: string_value
+          accountNumber: string_value
+          checkDigit: 7
+    userCreditPayment:
+      type: object
+      properties:
+        creditAmount:
+          $ref: '#/components/schemas/creditAmount'
+      required:
+      - creditAmount
+      example:
+        creditAmount:
+          amount: 99.99
+          currency: USD
+    creditCardDetails:
+      type: object
+      properties:
+        cardType:
+          $ref: '#/components/schemas/cardType'
+        cardNumber:
+          $ref: '#/components/schemas/cardNumber'
+        expirationDate:
+          $ref: '#/components/schemas/expirationDate'
+        cvv:
+          $ref: '#/components/schemas/cvv'
+      required:
+      - cardType
+      - cardNumber
+      - expirationDate
+      - cvv
+      example:
+        cardType: visa
+        cardNumber: string_value
+        expirationDate:
+          month: 12
+          year: 2024
+        cvv: 123
+    invoiceDetails:
+      type: object
+      properties:
+        invoiceNumber:
+          $ref: '#/components/schemas/invoiceNumber'
+        amountDue:
+          $ref: '#/components/schemas/amountDue'
+      required:
+      - invoiceNumber
+      - amountDue
+      example:
+        invoiceNumber: string_value
+        amountDue: 99.99
+    achDetails:
+      type: object
+      properties:
+        routingNumber:
+          $ref: '#/components/schemas/routingNumber'
+        accountNumber:
+          $ref: '#/components/schemas/accountNumber'
+        checkDigit:
+          $ref: '#/components/schemas/checkDigit'
+      required:
+      - routingNumber
+      - accountNumber
+      - checkDigit
+      example:
+        routingNumber: string_value
+        accountNumber: string_value
+        checkDigit: 7
+    creditAmount:
+      type: object
+      properties:
+        amount:
+          $ref: '#/components/schemas/amount'
+        currency:
+          $ref: '#/components/schemas/currency'
+      required:
+      - amount
+      - currency
+      example:
+        amount: 99.99
+        currency: USD
+    applePaymentDetails:
+      type: object
+    googlePaymentDetails:
+      type: object
+    currency:
+      type: string
+      enum:
+      - USD
+      - EUR
+      - GBP
+      - CAD
+      - AUD
+      example: USD
+    cardType:
+      type: string
+      enum:
+      - visa
+      - mastercard
+      - discover
+      - americanExpress
+      example: visa
+    expirationDate:
+      type: object
+      properties:
+        month:
+          $ref: '#/components/schemas/month'
+        year:
+          $ref: '#/components/schemas/year'
+      required:
+      - month
+      - year
+      example:
+        month: 12
+        year: 2024
+    documentFormat:
+      type: string
+      enum:
+      - pdf
+      - doc
+      - docx
+      - pub
+      - ppt
+      - pptx
+      - png
+      - jpeg
+      - odt
+      example: pdf
+    printOption:
+      type: string
+      enum:
+      - none
+      - color
+      - grayscale
+      example: none
+    envelope:
+      type: string
+      enum:
+      - flat
+      - windowedFlat
+      - letter
+      - legal
+      - postcard
+      example: flat
+    paperType:
+      type: string
+      enum:
+      - letter
+      - legal
+      - postcard
+      example: letter
+    layout:
+      type: string
+      enum:
+      - portrait
+      - landscape
+      example: portrait
+    mailclass:
+      type: string
+      enum:
+      - firstClassMail
+      - priorityMail
+      - largeEnvelope
+      example: firstClassMail
+    documentClass:
+      type: string
+      enum:
+      - businessLetter
+      - personalLetter
+      example: businessLetter
+    StandardResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: active
+        message:
+          type: string
+          example: Operation completed successfully
+        jobId:
+          type: string
+          example: job_123456
+      example:
+        status: active
+        message: Operation completed successfully
+        jobId: job_123456
+    ShortTokenRequest:
+      type: object
+      properties:
+        long_token:
+          type: string
+          description: Optional if the long-term token is provided in Authorization
+            header
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        scopes:
+          type: array
+          items:
+            type: string
+            example: string_value
+          description: Optional scope narrowing; defaults to the long-term token's
+            scopes
+          example: &id009
+          - string_value
+      additionalProperties: false
+      example:
+        long_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        scopes: *id009
+    ShortTokenResponse:
+      type: object
+      required:
+      - token_type
+      - access_token
+      - expires_in
+      - expires_at
+      properties:
+        token_type:
+          type: string
+          enum:
+          - Bearer
+          example: Bearer
+        access_token:
+          type: string
+          description: Short-lived JWT
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        expires_in:
+          type: integer
+          description: Lifetime in seconds (e.g., 900 for 15 minutes)
+          example: 123
+        expires_at:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp of expiration
+          example: '2024-01-15T10:30:00Z'
+        scopes:
+          type: array
+          items:
+            type: string
+            example: string_value
+          description: Granted scopes
+          example: &id010
+          - string_value
+        token_id:
+          type: string
+          description: Server-issued identifier for this token
+          example: id_abc123
+      example:
+        token_type: Bearer
+        access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        expires_in: 123
+        expires_at: '2024-01-15T10:30:00Z'
+        scopes: *id010
+        token_id: id_abc123
+    LongTokenRequest:
+      type: object
+      description: One of several credential mechanisms must be provided.
+      required:
+      - grant_type
+      - client_id
+      properties:
+        grant_type:
+          type: string
+          enum:
+          - client_credentials
+          - assertion
+          description: The authentication grant type
+          example: client_credentials
+        client_id:
+          type: string
+          description: Client identifier issued by Click2Mail
+          example: id_abc123
+        client_secret:
+          type: string
+          description: Required if using client_credentials with secret
+          example: string_value
+        otp_code:
+          type: string
+          description: Required if your policy mandates OTP for issuance
+          example: string_value
+        assertion_type:
+          type: string
+          description: Required when grant_type=assertion
+          example: default
+        assertion:
+          type: string
+          description: Signed JWT or other accepted assertion
+          example: string_value
+        scopes:
+          type: array
+          items:
+            type: string
+            example: string_value
+          description: Scopes to assign to the long-term token
+          example: &id011
+          - string_value
+        ttl_seconds:
+          type: integer
+          minimum: 3600
+          maximum: 7776000
+          description: Requested lifetime (1 hour - 90 days). Server may clamp.
+          example: 123
+      additionalProperties: false
+      example:
+        grant_type: client_credentials
+        client_id: id_abc123
+        client_secret: string_value
+        otp_code: string_value
+        assertion_type: default
+        assertion: string_value
+        scopes: *id011
+        ttl_seconds: 123
+    LongTokenResponse:
+      type: object
+      required:
+      - token_type
+      - access_token
+      - expires_in
+      - expires_at
+      properties:
+        token_type:
+          type: string
+          enum:
+          - Bearer
+          example: Bearer
+        access_token:
+          type: string
+          description: Long-lived token (opaque or JWT depending on deployment)
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        expires_in:
+          type: integer
+          description: Lifetime in seconds
+          example: 123
+        expires_at:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp of expiration
+          example: '2024-01-15T10:30:00Z'
+        scopes:
+          type: array
+          items:
+            type: string
+            example: string_value
+          description: Granted scopes
+          example: &id012
+          - string_value
+        token_id:
+          type: string
+          description: Server-issued identifier for this token
+          example: id_abc123
+      example:
+        token_type: Bearer
+        access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        expires_in: 123
+        expires_at: '2024-01-15T10:30:00Z'
+        scopes: *id012
+        token_id: id_abc123
+    AuthError:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          example: invalid_grant
+          description: OAuth-style error code
+        message:
+          type: string
+          example: The provided client credentials are invalid.
+          description: Human-readable error message
+        details:
+          type: object
+          description: Additional error details
+      example:
+        code: invalid_grant
+        message: The provided client credentials are invalid.
+        details: {}
+  parameters:
+    Authorization:
+      name: Authorization
+      in: header
+      required: true
+      schema:
+        type: string
+        example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+    Content-Type:
+      name: Content-Type
+      in: header
+      required: true
+      schema:
+        type: string
+        example: application/json
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    LongTokenAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Long-term JWT for exchanging to short-term tokens
+    ShortTokenAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Short-term JWT for API operations
+    ClientKey:
+      type: apiKey
+      in: header
+      name: X-Client-Id
+      description: Client identifier for additional security
+  responses:
+    Error400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthError'
+          examples:
+            invalidGrant:
+              value:
+                code: invalid_grant
+                message: The grant type is not supported
+    Error401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthError'
+          examples:
+            invalidToken:
+              value:
+                code: invalid_token
+                message: The provided token is expired or invalid
+    Error403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthError'
+          examples:
+            insufficientScope:
+              value:
+                code: insufficient_scope
+                message: The token lacks the required scope for this operation
+    Error404:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthError'
+          examples:
+            notFound:
+              value:
+                code: not_found
+                message: The requested resource was not found
+    Error429:
+      description: Too Many Requests
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthError'
+          examples:
+            rateLimited:
+              value:
+                code: rate_limited
+                message: Too many requests. Please retry after 60 seconds.
+security:
+- bearerAuth: []
+paths:
+  /jobs/single-doc-job-template:
+    post:
+      summary: Operation for /jobs/single-doc-job-template
+      operationId: submitSingleDocWithTemplateParams
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - type: object
+                properties:
+                  jobTemplate:
+                    $ref: '#/components/schemas/jobTemplate'
+                  paymentDetails:
+                    $ref: '#/components/schemas/paymentDetails'
+                  tags:
+                    $ref: '#/components/schemas/tags'
+                  documentSourceIdentifier:
+                    $ref: '#/components/schemas/documentSourceIdentifier'
+                required:
+                - jobTemplate
+                - documentSourceIdentifier
+              - type: object
+                properties:
+                  jobTemplate:
+                    $ref: '#/components/schemas/jobTemplate'
+                  paymentDetails:
+                    $ref: '#/components/schemas/paymentDetails'
+                  tags:
+                    $ref: '#/components/schemas/tags'
+                  recipientAddressSources:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/recipientAddressSource'
+                required:
+                - jobTemplate
+                - recipientAddressSources
+              - type: object
+                properties:
+                  jobTemplate:
+                    $ref: '#/components/schemas/jobTemplate'
+                  paymentDetails:
+                    $ref: '#/components/schemas/paymentDetails'
+                  tags:
+                    $ref: '#/components/schemas/tags'
+                  documentSourceIdentifier:
+                    $ref: '#/components/schemas/documentSourceIdentifier'
+                  recipientAddressSources:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/recipientAddressSource'
+                required:
+                - jobTemplate
+                - documentSourceIdentifier
+                - recipientAddressSources
+              examples:
+                variant1:
+                  summary: Example using variant1
+                  value: &id013
+                    jobTemplate: string_value
+                    paymentDetails:
+                      creditCardDetails:
+                        cardType: visa
+                        cardNumber: string_value
+                        expirationDate:
+                          month: 12
+                          year: 2024
+                        cvv: 123
+                    tags:
+                    - string_value
+                    documentSourceIdentifier: 1234
+                variant2:
+                  summary: Example using variant2
+                  value:
+                    jobTemplate: string_value
+                    paymentDetails:
+                      creditCardDetails:
+                        cardType: visa
+                        cardNumber: string_value
+                        expirationDate:
+                          month: 12
+                          year: 2024
+                        cvv: 123
+                    tags:
+                    - string_value
+                    recipientAddressSources: []
+                variant3:
+                  summary: Example using variant3
+                  value:
+                    jobTemplate: string_value
+                    paymentDetails:
+                      creditCardDetails:
+                        cardType: visa
+                        cardNumber: string_value
+                        expirationDate:
+                          month: 12
+                          year: 2024
+                        cvv: 123
+                    tags:
+                    - string_value
+                    documentSourceIdentifier: 1234
+                    recipientAddressSources: []
+              example: *id013
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              examples: {}
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /jobs/multi-docs-job-template:
+    post:
+      summary: Operation for /jobs/multi-docs-job-template
+      operationId: submitMultiDocWithTemplateParams
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      documentSourceIdentifier:
+                        $ref: '#/components/schemas/documentSourceIdentifier'
+                      recipientAddressSource:
+                        $ref: '#/components/schemas/recipientAddressSource'
+                    required:
+                    - documentSourceIdentifier
+                    - recipientAddressSource
+                    example: &id014
+                      documentSourceIdentifier: 1234
+                      recipientAddressSource: 123 Example Street
+                  example: &id015
+                  - *id014
+                jobTemplate:
+                  $ref: '#/components/schemas/jobTemplate'
+                paymentDetails:
+                  $ref: '#/components/schemas/paymentDetails'
+                tags:
+                  $ref: '#/components/schemas/tags'
+              required:
+              - items
+              - jobTemplate
+              - paymentDetails
+              example:
+                items: *id015
+                jobTemplate: string_value
+                paymentDetails:
+                  creditCardDetails:
+                    cardType: visa
+                    cardNumber: string_value
+                    expirationDate:
+                      month: 12
+                      year: 2024
+                    cvv: 123
+                tags:
+                - string_value
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              examples: {}
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /jobs/multi-doc-merge-job-template:
+    post:
+      summary: Operation for /jobs/multi-doc-merge-job-template
+      operationId: mergeMultiDocWithTemplateParams
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                documentsToMerge:
+                  $ref: '#/components/schemas/documentsToMerge'
+                recipientAddressSource:
+                  $ref: '#/components/schemas/recipientAddressSource'
+                jobTemplate:
+                  $ref: '#/components/schemas/jobTemplate'
+                paymentDetails:
+                  $ref: '#/components/schemas/paymentDetails'
+                tags:
+                  $ref: '#/components/schemas/tags'
+              required:
+              - documentsToMerge
+              - recipientAddressSource
+              - jobTemplate
+              example:
+                documentsToMerge: []
+                recipientAddressSource: 123 Example Street
+                jobTemplate: string_value
+                paymentDetails:
+                  creditCardDetails:
+                    cardType: visa
+                    cardNumber: string_value
+                    expirationDate:
+                      month: 12
+                      year: 2024
+                    cvv: 123
+                tags:
+                - string_value
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              examples: {}
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /jobs/single-doc:
+    post:
+      summary: Operation for /jobs/single-doc
+      operationId: singleDocJobParams
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                documentSourceIdentifier:
+                  $ref: '#/components/schemas/documentSourceIdentifier'
+                recipientAddressSources:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/recipientAddressSource'
+                jobOptions:
+                  $ref: '#/components/schemas/jobOptions'
+                paymentDetails:
+                  $ref: '#/components/schemas/paymentDetails'
+                tags:
+                  $ref: '#/components/schemas/tags'
+              required:
+              - documentSourceIdentifier
+              - recipientAddressSources
+              - jobOptions
+              - paymentDetails
+              example:
+                documentSourceIdentifier: 1234
+                recipientAddressSources: []
+                jobOptions:
+                  documentClass: businessLetter
+                  layout: portrait
+                  mailclass: firstClassMail
+                  paperType: letter
+                  printOption: none
+                  envelope: flat
+                paymentDetails:
+                  creditCardDetails:
+                    cardType: visa
+                    cardNumber: string_value
+                    expirationDate:
+                      month: 12
+                      year: 2024
+                    cvv: 123
+                tags:
+                - string_value
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              examples: {}
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /jobs/multi-doc:
+    post:
+      summary: Operation for /jobs/multi-doc
+      operationId: submitMultiDocParams
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      documentSourceIdentifier:
+                        $ref: '#/components/schemas/documentSourceIdentifier'
+                      recipientAddressSource:
+                        $ref: '#/components/schemas/recipientAddressSource'
+                    required:
+                    - documentSourceIdentifier
+                    - recipientAddressSource
+                    example: &id016
+                      documentSourceIdentifier: 1234
+                      recipientAddressSource: 123 Example Street
+                  example: &id017
+                  - *id016
+                jobOptions:
+                  $ref: '#/components/schemas/jobOptions'
+                paymentDetails:
+                  $ref: '#/components/schemas/paymentDetails'
+                tags:
+                  $ref: '#/components/schemas/tags'
+              required:
+              - items
+              - jobOptions
+              - paymentDetails
+              example:
+                items: *id017
+                jobOptions:
+                  documentClass: businessLetter
+                  layout: portrait
+                  mailclass: firstClassMail
+                  paperType: letter
+                  printOption: none
+                  envelope: flat
+                paymentDetails:
+                  creditCardDetails:
+                    cardType: visa
+                    cardNumber: string_value
+                    expirationDate:
+                      month: 12
+                      year: 2024
+                    cvv: 123
+                tags:
+                - string_value
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              examples: {}
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /jobs/multi-doc-merge:
+    post:
+      summary: Operation for /jobs/multi-doc-merge
+      operationId: mergeMultiDocParams
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                documentsToMerge:
+                  $ref: '#/components/schemas/documentsToMerge'
+                recipientAddressSource:
+                  $ref: '#/components/schemas/recipientAddressSource'
+                paymentDetails:
+                  $ref: '#/components/schemas/paymentDetails'
+                tags:
+                  $ref: '#/components/schemas/tags'
+              required:
+              - documentsToMerge
+              - recipientAddressSource
+              - paymentDetails
+              example:
+                documentsToMerge: []
+                recipientAddressSource: 123 Example Street
+                paymentDetails:
+                  creditCardDetails:
+                    cardType: visa
+                    cardNumber: string_value
+                    expirationDate:
+                      month: 12
+                      year: 2024
+                    cvv: 123
+                tags:
+                - string_value
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              examples: {}
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /jobs/single-pdf-split:
+    post:
+      summary: Operation for /jobs/single-pdf-split
+      operationId: splitPdfParams
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                documentSourceIdentifier:
+                  $ref: '#/components/schemas/documentSourceIdentifier'
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      pageRange:
+                        $ref: '#/components/schemas/pageRange'
+                      recipientAddressSources:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/recipientAddressSource'
+                    required:
+                    - pageRange
+                    - recipientAddressSources
+                    example: &id018
+                      pageRange:
+                        startPage: 1
+                        endPage: 1
+                      recipientAddressSources: []
+                  example: &id019
+                  - *id018
+                paymentDetails:
+                  $ref: '#/components/schemas/paymentDetails'
+                tags:
+                  $ref: '#/components/schemas/tags'
+              required:
+              - documentSourceIdentifier
+              - items
+              - paymentDetails
+              example:
+                documentSourceIdentifier: 1234
+                items: *id019
+                paymentDetails:
+                  creditCardDetails:
+                    cardType: visa
+                    cardNumber: string_value
+                    expirationDate:
+                      month: 12
+                      year: 2024
+                    cvv: 123
+                tags:
+                - string_value
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              examples: {}
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /jobs/single-pdf-split-addressCapture:
+    post:
+      summary: Operation for /jobs/single-pdf-split-addressCapture
+      operationId: splitPdfWithCaptureParams
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                documentSourceIdentifier:
+                  $ref: '#/components/schemas/documentSourceIdentifier'
+                embeddedExtractionSpecs:
+                  $ref: '#/components/schemas/embeddedExtractionSpecs'
+                paymentDetails:
+                  $ref: '#/components/schemas/paymentDetails'
+                tags:
+                  $ref: '#/components/schemas/tags'
+              required:
+              - documentSourceIdentifier
+              - embeddedExtractionSpecs
+              - paymentDetails
+              example:
+                documentSourceIdentifier: 1234
+                embeddedExtractionSpecs: []
+                paymentDetails:
+                  creditCardDetails:
+                    cardType: visa
+                    cardNumber: string_value
+                    expirationDate:
+                      month: 12
+                      year: 2024
+                    cvv: 123
+                tags:
+                - string_value
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              examples: {}
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /jobs/multi-pdf-address-capture:
+    post:
+      summary: Operation for /jobs/multi-pdf-address-capture
+      operationId: multiPdfWithCaptureParams
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                addressCapturePdfs:
+                  $ref: '#/components/schemas/addressCapturePdfs'
+                paymentDetails:
+                  $ref: '#/components/schemas/paymentDetails'
+                tags:
+                  $ref: '#/components/schemas/tags'
+              required:
+              - addressCapturePdfs
+              - paymentDetails
+              example:
+                addressCapturePdfs: []
+                paymentDetails:
+                  creditCardDetails:
+                    cardType: visa
+                    cardNumber: string_value
+                    expirationDate:
+                      month: 12
+                      year: 2024
+                    cvv: 123
+                tags:
+                - string_value
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              examples: {}
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /auth/tokens/short:
+    post:
+      tags:
+      - auth
+      operationId: issueShortTermToken
+      summary: Issue a short-term access token
+      description: 'Exchange a valid long-term token for a short-lived JWT (e.g.,
+        15 minutes).
+
+        The long-term token must be sent in the Authorization header as `Bearer <long_token>`.
+
+        '
+      security:
+      - LongTokenAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShortTokenRequest'
+            examples:
+              withScopes:
+                value:
+                  scopes:
+                  - jobs:submit
+                  - templates:read
+      responses:
+        '201':
+          description: Short-term token issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShortTokenResponse'
+              examples:
+                success:
+                  value:
+                    token_type: Bearer
+                    access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                    expires_in: 900
+                    expires_at: '2025-08-26T22:45:00Z'
+                    scopes:
+                    - jobs:submit
+                    - templates:read
+                    token_id: tok_st_9f3d2c
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '429':
+          $ref: '#/components/responses/Error429'
+  /auth/tokens/long:
+    post:
+      tags:
+      - auth
+      operationId: issueLongTermToken
+      summary: Issue or rotate a long-term token
+      description: 'Issues a long-term token (e.g., 30-90 days) for automation or
+        server-to-server use.
+
+        Requires step-up authentication. Choose one of the supported grant types:
+
+
+        - `client_credentials` + `client_secret`
+
+        - `client_credentials` + one-time `otp_code`
+
+        - `assertion` (e.g., signed JWT by your private key)
+
+        - Or an existing short-term token with the `tokens:write` scope
+
+
+        Only one mechanism is required per call.
+
+        '
+      security:
+      - ShortTokenAuth:
+        - tokens:write
+      - ClientKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LongTokenRequest'
+            examples:
+              clientSecret:
+                value:
+                  grant_type: client_credentials
+                  client_id: c2m_abc123
+                  client_secret: supersecret123
+                  scopes:
+                  - jobs:submit
+                  - templates:read
+                  ttl_seconds: 7776000
+              otp:
+                value:
+                  grant_type: client_credentials
+                  client_id: c2m_abc123
+                  otp_code: '123456'
+                  scopes:
+                  - jobs:*
+                  ttl_seconds: 2592000
+              assertion:
+                value:
+                  grant_type: assertion
+                  client_id: c2m_abc123
+                  assertion_type: urn:ietf:params:oauth:client-assertion-type:jwt-bearer
+                  assertion: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+                  scopes:
+                  - jobs:submit
+                  - templates:read
+      responses:
+        '201':
+          description: Long-term token issued
+          headers:
+            X-Token-Id:
+              description: Server-generated identifier for revocation and audit
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LongTokenResponse'
+              examples:
+                success:
+                  value:
+                    token_type: Bearer
+                    access_token: lt_0d51e9bd2f6449cf...
+                    expires_in: 2592000
+                    expires_at: '2025-09-25T22:45:00Z'
+                    scopes:
+                    - jobs:*
+                    token_id: tok_lt_b8e0aa
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '429':
+          $ref: '#/components/responses/Error429'
+  /auth/tokens/{tokenId}/revoke:
+    post:
+      tags:
+      - auth
+      operationId: revokeToken
+      summary: Revoke a token
+      description: Revokes a short- or long-term token by its `tokenId`. Idempotent.
+      security:
+      - ShortTokenAuth:
+        - tokens:revoke
+      - LongTokenAuth:
+        - tokens:revoke
+      parameters:
+      - name: tokenId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The token ID to revoke
+      responses:
+        '204':
+          description: Revoked (idempotent)
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'

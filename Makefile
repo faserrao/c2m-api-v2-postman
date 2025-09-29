@@ -519,6 +519,10 @@ postman-instance-build-and-test:
 	# Generate and link standard collection
 	$(MAKE) postman-create-linked-collection
 	$(MAKE) postman-create-test-collection
+	# Generate enhanced collections with all oneOf examples and use cases
+	$(MAKE) postman-extract-oneof-examples
+	$(MAKE) postman-generate-use-case-collection
+	$(MAKE) postman-upload-all-enhanced-collections
 	$(MAKE) postman-create-mock-and-env
 	# Start local mock and run tests
 	$(MAKE) prism-start
@@ -687,6 +691,10 @@ generate-openapi-spec-from-ebnf-dd:
 	# --- Run the conversion script ---
 	@echo "🛠  Running: $(EBNF_TO_OPENAPI_SCRIPT) → $(C2MAPIV2_OPENAPI_SPEC_BASE)"
 	$(VENV_PYTHON) $(EBNF_TO_OPENAPI_SCRIPT) -o $(C2MAPIV2_OPENAPI_SPEC_BASE) $(DD_EBNF_FILE)
+	# --- Fix anonymous oneOf schemas to named schemas ---
+	@echo "🔧 Fixing anonymous oneOf schemas in OpenAPI spec..."
+	$(VENV_PYTHON) $(SCRIPTS_DIR)/active/fix_openapi_oneOf_schemas.py $(C2MAPIV2_OPENAPI_SPEC_BASE) $(C2MAPIV2_OPENAPI_SPEC_BASE)
+	@echo "✅ OneOf schemas fixed (anonymous → named)"
 
 # Merge auth overlay into base OpenAPI spec
 .PHONY: openapi-merge-overlays
@@ -694,6 +702,11 @@ openapi-merge-overlays: $(C2MAPIV2_OPENAPI_SPEC_BASE) $(OPENAPI_AUTH_OVERLAY)
 	@echo "🔗 Merging auth overlay into generated OpenAPI..."
 	@$(VENV_PYTHON) scripts/active/merge_openapi_overlays.py \
 		$(C2MAPIV2_OPENAPI_SPEC_BASE) $(OPENAPI_AUTH_OVERLAY) $(C2MAPIV2_OPENAPI_SPEC)
+	# Add meaningful response examples
+	@echo "📝 Adding response examples to OpenAPI spec..."
+	@$(VENV_PYTHON) scripts/active/add_response_examples.py \
+		$(C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC)
+	@echo "✅ Response examples added"
 
 
 # ========================================================================
@@ -780,12 +793,12 @@ fix-yaml:
 # OPTION A1: Import OpenAPI with folderStrategy=none (native Postman flattening)
 .PHONY: postman-import-openapi-flat-native
 postman-import-openapi-flat-native:
-	@echo "📥 Importing OpenAPI from file $(C2MAPIV2_OPENAPI_SPEC) with native flattening (folderStrategy=none)..."
+	@echo "📥 Importing OpenAPI from file $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES) with native flattening (folderStrategy=none)..."
 	@mkdir -p $(POSTMAN_DIR)
 	@curl --silent --location --request POST "$(POSTMAN_BASE_URL)/import/openapi?workspace=$(POSTMAN_WS)" \
 		-H "X-Api-Key: $(POSTMAN_API_KEY)" \
 		--form "type=file" \
-		--form "input=@$(C2MAPIV2_OPENAPI_SPEC)" \
+		--form "input=@$(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES)" \
 		--form 'parameters={"folderStrategy":"none"}' \
 	| tee $(POSTMAN_DIR)/import-flat-native.json >/dev/null
 	@COLLECTION_UID=$$(jq -r '.collections[0].uid // empty' $(POSTMAN_DIR)/import-flat-native.json); \
@@ -811,7 +824,7 @@ postman-import-openapi-as-api:
 	@echo "🔑 Using API Key: $$(echo $(POSTMAN_API_KEY) | head -c 8)..."
 	@echo "📍 Target Workspace: $(POSTMAN_WS)"
 	@echo "🌐 API URL: $(POSTMAN_APIS_URL)?workspaceId=$(POSTMAN_WS)"
-	@CONTENT=$$(jq -Rs . < "$(C2MAPIV2_OPENAPI_SPEC)"); \
+	@CONTENT=$$(jq -Rs . < "$(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES)"); \
 	PAYLOAD=$$(jq -n \
 		--arg name "$(POSTMAN_API_NAME)" \
 		--arg schema "$$CONTENT" \
@@ -896,7 +909,7 @@ postman-import-openapi-spec:
 .PHONY: postman-spec-create
 postman-spec-create:
 	@echo "📄 Creating/updating OpenAPI spec under Specs tab..."
-	@CONTENT=$$(jq -Rs . < "$(C2MAPIV2_OPENAPI_SPEC)"); \
+	@CONTENT=$$(jq -Rs . < "$(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES)"); \
 	jq -n \
 		--arg name "$(C2MAPIV2_POSTMAN_API_NAME_PC)" \
 		--arg type "openapi3" \
@@ -922,7 +935,7 @@ postman-spec-create-standalone:
 	@echo "🧹 Deleting existing specs with the same name before creating new one..."
 	$(MAKE) postman-delete-specs-by-name NAME="$(C2MAPIV2_POSTMAN_API_NAME_PC)"
 	@echo "📄 Creating standalone spec in Specs tab..."
-	@CONTENT=$$(cat "$(C2MAPIV2_OPENAPI_SPEC)"); \
+	@CONTENT=$$(cat "$(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES)"); \
 	jq -n \
 		--arg name "$(C2MAPIV2_POSTMAN_API_NAME_PC)" \
 		--arg type "OPENAPI:3.0" \
@@ -1002,14 +1015,17 @@ postman-api-full-publish:
 .PHONY: postman-api-linked-collection-generate
 postman-api-linked-collection-generate: | $(POSTMAN_DIR)
 	@mkdir -p $(POSTMAN_GENERATED_DIR)
-	@echo "📦 Generating Postman collection from $(C2MAPIV2_OPENAPI_SPEC)..."
-	$(GENERATOR_OFFICIAL) -s $(C2MAPIV2_OPENAPI_SPEC) -o $(POSTMAN_COLLECTION_RAW) -p
+	@echo "📦 Generating Postman collection from $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES)..."
+	$(GENERATOR_OFFICIAL) -s $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES) -o $(POSTMAN_COLLECTION_RAW) -p
 	@echo "🛠 Adding 'info' block to collection..."
 	@JQ_INFO_NAME="$(POSTMAN_LINKED_COLLECTION_NAME)" \
 	 JQ_INFO_SCHEMA="$(POSTMAN_SCHEMA_V2)" \
 	 $(call jqf,$(JQ_ADD_INFO_FILE),$(POSTMAN_COLLECTION_RAW)) > $(POSTMAN_COLLECTION_RAW).tmp
 	@mv $(POSTMAN_COLLECTION_RAW).tmp $(POSTMAN_COLLECTION_RAW)
-	@echo "✅ Collection generated with 'info' block at $(POSTMAN_COLLECTION_RAW)"
+	@echo "✅ Collection generated with 'info' block"
+	@echo "🔧 Fixing oneOf placeholders in collection..."
+	@node scripts/active/fix_oneOf_placeholders.js $(POSTMAN_COLLECTION_RAW) $(POSTMAN_COLLECTION_RAW)
+	@echo "✅ OneOf placeholders fixed (e.g., <integer> → <oneOf>)"
 
 # ========================================================================
 # LINKED COLLECTION FLATTENING
@@ -1145,8 +1161,8 @@ postman-test-collection-merge-overrides:
 	fi
 	@if [ ! -f $(POSTMAN_OVERRIDES_FILE) ]; then \
 		echo "⚠️  No override file found at $(POSTMAN_OVERRIDES_FILE). Skipping overrides."; \
-		cp $(POSTMAN_COLLECTION_RAW) $(POSTMAN_TEST_COLLECTION_MERGED); \
-		echo "✅ No overrides applied. Copied $(POSTMAN_COLLECTION_RAW) to $(POSTMAN_TEST_COLLECTION_MERGED)"; \
+		cp $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES) $(POSTMAN_TEST_COLLECTION_MERGED); \
+		echo "✅ No overrides applied. Copied $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES) to $(POSTMAN_TEST_COLLECTION_MERGED)"; \
 		exit 0; \
 	fi
 	@jq -s -f $(MERGE_POSTMAN_OVERRIDES) $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES) $(POSTMAN_OVERRIDES_FILE) > $(POSTMAN_TEST_COLLECTION_MERGED)
@@ -1335,6 +1351,84 @@ postman-test-collection-upload:
 	fi
 
 # ========================================================================
+# USE CASE COLLECTION ENHANCEMENT
+# ========================================================================
+# Extract all oneOf examples from OpenAPI and patch test collection
+.PHONY: postman-extract-oneof-examples
+postman-extract-oneof-examples:
+	@echo "📊 Extracting all oneOf examples from OpenAPI spec..."
+	@if [ ! -f "$(POSTMAN_TEST_COLLECTION_FLAT)" ]; then \
+		echo "⚠️  Test collection not found. Run postman-create-test-collection first."; \
+		exit 1; \
+	fi
+	@$(VENV_PYTHON) scripts/active/extract_all_oneof_examples.py \
+		$(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES) \
+		$(POSTMAN_TEST_COLLECTION_FLAT) \
+		$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-test-collection-enhanced.json
+	@echo "✅ Enhanced test collection with all oneOf examples"
+
+# Generate curated use case collection
+.PHONY: postman-generate-use-case-collection
+postman-generate-use-case-collection:
+	@echo "📚 Generating curated use case collection..."
+	@$(VENV_PYTHON) scripts/active/generate_use_case_collection.py \
+		$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-use-case-collection.json
+	@echo "✅ Use case collection generated"
+
+# Upload enhanced test collection with all oneOf examples
+.PHONY: postman-upload-enhanced-collection
+postman-upload-enhanced-collection:
+	@echo "📤 Updating test collection with enhanced oneOf examples..."
+	@ENHANCED_FILE="$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-test-collection-enhanced.json"; \
+	if [ ! -f "$$ENHANCED_FILE" ]; then \
+		echo "⚠️  Enhanced collection not found. Run postman-extract-oneof-examples first."; \
+		exit 1; \
+	fi; \
+	if [ ! -f "$(POSTMAN_TEST_COLLECTION_UID_FILE)" ]; then \
+		echo "❌ Test collection UID file not found. Run postman-create-test-collection first."; \
+		exit 1; \
+	fi; \
+	TEST_COLLECTION_UID=$$(cat $(POSTMAN_TEST_COLLECTION_UID_FILE)); \
+	if [ -z "$$TEST_COLLECTION_UID" ]; then \
+		echo "❌ Test collection UID is empty"; exit 1; \
+	fi; \
+	echo "🔄 Updating existing test collection $$TEST_COLLECTION_UID..."; \
+	RESPONSE=$$(jq -c '{collection: .}' "$$ENHANCED_FILE" | \
+		curl --silent --location --request PUT "$(POSTMAN_COLLECTIONS_URL)/$$TEST_COLLECTION_UID" \
+			$(POSTMAN_CURL_HEADERS_XC) \
+			--data-binary @-); \
+	if echo "$$RESPONSE" | jq -e '.collection.uid' > /dev/null 2>&1; then \
+		echo "✅ Test collection updated with enhanced oneOf examples"; \
+	else \
+		echo "❌ Failed to update test collection: $$RESPONSE"; exit 1; \
+	fi
+
+# Upload use case collection
+.PHONY: postman-upload-use-case-collection
+postman-upload-use-case-collection:
+	@echo "📤 Uploading use case collection..."
+	@USE_CASE_FILE="$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-use-case-collection.json"; \
+	if [ ! -f "$$USE_CASE_FILE" ]; then \
+		echo "⚠️  Use case collection not found. Run postman-generate-use-case-collection first."; \
+		exit 1; \
+	fi; \
+	COLLECTION_UID=$$(jq -c '{collection: .}' "$$USE_CASE_FILE" | \
+		curl --silent --location --request POST "$(POSTMAN_COLLECTIONS_URL)?workspace=$(POSTMAN_WS)" \
+			$(POSTMAN_CURL_HEADERS_XC) \
+			--data-binary @- | jq -r '.collection.uid'); \
+	if [ "$$COLLECTION_UID" = "null" ] || [ -z "$$COLLECTION_UID" ]; then \
+		echo "❌ Failed to upload use case collection"; exit 1; \
+	else \
+		echo "✅ Use case collection uploaded with UID: $$COLLECTION_UID"; \
+		echo $$COLLECTION_UID > $(POSTMAN_GENERATED_DIR)/use-case-collection-uid.txt; \
+	fi
+
+# Upload all enhanced collections (both enhanced test and use case)
+.PHONY: postman-upload-all-enhanced-collections
+postman-upload-all-enhanced-collections: postman-upload-enhanced-collection postman-upload-use-case-collection
+	@echo "✅ All enhanced collections uploaded successfully"
+
+# ========================================================================
 # ENVIRONMENT CREATION
 # ========================================================================
 # Generate Postman environment file with mock URL and auth fields
@@ -1411,8 +1505,10 @@ postman-env-upload:
 postman-mock-create:
 	@echo "🆕 Creating Postman mock server..."
 	@if [ -z "$(POSTMAN_WS)" ]; then echo "❌ POSTMAN_WS (workspace ID) is not set. Aborting."; exit 1; fi
-	@if [ -z "$(POSTMAN_TEST_COLLECTION_UID)" ]; then echo "❌ POSTMAN_TEST_COLLECTION_UID not set. Aborting."; exit 1; fi
-	@PAYLOAD=$$(jq -n --arg coll "$(POSTMAN_TEST_COLLECTION_UID)" --arg name "$(POSTMAN_MOCK_NAME)" \
+	@if [ ! -f "$(POSTMAN_GENERATED_DIR)/use-case-collection-uid.txt" ]; then echo "❌ Use case collection UID not found. Run postman-upload-use-case-collection first."; exit 1; fi
+	@USE_CASE_COLLECTION_UID=$$(cat $(POSTMAN_GENERATED_DIR)/use-case-collection-uid.txt); \
+	if [ -z "$$USE_CASE_COLLECTION_UID" ]; then echo "❌ Use case collection UID is empty"; exit 1; fi; \
+	PAYLOAD=$$(jq -n --arg coll "$$USE_CASE_COLLECTION_UID" --arg name "$(POSTMAN_MOCK_NAME)" \
 	  '{ mock: { collection: $$coll, name: $$name, private: false } }'); \
 	echo "Debug: Creating mock with payload: $$PAYLOAD" >&2; \
 	echo "Debug: URL: $(POSTMAN_MOCKS_URL)$(POSTMAN_Q)" >&2; \
@@ -1443,7 +1539,7 @@ update-mock-env:
 	@curl --silent --show-error --fail --location \
 		--request PUT "$(POSTMAN_MOCKS_URL)/$(POSTMAN_MOCK_ID)" \
 		$(POSTMAN_CURL_HEADERS_XC) \
-		--data-raw '{ "mock": { "name": "C2mApiV2MockServer", "collection": "$(POSTMAN_TEST_COLLECTION_UID)", "environment": "$(POSTMAN_ENV_UID)", "description": "Mock server environment updated via Makefile.", "private": false } }' \
+		--data-raw "$$(jq -n --arg coll "$$(cat $(POSTMAN_GENERATED_DIR)/use-case-collection-uid.txt)" --arg env "$(POSTMAN_ENV_UID)" '{ "mock": { "name": "C2mApiV2MockServer", "collection": $$coll, "environment": $$env, "description": "Mock server environment updated via Makefile.", "private": false } }')" \
 		--output /dev/null \
 		&& echo "✅ Mock server environment updated." \
 		|| (echo "❌ Failed to update mock server. Check UID/ID values and API key." && exit 1)
@@ -1577,10 +1673,10 @@ postman-link-env-to-mock-server:
 	@echo "🔗 Linking environment to mock server..."
 	@if [ ! -f $(POSTMAN_ENV_UID_FILE) ]; then echo "❌ Missing environment UID file: $(POSTMAN_ENV_UID_FILE). Run postman-env-upload first."; exit 1; fi
 	@if [ ! -f $(POSTMAN_MOCK_UID_FILE) ]; then echo "❌ Missing mock UID file: $(POSTMAN_MOCK_UID_FILE). Run postman-mock-create first."; exit 1; fi
-	@if [ ! -f $(POSTMAN_TEST_COLLECTION_UID_FILE) ]; then echo "❌ Missing collection UID file: $(POSTMAN_TEST_COLLECTION_UID_FILE). Run postman-collection-upload-test first."; exit 1; fi
+	@if [ ! -f "$(POSTMAN_GENERATED_DIR)/use-case-collection-uid.txt" ]; then echo "❌ Missing use case collection UID file. Run postman-upload-use-case-collection first."; exit 1; fi
 	@POSTMAN_ENV_UID=$$(cat $(POSTMAN_ENV_UID_FILE)); \
 	POSTMAN_MOCK_UID=$$(cat $(POSTMAN_MOCK_UID_FILE)); \
-	COLLECTION_UID=$$(cat $(POSTMAN_TEST_COLLECTION_UID_FILE)); \
+	COLLECTION_UID=$$(cat $(POSTMAN_GENERATED_DIR)/use-case-collection-uid.txt); \
 	LINK_DEBUG="$(POSTMAN_MOCK_LINK_DEBUG_FILE)"; \
 	echo "📦 Linking Environment $$POSTMAN_ENV_UID with Collection $$COLLECTION_UID (Mock $$POSTMAN_MOCK_UID)..."; \
 	curl --silent --location --request PUT "$(POSTMAN_MOCKS_URL)/$$POSTMAN_MOCK_UID" \

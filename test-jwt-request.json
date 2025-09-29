@@ -1,0 +1,79 @@
+{
+  "info": {
+    "name": "JWT Test Request",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "console.log('Environment variables:');",
+          "console.log('- authUrl:', pm.environment.get('authUrl'));",
+          "console.log('- clientId:', pm.environment.get('clientId'));",
+          "console.log('- clientSecret:', pm.environment.get('clientSecret'));",
+          "console.log('');",
+          "console.log('Making auth request...');",
+          "",
+          "const authRequest = {",
+          "    url: pm.environment.get('authUrl') + '/auth/tokens/long',",
+          "    method: 'POST',",
+          "    header: {",
+          "        'Content-Type': 'application/json',",
+          "        'X-Client-Id': pm.environment.get('clientId')",
+          "    },",
+          "    body: {",
+          "        mode: 'raw',",
+          "        raw: JSON.stringify({",
+          "            grant_type: 'client_credentials',",
+          "            client_id: pm.environment.get('clientId'),",
+          "            client_secret: pm.environment.get('clientSecret')",
+          "        })",
+          "    }",
+          "};",
+          "",
+          "pm.sendRequest(authRequest, (err, response) => {",
+          "    if (err) {",
+          "        console.error('Auth request failed:', err);",
+          "    } else {",
+          "        console.log('Auth response status:', response.code);",
+          "        console.log('Auth response:', response.json());",
+          "        if (response.code === 200) {",
+          "            const token = response.json().access_token;",
+          "            pm.request.headers.add({",
+          "                key: 'Authorization',",
+          "                value: 'Bearer ' + token",
+          "            });",
+          "            console.log('Authorization header added');",
+          "        }",
+          "    }",
+          "});"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Test JWT Auth",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"test\": \"data\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/jobs/single-doc-job-template",
+          "host": ["{{baseUrl}}"],
+          "path": ["jobs", "single-doc-job-template"]
+        }
+      }
+    }
+  ]
+}

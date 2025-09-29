@@ -147,8 +147,6 @@ class EBNFToOpenAPITranslator:
         self.endpoints: List[Endpoint] = []
         self.issues: List[Issue] = []
         self.type_cache: Dict[str, TypeInfo] = {}
-        self.generated_schemas: Dict[str, Dict[str, Any]] = {}  # Store generated named schemas
-        self.schema_counter = 0  # Counter for unique schema names
         
         # OpenAPI type mappings for primitives
         self.primitive_types = {
@@ -406,9 +404,6 @@ class EBNFToOpenAPITranslator:
             }
         }
         
-        # Add any generated named schemas (e.g., for documentSourceIdentifier variants)
-        schemas.update(self.generated_schemas)
-        
         return schemas
     
     def _generate_paths(self) -> OrderedDict:
@@ -552,7 +547,7 @@ class EBNFToOpenAPITranslator:
                         "enum": [self._extract_literal_value(choice) for choice in choices]
                     }
                 else:
-                    # Generate oneOf schema with named schemas when appropriate
+                    # Generate oneOf schema
                     return self._generate_oneof_schema(choices, context)
             
             elif expr_type == 'symbol':
@@ -576,51 +571,28 @@ class EBNFToOpenAPITranslator:
         """Generate oneOf schema from alternation choices"""
         schemas = []
         
-        for i, choice in enumerate(choices):
+        for choice in choices:
             if isinstance(choice, dict):
                 choice_type = choice.get('type')
                 
                 if choice_type == 'symbol':
                     symbol_name = choice.get('name')
                     if symbol_name:
-                        # Check if this is a simple/primitive type that needs wrapping in oneOf context
-                        # For documentSourceIdentifier: documentId and externalUrl need wrapping
-                        # For recipientAddressSource: addressId and addressListId need wrapping
-                        needs_wrapping = False
-                        if context == 'documentSourceIdentifier' and symbol_name in ['documentId', 'externalUrl']:
-                            needs_wrapping = True
-                        elif context == 'recipientAddressSource' and symbol_name in ['addressId', 'addressListId']:
-                            needs_wrapping = True
-                        
-                        if needs_wrapping:
-                            # Wrap simple types in an object to preserve field name in oneOf contexts
-                            wrapped_schema = {
-                                "type": "object",
-                                "properties": {
-                                    symbol_name: {"$ref": f"#/components/schemas/{symbol_name}"}
-                                },
-                                "required": [symbol_name]
-                            }
-                            schemas.append(wrapped_schema)
-                        elif symbol_name in self.productions:
+                        if symbol_name in self.productions:
                             schemas.append({"$ref": f"#/components/schemas/{symbol_name}"})
                         else:
-                            # Simple type reference
-                            schemas.append({"$ref": f"#/components/schemas/{symbol_name}"})
+                            # Simple type wrapped in object
+                            schemas.append({
+                                "type": "object",
+                                "required": [symbol_name],
+                                "properties": {
+                                    symbol_name: self._get_field_type(symbol_name)
+                                }
+                            })
                 
                 elif choice_type == 'concatenation':
-                    # Complex object type - create named schema for oneOf variants
-                    if context in ['documentSourceIdentifier', 'recipientAddressSource', 'paymentDetails']:
-                        # Analyze the concatenation to determine schema name
-                        schema_obj = self._expression_to_schema(choice, context)
-                        schema_name = self._get_schema_name_for_concatenation(choice, context)
-                        
-                        # Store this as a named schema
-                        self.generated_schemas[schema_name] = schema_obj
-                        schemas.append({"$ref": f"#/components/schemas/{schema_name}"})
-                    else:
-                        # For other contexts, use inline schema
-                        schemas.append(self._expression_to_schema(choice, context))
+                    # Complex object type
+                    schemas.append(self._expression_to_schema(choice, context))
                 
                 elif choice_type == 'group':
                     # Process the grouped expression
@@ -630,41 +602,6 @@ class EBNFToOpenAPITranslator:
             return schemas[0]
         else:
             return {"oneOf": schemas}
-    
-    def _get_schema_name_for_concatenation(self, concatenation: Dict[str, Any], context: str) -> str:
-        """Generate a descriptive schema name based on concatenation properties"""
-        items = concatenation.get('items', [])
-        properties = []
-        
-        for item in items:
-            if isinstance(item, dict) and item.get('type') == 'symbol':
-                properties.append(item.get('name'))
-        
-        # Special handling for specific oneOf patterns
-        if context == 'documentSourceIdentifier':
-            if 'uploadRequestId' in properties and 'zipId' in properties:
-                return 'DocumentSourceWithUploadAndZip'
-            elif 'uploadRequestId' in properties:
-                return 'DocumentSourceWithUpload'
-            elif 'zipId' in properties:
-                return 'DocumentSourceFromZip'
-        elif context == 'paymentDetails':
-            if 'creditCardDetails' in properties:
-                return 'creditCardPayment'
-            elif 'invoiceDetails' in properties:
-                return 'invoicePayment'
-            elif 'achDetails' in properties:
-                return 'achPayment'
-            elif 'creditAmount' in properties:
-                return 'userCreditPayment'
-            elif 'applePaymentDetails' in properties:
-                return 'applePayPayment'
-            elif 'googlePaymentDetails' in properties:
-                return 'googlePayPayment'
-        
-        # Fallback to generic naming
-        self.schema_counter += 1
-        return f"{context.title()}Variant{self.schema_counter}"
     
     def _is_enum(self, choices: List[Any]) -> bool:
         """Check if alternation represents an enum"""

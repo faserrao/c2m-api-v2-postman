@@ -274,6 +274,14 @@ To set target: `echo "personal" > .postman-target`
   - Created AUTHENTICATION_GUIDE.md consolidating auth documentation
   - Created CUSTOMER_ONBOARDING_GUIDE.md for new customers
   - Established migration plan for remaining docs
+- **2025-09-27**: Fixed oneOf handling in the entire pipeline:
+  - openapi-to-postmanv2 simplifies anonymous oneOf schemas to just the first type
+  - Created fix_openapi_oneOf_schemas.py to convert anonymous to named schemas
+  - Modified EBNF to OpenAPI converter to generate named schemas for oneOf variants
+  - Integrated fixes into Makefile pipeline (not one-time changes)
+  - Fixed test data generator to handle `<oneOf>` placeholders
+  - Result: Linked collections show `<oneOf>`, test collections rotate through examples
+- **2024-02-28**: Added first memory about generating API documentation programmatically and maintaining a single source of truth with EBNF
 
 ## Project Memory & Key Patterns
 
@@ -306,6 +314,11 @@ make postman-workspace-debug
    - Postman CLI must be installed explicitly in GitHub Actions
    - Use CI-specific targets that skip local servers
    - openapi-diff npm version hangs (use npx, temporarily disabled)
+6. **OneOf handling**: 
+   - openapi-to-postmanv2 simplifies anonymous oneOf schemas to first type only
+   - Fix requires converting anonymous schemas to named schemas in OpenAPI
+   - Pipeline now includes fix_openapi_oneOf_schemas.py after EBNF conversion
+   - Test data generator must recognize `<oneOf>` as a placeholder
 
 ### Repository Relationships
 - **Main repo**: c2m-api-repo (core API functionality)

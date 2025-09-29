@@ -83,9 +83,9 @@ function parseArgs() {
 const oneOfFixtures = {
     documentSourceIdentifier: [
         // Variant 1: Just documentId (integer)
-        { "documentId": 1234 },
+        1234,
         // Variant 2: Just externalUrl (string with URI format)
-        { "externalUrl": "https://api.example.com/v1/documents/5678" },
+        "https://api.example.com/v1/documents/5678",
         // Variant 3: uploadRequestId + documentName
         {
             uploadRequestId: 100,
@@ -159,21 +159,18 @@ const oneOfFixtures = {
         },
         // Variant 4: userCreditPayment
         {
-            userCreditDetails: {
-                creditAmount: 50.00
+            creditAmount: {
+                amount: 50.00,
+                currency: "USD"
             }
         },
         // Variant 5: applePayPayment
         {
-            applePayDetails: {
-                applePaymentDetails: {}
-            }
+            applePaymentDetails: {}
         },
         // Variant 6: googlePayPayment
         {
-            googlePayDetails: {
-                googlePaymentDetails: {}
-            }
+            googlePaymentDetails: {}
         }
     ]
 };
@@ -238,7 +235,6 @@ function shouldReplaceValue(value, key) {
         value === '<string>' || 
         value === '<number>' || 
         value === '<integer>' ||
-        value === '<oneOf>' ||
         value === 'string' ||
         value === 'number'
     )) {
@@ -307,7 +303,7 @@ function generateRandomValue(key, existingValue) {
     } else if (keyLower.includes('id') && !keyLower.includes('email')) {
         return faker.string.alphanumeric(10);
     } else if (keyLower.includes('tags')) {
-        return ['important', 'customer-docs'];
+        return [faker.lorem.word(), faker.lorem.word()];
     } else if (keyLower.includes('template')) {
         return `template_${faker.string.alphanumeric(8)}`;
     } else if (keyLower.includes('year')) {
@@ -320,20 +316,9 @@ function generateRandomValue(key, existingValue) {
         return faker.finance.routingNumber();
     } else if (keyLower.includes('account')) {
         return faker.finance.accountNumber();
-    } else if (keyLower.includes('status')) {
-        return faker.helpers.arrayElement(['active', 'pending', 'completed', 'processing', 'success']);
-    } else if (keyLower.includes('message')) {
-        return faker.helpers.arrayElement([
-            'Operation completed successfully',
-            'Request processed',
-            'Job created successfully',
-            'Processing your request'
-        ]);
-    } else if (keyLower === 'jobid' || (keyLower.includes('job') && keyLower.includes('id'))) {
-        return `job_${Date.now()}_${faker.string.alphanumeric(6)}`;
     } else {
-        // Better default fallback - use a sensible default
-        return faker.helpers.arrayElement(['default', 'standard', 'basic', 'primary']);
+        // Default fallback
+        return faker.lorem.word();
     }
 }
 
