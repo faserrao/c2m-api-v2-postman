@@ -1,77 +1,41 @@
-(* TODO: Allow multiple recipient addresses in line. *)
-(* TODO: Allow different ways to specify recipient addresses in one api call. *)
-(* TODO: Should we define responses in the Data Dictionary *)
-
 (* In this version need to change all PascalCase to camelCase. *)
 
-(* TEST DEPLOYMENT: 2025-09-18 - Testing two-repo architecture deployment to both Postman workspaces *)
 
 (***********************************)
 (*        USE CASE DEFINITIONS        *)
 (***********************************)
 
-(*
-  Use Case 1: I have a document, recipient addresses & a job template.
-  Endpoint: POST /jobs/single-doc-job-template
-submitSingleDocWithTemplateParams =
-      documentSourceIdentifier
-    + [ { recipientAddressSource } ]
-    + jobTemplate
-    + [ paymentDetails ]
-    + [ tags ] ;
-*)
-
 (* 
   Use Case 1: I have a single document, some recipients, and a job template.
   Endpoint: POST /jobs/single-doc-job-template
-submitSingleDocWithTemplateParams =
-      ( ("TEMPLATE" | documentSourceIdentifier) + { recipientAddressSource }
-      | ("TEMPLATE" | { recipientAddressSource }) + documentSourceIdentifier
-      | (documentSourceIdentifier + { recipientAddressSource}) )
-    + jobTemplate
-    + paymentDetails
-    + [ tags ] ;
 *)
-
 submitSingleDocWithTemplateParams =
       ( documentSourceIdentifier
       | { recipientAddressSource }
       | (documentSourceIdentifier + { recipientAddressSource}) )
     + jobTemplate
-    + paymentDetails
+    + paymentDetails 
     + [ tags ] ;
 
-(*
+(* 
   Use Case 2: I have multiple documents each to different recipient addresses & a job template.
   Endpoint: POST /jobs/multi-docs-job-template
 *)
-submitMultiDocWithTemplateParams =
-      { documentSourceIdentifier + recipientAddressSource }
-    + jobTemplate
-    + paymentDetails
+submitMultiDocWithTemplateParams = 
+      { documentSourceIdentifier + recipientAddressSource } 
+    + jobTemplate 
+    + paymentDetails 
     + [ tags ] ;
 
 (* 
   Use Case 3: I want to merge multiple documents, send them to a single recipient, and use a job template.
   Endpoint: POST /jobs/multi-doc-merge-job-template
+*)
 mergeMultiDocWithTemplateParams = 
       documentsToMerge 
-    + [ ("TEMPLATE" | recipientAddressSource) ] 
+    + [ recipientAddressSource ] 
     + jobTemplate 
     + paymentDetails 
-    + [ tags ] ;
-*)
-
-
-(*
-  Use Case 3: I want to merge multiple documents, send them to a single recipient, and use a job template.
-  Endpoint: POST /jobs/multi-doc-merge-job-template
-*)
-mergeMultiDocWithTemplateParams =
-      documentsToMerge
-    + recipientAddressSource
-    + jobTemplate
-    + paymentDetails
     + [ tags ] ;
 
 (* 
@@ -199,22 +163,16 @@ documentSourceIdentifier =
   - A reference to a preloaded address list
   - Or a reference to a saved address
 *)
-(*
+recipientAddressSource = 
     exactlyOneNewAddress
     | exactlyOneListId
     | exactlyOneId ;
 
 exactlyOneNewAddress = recipientAddress ;
 exactlyOneListId     = addressListId ;
-exactlyOneId         = addressId ;
-*)
+exactlyOneId         = addressId ;        (* ??? Where is this field from *)
 
-recipientAddressSource = 
-    recipientAddress
-    | addressListId
-    | addressId ;
-
-(*
+(* 
   Comprehensive recipient address block.
   Required fields ensure mailable accuracy; optional fields enhance personalization or flexibility.
 *)
@@ -337,7 +295,14 @@ phoneNumber          = string ;
 tags                 = { tags } ; (* New as of 07102025 *)
 tag                  = string ;  (* Optional metadata tags for analytics or categorization *)
 
+(* Basic lexical types *)
 id = integer;
+integer = number ;                          (* Any whole number *)
+string  = { character } ; (* any printable ASCII character except double quote or backslash *)
+number  = {digit} ;
+digit   = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+
+
 
 (*************************)
 (*       ENUM DEFINITIONS     *)

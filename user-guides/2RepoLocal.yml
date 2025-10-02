@@ -1,0 +1,126 @@
+⏺ Let me elaborate on how local builds will work with the two-repo architecture:
+
+  Local Builds - Detailed Workflow
+
+  Current Situation (Single Repo)
+
+  # Currently, everything happens in one place
+  make openapi-build        # Creates files locally
+  make postman-publish      # Uploads to Postman AND commits files to git
+  # Problem: Generated files get mixed with source files
+
+  New Two-Repo Local Workflows
+
+  Workflow 1: Quick Local Development (Most Common)
+
+  You're just testing changes locally, not publishing anywhere:
+
+  cd c2m-api-repo
+
+  # Edit your EBNF file
+  vim data_dictionary/c2mapiv2-dd.ebnf
+
+  # Build and test locally
+  make openapi-build              # Generates openapi/*.yaml
+  make postman-collection-build   # Generates postman/generated/*
+  make docs-build                 # Generates docs/*
+  make generate-sdk-python        # Generates sdk/python/*
+
+  # View your generated files
+  cat openapi/c2mapiv2-openapi-spec-final.yaml
+  open docs/index.html
+
+  # IMPORTANT: These files are .gitignored
+  # They exist locally but won't be committed to source repo
+
+  Workflow 2: Test Full Pipeline Locally
+
+  You want to simulate the full CI/CD process:
+
+  # Have both repos side by side
+  ~/projects/
+    ├── c2m-api-repo/        # Source files
+    └── c2m-api-artifacts/   # Generated files
+
+  # Build in source repo
+  cd ~/projects/c2m-api-repo
+  make openapi-build
+  make generate-sdk-all
+
+  # Manually sync to artifacts repo
+  cp -r openapi/*.yaml ../c2m-api-artifacts/openapi/
+  cp -r sdk/* ../c2m-api-artifacts/sdks/
+
+  # Commit to artifacts repo (simulating CI)
+  cd ../c2m-api-artifacts
+  git add .
+  git commit -m "Local build test"
+
+  Workflow 3: Local Postman Updates
+
+  You want to update Postman from your local build:
+
+  cd c2m-api-repo
+
+  # Build locally
+  make openapi-build
+
+  # Publish to Postman directly (without git commits)
+  make postman-publish
+
+  # This updates Postman but doesn't touch git at all
+  # Perfect for testing before pushing to GitHub
+
+  Key Changes from Current Behavior
+
+  | Action               | Current (Single Repo)            | New (Two Repo)                    |
+  |----------------------|----------------------------------|-----------------------------------|
+  | make openapi-build   | Creates files, stages for commit | Creates files, they're gitignored |
+  | make postman-publish | Updates Postman + commits files  | Updates Postman only              |
+  | git commit           | Includes generated files         | Only source files                 |
+  | View artifacts       | In same repo                     | Need to check artifacts repo      |
+
+  New Make Targets We Could Add
+
+  # Sync local build to artifacts repo
+  local-sync:
+      @echo "Syncing to local artifacts repo..."
+      cp -r openapi/*.yaml $(ARTIFACTS_REPO)/openapi/
+      cp -r postman/generated/* $(ARTIFACTS_REPO)/postman/
+      cp -r docs/* $(ARTIFACTS_REPO)/docs/
+      cp -r sdk/* $(ARTIFACTS_REPO)/sdks/
+
+  # Build everything and sync
+  local-full-build: openapi-build docs-build generate-sdk-all local-sync
+      @echo "Full build complete and synced!"
+
+  # Test the complete pipeline locally
+  local-test-pipeline:
+      make local-full-build
+      cd $(ARTIFACTS_REPO) && git add . && git commit -m "Local test"
+      @echo "Pipeline test complete!"
+
+  Benefits for Local Development
+
+  1. Faster commits - No huge generated files in your commits
+  2. Cleaner diffs - Only see actual source changes
+  3. Flexible testing - Can test locally without affecting git
+  4. Parallel work - Can work on source while CI handles artifacts
+
+  .gitignore Changes
+
+  # Add to .gitignore in source repo
+  /openapi/c2mapiv2-openapi-spec-base.yaml
+  /openapi/c2mapiv2-openapi-spec-final.yaml
+  /openapi/bundled.yaml
+  /postman/generated/
+  /postman/*.json
+  /postman/*.txt
+  /docs/index.html
+  /docs/site/
+  /sdk/
+
+  This means you can still generate everything locally for testing, but it won't clutter your git history.
+
+  Does this clarify how local development will work? The key insight is that most of the time you'll just work in the source repo, and the generated files will be there
+  locally but gitignored.

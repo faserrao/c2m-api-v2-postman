@@ -1,0 +1,5628 @@
+{
+  "endpoint": "mergeMultiDocParams",
+  "paramsDefinition": [
+    "mergeMultiDocParams = ",
+    "      documentsToMerge ",
+    "    + recipientAddressSource ",
+    "    + paymentDetails",
+    "    + [ tags ] ;"
+  ],
+  "permutations": [
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "documentId": 1234
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "externalUrl": "https://example.com/doc.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 987,
+        "documentName": "invoice.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "uploadRequestId": 654,
+        "zipId": 321,
+        "documentName": "contract.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "address1": "123 Main Street",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001",
+        "country": "USA"
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressListId": 42
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "creditCardDetails": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "invoiceDetails": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "achDetails": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "userCreditPayment": {
+          "amount": 50,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "applePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "documentSourceIdentifier": {
+        "zipId": 111,
+        "documentName": "newsletter.pdf"
+      },
+      "recipientAddressSource": {
+        "addressId": 99
+      },
+      "paymentDetails": {
+        "googlePayPayment": "TBD"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    }
+  ]
+}

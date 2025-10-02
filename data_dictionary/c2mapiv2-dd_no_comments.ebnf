@@ -1,38 +1,8 @@
-(* TODO: Allow multiple recipient addresses in line. *)
-(* TODO: Allow different ways to specify recipient addresses in one api call. *)
-(* TODO: Should we define responses in the Data Dictionary *)
-
-(* In this version need to change all PascalCase to camelCase. *)
-
-(* TEST DEPLOYMENT: 2025-09-18 - Testing two-repo architecture deployment to both Postman workspaces *)
-
-(***********************************)
-(*        USE CASE DEFINITIONS        *)
-(***********************************)
-
-(*
-  Use Case 1: I have a document, recipient addresses & a job template.
-  Endpoint: POST /jobs/single-doc-job-template
-submitSingleDocWithTemplateParams =
-      documentSourceIdentifier
-    + [ { recipientAddressSource } ]
-    + jobTemplate
-    + [ paymentDetails ]
-    + [ tags ] ;
-*)
 
 (* 
   Use Case 1: I have a single document, some recipients, and a job template.
   Endpoint: POST /jobs/single-doc-job-template
-submitSingleDocWithTemplateParams =
-      ( ("TEMPLATE" | documentSourceIdentifier) + { recipientAddressSource }
-      | ("TEMPLATE" | { recipientAddressSource }) + documentSourceIdentifier
-      | (documentSourceIdentifier + { recipientAddressSource}) )
-    + jobTemplate
-    + paymentDetails
-    + [ tags ] ;
 *)
-
 submitSingleDocWithTemplateParams =
       ( documentSourceIdentifier
       | { recipientAddressSource }
@@ -51,18 +21,6 @@ submitMultiDocWithTemplateParams =
     + paymentDetails
     + [ tags ] ;
 
-(* 
-  Use Case 3: I want to merge multiple documents, send them to a single recipient, and use a job template.
-  Endpoint: POST /jobs/multi-doc-merge-job-template
-mergeMultiDocWithTemplateParams = 
-      documentsToMerge 
-    + [ ("TEMPLATE" | recipientAddressSource) ] 
-    + jobTemplate 
-    + paymentDetails 
-    + [ tags ] ;
-*)
-
-
 (*
   Use Case 3: I want to merge multiple documents, send them to a single recipient, and use a job template.
   Endpoint: POST /jobs/multi-doc-merge-job-template
@@ -77,19 +35,17 @@ mergeMultiDocWithTemplateParams =
 (* 
   Use Case 4: I have a document and multiple recipient addresses.
   Endpoint: POST /jobs/single-doc
-  Sends one document to multiple recipients. Common for bulk messaging, newsletters, or notices.
 *)
 singleDocJobParams = 
       documentSourceIdentifier 
-    + { recipientAddressSource }            (* One or more recipients, each defined or referenced *)
-    + jobOptions                            (* Layout, print, delivery preferences *)
-    + paymentDetails                    (* Optional billing info, depending on configuration *)
-    + [ tags ] ;                            (* Optional metadata tags, e.g., campaign identifiers *)
+    + { recipientAddressSource }
+    + jobOptions
+    + paymentDetails
+    + [ tags ] ;
 
 (* 
   Use Case 5: I have multiple documents; each goes to a different recipient address.
   Endpoint: POST /jobs/multi-doc
-  Perfect for personalized mailing, where each recipient gets a different file.
 *)
 submitMultiDocParams = 
       { documentSourceIdentifier + recipientAddressSource } 
@@ -100,7 +56,6 @@ submitMultiDocParams =
 (*
   Use Case 6: I want to merge multiple documents into one document and send it to a single recipient.
   Endpoint: POST /jobs/multi-doc-merge
-  Ideal for assembling packets (e.g., onboarding kits) before delivery.
 *)
 mergeMultiDocParams = 
       documentsToMerge 
@@ -113,7 +68,6 @@ documentsToMerge = { documentSourceIdentifier };        (* One or more documents
 (* 
   Use Case 7: I have a big PDF to send to different recipients.
   Endpoint: POST /jobs/single-pdf-split
-  Splits a multi-page PDF and assigns different recipients to each range.
 *)
 splitPdfParams = 
       documentSourceIdentifier 
@@ -128,7 +82,6 @@ endPage   = integer ;
 (* 
   Use Case 8: I have a big PDF with serialized documents and the related recipient addresses are in the PDF.
   Endpoint: POST /jobs/single-pdf-split-addressCapture
-  Enables automated address extraction from fixed regions inside PDF pages.
 *)
 splitPdfWithCaptureParams = 
       documentSourceIdentifier 
@@ -140,10 +93,8 @@ embeddedExtractionSpecs = { extractionSpec } ;
 
 extractionSpec = startPage + endPage + addressRegion ;
 
-(* Placehoder *)
 addressRegion = x + y + width + height + pageOffset ; (* Not sure how the addesses will be located.  This is a placeholder *)
 
-(* Placeholders *)
 x = number ; (* New as of 07082025 *)
 y = number ; (* New as of 07082025 *)
 width = number ; (* New as of 07082025 *)
@@ -168,12 +119,7 @@ addressListPdf =
     + [ delimiter ] 
     + [ tags ] ;
 
-addressListRegion = tbd ;
-
-tbd = string ;
-
-(* Not user a delimeter is used *)
-delimiter = string ;   (* Character used to separate multiple addresses inside the PDF *)
+addressListRegion = "TBD" ;
 
 (********************************)
 (*        CORE FIELD DEFINITIONS         *)
@@ -198,15 +144,6 @@ documentSourceIdentifier =
   - Either a fully inline address
   - A reference to a preloaded address list
   - Or a reference to a saved address
-*)
-(*
-    exactlyOneNewAddress
-    | exactlyOneListId
-    | exactlyOneId ;
-
-exactlyOneNewAddress = recipientAddress ;
-exactlyOneListId     = addressListId ;
-exactlyOneId         = addressId ;
 *)
 
 recipientAddressSource = 
@@ -369,59 +306,3 @@ mailclass =
 
 documentClass = 
       "businessLetter" | "personalLetter" ;
-
-
-(****************************)
-(*      JOB TEMPLATE BLOCK      *)
-(****************************)
-
-(*
-jobTemplate = 
-      jobTemplateId 
-    | fullJobTemplate 
-    | jobTemplateName ;
-??? 
-jobTemplateName = string ;
-*)
-
-(* 
-  Full inlined template with config and optional doc/recipient info.
-  Supports overrides and repeatable use.
-  What about jobTemplateName along with JobTemplateId? 
-fullJobTemplate = 
-      jobTemplateId +
-      [ { documentSourceIdentifier } ] |
-    [ { recipientAddressSource } ] ;
-*)
-
-(*
-jobTemplate = jobTemplateId +
-              [ { documentSourceIdentifier } ] |
-              [ { recipientAddressSource } ] ;
-
-jobTemplateId = id;
-*)
-
-(*
-      Maybe make this change?
-      multiDocRecipientPair = documentSourceIdentifier + recipientAddressSource ;
-      submitMultiDocParams = { multiDocRecipientPair } + jobOptions ...
-*)
-
-(*
-      TODO: Does jobTemplate really inlcude addressList
-      If addressList is passed within the template (rather than externally provided during submission), 
-      it implies tight coupling of content + recipients, which may be limiting. Might consider
-      breaking this apart:
-
-      jobTemplate = jobTemplateId + name + jobOptions + document
-      jobTemplateWithAddressList = jobTemplate + addressList
-
-      TODO: Note that jobOptions are in both jobSpecs and jobTemplate.
-      Also, is document contains documentId and documentSource 
-      can be a docoumentId.
-
-      In separate document we should analyze jobTemplate, jobSpecs, jobSpecsTemplate
-      and where they are referenced, because of possibility of the duplication of
-      some elements.
-*)

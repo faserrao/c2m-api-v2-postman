@@ -253,6 +253,9 @@ To set target: `echo "personal" > .postman-target`
 - `merge_yaml_files.py` - Merge multiple YAML specs
 - `api_client_generator.py` - Generate Python client from OpenAPI
 
+## Logging Protocol
+**Update logs after each major feature completion OR every 30 minutes, whichever comes first**
+
 ## Session History - 2025-09-29
 
 ### Critical Fixes Applied Today
@@ -274,6 +277,62 @@ To set target: `echo "personal" > .postman-target`
    - Added use case collection generation to CI flow (required for mock server)
    - Fixed shell syntax error in artifacts commit step
    - Added rule to generate `with-examples.yaml` file as dependency
+
+4. **Real World Use Cases Collection Overhaul**
+   - **Fixed Template Endpoints**: Removed `jobOptions` from Legal Firm, Real Estate Agent, and Monthly Newsletters
+     - Replaced with appropriate `jobTemplate` references (e.g., "legal_certified_mail")
+   - **Removed GET Requests**: Each use case now only contains Submit Job request
+   - **Updated Collection Description**:
+     - Removed authentication setup section
+     - Added detailed step-by-step navigation instructions (8 steps)
+     - Fixed missing navigation level (POST request expansion)
+     - Added full use case descriptions exactly as provided (not summarized)
+     - Removed reference to 'C2M Production' environment
+   - **Eliminated Duplicates**: Complete cleanup/rebuild to ensure only one collection
+   - **Fixed Mock Server**: Recreated using test collection instead of use case collection
+   - **File Consolidation**: Only generate `c2mapiv2-use-case-collection.json` via Makefile
+
+5. **Critical Mock Server Architecture Discovery**
+   - **Root Cause of Failures**: Mock server was being created with wrong collection
+     - Makefile bug: Lines 1521-1523 use `USE_CASE_COLLECTION_UID` for mock creation
+     - Real World Use Cases collection only has example requests, not endpoint definitions
+     - This caused 404 errors and generic "example" responses
+   - **Correct Architecture**:
+     - Mock server MUST be built from TEST collection (contains all endpoint definitions)
+     - Real World Use Cases collection sends requests TO the mock server
+     - TEST collection = blueprint/instruction manual for mock server
+     - Real World Use Cases = pre-filled example requests
+   - **Flow**: TEST Collection → Defines Mock Server → Accepts requests from ANY collection
+   - **Fix**: Complete rebuild properly created mock with test collection
+
+6. **Use Case Collection Permutation System** (2025-09-30)
+   - **Problem**: Original script generated similar examples (consecutive permutations too alike)
+   - **Solution**: Created `generate_use_case_collection_v2.py` that reads from existing permutation files
+   - **Architecture**:
+     - Reads from `data_dictionary/generate-endpoint-permutations/permutations/`
+     - Each file contains all permutations for an endpoint (270-810 permutations each)
+     - Script randomly selects 5 diverse examples per use case
+   - **Selection Strategy**:
+     - Divides permutation list into 5 sections
+     - Randomly picks one from each section
+     - Ensures variety across document sources, payment types, and address types
+   - **Integration**:
+     - Updated Makefile to use new script
+     - Original script preserved as fallback (`generate_use_case_collection.py`)
+     - Easy revert: just change script name in Makefile
+   - **Benefits**:
+     - More diverse examples (not consecutive similar ones)
+     - Leverages existing permutation generation infrastructure
+     - Repeatable in pipeline - different examples each run
+
+## Known Issues to Fix Later
+
+1. **Postman Response Examples Show Request Bodies**
+   - Issue: Response examples in Postman collections show request body format instead of actual response format
+   - Expected: `{status, message, jobId}`
+   - Actual: Shows request body with `{jobTemplate, documentSourceIdentifier, etc.}`
+   - Likely cause: openapi-to-postmanv2 converter issue
+   - Priority: Low - not blocking functionality
 
 ## Learning Memories
 
@@ -341,6 +400,11 @@ make postman-workspace-debug
    - Fix requires converting anonymous schemas to named schemas in OpenAPI
    - Pipeline now includes fix_openapi_oneOf_schemas.py after EBNF conversion
    - Test data generator must recognize `<oneOf>` as a placeholder
+7. **Mock Server Architecture** (CRITICAL):
+   - Mock server MUST be created from TEST collection, NOT Real World Use Cases
+   - TEST collection defines endpoints; Real World collection just sends requests
+   - Wrong collection = 404 errors or generic "example" responses
+   - Makefile bug at lines 1521-1523 can create mock with wrong collection
 
 ### Repository Relationships
 - **Main repo**: c2m-api-repo (core API functionality)

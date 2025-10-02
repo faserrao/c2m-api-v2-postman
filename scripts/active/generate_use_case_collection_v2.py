@@ -1,20 +1,17 @@
 #!/usr/bin/env python3
 """
-Generate Curated Use Case Collection for C2M API
+Generate Curated Use Case Collection for C2M API - Version 2
 
-This script generates a Postman collection organized by real-world use cases,
-making it easy for developers to understand and test the API.
+This version reads permutations from the pre-generated JSON files in
+data_dictionary/generate-endpoint-permutations/permutations/
 
-Each use case includes:
-- Submit Job request with pre-populated payload
-- Get Job Details follow-up
-- Get Job Status follow-up
+It randomly selects 5 permutations for each use case to ensure variety.
 """
 
 import json
 import sys
 import uuid
-import copy
+import random
 from pathlib import Path
 from typing import Dict, List, Any
 from datetime import datetime
@@ -22,7 +19,10 @@ from datetime import datetime
 # Default base URL placeholder
 BASE_URL = "{{baseUrl}}"
 
-# Use case definitions with their configurations
+# Path to permutation files
+PERMUTATIONS_DIR = Path(__file__).parent.parent.parent / "data_dictionary" / "generate-endpoint-permutations" / "permutations"
+
+# Use case definitions with their configurations and file mappings
 USE_CASES = {
     "legal_firm": {
         "name": "Legal Firm",
@@ -30,40 +30,7 @@ USE_CASES = {
         "description": "We have letters that we need to send all day. Each letter is sent to a specific recipient via Certified Mail. A copy is sent to their legal representative via First Class mail. Our system generates the PDF of the letter.",
         "endpoint": "/jobs/single-doc-job-template",
         "method": "POST",
-        "payload": {
-            "documentSourceIdentifier": {"documentId": 1234},
-            "recipientAddressSources": [
-                {
-                    "firstName": "John",
-                    "lastName": "Doe",
-                    "address1": "123 Main Street",
-                    "city": "New York",
-                    "state": "NY",
-                    "zip": "10001",
-                    "country": "USA"
-                },
-                {
-                    "firstName": "Jane",
-                    "lastName": "Smith (Attorney)",
-                    "address1": "456 Legal Avenue",
-                    "city": "New York", 
-                    "state": "NY",
-                    "zip": "10002",
-                    "country": "USA",
-                    "nickName": "Attorney Copy"
-                }
-            ],
-            "jobTemplate": "legal_certified_mail",
-            "paymentDetails": {
-                "creditCardDetails": {
-                    "cardType": "visa",
-                    "cardNumber": "4111111111111111",
-                    "expirationDate": {"month": 12, "year": 2025},
-                    "cvv": 123
-                }
-            },
-            "tags": ["legal", "certified", "client-correspondence"]
-        }
+        "permutation_file": "submitSingleDocWithTemplateParams.json"
     },
     
     "company_invoice_batch": {
@@ -72,64 +39,7 @@ USE_CASES = {
         "description": "We send invoices at the end of the month. Each invoice is in its own PDF. The address of the recipient is in the invoice.",
         "endpoint": "/jobs/multi-pdf-address-capture",
         "method": "POST",
-        "payload": {
-            "addressCapturePdfs": [
-                {
-                    "documentSourceIdentifier": {
-                        "uploadRequestId": 100,
-                        "documentName": "invoice_001.pdf"
-                    },
-                    "addressRegion": {
-                        "x": 300,
-                        "y": 100,
-                        "width": 200,
-                        "height": 100,
-                        "pageOffset": 0
-                    }
-                },
-                {
-                    "documentSourceIdentifier": {
-                        "uploadRequestId": 100,
-                        "documentName": "invoice_002.pdf"
-                    },
-                    "addressRegion": {
-                        "x": 300,
-                        "y": 100,
-                        "width": 200,
-                        "height": 100,
-                        "pageOffset": 0
-                    }
-                },
-                {
-                    "documentSourceIdentifier": {
-                        "uploadRequestId": 100,
-                        "documentName": "invoice_003.pdf"
-                    },
-                    "addressRegion": {
-                        "x": 300,
-                        "y": 100,
-                        "width": 200,
-                        "height": 100,
-                        "pageOffset": 0
-                    }
-                }
-            ],
-            "jobOptions": {
-                "documentClass": "businessLetter",
-                "layout": "portrait",
-                "mailclass": "firstClassMail",
-                "paperType": "letter",
-                "printOption": "color",
-                "envelope": "windowedFlat"
-            },
-            "paymentDetails": {
-                "invoiceDetails": {
-                    "invoiceNumber": "BATCH-2024-001",
-                    "amountDue": 450.00
-                }
-            },
-            "tags": ["invoices", "monthly-batch", "accounts-receivable"]
-        }
+        "permutation_file": "multiPdfWithCaptureParams.json"
     },
     
     "company_split_invoices": {
@@ -138,45 +48,7 @@ USE_CASES = {
         "description": "We send invoices at the end of the month. All the invoices are in a single big PDF. The addresses of the recipients are in the invoices.",
         "endpoint": "/jobs/single-pdf-split-addressCapture",
         "method": "POST",
-        "payload": {
-            "documentSourceIdentifier": {
-                "uploadRequestId": 200,
-                "zipId": 10,
-                "documentName": "combined_invoices.pdf"
-            },
-            "embeddedExtractionSpecs": [
-                {
-                    "startPage": 1,
-                    "endPage": 1,
-                    "addressRegion": {
-                        "x": 50,
-                        "y": 100,
-                        "width": 200,
-                        "height": 100,
-                        "pageOffset": 0
-                    }
-                },
-                {
-                    "startPage": 2,
-                    "endPage": 2,
-                    "addressRegion": {
-                        "x": 50,
-                        "y": 100,
-                        "width": 200,
-                        "height": 100,
-                        "pageOffset": 0
-                    }
-                }
-            ],
-            "paymentDetails": {
-                "achDetails": {
-                    "routingNumber": "021000021",
-                    "accountNumber": "1234567890",
-                    "checkDigit": 7
-                }
-            },
-            "tags": ["split-pdf", "address-capture", "automated"]
-        }
+        "permutation_file": "splitPdfWithCaptureParams.json"
     },
     
     "real_estate_agent": {
@@ -185,21 +57,7 @@ USE_CASES = {
         "description": "We send postcards as part of our campaign. The postcards have a specific template and use mail merge.",
         "endpoint": "/jobs/single-doc-job-template",
         "method": "POST",
-        "payload": {
-            "documentSourceIdentifier": {"externalUrl": "https://api.example.com/v1/marketing/postcards/luxury-homes"},
-            "recipientAddressSources": [
-                {"addressListId": 100},  # Address list ID for target neighborhood
-                {"addressListId": 101},  # Address list ID for recent movers
-                {"addressListId": 102}   # Address list ID for luxury buyers
-            ],
-            "jobTemplate": "postcard_luxury_homes",
-            "paymentDetails": {
-                "userCreditDetails": {
-                    "creditAmount": 500.00
-                }
-            },
-            "tags": ["marketing", "postcards", "real-estate", "bulk-mail"]
-        }
+        "permutation_file": "submitSingleDocWithTemplateParams.json"
     },
     
     "medical_agency": {
@@ -208,33 +66,7 @@ USE_CASES = {
         "description": "We send medical reports to patients. Each report is a custom PDF. In addition, a few boiler-plate pages of generic medical information are sent with each report.",
         "endpoint": "/jobs/multi-doc-merge-job-template",
         "method": "POST",
-        "payload": {
-            "documentsToMerge": [
-                {"documentId": 1001},  # Boilerplate header
-                {
-                    "uploadRequestId": 300,
-                    "documentName": "patient_report.pdf"
-                },
-                {"documentId": 1002}   # Boilerplate footer with disclaimers
-            ],
-            "recipientAddressSource": {
-                "firstName": "Patient",
-                "lastName": "Name",
-                "address1": "789 Health Street",
-                "address2": "Suite 200",
-                "city": "Chicago",
-                "state": "IL", 
-                "zip": "60601",
-                "country": "USA"
-            },
-            "paymentDetails": {
-                "invoiceDetails": {
-                    "invoiceNumber": "MED-2024-567",
-                    "amountDue": 75.00
-                }
-            },
-            "tags": ["medical", "compliance", "patient-reports"]
-        }
+        "permutation_file": "mergeMultiDocWithTemplateParams.json"
     },
     
     "monthly_newsletters": {
@@ -242,28 +74,8 @@ USE_CASES = {
         "scenario_type": "[single-doc-job-template]",
         "description": "We are an organization that sends out flyers at the beginning of each month to our subscribers. The flyer is a static document and we have a mailing list it has to go out to.",
         "endpoint": "/jobs/single-doc-job-template",
-        "method": "POST", 
-        "payload": {
-            "documentSourceIdentifier": {
-                "zipId": 50,
-                "documentName": "newsletter_december_2024.pdf"
-            },
-            "recipientAddressSources": [
-                {"addressListId": 200},  # Subscriber list - Basic tier
-                {"addressListId": 201},  # Subscriber list - Premium tier
-                {"addressListId": 202}   # Subscriber list - VIP tier
-            ],
-            "jobTemplate": "monthly_newsletter_standard",
-            "paymentDetails": {
-                "creditCardDetails": {
-                    "cardType": "mastercard",
-                    "cardNumber": "5555555555554444",
-                    "expirationDate": {"month": 6, "year": 2026},
-                    "cvv": 456
-                }
-            },
-            "tags": ["newsletter", "monthly", "subscribers", "marketing"]
-        }
+        "method": "POST",
+        "permutation_file": "submitSingleDocWithTemplateParams.json"
     },
     
     "reseller_merge_pdfs": {
@@ -272,41 +84,7 @@ USE_CASES = {
         "description": "We receive PDFs from our customers. Each PDF is unique. We want to batch the PDFs into a single big PDF and send them in one go.",
         "endpoint": "/jobs/single-pdf-split", 
         "method": "POST",
-        "payload": {
-            "documentSourceIdentifier": {
-                "uploadRequestId": 400,
-                "documentName": "batched_pdfs.pdf"
-            },
-            "items": [
-                {
-                    "pageRange": {
-                        "startPage": 1,
-                        "endPage": 5
-                    },
-                    "recipientAddressSources": [{"addressListId": 301}]
-                },
-                {
-                    "pageRange": {
-                        "startPage": 6,
-                        "endPage": 10
-                    },
-                    "recipientAddressSources": [{"addressListId": 302}]
-                },
-                {
-                    "pageRange": {
-                        "startPage": 11,
-                        "endPage": 15
-                    },
-                    "recipientAddressSources": [{"addressListId": 303}]
-                }
-            ],
-            "paymentDetails": {
-                "applePayDetails": {
-                    "applePaymentDetails": {}
-                }
-            },
-            "tags": ["reseller", "pdf-merge", "b2b"]
-        }
+        "permutation_file": "splitPdfParams.json"
     },
     
     "reseller_zip_pdfs": {
@@ -315,53 +93,121 @@ USE_CASES = {
         "description": "We receive PDFs from our customers. Each PDF is unique. We want to zip the PDFs and send them in one go.",
         "endpoint": "/jobs/multi-doc",
         "method": "POST",
-        "payload": {
-            "items": [
-                {
-                    "documentSourceIdentifier": {
-                        "uploadRequestId": 500,
-                        "zipId": 20,
-                        "documentName": "document_01.pdf"
-                    },
-                    "recipientAddressSource": {"addressId": 6001}
-                },
-                {
-                    "documentSourceIdentifier": {
-                        "uploadRequestId": 500,
-                        "zipId": 20,
-                        "documentName": "document_02.pdf"
-                    },
-                    "recipientAddressSource": {"addressId": 6002}
-                },
-                {
-                    "documentSourceIdentifier": {
-                        "uploadRequestId": 500,
-                        "zipId": 20,
-                        "documentName": "document_03.pdf"
-                    },
-                    "recipientAddressSource": {"addressId": 6003}
-                }
-            ],
-            "jobOptions": {
-                "documentClass": "businessLetter",
-                "layout": "portrait",
-                "mailclass": "priorityMail",
-                "paperType": "letter",
-                "printOption": "grayscale",
-                "envelope": "letter"
-            },
-            "paymentDetails": {
-                "googlePayDetails": {
-                    "googlePaymentDetails": {}
-                }
-            },
-            "tags": ["reseller", "zip-processing", "batch", "b2b"]
-        }
+        "permutation_file": "submitMultiDocParams.json"
     }
 }
 
-def create_submit_job_request(use_case_key: str, use_case: Dict) -> Dict:
-    """Create a Submit Job request for a use case with ALL oneOf examples."""
+def load_permutations(filename: str) -> List[Dict]:
+    """Load permutations from a JSON file."""
+    filepath = PERMUTATIONS_DIR / filename
+    if not filepath.exists():
+        print(f"⚠️  Warning: Permutation file not found: {filepath}")
+        return []
+    
+    with open(filepath, 'r') as f:
+        data = json.load(f)
+    
+    return data.get("permutations", [])
+
+def select_diverse_permutations(permutations: List[Dict], count: int = 5) -> List[Dict]:
+    """
+    Select diverse permutations using a combination of random and strategic selection.
+    
+    Strategy:
+    1. If we have fewer than requested, return all
+    2. Otherwise, divide the list into sections and pick one from each section
+    3. Add random picks if sections don't give us enough
+    """
+    if len(permutations) <= count:
+        return permutations
+    
+    selected = []
+    selected_indices = set()
+    
+    # Strategy 1: Divide into sections and pick one from each
+    section_size = len(permutations) // count
+    for i in range(count):
+        # Pick a random index from each section
+        start_idx = i * section_size
+        end_idx = start_idx + section_size if i < count - 1 else len(permutations)
+        
+        if start_idx < len(permutations):
+            idx = random.randint(start_idx, min(end_idx - 1, len(permutations) - 1))
+            selected.append(permutations[idx])
+            selected_indices.add(idx)
+    
+    # Strategy 2: If we need more, add random selections
+    while len(selected) < count and len(selected) < len(permutations):
+        idx = random.randint(0, len(permutations) - 1)
+        if idx not in selected_indices:
+            selected.append(permutations[idx])
+            selected_indices.add(idx)
+    
+    return selected
+
+def create_example_name(use_case_key: str, permutation: Dict, index: int) -> str:
+    """Generate a descriptive name for an example based on its content."""
+    parts = [use_case_key]
+    
+    # Add document source type
+    if "documentSourceIdentifier" in permutation:
+        doc_source = permutation["documentSourceIdentifier"]
+        if "documentId" in doc_source:
+            parts.append("DocID")
+        elif "externalUrl" in doc_source:
+            parts.append("ExtURL")
+        elif "uploadRequestId" in doc_source and "zipId" in doc_source:
+            parts.append("Upload+Zip")
+        elif "uploadRequestId" in doc_source:
+            parts.append("Upload")
+        elif "zipId" in doc_source:
+            parts.append("Zip")
+    
+    # Add payment type
+    if "paymentDetails" in permutation:
+        payment = permutation["paymentDetails"]
+        if "creditCardDetails" in payment:
+            parts.append("CreditCard")
+        elif "invoiceDetails" in payment:
+            parts.append("Invoice")
+        elif "achDetails" in payment:
+            parts.append("ACH")
+        elif "userCreditDetails" in payment:
+            parts.append("UserCredit")
+        elif "applePayDetails" in payment:
+            parts.append("ApplePay")
+        elif "googlePayDetails" in payment:
+            parts.append("GooglePay")
+    
+    # Add address type (if present)
+    if "recipientAddressSource" in permutation:
+        addr = permutation["recipientAddressSource"]
+        if isinstance(addr, dict):
+            if "addressId" in addr:
+                parts.append("AddrID")
+            elif "addressListId" in addr:
+                parts.append("AddrListID")
+            elif "firstName" in addr:
+                parts.append("NewAddr")
+    elif "recipientAddressSources" in permutation:
+        # For arrays, check first element
+        if permutation["recipientAddressSources"]:
+            addr = permutation["recipientAddressSources"][0]
+            if isinstance(addr, dict):
+                if "addressId" in addr:
+                    parts.append("AddrIDs")
+                elif "addressListId" in addr:
+                    parts.append("AddrListIDs")
+                elif "firstName" in addr:
+                    parts.append("NewAddrs")
+    
+    # Add example number
+    parts.append(f"Ex{index}")
+    
+    return " - ".join(parts)
+
+def create_submit_job_request(use_case_key: str, use_case: Dict, permutations: List[Dict]) -> Dict:
+    """Create a Submit Job request for a use case using loaded permutations."""
     
     # Use the scenario_type as the request name
     request_name = use_case.get("scenario_type", "[unknown]")
@@ -409,7 +255,7 @@ def create_submit_job_request(use_case_key: str, use_case: Dict) -> Dict:
             ],
             "body": {
                 "mode": "raw",
-                "raw": json.dumps(use_case["payload"], indent=2)
+                "raw": json.dumps(permutations[0] if permutations else {}, indent=2)
             },
             "url": {
                 "raw": f"{BASE_URL}{use_case['endpoint']}",
@@ -421,169 +267,79 @@ def create_submit_job_request(use_case_key: str, use_case: Dict) -> Dict:
         "response": []
     }
     
-    # Add examples for different oneOf variants
+    # Create examples from the selected permutations
     examples = []
-    
-    # Generate examples based on the use case
-    base_payload = use_case["payload"].copy()
-    
-    # Add documentSourceIdentifier variants
-    doc_source_variants = [
-        ("Document ID", {"documentId": 1234}),
-        ("External URL", {"externalUrl": "https://api.example.com/v1/documents/5678"}),
-        ("Upload Request", {"uploadRequestId": 100, "documentName": f"{use_case_key}_document.pdf"}),
-        ("Upload + Zip", {"uploadRequestId": 200, "zipId": 10, "documentName": f"{use_case_key}_doc.pdf"}),
-        ("Zip Only", {"zipId": 20, "documentName": f"{use_case_key}_file.pdf"})
-    ]
-    
-    # Add payment variants
-    payment_variants = [
-        ("Credit Card", {
-            "creditCardDetails": {
-                "cardType": "visa",
-                "cardNumber": "4111111111111111",
-                "expirationDate": {"month": 12, "year": 2025},
-                "cvv": 123
-            }
-        }),
-        ("Invoice", {
-            "invoiceDetails": {
-                "invoiceNumber": f"{use_case_key.upper()}-2024-001",
-                "amountDue": 150.00
-            }
-        }),
-        ("ACH", {
-            "achDetails": {
-                "routingNumber": "021000021",
-                "accountNumber": "1234567890",
-                "checkDigit": 7
-            }
-        }),
-        ("User Credit", {
-            "userCreditDetails": {
-                "creditAmount": 50.00
-            }
-        }),
-        ("Apple Pay", {
-            "applePayDetails": {
-                "applePaymentDetails": {}
-            }
-        }),
-        ("Google Pay", {
-            "googlePayDetails": {
-                "googlePaymentDetails": {}
-            }
-        })
-    ]
-    
-    # Create examples combining different variants
-    # For endpoints with recipientAddressSources array, also vary the address types
-    recipient_variants = [
-        ("New Address", {
-            "firstName": "John",
-            "lastName": "Doe",
-            "address1": "123 Main Street",
-            "city": "New York",
-            "state": "NY",
-            "zip": "10001",
-            "country": "USA"
-        }),
-        ("Address List ID", {"addressListId": 42}),  # addressListId
-        ("Address ID", {"addressId": 12345})     # addressId
-    ]
-    
-    # Create comprehensive examples covering all variants
-    example_count = 0
-    for doc_idx, (doc_name, doc_value) in enumerate(doc_source_variants):
-        # Cycle through payment types
-        pay_idx = doc_idx % len(payment_variants)
-        pay_name, pay_value = payment_variants[pay_idx]
+    for idx, permutation in enumerate(permutations, 1):
+        example_name = create_example_name(use_case_key, permutation, idx)
         
-        example_payload = copy.deepcopy(base_payload)
-        
-        # Update documentSourceIdentifier if present
-        if "documentSourceIdentifier" in example_payload:
-            example_payload["documentSourceIdentifier"] = doc_value
-        elif "items" in example_payload and isinstance(example_payload["items"], list):
-            # For multi-doc endpoints
-            for item in example_payload["items"]:
-                if "documentSourceIdentifier" in item:
-                    item["documentSourceIdentifier"] = doc_value
-        elif "documentsToMerge" in example_payload:
-            # For merge endpoints - preserve boilerplate docs for medical agency
-            if use_case_key == "medical_agency":
-                # Keep the boilerplate header (1001) and footer (1002)
-                # Only update the middle document
-                example_payload["documentsToMerge"][1] = doc_value
-            else:
-                # For other use cases, update the first document
-                example_payload["documentsToMerge"][0] = doc_value
-        
-        # Update payment details
-        if "paymentDetails" in example_payload:
-            example_payload["paymentDetails"] = pay_value
-        
-        # Update recipientAddressSources if present (vary the types)
-        if "recipientAddressSources" in example_payload:
-            # Use different recipient types for variety
-            recip_idx = doc_idx % len(recipient_variants)
-            recip_name, recip_value = recipient_variants[recip_idx]
-            # Keep array structure but vary the content
-            example_payload["recipientAddressSources"] = [recip_value]
-            if isinstance(recip_value, dict):
-                # Add a second address for new address type
-                example_payload["recipientAddressSources"].append({
-                    "firstName": "Jane",
-                    "lastName": "Smith",
-                    "address1": "456 Oak Avenue",
-                    "city": "Boston",
-                    "state": "MA",
-                    "zip": "02101",
-                    "country": "USA"
-                })
-            example_name = f"{use_case_key} - {doc_name} + {pay_name} + {recip_name}"
-        elif "recipientAddressSource" in example_payload:
-            # Single recipient (not array)
-            recip_idx = doc_idx % len(recipient_variants)
-            recip_name, recip_value = recipient_variants[recip_idx]
-            example_payload["recipientAddressSource"] = recip_value
-            example_name = f"{use_case_key} - {doc_name} + {pay_name} + {recip_name}"
-        else:
-            # Create example name without recipient
-            example_name = f"{use_case_key} - {doc_name} + {pay_name}"
+        # Customize permutation based on use case
+        customized_permutation = customize_permutation_for_use_case(use_case_key, permutation)
         
         examples.append({
-                "name": example_name,
-                "originalRequest": {
-                    "method": use_case["method"],
-                    "header": request["request"]["header"],
-                    "body": {
-                        "mode": "raw",
-                        "raw": json.dumps(example_payload, indent=2)
-                    },
-                    "url": request["request"]["url"]
+            "name": example_name,
+            "originalRequest": {
+                "method": use_case["method"],
+                "header": request["request"]["header"],
+                "body": {
+                    "mode": "raw",
+                    "raw": json.dumps(customized_permutation, indent=2)
                 },
-                "status": "Success",
-                "code": 200,
-                "_postman_previewlanguage": "json",
-                "header": [
-                    {
-                        "key": "Content-Type",
-                        "value": "application/json"
-                    }
-                ],
-                "cookie": [],
-                "body": json.dumps({
-                    "status": "success",
-                    "message": "Job created successfully",
-                    "jobId": 123456
-                }, indent=2)
-            })
+                "url": request["request"]["url"]
+            },
+            "status": "Success",
+            "code": 200,
+            "_postman_previewlanguage": "json",
+            "header": [
+                {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "cookie": [],
+            "body": json.dumps({
+                "status": "success",
+                "message": "Job created successfully",
+                "jobId": 123456
+            }, indent=2)
+        })
     
     # Add the examples to the request
     request["response"] = examples
     
     return request
+
+def customize_permutation_for_use_case(use_case_key: str, permutation: Dict) -> Dict:
+    """Add use-case-specific customizations to a permutation."""
+    # Make a copy to avoid modifying the original
+    customized = json.loads(json.dumps(permutation))
+    
+    # Add use-case-specific tags
+    use_case_tags = {
+        "legal_firm": ["legal", "certified", "client-correspondence"],
+        "company_invoice_batch": ["invoices", "monthly-batch", "accounts-receivable"],
+        "company_split_invoices": ["split-pdf", "address-capture", "automated"],
+        "real_estate_agent": ["marketing", "postcards", "real-estate", "bulk-mail"],
+        "medical_agency": ["medical", "compliance", "patient-reports"],
+        "monthly_newsletters": ["newsletter", "monthly", "subscribers", "marketing"],
+        "reseller_merge_pdfs": ["reseller", "pdf-merge", "b2b"],
+        "reseller_zip_pdfs": ["reseller", "zip-processing", "batch", "b2b"]
+    }
+    
+    if use_case_key in use_case_tags:
+        customized["tags"] = use_case_tags[use_case_key]
+    
+    # Add use-case-specific job template names where appropriate
+    if "jobTemplate" in customized:
+        template_mappings = {
+            "legal_firm": "legal_certified_mail",
+            "real_estate_agent": "postcard_luxury_homes",
+            "monthly_newsletters": "monthly_newsletter_standard",
+            "medical_agency": "medical_report_with_boilerplate"
+        }
+        if use_case_key in template_mappings:
+            customized["jobTemplate"] = template_mappings[use_case_key]
+    
+    return customized
 
 def create_get_job_details_request() -> Dict:
     """Create a Get Job Details request."""
@@ -682,7 +438,7 @@ def create_collection() -> Dict:
                 "3. **Expand the collection** → Click the arrow next to 'C2M API v2 – Real World Use Cases'\n"
                 "4. **Choose a use case folder** → Click arrow next to a folder (e.g., 'Legal Firm')\n"
                 "5. **Expand the POST request** → Click arrow next to 'POST [single-doc-job-template]'\n"
-                "6. **Select an example** → Click one of the pre-filled examples (e.g., 'legal_firm - Document ID + Credit Card + New Address')\n"
+                "6. **Select an example** → Click one of the pre-filled examples (e.g., 'legal_firm - DocID - CreditCard - Ex1')\n"
                 "7. **Review the Body tab** → See the pre-populated request data for this scenario\n"
                 "8. **Click Send** → Response includes jobId for the submitted job\n\n"
                 "**Use Case Scenarios:**\n\n"
@@ -855,13 +611,29 @@ def create_collection() -> Dict:
         ]
     }
     
+    # Seed random for reproducibility (remove this line for truly random selections)
+    # random.seed(42)
+    
     # Add each use case as a folder
     for use_case_key, use_case in USE_CASES.items():
+        # Load permutations from file
+        permutations = load_permutations(use_case["permutation_file"])
+        
+        if not permutations:
+            print(f"⚠️  No permutations found for {use_case_key}")
+            continue
+        
+        print(f"📁 {use_case['name']}: {len(permutations)} permutations available")
+        
+        # Select diverse permutations
+        selected_permutations = select_diverse_permutations(permutations, 5)
+        print(f"   → Selected {len(selected_permutations)} examples")
+        
         folder = {
             "name": use_case["name"],
             "description": use_case["description"],
             "item": [
-                create_submit_job_request(use_case_key, use_case)
+                create_submit_job_request(use_case_key, use_case, selected_permutations)
             ]
         }
         collection["item"].append(folder)
@@ -870,18 +642,21 @@ def create_collection() -> Dict:
 
 def main():
     if len(sys.argv) != 2:
-        print("Usage: generate_use_case_collection.py <output.json>")
+        print("Usage: generate_use_case_collection_v2.py <output.json>")
         print("\nThis script generates a curated Postman collection with real-world use cases.")
+        print("It reads permutations from data_dictionary/generate-endpoint-permutations/permutations/")
         sys.exit(1)
     
     output_file = sys.argv[1]
     
-    print("📚 Generating curated use case collection...")
+    print("📚 Generating curated use case collection (v2)...")
+    print(f"📂 Reading permutations from: {PERMUTATIONS_DIR}")
+    
     collection = create_collection()
     
-    print(f"📊 Created {len(USE_CASES)} use cases with {len(USE_CASES)} total requests")
+    print(f"\n📊 Created {len(USE_CASES)} use cases")
     
-    print(f"💾 Saving collection to {output_file}...")
+    print(f"\n💾 Saving collection to {output_file}...")
     with open(output_file, 'w') as f:
         json.dump(collection, f, indent=2)
     
