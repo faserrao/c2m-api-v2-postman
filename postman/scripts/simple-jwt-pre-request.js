@@ -34,15 +34,21 @@ pm.sendRequest(authRequest, (err, response) => {
     // Always save the token for later use
     pm.environment.set("authToken", token);
 
-    // Check if we're using a mock server - FIX: Check ACTUAL request URL
+    // FIX: Check URL host (resolved) OR baseUrl variable (for templates)
     const requestUrl = pm.request.url.toString();
-    const baseUrlVar = pm.environment.get("baseUrl") || "";
-    const isMockServer = requestUrl.includes("mock.pstmn.io") ||
-                        requestUrl.includes("localhost:4010");
+    const urlHost = Array.isArray(pm.request.url.host) ? pm.request.url.host.join(".") : (pm.request.url.host || "");
+    const baseUrlVar = pm.environment.get("baseUrl") || pm.collectionVariables.get("baseUrl") || "";
+
+    // Check both the resolved host AND the baseUrl variable
+    const isMockServer = urlHost.includes("mock.pstmn.io") ||
+                        urlHost.includes("localhost") ||
+                        baseUrlVar.includes("mock.pstmn.io") ||
+                        baseUrlVar.includes("localhost:4010");
 
     // Enhanced logging for debugging
     console.log("=== JWT AUTH DEBUG ===");
     console.log("Request URL:", requestUrl);
+    console.log("URL Host (resolved):", urlHost);
     console.log("BaseUrl variable:", baseUrlVar);
     console.log("Is mock server:", isMockServer);
     console.log("Long-term token (last 20 chars):", token ? "..." + token.slice(-20) : "NONE");
