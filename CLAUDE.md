@@ -256,6 +256,60 @@ To set target: `echo "personal" > .postman-target`
 ## Logging Protocol
 **Update logs after each major feature completion OR every 30 minutes, whichever comes first**
 
+## Session History - 2025-10-09
+
+### JWT Mock Detection Fix & Mock Server Collection Bug
+1. **JWT Pre-request Script - URL Resolution Fix**
+   - **Problem**: Authorization headers were being added to mock server requests despite console showing "Mock server detected - skipping"
+   - **Root Cause**: `pm.request.url.toString()` returns unresolved template `{{baseUrl}}/path` not the actual URL
+   - **Solution**: Check both `pm.request.url.host` (resolved by Postman) AND `baseUrl` variable
+   - **Files Modified**:
+     - `postman/scripts/jwt-pre-request.js` (Test Collection - two-token flow)
+     - `postman/scripts/simple-jwt-pre-request.js` (Real World Collection - single token)
+     - `scripts/active/generate_use_case_collection.py` (hardcoded JavaScript in Python)
+   - **Enhanced Logging**: Added debug output showing:
+     - Request URL (unresolved template)
+     - URL Host (resolved by Postman)
+     - BaseUrl variable value
+     - Mock detection result
+     - Token last 20 chars for security
+
+2. **Mock Server Creation Collection Bug**
+   - **Problem**: `/jobs/single-doc` and `/jobs/multi-doc-merge` returned mockRequestNotFoundError
+   - **Root Cause**: Mock server created from Real World Use Cases collection (only 3 endpoints) instead of Test Collection (all 9 endpoints)
+   - **Diagnosis**: Other endpoints worked because Real World collection has:
+     - `/jobs/single-doc-job-template` ✅
+     - `/jobs/multi-doc-merge-job-template` ✅
+     - But missing base endpoints: `/jobs/single-doc` ❌ and `/jobs/multi-doc-merge` ❌
+   - **Solution**: Updated Makefile targets to use Test Collection UID:
+     - `postman-mock-create` - Changed from use-case-collection-uid.txt to native-flat-collection-uid.txt
+     - `postman-link-env-to-mock-server` - Now uses Test Collection for linking
+     - `update-mock-env` - Updated description to clarify "TEST Collection (all endpoints)"
+   - **Key Insight**: Mock server works with both collections once created from the right one
+     - Test Collection defines all 9 endpoints (blueprint)
+     - Real World Collection sends example requests to those endpoints
+     - Both collections can use the same mock server
+
+3. **Technical Details**
+   - **Postman URL Resolution Timing**:
+     - `pm.request.url.toString()` → Returns `{{baseUrl}}/jobs/...` (template not resolved)
+     - `pm.request.url.host` → Returns array like `['46116679-9a50-434a-a26a-49781942a926', 'mock', 'pstmn', 'io']` (resolved)
+   - **Mock Detection Logic**:
+     ```javascript
+     const urlHost = Array.isArray(pm.request.url.host) ? pm.request.url.host.join('.') : (pm.request.url.host || '');
+     const baseUrlVar = pm.environment.get('baseUrl') || pm.collectionVariables.get('baseUrl') || '';
+     const isMockServer = urlHost.includes('mock.pstmn.io') ||
+                         urlHost.includes('localhost') ||
+                         baseUrlVar.includes('mock.pstmn.io') ||
+                         baseUrlVar.includes('localhost:4010');
+     ```
+   - **Collection Structure**:
+     - Test Collection: 9 endpoints (all from OpenAPI spec)
+     - Real World Use Cases: 3 template endpoints (curated examples)
+
+4. **Branch**: All changes committed to `experiment/fix-jwt-mock-detection`
+   - Ready to merge to main after user verification
+
 ## Session History - 2025-09-29
 
 ### Critical Fixes Applied Today
@@ -358,6 +412,14 @@ To set target: `echo "personal" > .postman-target`
 - **2025-09-27**: Fixed oneOf handling in the entire pipeline:
   - openapi-to-postmanv2 simplifies anonymous oneOf schemas to just the first type
   - Created fix_openapi_oneOf_schemas.py to convert anonymous to named schemas
+- **2025-10-09**: JWT mock detection and mock server collection bug:
+  - `pm.request.url.toString()` returns unresolved template `{{baseUrl}}/path` during pre-request
+  - `pm.request.url.host` is resolved by Postman (array format) - use this for mock detection
+  - Must check BOTH resolved host AND baseUrl variable for complete coverage
+  - Mock server MUST be created from Test Collection (9 endpoints) not Real World Use Cases (3 endpoints)
+  - Test Collection = blueprint for mock server, Real World = example requests
+  - Both collections can use same mock once created from correct collection
+  - Enhanced logging crucial for debugging Postman pre-request script issues
   - Modified EBNF to OpenAPI converter to generate named schemas for oneOf variants
   - Integrated fixes into Makefile pipeline (not one-time changes)
   - Fixed test data generator to handle `<oneOf>` placeholders
