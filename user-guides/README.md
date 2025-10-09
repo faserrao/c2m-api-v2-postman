@@ -1,90 +1,122 @@
 # C2M API V2 User Guides
 
-This directory contains comprehensive documentation for understanding and working with the C2M API v2 build system and infrastructure.
+**📖 For comprehensive documentation, see [REPOSITORY_GUIDE.md](./REPOSITORY_GUIDE.md)**
 
-## 📚 Documentation Overview
-
-### Core Documentation
-
-#### [BUILD_INFRASTRUCTURE_GUIDE.md](./BUILD_INFRASTRUCTURE_GUIDE.md)
-The complete technical reference for the C2M API v2 build system. This guide explains:
-- How the build pipeline transforms EBNF to a complete API ecosystem
-- All Makefile targets and their purposes
-- GitHub Actions CI/CD workflows
-- Dynamic resource management for Postman
-- Test generation and execution
-- Documentation and SDK generation processes
-
-### Additional Guides
-
-#### Security Setup
-- **SECURITY_REPO_GITHUB_SETUP.md** - Instructions for configuring the security repository integration
-
-#### File Inspection Tools
-- **finspect-README.md** - Documentation for the file inspection utility
-- **finspect-file-type-detection-methods.md** - Technical details on file type detection
-
-## 🚀 Getting Started
-
-For developers new to the C2M API v2 build system:
-
-1. **Read the BUILD_INFRASTRUCTURE_GUIDE** to understand the complete system
-2. **Run `make check-env`** to verify your local setup
-3. **Execute `make pipeline`** to run the complete build
-4. **Check generated artifacts** in `dist/`, `docs/`, and `postman/` directories
-
-## 🔧 Key Concepts
-
-### Build Pipeline
-The system follows a linear transformation pipeline:
-```
-EBNF → OpenAPI → Postman → Tests → Docs/SDKs
-```
-
-### Dynamic Resources
-All Postman collections, mock servers, and environments are created dynamically during the build process. The system tracks these using UID files that persist between builds.
-
-### Environment Agnostic
-The same Makefile targets work both locally and in CI/CD, with appropriate adaptations for each environment.
-
-## 📁 Related Directories
-
-- `/openapi` - OpenAPI specifications and schemas
-- `/postman` - Postman collections and test results  
-- `/scripts` - Build scripts and utilities
-- `/docs` - Generated API documentation
-- `/dist` - Build artifacts and SDKs
-- `/.github/workflows` - CI/CD configurations
-
-## 🔄 Build Commands
-
-Quick reference for common operations:
-
-```bash
-# Complete build pipeline
-make pipeline
-
-# Check environment setup
-make check-env
-
-# Clean all artifacts
-make clean-all
-
-# Run tests only
-make postman-test
-
-# Generate documentation
-make docs-build
-
-# Create SDKs
-make sdks-generate
-```
-
-## 📝 Archive
-
-Previous versions of documentation are preserved in the `archive/` subdirectory for historical reference.
+This directory contains documentation for understanding and working with the C2M API v2 build system and infrastructure.
 
 ---
 
-*Last Updated: 2025-09-15*  
-*Version: 2.0 - Post-consolidation and accuracy improvements*
+## 🚀 Quick Start
+
+**New to C2M API?** Start here:
+
+1. **Read [REPOSITORY_GUIDE.md](./REPOSITORY_GUIDE.md)** - Comprehensive guide with Cliff Notes section for quick reference
+2. **Run `make check-env`** - Verify your local setup
+3. **Execute `make postman-instance-build-and-test`** - Run complete build pipeline
+4. **Check generated artifacts** - Look in `dist/`, `docs/`, and `postman/` directories
+
+---
+
+## 📚 Primary Documentation
+
+### [REPOSITORY_GUIDE.md](./REPOSITORY_GUIDE.md) ⭐ **START HERE**
+
+**Comprehensive single-source guide that consolidates 50+ scattered documents:**
+- 📖 **Cliff Notes** (2-page quick reference)
+- Build pipeline (EBNF → OpenAPI → Postman → Tests → Docs)
+- Makefile orchestration
+- Smart rebuild system
+- Testing strategies
+- Deployment procedures
+- Troubleshooting
+
+---
+
+## 📋 Additional Documentation
+
+### For Management
+
+- **[EXECUTIVE_SUMMARY.md](./EXECUTIVE_SUMMARY.md)** - High-level project overview
+- **[PROJECT_ACCOMPLISHMENTS_SUMMARY.md](./PROJECT_ACCOMPLISHMENTS_SUMMARY.md)** - Key achievements and milestones
+
+### Directory Organization
+
+Documentation is organized into topic-based subdirectories:
+
+- **getting-started/** - Onboarding, quick reference, build guide
+- **authentication/** - JWT authentication, Cognito setup
+- **development/** - SDK generation, Postman usage, CI/CD
+- **api-reference/** - Template endpoints, job tracking
+- **architecture/** - PROJECT_MEMORY.md, CLAUDE.md
+- **project-reports/** - Status reports, analysis
+- **archive/** - Historical docs (preserved for reference)
+
+---
+
+## 🔧 Essential Commands
+
+```bash
+# Complete build pipeline
+make postman-instance-build-and-test
+
+# Clean and rebuild
+make postman-cleanup-all
+
+# Test with local mock
+make prism-mock-test
+
+# Smart rebuild (only changed files)
+make smart-rebuild
+
+# View all available targets
+make help
+```
+
+See [REPOSITORY_GUIDE.md](./REPOSITORY_GUIDE.md) for complete command reference.
+
+---
+
+## 🏗️ Architecture
+
+The system follows a data-driven pipeline:
+
+```
+EBNF Data Dictionary → OpenAPI Spec → Postman Collections → Mock Server → Tests → Docs/SDKs
+```
+
+**Single Source of Truth**: `data_dictionary/c2mapiv2-dd.ebnf`
+
+See [REPOSITORY_GUIDE.md](./REPOSITORY_GUIDE.md) for detailed architecture documentation.
+
+---
+
+## 📁 Related Repositories
+
+This repository is part of a 4-repository ecosystem:
+
+1. **c2m-api-repo** (this repo) - Source of truth
+2. **c2m-api-artifacts** - Generated artifacts (OpenAPI, SDKs, docs)
+3. **c2m-api-v2-security** - JWT authentication service
+4. **click2endpoint-aws** - Interactive endpoint wizard
+
+See **[C2M_API_V2_SYSTEM_ARCHITECTURE.md](../C2M_API_V2_SYSTEM_ARCHITECTURE.md)** for multi-repo overview.
+
+---
+
+## 🗂️ Archive
+
+Previous versions of documentation are preserved in the `archive/` subdirectory and `archive/root-level-docs/` for historical reference.
+
+---
+
+## 🆘 Getting Help
+
+1. **Check [REPOSITORY_GUIDE.md](./REPOSITORY_GUIDE.md)** - Comprehensive troubleshooting section
+2. **Review Makefile comments** - Inline documentation for all targets
+3. **Check GitHub Actions logs** - CI/CD workflow diagnostics
+4. **See [PROJECT_MEMORY.md](./architecture/PROJECT_MEMORY.md)** - Historical context and decisions
+
+---
+
+*Last Updated: 2025-10-08*
+*Version: 3.0 - Consolidated into REPOSITORY_GUIDE.md*
