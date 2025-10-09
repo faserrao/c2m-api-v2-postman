@@ -33,16 +33,34 @@ pm.sendRequest(authRequest, (err, response) => {
     const token = response.json().access_token;
     // Always save the token for later use
     pm.environment.set("authToken", token);
-    
-    // Check if we're using a mock server
-    const baseUrl = pm.environment.get("baseUrl") || "";
-    if (baseUrl.includes("mock.pstmn.io")) {
-        console.log("✅ JWT token obtained and saved, but NOT attached (mock server detected)");
-    } else {
+
+    // FIX: Check URL host (resolved) OR baseUrl variable (for templates)
+    const requestUrl = pm.request.url.toString();
+    const urlHost = Array.isArray(pm.request.url.host) ? pm.request.url.host.join(".") : (pm.request.url.host || "");
+    const baseUrlVar = pm.environment.get("baseUrl") || pm.collectionVariables.get("baseUrl") || "";
+
+    // Check both the resolved host AND the baseUrl variable
+    const isMockServer = urlHost.includes("mock.pstmn.io") ||
+                        urlHost.includes("localhost") ||
+                        baseUrlVar.includes("mock.pstmn.io") ||
+                        baseUrlVar.includes("localhost:4010");
+
+    // Enhanced logging for debugging
+    console.log("=== JWT AUTH DEBUG ===");
+    console.log("Request URL:", requestUrl);
+    console.log("URL Host (resolved):", urlHost);
+    console.log("BaseUrl variable:", baseUrlVar);
+    console.log("Is mock server:", isMockServer);
+    console.log("Long-term token (last 20 chars):", token ? "..." + token.slice(-20) : "NONE");
+
+    if (!isMockServer) {
         pm.request.headers.add({
             key: "Authorization",
             value: "Bearer " + token
         });
-        console.log("✅ JWT token obtained and Authorization header added (real API)");
+        console.log("✅ JWT token obtained and Authorization header ADDED (real API detected)");
+    } else {
+        console.log("⏭️  JWT token obtained and saved, but Authorization header SKIPPED (mock server detected)");
     }
+    console.log("=== END DEBUG ===");
 });
