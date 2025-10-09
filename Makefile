@@ -1517,8 +1517,8 @@ postman-env-upload:
 postman-mock-create:
 	@echo "🆕 Creating Postman mock server from TEST Collection (has all endpoints)..."
 	@if [ -z "$(POSTMAN_WS)" ]; then echo "❌ POSTMAN_WS (workspace ID) is not set. Aborting."; exit 1; fi
-	@if [ ! -f "$(POSTMAN_DIR)/native-flat-collection-uid.txt" ]; then echo "❌ Test collection UID not found. Run postman-test-collection-upload first."; exit 1; fi
-	@TEST_COLLECTION_UID=$$(cat $(POSTMAN_DIR)/native-flat-collection-uid.txt); \
+	@if [ ! -f "$(POSTMAN_TEST_COLLECTION_UID_FILE)" ]; then echo "❌ Test collection UID not found. Run postman-test-collection-upload first."; exit 1; fi
+	@TEST_COLLECTION_UID=$$(cat $(POSTMAN_TEST_COLLECTION_UID_FILE)); \
 	if [ -z "$$TEST_COLLECTION_UID" ]; then echo "❌ Test collection UID is empty"; exit 1; fi; \
 	PAYLOAD=$$(jq -n --arg coll "$$TEST_COLLECTION_UID" --arg name "$(POSTMAN_MOCK_NAME)" \
 	  '{ mock: { collection: $$coll, name: $$name, private: false } }'); \
@@ -1551,7 +1551,7 @@ update-mock-env:
 	@curl --silent --show-error --fail --location \
 		--request PUT "$(POSTMAN_MOCKS_URL)/$(POSTMAN_MOCK_ID)" \
 		$(POSTMAN_CURL_HEADERS_XC) \
-		--data-raw "$$(jq -n --arg coll "$$(cat $(POSTMAN_DIR)/native-flat-collection-uid.txt)" --arg env "$(POSTMAN_ENV_UID)" '{ "mock": { "name": "C2mApiV2MockServer", "collection": $$coll, "environment": $$env, "description": "Mock server with TEST Collection (all endpoints).", "private": false } }')" \
+		--data-raw "$$(jq -n --arg coll "$$(cat $(POSTMAN_TEST_COLLECTION_UID_FILE))" --arg env "$(POSTMAN_ENV_UID)" '{ "mock": { "name": "C2mApiV2MockServer", "collection": $$coll, "environment": $$env, "description": "Mock server with TEST Collection (all endpoints).", "private": false } }')" \
 		--output /dev/null \
 		&& echo "✅ Mock server environment updated." \
 		|| (echo "❌ Failed to update mock server. Check UID/ID values and API key." && exit 1)
@@ -1685,10 +1685,10 @@ postman-link-env-to-mock-server:
 	@echo "🔗 Linking environment to mock server..."
 	@if [ ! -f $(POSTMAN_ENV_UID_FILE) ]; then echo "❌ Missing environment UID file: $(POSTMAN_ENV_UID_FILE). Run postman-env-upload first."; exit 1; fi
 	@if [ ! -f $(POSTMAN_MOCK_UID_FILE) ]; then echo "❌ Missing mock UID file: $(POSTMAN_MOCK_UID_FILE). Run postman-mock-create first."; exit 1; fi
-	@if [ ! -f "$(POSTMAN_DIR)/native-flat-collection-uid.txt" ]; then echo "❌ Missing test collection UID file. Run postman-test-collection-upload first."; exit 1; fi
+	@if [ ! -f "$(POSTMAN_TEST_COLLECTION_UID_FILE)" ]; then echo "❌ Missing test collection UID file. Run postman-test-collection-upload first."; exit 1; fi
 	@POSTMAN_ENV_UID=$$(cat $(POSTMAN_ENV_UID_FILE)); \
 	POSTMAN_MOCK_UID=$$(cat $(POSTMAN_MOCK_UID_FILE)); \
-	COLLECTION_UID=$$(cat $(POSTMAN_DIR)/native-flat-collection-uid.txt); \
+	COLLECTION_UID=$$(cat $(POSTMAN_TEST_COLLECTION_UID_FILE)); \
 	LINK_DEBUG="$(POSTMAN_MOCK_LINK_DEBUG_FILE)"; \
 	echo "📦 Linking Environment $$POSTMAN_ENV_UID with TEST Collection $$COLLECTION_UID (Mock $$POSTMAN_MOCK_UID)..."; \
 	curl --silent --location --request PUT "$(POSTMAN_MOCKS_URL)/$$POSTMAN_MOCK_UID" \
