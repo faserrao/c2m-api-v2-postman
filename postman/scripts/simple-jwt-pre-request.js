@@ -33,16 +33,28 @@ pm.sendRequest(authRequest, (err, response) => {
     const token = response.json().access_token;
     // Always save the token for later use
     pm.environment.set("authToken", token);
-    
-    // Check if we're using a mock server
-    const baseUrl = pm.environment.get("baseUrl") || "";
-    if (baseUrl.includes("mock.pstmn.io")) {
-        console.log("✅ JWT token obtained and saved, but NOT attached (mock server detected)");
-    } else {
+
+    // Check if we're using a mock server - FIX: Check ACTUAL request URL
+    const requestUrl = pm.request.url.toString();
+    const baseUrlVar = pm.environment.get("baseUrl") || "";
+    const isMockServer = requestUrl.includes("mock.pstmn.io") ||
+                        requestUrl.includes("localhost:4010");
+
+    // Enhanced logging for debugging
+    console.log("=== JWT AUTH DEBUG ===");
+    console.log("Request URL:", requestUrl);
+    console.log("BaseUrl variable:", baseUrlVar);
+    console.log("Is mock server:", isMockServer);
+    console.log("Long-term token (last 20 chars):", token ? "..." + token.slice(-20) : "NONE");
+
+    if (!isMockServer) {
         pm.request.headers.add({
             key: "Authorization",
             value: "Bearer " + token
         });
-        console.log("✅ JWT token obtained and Authorization header added (real API)");
+        console.log("✅ JWT token obtained and Authorization header ADDED (real API detected)");
+    } else {
+        console.log("⏭️  JWT token obtained and saved, but Authorization header SKIPPED (mock server detected)");
     }
+    console.log("=== END DEBUG ===");
 });

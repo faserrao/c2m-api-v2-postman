@@ -147,22 +147,32 @@ async function authenticate() {
         
         // Set the Authorization header with the short-term token
         const currentShortToken = pm.environment.get(config.shortTokenVar);
-        
+
         // Check if we're using a mock server - if so, skip adding the Authorization header
-        const baseUrl = pm.environment.get('baseUrl') || '';
-        const isMockServer = baseUrl.includes('mock.pstmn.io') || 
-                           baseUrl.includes('localhost:4010') ||
+        // FIX: Check the ACTUAL request URL, not just the baseUrl variable
+        const requestUrl = pm.request.url.toString();
+        const baseUrlVar = pm.environment.get('baseUrl') || '';
+        const isMockServer = requestUrl.includes('mock.pstmn.io') ||
+                           requestUrl.includes('localhost:4010') ||
                            pm.environment.get('isMockServer') === 'true';
-        
+
+        // Enhanced logging for debugging
+        console.log('=== JWT AUTH DEBUG ===');
+        console.log('Request URL:', requestUrl);
+        console.log('BaseUrl variable:', baseUrlVar);
+        console.log('Is mock server:', isMockServer);
+        console.log('Short-term token (last 20 chars):', currentShortToken ? '...' + currentShortToken.slice(-20) : 'NONE');
+
         if (!isMockServer) {
             pm.request.headers.add({
                 key: 'Authorization',
                 value: `Bearer ${currentShortToken}`
             });
-            console.log('Authentication complete, Authorization header set');
+            console.log('✅ Authorization header ADDED (real API detected)');
         } else {
-            console.log('Mock server detected - skipping Authorization header');
+            console.log('⏭️  Authorization header SKIPPED (mock server detected)');
         }
+        console.log('=== END DEBUG ===');
         
     } catch (error) {
         console.error('Authentication failed:', error);
