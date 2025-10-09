@@ -258,7 +258,11 @@ To set target: `echo "personal" > .postman-target`
 
 ## Session History - 2025-10-09
 
-### JWT Mock Detection Fix & Mock Server Collection Bug
+### Complete Session: JWT Mock Detection, CI/CD Environment Creation Fix
+
+**Summary**: Fixed JWT mock detection, resolved mock server collection bug, fixed GitHub Actions environment creation, updated Click2Endpoint URLs, and documented credentials.
+
+#### Part 1: JWT Mock Detection Fix & Mock Server Collection Bug
 1. **JWT Pre-request Script - URL Resolution Fix**
    - **Problem**: Authorization headers were being added to mock server requests despite console showing "Mock server detected - skipping"
    - **Root Cause**: `pm.request.url.toString()` returns unresolved template `{{baseUrl}}/path` not the actual URL
@@ -267,48 +271,87 @@ To set target: `echo "personal" > .postman-target`
      - `postman/scripts/jwt-pre-request.js` (Test Collection - two-token flow)
      - `postman/scripts/simple-jwt-pre-request.js` (Real World Collection - single token)
      - `scripts/active/generate_use_case_collection.py` (hardcoded JavaScript in Python)
-   - **Enhanced Logging**: Added debug output showing:
-     - Request URL (unresolved template)
-     - URL Host (resolved by Postman)
-     - BaseUrl variable value
-     - Mock detection result
-     - Token last 20 chars for security
+   - **Enhanced Logging**: Added debug output showing URL resolution, host detection, baseUrl variable, and mock detection result
 
 2. **Mock Server Creation Collection Bug**
    - **Problem**: `/jobs/single-doc` and `/jobs/multi-doc-merge` returned mockRequestNotFoundError
    - **Root Cause**: Mock server created from Real World Use Cases collection (only 3 endpoints) instead of Test Collection (all 9 endpoints)
-   - **Diagnosis**: Other endpoints worked because Real World collection has:
-     - `/jobs/single-doc-job-template` ✅
-     - `/jobs/multi-doc-merge-job-template` ✅
-     - But missing base endpoints: `/jobs/single-doc` ❌ and `/jobs/multi-doc-merge` ❌
-   - **Solution**: Updated Makefile targets to use Test Collection UID:
-     - `postman-mock-create` - Changed from use-case-collection-uid.txt to native-flat-collection-uid.txt
-     - `postman-link-env-to-mock-server` - Now uses Test Collection for linking
-     - `update-mock-env` - Updated description to clarify "TEST Collection (all endpoints)"
-   - **Key Insight**: Mock server works with both collections once created from the right one
-     - Test Collection defines all 9 endpoints (blueprint)
-     - Real World Collection sends example requests to those endpoints
-     - Both collections can use the same mock server
+   - **Solution**: Updated Makefile to create mock from Test Collection UID file
+   - **Key Insight**: Test Collection defines all endpoints (blueprint), Real World Collection sends example requests
 
-3. **Technical Details**
-   - **Postman URL Resolution Timing**:
-     - `pm.request.url.toString()` → Returns `{{baseUrl}}/jobs/...` (template not resolved)
-     - `pm.request.url.host` → Returns array like `['46116679-9a50-434a-a26a-49781942a926', 'mock', 'pstmn', 'io']` (resolved)
-   - **Mock Detection Logic**:
-     ```javascript
-     const urlHost = Array.isArray(pm.request.url.host) ? pm.request.url.host.join('.') : (pm.request.url.host || '');
-     const baseUrlVar = pm.environment.get('baseUrl') || pm.collectionVariables.get('baseUrl') || '';
-     const isMockServer = urlHost.includes('mock.pstmn.io') ||
-                         urlHost.includes('localhost') ||
-                         baseUrlVar.includes('mock.pstmn.io') ||
-                         baseUrlVar.includes('localhost:4010');
-     ```
-   - **Collection Structure**:
-     - Test Collection: 9 endpoints (all from OpenAPI spec)
-     - Real World Use Cases: 3 template endpoints (curated examples)
+3. **Click2Endpoint URL Updates**
+   - Updated 3 files with new mock server URL after rebuild:
+     - `click2endpoint-aws/frontend/.env.local`
+     - `click2endpoint-aws/frontend/src/utils/codeGenerators.ts`
+     - `click2endpoint-aws/frontend/.env.example`
+   - New mock URL: `https://46116679-9a50-434a-a26a-49781942a926.mock.pstmn.io`
 
-4. **Branch**: All changes committed to `experiment/fix-jwt-mock-detection`
-   - Ready to merge to main after user verification
+4. **Credentials Documentation**
+   - Added comprehensive Click2Endpoint section (~110 lines) to both:
+     - `~/.c2msecure/C2M_API_V2_CREDENTIALS_REFERENCE.md` (with actual credentials)
+     - `SystemWideDocuments/C2M_API_V2_CREDENTIALS_REFERENCE.md` (sanitized)
+   - Documented storage locations, credential types, settings flow, auth flow, and security notes
+
+5. **Branch Merged to Main**
+   - Branch: `experiment/fix-jwt-mock-detection`
+   - Commits: 8 files modified, +153/-43 lines
+   - Merged successfully and pushed to GitHub
+
+#### Part 2: GitHub Actions CI/CD Environment Creation Fix
+
+6. **Environment Creation Bug in CI/CD**
+   - **Problem**: GitHub Actions workflow not creating environments in Postman
+   - **Root Cause**: UID file mismatch (same issue as local build)
+     - `postman-test-collection-upload` saves UID to `postman/test_collection_uid.txt`
+     - `postman-mock-create` was reading from `postman/native-flat-collection-uid.txt` (different file!)
+   - **Solution**: Updated 3 Makefile targets to use `$(POSTMAN_TEST_COLLECTION_UID_FILE)`:
+     - `postman-mock-create` (line 1520)
+     - `postman-link-env-to-mock-server` (lines 1688, 1691)
+     - `update-mock-env` (line 1554)
+   - **Testing**:
+     - ✅ Local test: Deleted stale file, ran `make postman-instance-build-only` successfully
+     - ✅ CI/CD test: Triggered workflow #18389887601, completed successfully in 2m 43s
+
+7. **CI/CD Test Results** (Workflow #18389887601)
+   - ✅ **2 Environments Created**:
+     - C2M API - Mock Server (`46321051-83ef2298-0979-4696-8215-268903ae188c`)
+     - C2M API - AWS Dev (`46321051-73ed8284-064d-488b-9973-37dcc0488d8e`)
+   - ✅ **3 Collections Created**:
+     - C2M API v2 – Real World Use Cases
+     - C2mApiCollectionLinked
+     - C2mApiV2TestCollection
+   - ✅ **Mock Server Created and Linked**:
+     - URL: `https://908705d8-5891-4b43-88f3-ab4633156419.mock.pstmn.io`
+     - Collection: Test Collection (all 12 endpoints)
+     - Environment: Linked to C2M API - Mock Server environment
+   - ✅ **Mock Server Tested**: POST request returned valid response (status: processing, jobId: CSlkTg1owN)
+
+8. **End-to-End Verification**
+   - User tested Real World Use Cases collection in Postman
+   - JWT auth flow working: Token obtained, mock detected, auth header skipped
+   - Mock server responded: 200 OK, 338ms, jobId saved
+   - **All components working perfectly**: CI/CD → Environments → Mock Server → Collections → JWT Auth
+
+#### Technical Details
+- **Postman URL Resolution**:
+  - `pm.request.url.toString()` → `{{baseUrl}}/path` (template)
+  - `pm.request.url.host` → `['908705d8-5891-4b43-88f3-ab4633156419', 'mock', 'pstmn', 'io']` (resolved)
+  - Fallback: Check `baseUrl` variable when host is unresolved
+- **Mock Detection Logic**: Dual check (host + baseUrl variable)
+- **Collection Structure**: Test Collection (9 endpoints), Real World (3 template endpoints)
+- **UID File Consolidation**: Single source of truth (`test_collection_uid.txt`)
+
+#### Key Learnings
+- Postman URL resolution varies by context - always check both resolved host AND variables
+- Mock server creation requires collection with endpoint definitions (Test), not just examples (Use Cases)
+- UID file synchronization critical for CI/CD - one target writes, all targets must read same file
+- Hardcoded JavaScript in Python strings is pragmatic but should be refactored to template files
+- Dual verification (local + CI/CD) catches environment-specific issues
+
+#### Commits
+- `f8abfc9` - Merge branch 'experiment/fix-jwt-mock-detection'
+- `9de9aaf` - fix: update Test Collection UID after rebuild
+- `070d280` - fix: use correct UID file for mock server creation
 
 ## Session History - 2025-09-29
 
