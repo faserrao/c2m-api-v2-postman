@@ -195,9 +195,9 @@ jobs:
       # ---------- Publish to Postman (optional) ----------
       - name: Publish to Postman
         if: |
-          github.event_name == 'push' && 
           github.ref == 'refs/heads/main' &&
-          env.PUBLISH_TO_POSTMAN == 'true'
+          ((github.event_name == 'push' && env.PUBLISH_TO_POSTMAN == 'true') ||
+           (github.event_name == 'workflow_dispatch' && github.event.inputs.publish_to_postman == 'true'))
         env:
           POSTMAN_SERRAO_API_KEY: ${{ secrets.POSTMAN_SERRAO_API_KEY }}
           POSTMAN_C2M_API_KEY: ${{ secrets.POSTMAN_C2M_API_KEY }}
@@ -231,7 +231,9 @@ jobs:
 
       # ---------- Copy artifacts to artifacts repo ----------
       - name: Copy artifacts to artifacts repository
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: |
+          github.ref == 'refs/heads/main' &&
+          (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         run: |
           echo "📦 Copying artifacts to artifacts repository..."
           # Create directories if they don't exist
@@ -263,7 +265,9 @@ jobs:
 
       # ---------- Commit and push to artifacts repo ----------
       - name: Commit and push artifacts
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: |
+          github.ref == 'refs/heads/main' &&
+          (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         working-directory: artifacts-repo
         run: |
           git config user.name "c2m-api-bot"
@@ -302,11 +306,17 @@ jobs:
 
       # ---------- Prepare GitHub Pages ----------
       - name: Setup Pages
-        if: env.DEPLOY_GH_PAGES == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: |
+          github.ref == 'refs/heads/main' &&
+          ((github.event_name == 'push' && env.DEPLOY_GH_PAGES == 'true') ||
+           (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_gh_pages == 'true'))
         uses: actions/configure-pages@v4
 
       - name: Upload GitHub Pages artifact
-        if: env.DEPLOY_GH_PAGES == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: |
+          github.ref == 'refs/heads/main' &&
+          ((github.event_name == 'push' && env.DEPLOY_GH_PAGES == 'true') ||
+           (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_gh_pages == 'true'))
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs
@@ -315,9 +325,9 @@ jobs:
   deploy-pages:
     name: Deploy to GitHub Pages
     if: |
-      github.event_name == 'push' && 
       github.ref == 'refs/heads/main' &&
-      needs.build.result == 'success'
+      needs.build.result == 'success' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     needs: build
     runs-on: ubuntu-latest
     permissions:
