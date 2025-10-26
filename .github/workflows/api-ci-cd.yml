@@ -71,14 +71,14 @@ jobs:
       - name: Checkout security repository
         uses: actions/checkout@v4
         with:
-          repository: faserrao/c2m-api-v2-security
+          repository: click2mail/c2m-api-v2-postman-security
           path: c2m-api-v2-security
           token: ${{ secrets.SECURITY_REPO_TOKEN }}
 
       - name: Checkout artifacts repository
         uses: actions/checkout@v4
         with:
-          repository: faserrao/c2m-api-artifacts
+          repository: click2mail/c2m-api-v2-postman-artifacts
           path: artifacts-repo
           token: ${{ secrets.SECURITY_REPO_TOKEN }}
 
