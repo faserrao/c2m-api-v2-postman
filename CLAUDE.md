@@ -8,7 +8,7 @@ This is the C2M API V2 project that implements a unique pipeline: EBNF Data Dict
 
 ## Restoration Status (2025-09-08)
 
-✅ **RESTORATION COMPLETE** - The c2m-api-repo has been successfully restored to its pre-auth state:
+✅ **RESTORATION COMPLETE** - The c2m-api-v2-postman repository (formerly c2m-api-v2-postman) has been successfully restored to its pre-auth state:
 - JWT authentication code moved to separate security repository
 - Makefile cleaned up (removed redundant targets, simplified publish workflow)
 - Documentation reorganized into user-guides directory with symlinks
@@ -280,7 +280,7 @@ To set target: `echo "personal" > .postman-target`
 
 #### Approach A: Dual-Mechanism Unified Service (Recommended)
 **Architecture**:
-- Extend c2m-api-v2-security with NEW Cognito User Pool for human users
+- Extend c2m-api-v2-postman-security with NEW Cognito User Pool for human users
 - KEEP existing M2M Lambda authorizer unchanged (backwards compatible)
 - Add UserCredentials DynamoDB table (maps userId → unique clientId/secret)
 - Add endpoints: POST /auth/user/login, GET /auth/user/credentials
@@ -350,7 +350,7 @@ To set target: `echo "personal" > .postman-target`
 - Can evaluate OAuth2 model after Approach A is proven
 - Migration from A to B estimated at 2-3 weeks (vs 6-8 weeks fresh)
 
-#### Impact on c2m-api-repo
+#### Impact on c2m-api-v2-postman
 - **No changes to existing functionality** (either approach)
 - Postman collections:
   - Approach A: No changes required (JWT pre-request script unchanged)
@@ -376,7 +376,7 @@ To set target: `echo "personal" > .postman-target`
 #### Next Steps
 1. ✅ Review AUTHENTICATION_CONSOLIDATION_PLAN_V2.md
 2. ⏳ Stakeholder decision (Approach A vs B) within 1 week
-3. ⏳ If Approach A: Start Phase 1 (Infrastructure setup in c2m-api-v2-security)
+3. ⏳ If Approach A: Start Phase 1 (Infrastructure setup in c2m-api-v2-postman-security)
 4. ⏳ If Approach B: Review SINGLE_USER_POOL_MIGRATION_PLAN.md, create Postman migration plan
 
 #### Key Learning
@@ -389,30 +389,30 @@ To set target: `echo "personal" > .postman-target`
 
 ### Authentication Consolidation Decision & Planning
 
-**Summary**: Decided to consolidate all authentication (M2M + User) into c2m-api-v2-security as THE unified authentication service for the entire C2M API V2 ecosystem.
+**Summary**: Decided to consolidate all authentication (M2M + User) into c2m-api-v2-postman-security as THE unified authentication service for the entire C2M API V2 ecosystem.
 
 #### Background
 - Analyzed current authentication infrastructure across the project
 - Discovered two completely independent systems with no integration:
-  1. **c2m-api-v2-security**: M2M client credentials (used by Postman collections)
-  2. **click2endpoint-aws**: User username/password (used by wizard app)
+  1. **c2m-api-v2-postman-security**: M2M client credentials (used by Postman collections)
+  2. **c2m-api-v2-click2endpoint-developers**: User username/password (used by wizard app)
 - Identified problems: Duplicate infrastructure, hardcoded credentials, no per-user isolation, manual credential entry
 
 #### Decision
-- **Make c2m-api-v2-security the single authentication service** for everything
+- **Make c2m-api-v2-postman-security the single authentication service** for everything
 - Extend it to support both M2M (existing) and User authentication (new)
-- Remove duplicate Cognito infrastructure from click2endpoint-aws
+- Remove duplicate Cognito infrastructure from c2m-api-v2-click2endpoint-developers
 - Auto-fetch user credentials after login (no more hardcoded test-client-123)
 
 #### Key Changes Planned
-1. **Extend c2m-api-v2-security** (Phase 1-2):
+1. **Extend c2m-api-v2-postman-security** (Phase 1-2):
    - Add Cognito User Pool for human users (username/password)
    - Create UserCredentials DynamoDB table (maps users to their clientId/clientSecret)
    - Add Lambda functions: user-login, get-credentials, rotate-credentials
    - Add API endpoints: POST /auth/user/login, GET /auth/user/credentials, GET /auth/user/me
    - Keep existing M2M endpoints unchanged
 
-2. **Update click2endpoint-aws** (Phase 3):
+2. **Update c2m-api-v2-click2endpoint-developers** (Phase 3):
    - Remove local Cognito User Pool
    - Replace AWS Amplify with fetch() calls to security repo API
    - Auto-fetch credentials after user login
@@ -439,7 +439,7 @@ To set target: `echo "personal" > .postman-target`
 - ✅ Maintainable (one codebase to secure and update)
 - ✅ Cost-effective (+$2/month = $7-12/month total)
 
-#### Impact on c2m-api-repo
+#### Impact on c2m-api-v2-postman
 - **No changes to existing functionality**: Postman collections continue to work as-is
 - JWT pre-request script unchanged (still calls /auth/tokens/long and /auth/tokens/short)
 - Mock server detection logic unchanged
@@ -489,9 +489,9 @@ To set target: `echo "personal" > .postman-target`
 
 3. **Click2Endpoint URL Updates**
    - Updated 3 files with new mock server URL after rebuild:
-     - `click2endpoint-aws/frontend/.env.local`
-     - `click2endpoint-aws/frontend/src/utils/codeGenerators.ts`
-     - `click2endpoint-aws/frontend/.env.example`
+     - `c2m-api-v2-click2endpoint-developers/frontend/.env.local`
+     - `c2m-api-v2-click2endpoint-developers/frontend/src/utils/codeGenerators.ts`
+     - `c2m-api-v2-click2endpoint-developers/frontend/.env.example`
    - New mock URL: `https://46116679-9a50-434a-a26a-49781942a926.mock.pstmn.io`
 
 4. **Credentials Documentation**
@@ -720,6 +720,6 @@ make postman-workspace-debug
    - Makefile bug at lines 1521-1523 can create mock with wrong collection
 
 ### Repository Relationships
-- **Main repo**: c2m-api-repo (core API functionality)
-- **Security repo**: c2m-api-v2-security (JWT auth implementation)
+- **Main repo**: c2m-api-v2-postman (core API functionality)
+- **Security repo**: c2m-api-v2-postman-security (JWT auth implementation)
 - **Integration**: Minimal hooks, not full integration
