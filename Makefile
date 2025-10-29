@@ -827,7 +827,7 @@ postman-import-openapi-as-api:
 	@echo "🔑 Using API Key: $$(echo $(POSTMAN_API_KEY) | head -c 8)..."
 	@echo "📍 Target Workspace: $(POSTMAN_WS)"
 	@echo "🌐 API URL: $(POSTMAN_APIS_URL)?workspaceId=$(POSTMAN_WS)"
-	@CONTENT=$$(jq -Rs . < "$(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES)"); \
+	@CONTENT=$$(cat "$(C2MAPIV2_OPENAPI_SPEC)"); \
 	PAYLOAD=$$(jq -n \
 		--arg name "$(POSTMAN_API_NAME)" \
 		--arg schema "$$CONTENT" \
@@ -912,7 +912,7 @@ postman-import-openapi-spec:
 .PHONY: postman-spec-create
 postman-spec-create:
 	@echo "📄 Creating/updating OpenAPI spec under Specs tab..."
-	@CONTENT=$$(jq -Rs . < "$(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES)"); \
+	@CONTENT=$$(cat "$(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES)"); \
 	jq -n \
 		--arg name "$(C2MAPIV2_POSTMAN_API_NAME_PC)" \
 		--arg type "openapi3" \
@@ -938,7 +938,7 @@ postman-spec-create-standalone:
 	@echo "🧹 Deleting existing specs with the same name before creating new one..."
 	$(MAKE) postman-delete-specs-by-name NAME="$(C2MAPIV2_POSTMAN_API_NAME_PC)"
 	@echo "📄 Creating standalone spec in Specs tab..."
-	@CONTENT=$$(cat "$(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES)"); \
+	@CONTENT=$$(cat "$(C2MAPIV2_OPENAPI_SPEC)"); \
 	jq -n \
 		--arg name "$(C2MAPIV2_POSTMAN_API_NAME_PC)" \
 		--arg type "OPENAPI:3.0" \
@@ -987,7 +987,7 @@ postman-api-full-publish:
 
 	# Build payload JSON for new spec (YAML as raw string; no fromjson)
 	@echo "🆕 Creating a fresh Postman Spec with $(C2MAPIV2_OPENAPI_SPEC)..."
-	@CONTENT=$$(jq -Rs . < "$(C2MAPIV2_OPENAPI_SPEC)"); \
+	@CONTENT=$$(cat "$(C2MAPIV2_OPENAPI_SPEC)"); \
 	jq -n \
 		--arg name "$(C2MAPIV2_POSTMAN_API_NAME_PC)" \
 		--arg type "OPENAPI:3.0" \
