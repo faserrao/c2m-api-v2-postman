@@ -144,11 +144,6 @@ jobs:
           echo "📋 Building OpenAPI spec from EBNF data dictionary..."
           make openapi-build
 
-      - name: Build Postman Collection
-        run: |
-          echo "📦 Building Postman collection..."
-          make postman-collection-build
-
       - name: Lint OpenAPI Spec
         continue-on-error: true
         run: |
@@ -162,16 +157,16 @@ jobs:
           echo "📊 Comparing OpenAPI spec changes..."
           make diff || echo "ℹ️  Diff completed"
 
+      - name: Build Documentation
+        run: |
+          echo "📚 Building API documentation..."
+          make docs
+
       - name: Generate SDKs
         continue-on-error: true
         run: |
           echo "🔧 Generating SDKs..."
           make generate-sdk-all || echo "⚠️  SDK generation not fully implemented yet"
-
-      - name: Build Documentation
-        run: |
-          echo "📚 Building API documentation..."
-          make docs
 
       # ---------- Drift Detection (PRs only) ----------
       - name: Check for uncommitted changes
@@ -193,7 +188,7 @@ jobs:
           fi
 
       # ---------- Publish to Postman (optional) ----------
-      - name: Publish to Postman
+      - name: Publish to Postman (Full Cleanup and Rebuild)
         if: |
           github.ref == 'refs/heads/main' &&
           ((github.event_name == 'push' && env.PUBLISH_TO_POSTMAN == 'true') ||
@@ -218,15 +213,24 @@ jobs:
               POSTMAN_TARGET="personal"
               echo "📍 Using default target: $POSTMAN_TARGET"
             fi
-            
-            echo "🚀 Publishing to Postman workspaces..."
+
+            echo "🚀 FULL CLEANUP AND REBUILD of Postman workspace..."
             echo "   Target: $POSTMAN_TARGET"
             echo "   API Keys available: SERRAO=$([ -n "$POSTMAN_SERRAO_API_KEY" ] && echo "Yes" || echo "No"), C2M=$([ -n "$POSTMAN_C2M_API_KEY" ] && echo "Yes" || echo "No")"
+            echo ""
+            echo "   This will DELETE and RECREATE:"
+            echo "   - API Definitions"
+            echo "   - OpenAPI Specs (standalone)"
+            echo "   - Collections (Linked, Test, Use Cases)"
+            echo "   - Mock Servers"
+            echo "   - Environments"
+            echo ""
             export POSTMAN_SERRAO_API_KEY
             export POSTMAN_C2M_API_KEY
             make workspace-info
             echo ""
-            POSTMAN_TARGET=$POSTMAN_TARGET make postman-publish
+            POSTMAN_TARGET=$POSTMAN_TARGET make postman-cleanup-all
+            POSTMAN_TARGET=$POSTMAN_TARGET make postman-instance-build-only
           fi
 
       # ---------- Copy artifacts to artifacts repo ----------
@@ -235,33 +239,35 @@ jobs:
           github.ref == 'refs/heads/main' &&
           (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         run: |
-          echo "📦 Copying artifacts to artifacts repository..."
+          echo "📦 Copying ALL generated artifacts to artifacts repository..."
           # Create directories if they don't exist
           mkdir -p artifacts-repo/openapi
           mkdir -p artifacts-repo/postman/collections
           mkdir -p artifacts-repo/postman/metadata
           mkdir -p artifacts-repo/docs
           mkdir -p artifacts-repo/sdks
-          
-          # Copy OpenAPI specs
-          cp -v ${{ env.OPENAPI_DIR }}/*.yaml artifacts-repo/openapi/ 2>/dev/null || echo "No OpenAPI specs to copy"
-          
-          # Copy Postman collections
-          cp -v ${{ env.POSTMAN_DIR }}/generated/*.json artifacts-repo/postman/collections/ 2>/dev/null || echo "No collections to copy"
-          
-          # Copy Postman metadata
-          cp -v ${{ env.POSTMAN_DIR }}/*.txt artifacts-repo/postman/metadata/ 2>/dev/null || echo "No txt files to copy"
-          cp -v ${{ env.POSTMAN_DIR }}/*.json artifacts-repo/postman/metadata/ 2>/dev/null || echo "No json files to copy"
-          
-          # Copy documentation
-          cp -rv ${{ env.DOCS_DIR }}/* artifacts-repo/docs/ 2>/dev/null || echo "No docs to copy"
-          
-          # Copy SDKs if they exist
+
+          echo "📋 Copying OpenAPI specs..."
+          cp -v ${{ env.OPENAPI_DIR }}/*.yaml artifacts-repo/openapi/ 2>/dev/null || echo "  ⚠️  No OpenAPI specs to copy"
+
+          echo "📦 Copying Postman collections..."
+          cp -v ${{ env.POSTMAN_DIR }}/generated/*.json artifacts-repo/postman/collections/ 2>/dev/null || echo "  ⚠️  No collections to copy"
+
+          echo "📄 Copying Postman metadata (UIDs, URLs)..."
+          cp -v ${{ env.POSTMAN_DIR }}/*.txt artifacts-repo/postman/metadata/ 2>/dev/null || echo "  ⚠️  No txt files to copy"
+          cp -v ${{ env.POSTMAN_DIR }}/*.json artifacts-repo/postman/metadata/ 2>/dev/null || echo "  ⚠️  No json files to copy"
+
+          echo "📚 Copying documentation (Redocly)..."
+          cp -rv ${{ env.DOCS_DIR }}/* artifacts-repo/docs/ 2>/dev/null || echo "  ⚠️  No docs to copy"
+
+          echo "🔧 Copying SDKs (Python, JavaScript, etc.)..."
           if [ -d "sdk" ]; then
-            cp -rv sdk/* artifacts-repo/sdks/ 2>/dev/null || echo "No SDKs to copy"
+            cp -rv sdk/* artifacts-repo/sdks/ 2>/dev/null || echo "  ⚠️  No SDKs to copy"
+          else
+            echo "  ⚠️  SDK directory not found (generation may have failed)"
           fi
-          
-          echo "✅ Artifacts copied successfully"
+
+          echo "✅ All artifacts copied successfully"
 
       # ---------- Commit and push to artifacts repo ----------
       - name: Commit and push artifacts
@@ -297,12 +303,12 @@ jobs:
         with:
           name: api-artifacts
           path: |
-            ${{ env.OPENAPI_DIR }}/c2mapiv2-openapi-spec-final.yaml
-            ${{ env.OPENAPI_DIR }}/bundled.yaml
+            ${{ env.OPENAPI_DIR }}/*.yaml
             ${{ env.POSTMAN_DIR }}/generated/*.json
-            ${{ env.DOCS_DIR }}/index.html
-            ${{ env.DOCS_DIR }}/site/**
-            ${{ env.DOCS_DIR }}/swagger/**
+            ${{ env.POSTMAN_DIR }}/*.txt
+            ${{ env.POSTMAN_DIR }}/*.json
+            ${{ env.DOCS_DIR }}/**
+            sdk/**
 
       # ---------- Prepare GitHub Pages ----------
       - name: Setup Pages
