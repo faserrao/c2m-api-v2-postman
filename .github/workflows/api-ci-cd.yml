@@ -233,6 +233,45 @@ jobs:
             POSTMAN_TARGET=$POSTMAN_TARGET make postman-instance-build-only
           fi
 
+      # ---------- Post-Build Validation ----------
+      - name: Run Post-Build Validation
+        if: |
+          github.ref == 'refs/heads/main' &&
+          ((github.event_name == 'push' && env.PUBLISH_TO_POSTMAN == 'true') ||
+           (github.event_name == 'workflow_dispatch' && github.event.inputs.publish_to_postman == 'true'))
+        env:
+          POSTMAN_SERRAO_API_KEY: ${{ secrets.POSTMAN_SERRAO_API_KEY }}
+          POSTMAN_C2M_API_KEY: ${{ secrets.POSTMAN_C2M_API_KEY }}
+        run: |
+          # Determine workspace from .postman-target or default
+          if [ -f .postman-target ]; then
+            WORKSPACE=$(cat .postman-target)
+          else
+            WORKSPACE="personal"
+          fi
+
+          echo "🔍 Running post-build validation..."
+          echo "   Workspace: $WORKSPACE"
+
+          # Run CI validation script
+          ./scripts/validation/ci_verify.sh "$WORKSPACE"
+
+      - name: Upload Validation Reports
+        if: |
+          always() &&
+          github.ref == 'refs/heads/main' &&
+          ((github.event_name == 'push' && env.PUBLISH_TO_POSTMAN == 'true') ||
+           (github.event_name == 'workflow_dispatch' && github.event.inputs.publish_to_postman == 'true'))
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-reports
+          path: |
+            reports/validation-*.md
+            reports/validation-*.json
+            reports/newman-*.html
+            reports/newman-*.json
+          retention-days: 30
+
       # ---------- Copy artifacts to artifacts repo ----------
       - name: Copy artifacts to artifacts repository
         if: |
