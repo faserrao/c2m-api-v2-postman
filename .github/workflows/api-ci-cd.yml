@@ -1,5 +1,5 @@
 name: API Spec, Docs, and Postman CI/CD
-# Test workflow after migration to click2mail organization (2025-10-25)
+# Dual-repository workflow: auto-detects workspace from owner (faserrao=personal, click2mail=corporate)
 
 on:
   push:
@@ -53,7 +53,7 @@ env:
   
   # Postman configuration
   POSTMAN_API_BASE: https://api.postman.com
-  # Note: Workspace is auto-selected by Makefile based on branch
+  # Note: Workspace is auto-detected from repository owner (faserrao=personal, click2mail=corporate)
   POSTMAN_SERRAO_API_KEY: ${{ secrets.POSTMAN_SERRAO_API_KEY }}
   POSTMAN_C2M_API_KEY: ${{ secrets.POSTMAN_C2M_API_KEY }}
 
@@ -196,24 +196,25 @@ jobs:
         env:
           POSTMAN_SERRAO_API_KEY: ${{ secrets.POSTMAN_SERRAO_API_KEY }}
           POSTMAN_C2M_API_KEY: ${{ secrets.POSTMAN_C2M_API_KEY }}
-          POSTMAN_TARGET_OVERRIDE: ${{ secrets.POSTMAN_TARGET }}
         run: |
           if [ -z "$POSTMAN_SERRAO_API_KEY" ] && [ -z "$POSTMAN_C2M_API_KEY" ]; then
             echo "⚠️  Skipping Postman publish: No API keys configured"
             echo "   Add POSTMAN_SERRAO_API_KEY and/or POSTMAN_C2M_API_KEY secrets"
           else
-            # Read target from file if it exists, otherwise use override or default
-            if [ -f .postman-target ]; then
-              POSTMAN_TARGET=$(cat .postman-target)
-              echo "📄 Using target from .postman-target file: $POSTMAN_TARGET"
-            elif [ -n "$POSTMAN_TARGET_OVERRIDE" ]; then
-              POSTMAN_TARGET=$POSTMAN_TARGET_OVERRIDE
-              echo "🔧 Using target from secret: $POSTMAN_TARGET"
-            else
+            # Auto-detect workspace from repository owner (identical workflow in both repos)
+            if [ "${{ github.repository_owner }}" = "faserrao" ]; then
               POSTMAN_TARGET="personal"
-              echo "📍 Using default target: $POSTMAN_TARGET"
+              echo "🎯 Auto-detected workspace from repository owner: personal"
+              echo "   Repository: ${{ github.repository }}"
+              echo "   Owner: faserrao (personal account)"
+            else
+              POSTMAN_TARGET="corporate"
+              echo "🎯 Auto-detected workspace from repository owner: corporate"
+              echo "   Repository: ${{ github.repository }}"
+              echo "   Owner: ${{ github.repository_owner }} (organization)"
             fi
 
+            echo ""
             echo "🚀 FULL CLEANUP AND REBUILD of Postman workspace..."
             echo "   Target: $POSTMAN_TARGET"
             echo "   API Keys available: SERRAO=$([ -n "$POSTMAN_SERRAO_API_KEY" ] && echo "Yes" || echo "No"), C2M=$([ -n "$POSTMAN_C2M_API_KEY" ] && echo "Yes" || echo "No")"
@@ -243,15 +244,18 @@ jobs:
           POSTMAN_SERRAO_API_KEY: ${{ secrets.POSTMAN_SERRAO_API_KEY }}
           POSTMAN_C2M_API_KEY: ${{ secrets.POSTMAN_C2M_API_KEY }}
         run: |
-          # Determine workspace from .postman-target or default
-          if [ -f .postman-target ]; then
-            WORKSPACE=$(cat .postman-target)
-          else
+          # Auto-detect workspace from repository owner (identical workflow in both repos)
+          if [ "${{ github.repository_owner }}" = "faserrao" ]; then
             WORKSPACE="personal"
+            echo "🎯 Auto-detected workspace: personal (faserrao)"
+          else
+            WORKSPACE="corporate"
+            echo "🎯 Auto-detected workspace: corporate (${{ github.repository_owner }})"
           fi
 
           echo "🔍 Running post-build validation..."
           echo "   Workspace: $WORKSPACE"
+          echo "   Repository: ${{ github.repository }}"
 
           # Run CI validation script
           ./scripts/validation/ci_verify.sh "$WORKSPACE"
