@@ -2097,6 +2097,9 @@ validate-local-personal: ## Run complete validation suite (personal workspace)
 	@echo ""
 	@$(MAKE) validate-mocks
 	@echo ""
+	@echo "📊 Generating consolidated validation report..."
+	@python3 scripts/validation/generate_report.py --workspace personal --build-type local
+	@echo ""
 	@echo "════════════════════════════════════════════════════════════════"
 	@echo "✅ Local validation complete (Personal Workspace)"
 	@echo "════════════════════════════════════════════════════════════════"
@@ -2116,6 +2119,9 @@ validate-local-team: ## Run complete validation suite (team workspace)
 	@$(MAKE) validate-pipeline
 	@echo ""
 	@$(MAKE) validate-mocks
+	@echo ""
+	@echo "📊 Generating consolidated validation report..."
+	@python3 scripts/validation/generate_report.py --workspace team --build-type local
 	@echo ""
 	@echo "════════════════════════════════════════════════════════════════"
 	@echo "✅ Local validation complete (Team Workspace)"
@@ -2143,6 +2149,9 @@ validate-github-personal: ## CI validation for personal workspace (no Prism)
 	@echo ""
 	@echo "ℹ️  Skipping Prism mock tests (not available in CI)"
 	@echo ""
+	@echo "📊 Generating consolidated validation report..."
+	@python3 scripts/validation/generate_report.py --workspace personal --build-type github
+	@echo ""
 	@echo "════════════════════════════════════════════════════════════════"
 	@echo "✅ GitHub validation complete (Personal Workspace)"
 	@echo "════════════════════════════════════════════════════════════════"
@@ -2162,6 +2171,9 @@ validate-github-team: ## CI validation for team workspace (no Prism)
 	@$(MAKE) validate-pipeline
 	@echo ""
 	@echo "ℹ️  Skipping Prism mock tests (not available in CI)"
+	@echo ""
+	@echo "📊 Generating consolidated validation report..."
+	@python3 scripts/validation/generate_report.py --workspace team --build-type github
 	@echo ""
 	@echo "════════════════════════════════════════════════════════════════"
 	@echo "✅ GitHub validation complete (Team Workspace)"
