@@ -7,7 +7,7 @@
 # Date: September 27, 2025
 # =============================================================================
 
-set -euo pipefail
+set -uo pipefail  # Removed -e to collect all failures before exiting
 
 # Color codes
 RED='\033[0;31m'

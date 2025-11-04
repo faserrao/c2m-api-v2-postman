@@ -97,7 +97,10 @@ class MockVerifier:
         try:
             # For POST/PUT/PATCH, send minimal valid body
             data = None
-            headers = {'Content-Type': 'application/json'}
+            headers = {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer mock-test-token'  # Dummy token for mock servers
+            }
 
             if method in ['POST', 'PUT', 'PATCH']:
                 data = json.dumps({})  # Empty object as minimal body
@@ -106,7 +109,7 @@ class MockVerifier:
                 method,
                 url,
                 data=data,
-                headers=headers if data else {},
+                headers=headers,
                 timeout=10
             )
 
