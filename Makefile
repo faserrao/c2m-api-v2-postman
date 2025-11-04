@@ -2045,6 +2045,129 @@ prism-test-select: ## Test endpoint with specific test body index
 	@$(SCRIPTS_DIR)/utilities/prism_test.sh "$(PRISM_TEST_ENDPOINT)" --select "$(PRISM_TEST_INDEX)"
 
 # ========================================================================
+# POST-BUILD VALIDATION SYSTEM
+# ========================================================================
+# Comprehensive validation orchestration for Local and GitHub builds
+# Integrates: pipeline validation, secret validation, mock tests, reporting
+
+# Detect workspace from .postman-target file (personal or corporate)
+POSTMAN_TARGET := $(shell cat .postman-target 2>/dev/null || echo "personal")
+
+# Validate secrets and environment configuration
+.PHONY: validate-secrets
+validate-secrets: ## Validate secrets and environment configuration
+	@echo "🔐 Validating secrets and environment configuration..."
+	@chmod +x tests/validate-secrets.sh
+	@tests/validate-secrets.sh
+
+# Validate pipeline outputs (OpenAPI, collections, artifacts, docs)
+.PHONY: validate-pipeline
+validate-pipeline: ## Validate pipeline outputs (OpenAPI, collections, docs)
+	@echo "📊 Validating pipeline outputs..."
+	@chmod +x tests/validate-pipeline-outputs.sh
+	@tests/validate-pipeline-outputs.sh
+
+# Validate mock servers (Prism and Postman)
+.PHONY: validate-mocks
+validate-mocks: ## Validate mock servers and run Newman tests
+	@echo "🧪 Validating mock servers..."
+	@echo "   - Prism mock: http://localhost:4010"
+	@if lsof -Pi :4010 -sTCP:LISTEN -t >/dev/null 2>&1; then \
+		echo "   ✅ Prism mock server is running"; \
+	else \
+		echo "   ⚠️  Prism mock server is not running"; \
+		echo "   Run 'make prism-start' to start it"; \
+	fi
+	@echo "   - Running Newman tests against mocks..."
+	@$(MAKE) prism-mock-test
+
+# Orchestrator: Validate local build (personal workspace)
+.PHONY: validate-local-personal
+validate-local-personal: ## Run complete validation suite (personal workspace)
+	@echo ""
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo "  POST-BUILD VALIDATION - Local Build (Personal Workspace)"
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo ""
+	@echo "📋 Running comprehensive validation suite..."
+	@echo ""
+	@$(MAKE) validate-secrets
+	@echo ""
+	@$(MAKE) validate-pipeline
+	@echo ""
+	@$(MAKE) validate-mocks
+	@echo ""
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo "✅ Local validation complete (Personal Workspace)"
+	@echo "════════════════════════════════════════════════════════════════"
+
+# Orchestrator: Validate local build (team workspace)
+.PHONY: validate-local-team
+validate-local-team: ## Run complete validation suite (team workspace)
+	@echo ""
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo "  POST-BUILD VALIDATION - Local Build (Team Workspace)"
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo ""
+	@echo "📋 Running comprehensive validation suite..."
+	@echo ""
+	@$(MAKE) validate-secrets
+	@echo ""
+	@$(MAKE) validate-pipeline
+	@echo ""
+	@$(MAKE) validate-mocks
+	@echo ""
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo "✅ Local validation complete (Team Workspace)"
+	@echo "════════════════════════════════════════════════════════════════"
+
+# Orchestrator: Validate local build (auto-detect workspace)
+.PHONY: validate-local
+validate-local: ## Run complete validation (auto-detect workspace from .postman-target)
+	@echo "🔍 Detected workspace: $(POSTMAN_TARGET)"
+	@$(MAKE) validate-local-$(POSTMAN_TARGET)
+
+# CI/CD: Validate GitHub Actions build (personal workspace)
+.PHONY: validate-github-personal
+validate-github-personal: ## CI validation for personal workspace (no Prism)
+	@echo ""
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo "  POST-BUILD VALIDATION - GitHub Actions (Personal Workspace)"
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo ""
+	@echo "📋 Running CI validation suite..."
+	@echo ""
+	@$(MAKE) validate-secrets
+	@echo ""
+	@$(MAKE) validate-pipeline
+	@echo ""
+	@echo "ℹ️  Skipping Prism mock tests (not available in CI)"
+	@echo ""
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo "✅ GitHub validation complete (Personal Workspace)"
+	@echo "════════════════════════════════════════════════════════════════"
+
+# CI/CD: Validate GitHub Actions build (team workspace)
+.PHONY: validate-github-team
+validate-github-team: ## CI validation for team workspace (no Prism)
+	@echo ""
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo "  POST-BUILD VALIDATION - GitHub Actions (Team Workspace)"
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo ""
+	@echo "📋 Running CI validation suite..."
+	@echo ""
+	@$(MAKE) validate-secrets
+	@echo ""
+	@$(MAKE) validate-pipeline
+	@echo ""
+	@echo "ℹ️  Skipping Prism mock tests (not available in CI)"
+	@echo ""
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo "✅ GitHub validation complete (Team Workspace)"
+	@echo "════════════════════════════════════════════════════════════════"
+
+# ========================================================================
 # SDK GENERATION
 # ========================================================================
 # Generate SDK from OpenAPI specification
