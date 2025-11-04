@@ -156,16 +156,16 @@ validate_postman_collections() {
     if [ -f "postman/generated/c2mapiv2-test-collection-fixed.json" ]; then
         log_pass "Test collection exists"
         
-        # Check if tests were added
-        local test_count=$(jq '[.item[].event[]?.script?.exec[]? | select(contains("pm.test"))] | length' postman/generated/c2mapiv2-test-collection-fixed.json 2>/dev/null || echo "0")
+        # Check if tests were added (check all nesting levels with recursive descent)
+        local test_count=$(jq '[.. | objects | .event? // empty | .[]? | select(.listen == "test") | .script.exec[] | select(contains("pm.test"))] | length' postman/generated/c2mapiv2-test-collection-fixed.json 2>/dev/null || echo "0")
         if [ "$test_count" -gt "0" ]; then
-            log_pass "Test scripts found in collection ($test_count tests)"
+            log_pass "Test scripts found in collection ($test_count test assertions)"
         else
             log_fail "No test scripts found in test collection"
         fi
         
-        # Check if examples were added
-        local example_count=$(jq '[.item[].request.body?.raw? | select(. != null and . != "")] | length' postman/generated/c2mapiv2-test-collection-fixed.json 2>/dev/null || echo "0")
+        # Check if examples were added (check all nesting levels with recursive descent)
+        local example_count=$(jq '[.. | .request?.body?.raw? | select(. != null and . != "")] | length' postman/generated/c2mapiv2-test-collection-fixed.json 2>/dev/null || echo "0")
         if [ "$example_count" -gt "0" ]; then
             log_pass "Request examples found ($example_count requests with body)"
         else
@@ -233,20 +233,20 @@ validate_postman_artifacts() {
 
 validate_documentation() {
     log_check "Validating documentation..."
-    
-    # Check Redoc output
-    if [ -f "docs/redoc-static.html" ]; then
+
+    # Check Redoc output (generated as docs/index.html by docs-build target)
+    if [ -f "docs/index.html" ]; then
         log_pass "Redoc documentation exists"
-        
+
         # Check file size (should be substantial)
-        local file_size=$(stat -f%z "docs/redoc-static.html" 2>/dev/null || stat -c%s "docs/redoc-static.html" 2>/dev/null || echo "0")
+        local file_size=$(stat -f%z "docs/index.html" 2>/dev/null || stat -c%s "docs/index.html" 2>/dev/null || echo "0")
         if [ "$file_size" -gt 100000 ]; then
             log_pass "Documentation file size OK ($(($file_size / 1024))KB)"
         else
             log_fail "Documentation file seems too small ($(($file_size / 1024))KB)"
         fi
     else
-        log_fail "Redoc documentation not found"
+        log_fail "Redoc documentation not found (expected docs/index.html)"
     fi
     
     # Check bundled spec

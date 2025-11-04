@@ -256,6 +256,65 @@ To set target: `echo "personal" > .postman-target`
 ## Logging Protocol
 **Update logs after each major feature completion OR every 30 minutes, whichever comes first**
 
+## Session History - 2025-11-04
+
+### Makefile Target Renaming for Clarity
+
+**Summary**: Renamed Makefile targets to eliminate confusion about build behavior (with/without tests).
+
+#### Background
+- Original naming caused confusion:
+  - `postman-instance-build-and-test` (local development with tests)
+  - `postman-instance-build-only` (CI/CD without tests)
+- The word "only" was ambiguous - unclear what was being excluded
+- Need for symmetric, parallel naming convention
+
+#### Changes Made
+**Old Names → New Names:**
+- `postman-instance-build-and-test` → `postman-instance-build-with-tests`
+- `postman-instance-build-only` → `postman-instance-build-without-tests`
+
+**Files Updated:**
+1. **Makefile** - Target definitions and all references (6 changes)
+2. **.github/workflows/api-ci-cd.yml** - CI/CD pipeline (1 change)
+3. **CLAUDE.md** - Session history and key commands (2 changes)
+4. **CI_CD_OPERATIONS_GUIDE.md** - All workflow examples (9 changes)
+5. **VALIDATION_CI_CD_INTEGRATION.md** - Troubleshooting section (1 change)
+
+#### Benefits
+- ✅ **Crystal clear intent**: Both names explicitly state test inclusion/exclusion
+- ✅ **Symmetric naming**: Both follow pattern `postman-instance-build-<modifier>`
+- ✅ **No ambiguity**: "with-tests" vs "without-tests" is unambiguous
+- ✅ **Better developer experience**: Immediately obvious which target to use
+
+#### Usage Clarification
+**Local Development:**
+```bash
+make postman-instance-build-with-tests
+# Includes: Prism mock server, local testing, documentation serving
+```
+
+**CI/CD Pipeline:**
+```bash
+make postman-instance-build-without-tests
+# Skips: Local testing, prism-start, docs-serve
+# Includes: All Postman publishing, collections, mock servers, environments
+```
+
+#### Rationale
+- Tests require local infrastructure (Prism server, docs server)
+- CI/CD publishes to Postman cloud (doesn't need local testing)
+- CI/CD uses separate validation step after publish
+- Local developers want immediate test feedback
+- Both targets generate same Postman artifacts
+
+#### Key Learning
+- Target names should be self-documenting
+- Parallel structures reduce cognitive load
+- "with/without" pattern clearer than "only" suffix
+
+---
+
 ## Session History - 2025-10-12
 
 ### Authentication Consolidation - Comparative Analysis of Two Approaches
@@ -517,7 +576,7 @@ To set target: `echo "personal" > .postman-target`
      - `postman-link-env-to-mock-server` (lines 1688, 1691)
      - `update-mock-env` (line 1554)
    - **Testing**:
-     - ✅ Local test: Deleted stale file, ran `make postman-instance-build-only` successfully
+     - ✅ Local test: Deleted stale file, ran `make postman-instance-build-without-tests` successfully
      - ✅ CI/CD test: Triggered workflow #18389887601, completed successfully in 2m 43s
 
 7. **CI/CD Test Results** (Workflow #18389887601)
@@ -689,7 +748,7 @@ To set target: `echo "personal" > .postman-target`
 ### Key Commands to Remember
 ```bash
 # Most common development command
-make postman-instance-build-and-test
+make postman-instance-build-with-tests
 
 # When things go wrong
 make postman-cleanup-all

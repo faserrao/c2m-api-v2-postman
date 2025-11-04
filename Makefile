@@ -14,7 +14,7 @@
 #
 # Usage:
 #   make help                          # Show all available targets
-#   make postman-instance-build-and-test  # Run complete pipeline
+#   make postman-instance-build-with-tests  # Run complete pipeline
 #   make postman-cleanup-all           # Clean all Postman resources
 #
 # Load environment variables from .env file if it exists
@@ -507,8 +507,8 @@ postman-docs-build-and-serve-up:
 #	instance.
 # ========================================================================
 
-.PHONY: postman-instance-build-and-test
-postman-instance-build-and-test:
+.PHONY: postman-instance-build-with-tests
+postman-instance-build-with-tests:
 	@echo "🚀 Starting Postman build and test..."
 	# Authentication
 	$(MAKE) postman-login
@@ -531,8 +531,8 @@ postman-instance-build-and-test:
 	$(MAKE) postman-docs-build-and-serve-up
 
 # CI version - skips local testing
-.PHONY: postman-instance-build-only
-postman-instance-build-only:
+.PHONY: postman-instance-build-without-tests
+postman-instance-build-without-tests:
 	@echo "🚀 Starting Postman build (CI mode - no local testing)..."
 	# Authentication
 	$(MAKE) postman-login
@@ -595,7 +595,7 @@ postman-cleanup-all:
 rebuild-all-no-delete:
 	$(MAKE) install
 	$(MAKE) generate-and-validate-openapi-spec
-	$(MAKE) postman-instance-build-and-test
+	$(MAKE) postman-instance-build-with-tests
 
 # Delete existing resources and rebuild everything.
 .PHONY: rebuild-all-with-delete
@@ -608,7 +608,7 @@ rebuild-all-with-delete:
 rebuild-all-no-delete-ci:
 	$(MAKE) install
 	$(MAKE) generate-and-validate-openapi-spec
-	$(MAKE) postman-instance-build-only
+	$(MAKE) postman-instance-build-without-tests
 
 .PHONY: rebuild-all-with-delete-ci
 rebuild-all-with-delete-ci:

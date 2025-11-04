@@ -231,7 +231,7 @@ jobs:
             make workspace-info
             echo ""
             POSTMAN_TARGET=$POSTMAN_TARGET make postman-cleanup-all
-            POSTMAN_TARGET=$POSTMAN_TARGET make postman-instance-build-only
+            POSTMAN_TARGET=$POSTMAN_TARGET make postman-instance-build-without-tests
           fi
 
       # ---------- Post-Build Validation ----------

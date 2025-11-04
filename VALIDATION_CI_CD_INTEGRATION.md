@@ -362,7 +362,7 @@ cat scripts/validation/ci_verify.sh | grep "pip install"
 # Check workflow logs for publish step
 # Verify these steps completed:
 # 1. postman-cleanup-all
-# 2. postman-instance-build-only
+# 2. postman-instance-build-without-tests
 # 3. Mock server creation
 
 # Check for mock-env.json in artifacts

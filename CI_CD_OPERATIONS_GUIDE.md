@@ -330,7 +330,7 @@ vim openapi/c2mapiv2-openapi-spec-final.yaml
 **Step 2: Build Locally**
 ```bash
 # Full build pipeline
-make postman-instance-build-and-test
+make postman-instance-build-with-tests
 
 # Or individual steps
 make generate-openapi-spec-from-ebnf-dd
@@ -510,7 +510,7 @@ make validate-mocks                   # Mock servers only
 vim data_dictionary/c2mapiv2-dd.ebnf
 
 # 2. Build locally
-make postman-instance-build-and-test
+make postman-instance-build-with-tests
 
 # 3. Publish to Personal workspace
 echo "personal" > .postman-target
@@ -531,7 +531,7 @@ git push origin main
 
 ```bash
 # 1. Verify local build passes
-make postman-instance-build-and-test
+make postman-instance-build-with-tests
 
 # 2. Test in Personal workspace first
 make postman-publish-personal
@@ -571,7 +571,7 @@ git ctx-push-both main
 
 ```bash
 # 1. Build everything locally
-make postman-instance-build-and-test
+make postman-instance-build-with-tests
 
 # 2. Start local Prism mock
 make prism-start
@@ -594,7 +594,7 @@ make prism-stop
 
 ```bash
 # Build once
-make postman-instance-build-only
+make postman-instance-build-without-tests
 
 # Publish to Personal
 make postman-publish-personal
@@ -867,7 +867,7 @@ git push click2mail main
 
 **3. Reduce API calls**
 - Skip validation in one repository
-- Use `make postman-instance-build-only` (no validation)
+- Use `make postman-instance-build-without-tests` (no validation)
 
 ---
 
@@ -945,10 +945,10 @@ gh workflow run api-ci-cd.yml --repo faserrao/c2m-api-v2-postman --ref main
 
 ```bash
 # Full build + test + publish + validate
-make postman-instance-build-and-test
+make postman-instance-build-with-tests
 
 # Build only (no publish)
-make postman-instance-build-only
+make postman-instance-build-without-tests
 
 # Publish only
 make postman-publish-personal
