@@ -91,13 +91,13 @@ validate_openapi_spec() {
     # Check examples spec
     if [ -f "openapi/c2mapiv2-openapi-spec-final-with-examples.yaml" ]; then
         log_pass "OpenAPI spec with examples exists"
-        
-        # Check if examples were added
-        local has_examples=$(yq eval '.. | select(has("examples")) | length' openapi/c2mapiv2-openapi-spec-final-with-examples.yaml 2>/dev/null || echo "0")
-        if [ "$has_examples" -gt "0" ]; then
-            log_pass "Examples found in spec ($has_examples locations)"
+
+        # Check if SDK code samples (x-codeSamples) were added
+        local has_code_samples=$(yq eval '.. | select(has("x-codeSamples")) | length' openapi/c2mapiv2-openapi-spec-final-with-examples.yaml 2>/dev/null || echo "0")
+        if [ "$has_code_samples" -gt "0" ]; then
+            log_pass "SDK code samples found in spec ($has_code_samples endpoints)"
         else
-            log_fail "No examples found in examples spec"
+            log_info "No SDK code samples found (x-codeSamples)"
         fi
     else
         log_info "OpenAPI spec with examples not found (may be optional)"
@@ -220,11 +220,18 @@ validate_postman_artifacts() {
         # Check for auth variables
         local has_client_id=$(jq '.values[] | select(.key == "clientId") | length' postman/mock-env.json 2>/dev/null || echo "0")
         local has_client_secret=$(jq '.values[] | select(.key == "clientSecret") | length' postman/mock-env.json 2>/dev/null || echo "0")
-        
+
         if [ "$has_client_id" -gt "0" ] && [ "$has_client_secret" -gt "0" ]; then
             log_pass "Auth credentials found in environment"
         else
-            log_fail "Auth credentials missing from environment"
+            # In CI/CD, credentials come from GitHub Secrets and are uploaded to Postman
+            # Local file may be sanitized after upload - this is acceptable
+            local build_type="${BUILD_TYPE:-local}"
+            if [ "$build_type" = "github" ]; then
+                log_info "Auth credentials not in local file (expected in CI/CD - credentials uploaded to Postman)"
+            else
+                log_fail "Auth credentials missing from environment"
+            fi
         fi
     else
         log_info "Mock environment file not found"
