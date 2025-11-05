@@ -93,7 +93,7 @@ validate_openapi_spec() {
         log_pass "OpenAPI spec with examples exists"
 
         # Check if SDK code samples (x-codeSamples) were added
-        local has_code_samples=$(yq eval '.. | select(has("x-codeSamples")) | length' openapi/c2mapiv2-openapi-spec-final-with-examples.yaml 2>/dev/null || echo "0")
+        local has_code_samples=$(yq eval '[.. | select(has("x-codeSamples"))] | length' openapi/c2mapiv2-openapi-spec-final-with-examples.yaml 2>/dev/null || echo "0")
         if [ "$has_code_samples" -gt "0" ]; then
             log_pass "SDK code samples found in spec ($has_code_samples endpoints)"
         else

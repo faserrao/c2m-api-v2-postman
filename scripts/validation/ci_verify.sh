@@ -37,6 +37,7 @@ NC='\033[0m'
 # Configuration
 WORKSPACE="${1:-personal}"
 BUILD_TYPE="github"
+export BUILD_TYPE  # Export so validation script can access it
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
