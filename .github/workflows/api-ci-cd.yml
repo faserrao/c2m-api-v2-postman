@@ -356,6 +356,7 @@ jobs:
 
       # ---------- Prepare GitHub Pages ----------
       - name: Setup Pages
+        continue-on-error: true  # Don't fail workflow if Pages not enabled (requires admin)
         if: |
           github.ref == 'refs/heads/main' &&
           ((github.event_name == 'push' && env.DEPLOY_GH_PAGES == 'true') ||
@@ -363,6 +364,7 @@ jobs:
         uses: actions/configure-pages@v4
 
       - name: Upload GitHub Pages artifact
+        continue-on-error: true  # Don't fail if Setup Pages failed
         if: |
           github.ref == 'refs/heads/main' &&
           ((github.event_name == 'push' && env.DEPLOY_GH_PAGES == 'true') ||
