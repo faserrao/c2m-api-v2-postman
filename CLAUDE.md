@@ -256,9 +256,37 @@ To set target: `echo "personal" > .postman-target`
 ## Logging Protocol
 **Update logs after each major feature completion OR every 30 minutes, whichever comes first**
 
-## Session History - 2025-11-04
+## Session History
 
-### Makefile Target Renaming for Clarity
+### 2025-11-07: Security Cleanup - ARCHIVE Directory Removed from Git History ✅
+
+**Summary**: Comprehensive security cleanup removing 146 ARCHIVE files from git history and scanning all repositories for sensitive data.
+
+#### Git History Cleanup
+- ✅ **ARCHIVE/ removed from all 241 commits** using git-filter-repo
+- ✅ **Force pushed to both GitHub remotes** (faserrao and click2mail)
+- ✅ **Backup branch created**: backup-before-archive-removal-20251107
+- ✅ **Verification**: `git log --all --full-history -- ARCHIVE/` returns 0 results
+
+#### Security Scan Results
+- Scanned all 5 repositories for exposed API keys and secrets
+- ✅ **No security issues found** - all API keys in .env files (properly .gitignored)
+- ✅ **No private keys found** (only test fixtures in node_modules)
+- Created comprehensive security scan report
+
+#### Documents Updated
+- `all-archives/README.md` - Marked git history cleanup complete
+- `SECURITY_ARCHIVE_CLEANUP_REPORT.md` - Updated status to RESOLVED
+- `SECURITY_SCAN_REPORT_2025-11-07.md` - Created (later confirmed .env files are safe)
+
+#### Key Learnings
+- Git history cleanup after disk space improved (22 GB available vs 479 MB)
+- Force push requires coordination (rewrites history for all users)
+- .env files in local repos are safe and expected (not a security issue)
+
+---
+
+### 2025-11-04: Makefile Target Renaming for Clarity
 
 **Summary**: Renamed Makefile targets to eliminate confusion about build behavior (with/without tests).
 
