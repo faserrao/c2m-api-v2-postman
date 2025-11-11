@@ -4,7 +4,7 @@ This directory is a placeholder for the future JavaScript/Node.js SDK for the C2
 
 ## Status
 
-⚠️ **Not Yet Implemented** - The active JavaScript SDK development is tracked in the main `/sdk` directory.
+WARNING **Not Yet Implemented** - The active JavaScript SDK development is tracked in the main `/sdk` directory.
 
 ## Planned Features
 

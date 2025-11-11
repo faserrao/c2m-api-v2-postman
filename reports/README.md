@@ -159,19 +159,19 @@ Reports are uploaded as workflow artifacts:
 - Failed: 4
 - Success Rate: 97.4%
 
-## Secret Configuration ✅
-- .env file: ✅ Exists
-- API keys: ✅ Valid
-- Workspace: ✅ Accessible
+## Secret Configuration YES
+- .env file: YES Exists
+- API keys: YES Valid
+- Workspace: YES Accessible
 
-## Pipeline Outputs ✅
-- OpenAPI spec: ✅ Valid
-- Collections: ✅ Generated
-- Documentation: ✅ Built
+## Pipeline Outputs YES
+- OpenAPI spec: YES Valid
+- Collections: YES Generated
+- Documentation: YES Built
 
-## Mock Servers ⚠️
-- Prism: ✅ 8/9 endpoints passed
-- Postman: ✅ 9/9 endpoints passed
+## Mock Servers WARNING
+- Prism: YES 8/9 endpoints passed
+- Postman: YES 9/9 endpoints passed
 
 ## Details
 

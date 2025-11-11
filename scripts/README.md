@@ -8,14 +8,14 @@ The scripts directory has been reorganized for better maintainability:
 
 ```
 scripts/
-├── active/                     # ⭐ Scripts actively used by Makefile pipeline
+├── active/                     #  Scripts actively used by Makefile pipeline
 │   ├── ebnf_to_openapi_dynamic_v3.py
 │   ├── add_tests.js
 │   ├── fix_collection_urls_v2.py
 │   ├── validate_collection.js
 │   ├── add_tests_jwt.js
 │   └── fix-template-banner.sh
-├── utilities/                  # 🔧 Useful scripts for manual operations
+├── utilities/                  #  Useful scripts for manual operations
 │   ├── prism_test.sh
 │   ├── generate-sdk.sh
 │   ├── deploy-docs.sh

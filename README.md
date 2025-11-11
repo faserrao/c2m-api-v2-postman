@@ -2,16 +2,16 @@
 
 > **Updated 2025-09-08**: Documentation reorganized into subject-based folders for better navigation.
 
-## 📁 Documentation by Category
+##  Documentation by Category
 
-### [🚀 Getting Started](./getting-started/)
+### [ Getting Started](./getting-started/)
 Essential guides for new users and customers
 - Customer onboarding
 - Quick reference guide  
 - Build instructions
 - V1 to V2 migration
 
-### [🔐 Authentication](./authentication/)
+### [ Authentication](./authentication/)
 Complete authentication documentation
 - Consolidated auth guide (replaces 7 docs)
 - JWT examples and security
@@ -39,7 +39,7 @@ System design and project context
 - Project memory (comprehensive knowledge base)
 - Claude AI context
 
-### [📊 Project Reports](./project-reports/)
+### [ Project Reports](./project-reports/)
 Status reports and analysis
 - Restoration reports
 - Documentation migration summaries
@@ -90,10 +90,10 @@ Historical documentation (19 documents)
 - Consolidated SDK documentation
 - Migrated user docs from security repo
 
-## 💡 Tips
+##  Tips
 
 - Each folder has its own README with document descriptions
-- Star (⭐) indicates primary/recommended documents
+- Star () indicates primary/recommended documents
 - Cross-references updated to new locations
 - Use browser search (Ctrl+F) to find specific topics
 

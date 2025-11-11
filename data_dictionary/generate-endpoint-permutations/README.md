@@ -19,7 +19,7 @@ chmod +x run_permutations.sh
 This will generate:
 - `permutations/submitSingleDocWithTemplateParams.json`
 
-## 📝 Notes
+##  Notes
 - Each `documentSourceIdentifier`, `recipientAddressSource`, `paymentDetails`, and optional `tags` permutation is fully expanded as **wrapper objects**.
 - Current implementation: **submitSingleDocWithTemplateParams** endpoint only.
 - Extendable: Add functions for other endpoints (see `endpoint_generators` in the code).

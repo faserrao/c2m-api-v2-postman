@@ -6,9 +6,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is the C2M API V2 project that implements a unique pipeline: EBNF Data Dictionary → OpenAPI Specification → Postman Collection → Mock Server → API Documentation.
 
+## Documentation Guidelines
+
+**IMPORTANT**: All documentation must be generated WITHOUT emojis unless explicitly requested by the user.
+
+**Rules**:
+- Never use emojis in markdown files (✅ ❌ ⚠️ ⏱️ 📊 🔍 etc.)
+- Use plain text equivalents instead:
+  - Use "YES" instead of ✅
+  - Use "NO" instead of ❌
+  - Use "WARNING" instead of ⚠️
+  - Use "PENDING" instead of ⏳
+- Remove any emojis when updating or creating documentation
+- Apply this rule to all markdown files in the repository
+- This is a user preference that must be respected
+
 ## Restoration Status (2025-09-08)
 
-✅ **RESTORATION COMPLETE** - The c2m-api-v2-postman repository (formerly c2m-api-v2-postman) has been successfully restored to its pre-auth state:
+YES **RESTORATION COMPLETE** - The c2m-api-v2-postman repository (formerly c2m-api-v2-postman) has been successfully restored to its pre-auth state:
 - JWT authentication code moved to separate security repository
 - Makefile cleaned up (removed redundant targets, simplified publish workflow)
 - Documentation reorganized into user-guides directory with symlinks
@@ -241,12 +256,12 @@ To set target: `echo "personal" > .postman-target`
 ## Script Integration Status
 
 ### Recently Integrated Scripts
-✅ `prism_test.sh` - Advanced endpoint testing with Prism (targets: prism-test-*)
-✅ `generate-sdk.sh` - SDK generation placeholder (target: generate-sdk)
-✅ `deploy-docs.sh` - Documentation deployment placeholder (target: deploy-docs)
-✅ `cleanup-*.sh` - Directory cleanup utilities (targets: cleanup-*)
-✅ `git-pull-rebase.sh` - Git workflow helper (target: git-pull-rebase)
-✅ `git-push.sh` - Quick commit helper (target: git-save)
+YES `prism_test.sh` - Advanced endpoint testing with Prism (targets: prism-test-*)
+YES `generate-sdk.sh` - SDK generation placeholder (target: generate-sdk)
+YES `deploy-docs.sh` - Documentation deployment placeholder (target: deploy-docs)
+YES `cleanup-*.sh` - Directory cleanup utilities (targets: cleanup-*)
+YES `git-pull-rebase.sh` - Git workflow helper (target: git-pull-rebase)
+YES `git-push.sh` - Quick commit helper (target: git-save)
 
 ### Remaining Integration Opportunities
 - `generate_openapi_from_swagger.py` - Swagger to OpenAPI conversion
@@ -258,20 +273,111 @@ To set target: `echo "personal" > .postman-target`
 
 ## Session History
 
-### 2025-11-07: Security Cleanup - ARCHIVE Directory Removed from Git History ✅
+### 2025-11-09: Apple Pay/Google Pay Proposal + Data Dictionary Duplicate Definitions Fix YES
+
+**Summary**: Created comprehensive Apple Pay and Google Pay payment method proposals for V2 wrapper implementation, then discovered and resolved duplicate EBNF definitions in the data dictionary.
+
+#### Part 1: Apple Pay & Google Pay Research and Proposal
+
+**Context**: User requested research on Apple Pay and Google Pay data structures for V1-V2 wrapper implementation (both marked as "TBD" in data dictionary).
+
+**Research Completed**:
+- YES Official Apple Pay Web API documentation analysis
+- YES Official Google Pay API documentation analysis
+- YES Confirmed NOT implemented in V1 codebase (verified via code search)
+- YES Both marked as "TBD" in V2 data dictionary (lines 298-299)
+
+**Document Created**: `v1-v2-wrapper-implementation/APPLE_PAY_GOOGLE_PAY_PROPOSED_DEFINITIONS.md` (33 pages / 1,560 lines)
+- Complete EBNF proposals to replace "TBD"
+- Apple Pay: Token-based structure (paymentData, paymentMethod, transactionIdentifier, billingContact)
+- Google Pay: Signature-based structure (signature, intermediateSigningKey, protocolVersion, signedMessage)
+- 30+ validation requirements with test cases
+- Security considerations (PCI-DSS compliance, token handling)
+- Implementation timeline: 10-16 weeks estimate
+
+**Key Findings**:
+- **Apple Pay**: Simpler token structure, card info visible (displayName, network, type)
+- **Google Pay**: Complex signature verification, card info encrypted
+- **Both**: Encrypted tokens (never raw card data), support major networks, require payment gateway
+- **Networks**: Visa, MasterCard, Amex, Discover, JCB, ChinaUnionPay, Interac, PrivateLabel
+- **Card Types**: debit, credit, prepaid, store
+
+**Updated Documentation**:
+- YES Added to `v1-v2-wrapper-implementation/README.md` (new document entry + status table)
+- YES Updated Key Changes section with proposal creation
+- YES Added to Remaining Work items
+
+#### Part 2: Data Dictionary Duplicate Definitions Issue
+
+**Discovery**: User identified `cardType` had two conflicting definitions in `data_dictionary/c2mapiv2-dd.ebnf`
+
+**Duplicate Definitions Found** (4 total):
+1. **cardType** - NO 2 active definitions (CRITICAL):
+   - Line 307: `cardType = string ;` (generic - WRONG)
+   - Lines 346-350: `cardType = "visa" | "mastercard" | "discover" | "americanExpress" ;` (enum - CORRECT)
+2. **jobTemplate** - YES 1 active, 3 commented (safe)
+3. **mergeMultiDocWithTemplateParams** - YES 1 active, 1 commented (safe)
+4. **submitSingleDocWithTemplateParams** - YES 1 active, 2 commented (safe)
+
+**Root Cause Analysis**:
+- Only `cardType` had true duplicate (generic string definition should have been removed when enum added)
+- Other 3 identifiers had commented-out design alternatives (safe to keep as historical context)
+- No automated validation to detect duplicates in EBNF
+
+**Actions Taken**:
+- YES User removed line 307: `cardType = string ;`
+- YES Kept enum definition (lines 346-350)
+- YES Verified all other "duplicates" are in comments (inactive)
+- YES Created comprehensive analysis document
+
+**Document Created**: `data_dictionary/DUPLICATE_DEFINITIONS_ISSUE.md` (469 lines)
+- Complete analysis of all 4 duplicate definitions
+- Impact assessment (OpenAPI generation, validation, mock server)
+- Resolution documentation
+- Detection script for CI/CD integration
+- Testing recommendations
+- Status: YES RESOLVED
+
+**Impact**:
+- **Before Fix**: `cardType` could accept any string (no validation)
+- **After Fix**: `cardType` constrained to 4 valid values (visa, mastercard, discover, americanExpress)
+- **Next Steps**: Regenerate OpenAPI spec to verify enum constraint
+
+**Files Modified**:
+- `data_dictionary/c2mapiv2-dd.ebnf` - Removed duplicate `cardType` definition (user action)
+- `data_dictionary/DUPLICATE_DEFINITIONS_ISSUE.md` - Created analysis doc (469 lines)
+- `v1-v2-wrapper-implementation/APPLE_PAY_GOOGLE_PAY_PROPOSED_DEFINITIONS.md` - Created proposal (1,560 lines)
+- `v1-v2-wrapper-implementation/README.md` - Updated with Apple/Google Pay proposal entry
+
+**Key Learnings**:
+- Data dictionary lacked duplicate definition validation
+- Commented EBNF alternatives are safe and provide design context
+- Generic `string` definitions should be replaced with enums when constraints known
+- Detection script recommended for CI/CD to prevent future duplicates
+
+**Recommended Next Steps**:
+1. Regenerate OpenAPI spec to verify `cardType` enum constraint
+2. Test payment endpoints to ensure card type validation works
+3. Consider adding duplicate detection script to CI/CD (optional)
+4. Review and approve Apple Pay/Google Pay EBNF proposals
+5. Update data dictionary with approved payment method definitions (when ready)
+
+---
+
+### 2025-11-07: Security Cleanup - ARCHIVE Directory Removed from Git History YES
 
 **Summary**: Comprehensive security cleanup removing 146 ARCHIVE files from git history and scanning all repositories for sensitive data.
 
 #### Git History Cleanup
-- ✅ **ARCHIVE/ removed from all 241 commits** using git-filter-repo
-- ✅ **Force pushed to both GitHub remotes** (faserrao and click2mail)
-- ✅ **Backup branch created**: backup-before-archive-removal-20251107
-- ✅ **Verification**: `git log --all --full-history -- ARCHIVE/` returns 0 results
+- YES **ARCHIVE/ removed from all 241 commits** using git-filter-repo
+- YES **Force pushed to both GitHub remotes** (faserrao and click2mail)
+- YES **Backup branch created**: backup-before-archive-removal-20251107
+- YES **Verification**: `git log --all --full-history -- ARCHIVE/` returns 0 results
 
 #### Security Scan Results
 - Scanned all 5 repositories for exposed API keys and secrets
-- ✅ **No security issues found** - all API keys in .env files (properly .gitignored)
-- ✅ **No private keys found** (only test fixtures in node_modules)
+- YES **No security issues found** - all API keys in .env files (properly .gitignored)
+- YES **No private keys found** (only test fixtures in node_modules)
 - Created comprehensive security scan report
 
 #### Documents Updated
@@ -310,10 +416,10 @@ To set target: `echo "personal" > .postman-target`
 5. **VALIDATION_CI_CD_INTEGRATION.md** - Troubleshooting section (1 change)
 
 #### Benefits
-- ✅ **Crystal clear intent**: Both names explicitly state test inclusion/exclusion
-- ✅ **Symmetric naming**: Both follow pattern `postman-instance-build-<modifier>`
-- ✅ **No ambiguity**: "with-tests" vs "without-tests" is unambiguous
-- ✅ **Better developer experience**: Immediately obvious which target to use
+- YES **Crystal clear intent**: Both names explicitly state test inclusion/exclusion
+- YES **Symmetric naming**: Both follow pattern `postman-instance-build-<modifier>`
+- YES **No ambiguity**: "with-tests" vs "without-tests" is unambiguous
+- YES **Better developer experience**: Immediately obvious which target to use
 
 #### Usage Clarification
 **Local Development:**
@@ -354,14 +460,14 @@ make postman-instance-build-without-tests
 
 #### Issues Fixed
 
-**1. OpenAPI Examples Validation** (RESOLVED ✅)
+**1. OpenAPI Examples Validation** (RESOLVED YES)
 - **Problem**: Validation looked for `examples` key (request/response examples)
 - **Reality**: Spec uses `x-codeSamples` key (SDK code samples for Redocly)
 - **Root Cause**: Misunderstanding of what "with-examples" spec contains
 - **Fix**: Changed validation from `select(has("examples"))` to `select(has("x-codeSamples"))`
 - **Result**: Now correctly detects 11 SDK code samples in spec
 
-**2. Auth Credentials Validation Context** (RESOLVED ✅)
+**2. Auth Credentials Validation Context** (RESOLVED YES)
 - **Problem**: Validation marked missing credentials as FAIL in CI/CD context
 - **Reality**: In CI/CD, credentials uploaded to Postman from GitHub Secrets
 - **Root Cause**: Validation didn't differentiate between local and CI/CD builds
@@ -371,7 +477,7 @@ make postman-instance-build-without-tests
   - Change FAIL to INFO when `BUILD_TYPE=github`
 - **Result**: CI/CD now shows INFO message instead of failing
 
-**3. Bash Syntax Errors** (RESOLVED ✅)
+**3. Bash Syntax Errors** (RESOLVED YES)
 - **Problem**: `yq eval '.. | select(has("x-codeSamples")) | length'` output multiple numbers
 - **Error**: `[: 5 8 8 8: integer expression expected`
 - **Root Cause**: Recursive descent without array wrapper returns one number per match
@@ -390,20 +496,20 @@ make postman-instance-build-without-tests
 
 #### Validation Results
 **Before Fixes**: 45/47 passed (95.7%)
-- ❌ "No examples found in examples spec"
-- ❌ "Auth credentials missing from environment"
+- NO "No examples found in examples spec"
+- NO "Auth credentials missing from environment"
 
-**After Fixes**: 22/22 passed (100%) ✅
-- ✅ SDK code samples found in spec (11 endpoints)
+**After Fixes**: 22/22 passed (100%) YES
+- YES SDK code samples found in spec (11 endpoints)
 - ℹ️ Auth credentials not in local file (expected in CI/CD)
 
 #### Repository Synchronization
 **All 5 repositories synced between faserrao and click2mail**:
-- ✅ c2m-api-v2-postman: f1273c1 (both)
-- ✅ c2m-api-v2-postman-security: be2669b (both)
-- ✅ c2m-api-v2-postman-artifacts: f9137a4 (both)
-- ✅ c2m-api-v2-click2endpoint-developers: 62492a4 (both)
-- ✅ c2m-api-v2-click2endpoint-business: 0f3d2d8 (both)
+- YES c2m-api-v2-postman: f1273c1 (both)
+- YES c2m-api-v2-postman-security: be2669b (both)
+- YES c2m-api-v2-postman-artifacts: f9137a4 (both)
+- YES c2m-api-v2-click2endpoint-developers: 62492a4 (both)
+- YES c2m-api-v2-click2endpoint-business: 0f3d2d8 (both)
 
 **Artifacts Repo Sync Process**:
 - click2mail had 4 automatic CI/CD build commits
@@ -425,9 +531,9 @@ make postman-instance-build-without-tests
 - **Repository sync**: Dual-remote setup enables synchronized updates to both organizations
 
 #### Next Steps
-- ✅ Validation passing at 100% (22/22 tests)
-- ✅ All repos synchronized
-- ⏳ GitHub Pages deployment (requires admin to enable in settings)
+- YES Validation passing at 100% (22/22 tests)
+- YES All repos synchronized
+- PENDING GitHub Pages deployment (requires admin to enable in settings)
 
 ---
 
@@ -469,17 +575,17 @@ make postman-instance-build-without-tests
 - Backwards Compatibility: 100%
 
 **Benefits**:
-- ✅ Fast implementation (5 weeks vs 6-8 weeks)
-- ✅ No breaking changes for Postman collections or existing M2M
-- ✅ Per-user credential isolation (unique clientId per user)
-- ✅ Auto-fetch credentials (no manual entry)
-- ✅ Easy rollback if issues arise
+- YES Fast implementation (5 weeks vs 6-8 weeks)
+- YES No breaking changes for Postman collections or existing M2M
+- YES Per-user credential isolation (unique clientId per user)
+- YES Auto-fetch credentials (no manual entry)
+- YES Easy rollback if issues arise
 
 **Trade-offs**:
-- ⚠️ Two auth mechanisms to maintain (Lambda + Cognito)
-- ⚠️ Higher operational cost (+$2/month)
-- ⚠️ API logs show clientId not username
-- ⚠️ More complex architecture long-term
+- WARNING Two auth mechanisms to maintain (Lambda + Cognito)
+- WARNING Higher operational cost (+$2/month)
+- WARNING API logs show clientId not username
+- WARNING More complex architecture long-term
 
 #### Approach B: Single User Pool (Alternative)
 **Architecture**:
@@ -497,18 +603,18 @@ make postman-instance-build-without-tests
 - Backwards Compatibility: 0% (breaking change)
 
 **Benefits**:
-- ✅ Simpler long-term architecture (one auth system)
-- ✅ Cost savings (-$3/month)
-- ✅ User-level tracking in ALL API logs
-- ✅ Native Cognito features (MFA, password policy, etc.)
-- ✅ OAuth2 scopes for fine-grained authorization
+- YES Simpler long-term architecture (one auth system)
+- YES Cost savings (-$3/month)
+- YES User-level tracking in ALL API logs
+- YES Native Cognito features (MFA, password policy, etc.)
+- YES OAuth2 scopes for fine-grained authorization
 
 **Trade-offs**:
-- ⚠️ Slower implementation (6-8 weeks)
-- ⚠️ Breaking change for all Postman collections
-- ⚠️ Higher migration risk (production impact)
-- ⚠️ Extensive testing required (all auth flows change)
-- ⚠️ Service accounts in User Pool (unconventional)
+- WARNING Slower implementation (6-8 weeks)
+- WARNING Breaking change for all Postman collections
+- WARNING Higher migration risk (production impact)
+- WARNING Extensive testing required (all auth flows change)
+- WARNING Service accounts in User Pool (unconventional)
 
 #### Recommendation: Approach A with Future Migration Path
 
@@ -536,23 +642,23 @@ make postman-instance-build-without-tests
 #### Decision Framework
 
 **Choose Approach A if**:
-- ✅ Need deployment within 5-6 weeks
-- ✅ Breaking changes not acceptable
-- ✅ Lower risk is priority
-- ✅ Want to validate model before full commitment
+- YES Need deployment within 5-6 weeks
+- YES Breaking changes not acceptable
+- YES Lower risk is priority
+- YES Want to validate model before full commitment
 
 **Choose Approach B if**:
-- ✅ Have 6-8 weeks for implementation
-- ✅ Can coordinate breaking changes with all stakeholders
-- ✅ Long-term cost reduction critical
-- ✅ User-level tracking in ALL logs required immediately
-- ✅ Want to avoid technical debt (two auth systems)
+- YES Have 6-8 weeks for implementation
+- YES Can coordinate breaking changes with all stakeholders
+- YES Long-term cost reduction critical
+- YES User-level tracking in ALL logs required immediately
+- YES Want to avoid technical debt (two auth systems)
 
 #### Next Steps
-1. ✅ Review AUTHENTICATION_CONSOLIDATION_PLAN_V2.md
-2. ⏳ Stakeholder decision (Approach A vs B) within 1 week
-3. ⏳ If Approach A: Start Phase 1 (Infrastructure setup in c2m-api-v2-postman-security)
-4. ⏳ If Approach B: Review SINGLE_USER_POOL_MIGRATION_PLAN.md, create Postman migration plan
+1. YES Review AUTHENTICATION_CONSOLIDATION_PLAN_V2.md
+2. PENDING Stakeholder decision (Approach A vs B) within 1 week
+3. PENDING If Approach A: Start Phase 1 (Infrastructure setup in c2m-api-v2-postman-security)
+4. PENDING If Approach B: Review SINGLE_USER_POOL_MIGRATION_PLAN.md, create Postman migration plan
 
 #### Key Learning
 - Authentication consolidation has multiple valid approaches
@@ -606,13 +712,13 @@ make postman-instance-build-without-tests
 - **AUTHENTICATION_INFRASTRUCTURE_COMPARISON.md**: Side-by-side comparison of both systems
 
 #### Benefits
-- ✅ Single source of truth for all authentication
-- ✅ Per-user credential isolation (each user gets unique clientId/secret)
-- ✅ Better UX (auto-fetch credentials, no manual entry)
-- ✅ Production-ready (same system for dev and prod)
-- ✅ Scalable (easy to add click2endpoint-nlp, future apps)
-- ✅ Maintainable (one codebase to secure and update)
-- ✅ Cost-effective (+$2/month = $7-12/month total)
+- YES Single source of truth for all authentication
+- YES Per-user credential isolation (each user gets unique clientId/secret)
+- YES Better UX (auto-fetch credentials, no manual entry)
+- YES Production-ready (same system for dev and prod)
+- YES Scalable (easy to add click2endpoint-nlp, future apps)
+- YES Maintainable (one codebase to secure and update)
+- YES Cost-effective (+$2/month = $7-12/month total)
 
 #### Impact on c2m-api-v2-postman
 - **No changes to existing functionality**: Postman collections continue to work as-is
@@ -692,22 +798,22 @@ make postman-instance-build-without-tests
      - `postman-link-env-to-mock-server` (lines 1688, 1691)
      - `update-mock-env` (line 1554)
    - **Testing**:
-     - ✅ Local test: Deleted stale file, ran `make postman-instance-build-without-tests` successfully
-     - ✅ CI/CD test: Triggered workflow #18389887601, completed successfully in 2m 43s
+     - YES Local test: Deleted stale file, ran `make postman-instance-build-without-tests` successfully
+     - YES CI/CD test: Triggered workflow #18389887601, completed successfully in 2m 43s
 
 7. **CI/CD Test Results** (Workflow #18389887601)
-   - ✅ **2 Environments Created**:
+   - YES **2 Environments Created**:
      - C2M API - Mock Server (`46321051-83ef2298-0979-4696-8215-268903ae188c`)
      - C2M API - AWS Dev (`46321051-73ed8284-064d-488b-9973-37dcc0488d8e`)
-   - ✅ **3 Collections Created**:
+   - YES **3 Collections Created**:
      - C2M API v2 – Real World Use Cases
      - C2mApiCollectionLinked
      - C2mApiV2TestCollection
-   - ✅ **Mock Server Created and Linked**:
+   - YES **Mock Server Created and Linked**:
      - URL: `https://908705d8-5891-4b43-88f3-ab4633156419.mock.pstmn.io`
      - Collection: Test Collection (all 12 endpoints)
      - Environment: Linked to C2M API - Mock Server environment
-   - ✅ **Mock Server Tested**: POST request returned valid response (status: processing, jobId: CSlkTg1owN)
+   - YES **Mock Server Tested**: POST request returned valid response (status: processing, jobId: CSlkTg1owN)
 
 8. **End-to-End Verification**
    - User tested Real World Use Cases collection in Postman

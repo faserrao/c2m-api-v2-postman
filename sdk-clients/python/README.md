@@ -4,7 +4,7 @@ This directory is a placeholder for the future Python SDK for the C2M API.
 
 ## Status
 
-⚠️ **Active SDK Available** - A fully functional Python SDK is already available in the `/sdk/python/` directory. This directory is reserved for future SDK reorganization.
+WARNING **Active SDK Available** - A fully functional Python SDK is already available in the `/sdk/python/` directory. This directory is reserved for future SDK reorganization.
 
 ## Current Python SDK
 

@@ -47,9 +47,9 @@ SDKs (generated - future)
 
 | Build Type | Trigger | Testing | Publish Target |
 |------------|---------|---------|----------------|
-| **Local with Tests** | Developer manual | ✅ Local mock server + tests | Personal or Corporate workspace |
-| **Local without Tests** | Developer manual | ❌ Skip local testing | Personal or Corporate workspace |
-| **GitHub CI/CD** | Git push / PR / Manual | ✅ Automated validation | Workspace from `.postman-target` |
+| **Local with Tests** | Developer manual | YES Local mock server + tests | Personal or Corporate workspace |
+| **Local without Tests** | Developer manual | NO Skip local testing | Personal or Corporate workspace |
+| **GitHub CI/CD** | Git push / PR / Manual | YES Automated validation | Workspace from `.postman-target` |
 
 ---
 
@@ -229,8 +229,8 @@ cat .postman-target
 
 | Makefile Target | Purpose | Local Testing | Use Case |
 |----------------|---------|---------------|----------|
-| `postman-instance-build-with-tests` | Full build + local testing | ✅ Yes | Development |
-| `postman-instance-build-without-tests` | Build only, skip tests | ❌ No | CI/CD, Quick publish |
+| `postman-instance-build-with-tests` | Full build + local testing | YES Yes | Development |
+| `postman-instance-build-without-tests` | Build only, skip tests | NO No | CI/CD, Quick publish |
 | `postman-cleanup-all` | Delete all Postman resources | N/A | Clean slate |
 
 ---
@@ -304,15 +304,15 @@ make postman-cleanup-all
 **Expected Output**:
 
 ```
-🧹 Starting FULL cleanup of Postman resources for workspace d8a1f479-a2aa-4471-869e-b12feea0a98c...
-🔍 Fetching mock servers from workspace...
-🗑 Deleting mock server 59cece1b-0966-4544-9135-73f9a9bbfc8c...
-✅ Mock server deleted
-🔍 Fetching collections from workspace...
-🗑 Deleting collection 46321051-402bcb82-b4e6-4bb2-90c8-3f2bed733002...
-✅ Collection deleted
+ Starting FULL cleanup of Postman resources for workspace d8a1f479-a2aa-4471-869e-b12feea0a98c...
+ Fetching mock servers from workspace...
+ Deleting mock server 59cece1b-0966-4544-9135-73f9a9bbfc8c...
+YES Mock server deleted
+ Fetching collections from workspace...
+ Deleting collection 46321051-402bcb82-b4e6-4bb2-90c8-3f2bed733002...
+YES Collection deleted
 ...
-✅ Postman cleanup complete
+YES Postman cleanup complete
 ```
 
 **Duration**: ~30 seconds (depends on number of resources)
@@ -354,7 +354,7 @@ postman login --with-api-key $POSTMAN_API_KEY
 
 **Output**:
 ```
-🔐 Logging in to Postman...
+ Logging in to Postman...
 Logged in using api key of user: stellario2021
 Logged in successfully.
 ```
@@ -1184,9 +1184,9 @@ postman collection run \
 - Additional custom tests from overrides
 
 **Expected Results**:
-- ✅ All tests pass
-- ⏱️ Response times < 1s
-- ✅ Status codes in allowed list
+- YES All tests pass
+-  Response times < 1s
+- YES Status codes in allowed list
 
 **If Tests Fail**:
 - Check Prism logs for validation errors
@@ -1542,19 +1542,19 @@ All sensitive credentials stored in GitHub repository settings.
 
 ```
 15:23:14 - Workflow triggered by push (commit abc123)
-15:23:16 - Checkout code                                 ✓ 2s
-15:23:18 - Setup Node.js 18                              ✓ 2s
-15:23:25 - Install dependencies (npm ci)                 ✓ 7s
-15:23:32 - Install Postman CLI                           ✓ 7s
-15:23:33 - Set Postman target (personal)                 ✓ 1s
-15:25:42 - Build OpenAPI spec from EBNF                  ✓ 2m 9s
-15:27:15 - Generate Postman collections                  ✓ 1m 33s
-15:27:48 - Build documentation                           ✓ 33s
-15:27:51 - Commit generated files                        ✓ 3s
-15:29:23 - Publish to Postman (personal workspace)       ✓ 1m 32s
-15:29:35 - Copy artifacts to artifacts repo              ✓ 12s
-15:29:47 - Deploy docs to GitHub Pages                   ✓ 12s
-15:29:48 - Workflow complete                             ✓ 6m 34s
+15:23:16 - Checkout code                                 YES 2s
+15:23:18 - Setup Node.js 18                              YES 2s
+15:23:25 - Install dependencies (npm ci)                 YES 7s
+15:23:32 - Install Postman CLI                           YES 7s
+15:23:33 - Set Postman target (personal)                 YES 1s
+15:25:42 - Build OpenAPI spec from EBNF                  YES 2m 9s
+15:27:15 - Generate Postman collections                  YES 1m 33s
+15:27:48 - Build documentation                           YES 33s
+15:27:51 - Commit generated files                        YES 3s
+15:29:23 - Publish to Postman (personal workspace)       YES 1m 32s
+15:29:35 - Copy artifacts to artifacts repo              YES 12s
+15:29:47 - Deploy docs to GitHub Pages                   YES 12s
+15:29:48 - Workflow complete                             YES 6m 34s
 ```
 
 **Total Duration**: ~6-7 minutes
@@ -1698,7 +1698,7 @@ This section explains the recommended approach for updating Postman resources wh
 
 ### Two Approaches Considered
 
-#### Approach 1: Full Rebuild (Recommended ✅)
+#### Approach 1: Full Rebuild (Recommended YES)
 
 **Command**:
 ```bash
@@ -1711,16 +1711,16 @@ make postman-cleanup-all && make postman-instance-build-without-tests
 3. Upload all resources to Postman workspace
 
 **Advantages**:
-- ✅ **Clean slate**: No orphaned resources or inconsistencies
-- ✅ **Predictable**: Always produces same result regardless of previous state
-- ✅ **Dual workspace compatible**: Works correctly with both personal and corporate workspaces
-- ✅ **No UID tracking issues**: All UIDs regenerated fresh
-- ✅ **Safe**: No risk of partial state corruption
-- ✅ **Tested**: This is the primary workflow tested in CI/CD
+- YES **Clean slate**: No orphaned resources or inconsistencies
+- YES **Predictable**: Always produces same result regardless of previous state
+- YES **Dual workspace compatible**: Works correctly with both personal and corporate workspaces
+- YES **No UID tracking issues**: All UIDs regenerated fresh
+- YES **Safe**: No risk of partial state corruption
+- YES **Tested**: This is the primary workflow tested in CI/CD
 
 **Disadvantages**:
-- ⏱️ Slower: Takes 5-8 minutes for complete rebuild
-- 📊 UID changes: New UIDs generated each time (breaks external references)
+-  Slower: Takes 5-8 minutes for complete rebuild
+-  UID changes: New UIDs generated each time (breaks external references)
 
 **When to Use**:
 - Making changes to EBNF data dictionary
@@ -1732,7 +1732,7 @@ make postman-cleanup-all && make postman-instance-build-without-tests
 
 ---
 
-#### Approach 2: Partial Update (Not Recommended ⚠️)
+#### Approach 2: Partial Update (Not Recommended WARNING)
 
 **Concept**: Update only the changed resource (e.g., re-upload one collection without full rebuild)
 
@@ -1943,7 +1943,7 @@ If partial updates become critical (e.g., for very large APIs where full rebuild
 
 **Symptom**:
 ```
-🔐 Logging in to Postman...
+ Logging in to Postman...
 error: Error occurred in validating API key. Please try again.
 make: *** [postman-login] Error 1
 ```

@@ -50,10 +50,10 @@ The C2M API V2 project uses a **dual-repository architecture** with **workspace 
 - Clear separation of development and production environments
 
 **Benefits:**
-- ✅ Safety: No cross-contamination possible
-- ✅ Clarity: Repository name tells you the environment
-- ✅ Flexibility: Independent development and production workflows
-- ✅ Simplicity: Identical workflow files (no divergence)
+- YES Safety: No cross-contamination possible
+- YES Clarity: Repository name tells you the environment
+- YES Flexibility: Independent development and production workflows
+- YES Simplicity: Identical workflow files (no divergence)
 
 ### Repository Synchronization
 
@@ -287,9 +287,9 @@ Developer's Local Machine:
 ┌─────────────────────────────────────────┐
 │     LOCAL VALIDATION REPORT             │
 ├─────────────────────────────────────────┤
-│ • Secret configuration: ✅              │
-│ • Pipeline outputs: ⚠️ 15/20           │
-│ • Mock server detection: ✅            │
+│ • Secret configuration: YES              │
+│ • Pipeline outputs: WARNING 15/20           │
+│ • Mock server detection: YES            │
 │ • Newman tests: ⏸️ SKIPPED             │
 │ • Report: reports/validation-*.md      │
 └─────────────────────────────────────────┘
@@ -388,9 +388,9 @@ git push origin main && git push click2mail main
 ### Overview
 
 The post-build validation system runs **everywhere**:
-- ✅ **Locally**: `make validate-local`
-- ✅ **CI/CD (faserrao)**: After publishing to Personal workspace
-- ✅ **CI/CD (click2mail)**: After publishing to Corporate workspace
+- YES **Locally**: `make validate-local`
+- YES **CI/CD (faserrao)**: After publishing to Personal workspace
+- YES **CI/CD (click2mail)**: After publishing to Corporate workspace
 
 ### Validation Components
 
@@ -462,7 +462,7 @@ make validate-mocks                   # Mock servers only
 **Build Type**: Local
 
 ## Summary
-- **Status**: ✅ PASSED
+- **Status**: YES PASSED
 - **Total Tests**: 20
 - **Passed**: 15
 - **Failed**: 5
@@ -470,15 +470,15 @@ make validate-mocks                   # Mock servers only
 
 ## Component Results
 
-### Secrets ✅
+### Secrets YES
 - **Status**: PASSED
 - **Tests**: 2/2 passed
 
-### Pipeline ⚠️
+### Pipeline WARNING
 - **Status**: PASSED
 - **Tests**: 15/20 passed (5 expected failures)
 
-### Mocks ✅
+### Mocks YES
 - **Status**: PASSED
 - **Tests**: 1/1 passed
 ```
@@ -486,9 +486,9 @@ make validate-mocks                   # Mock servers only
 ### Success Criteria
 
 **Passing validation requires:**
-- ✅ Secret validation: All checks pass (2/2)
-- ✅ Pipeline validation: Core checks pass (≥75%)
-- ✅ Mock server detection: Mock server accessible
+- YES Secret validation: All checks pass (2/2)
+- YES Pipeline validation: Core checks pass (≥75%)
+- YES Mock server detection: Mock server accessible
 - ⏸️ Newman tests: Optional (requires published mock)
 
 **Known acceptable failures:**
@@ -689,8 +689,8 @@ gh api repos/click2mail/c2m-api-v2-postman --jq .owner.login
 ### Issue: Validation Fails in CI/CD But Passes Locally
 
 **Symptoms:**
-- Local validation: ✅ PASS
-- CI/CD validation: ❌ FAIL
+- Local validation: YES PASS
+- CI/CD validation: NO FAIL
 
 **Common Causes:**
 
