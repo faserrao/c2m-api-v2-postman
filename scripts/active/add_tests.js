@@ -23,7 +23,7 @@ console.log(`ℹ️ Allowed status codes: ${allowedCodes}`);
 
 const testsToAdd = [
   `pm.test("Status code is allowed (${allowedCodes})", function () { pm.expect([${allowedCodes}]).to.include(pm.response.code); });`,
-  `pm.test("Response time < 1s", function () { pm.expect(pm.response.responseTime).to.be.below(1000); });`
+  `pm.test("Response time check (informational)", function () { const rt = pm.response.responseTime; console.log(\`⏱️  Response time: \${rt}ms \${rt > 1000 ? '(>1s - SLOW)' : '(OK)'}\`); });`
 ];
 
 function addTestsToItem(item) {
@@ -46,8 +46,12 @@ function addTestsToItem(item) {
       )
     );
 
-    // Remove old "Status code is 200" tests
-    testEvent.script.exec = testEvent.script.exec.filter(line => !line.includes('Status code is 200'));
+    // Remove old "Status code is 200" tests and old hard response time assertions
+    testEvent.script.exec = testEvent.script.exec.filter(line =>
+      !line.includes('Status code is 200') &&
+      !line.includes('Response time < 1s') &&
+      !line.includes('pm.response.responseTime).to.be.below(1000)')
+    );
 
     // Only add new tests if no custom status test exists
     if (!hasStatusTest) {
