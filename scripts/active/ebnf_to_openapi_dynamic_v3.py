@@ -50,7 +50,7 @@ EBNF_GRAMMAR = r"""
     
     %import common.WS
     %ignore WS
-    %ignore /\(\*.*?\*\)/s              // Multi-line comments
+    %ignore /\(\*(.|\n)*?\*\)/          // Multi-line comments
 """
 
 # ─────────────────────────── Data Classes ───────────────────────────
@@ -185,7 +185,7 @@ class EBNFToOpenAPITranslator:
         # Parse the EBNF
         try:
             ast = self.parser.parse(content)
-            
+
             # Store productions
             for item in ast:
                 if isinstance(item, dict) and 'name' in item and 'expression' in item:
@@ -219,38 +219,42 @@ class EBNFToOpenAPITranslator:
                     line_number=i + 1
                 )
                 
-                # Look for the production name after the comment block
+                # Look for the production name after the comment block(s)
                 j = i + 1
-                in_comment = True  # We know we're starting inside a comment
-                
+                in_comment = '(*' in lines[i] and not lines[i].strip().endswith('*)')
+
                 while j < len(lines):
                     line_content = lines[j].strip()
-                    
+
+                    # Check if entering a new comment block
+                    if not in_comment and line_content.startswith('(*'):
+                        in_comment = True
+
                     # Check if we're exiting the comment block
                     if in_comment and '*)' in lines[j]:
                         in_comment = False
                         j += 1
                         continue
-                    
+
                     # Skip lines while still in comment
                     if in_comment:
                         j += 1
                         continue
-                    
-                    # Skip empty lines after comment
+
+                    # Skip empty lines
                     if not line_content:
                         j += 1
                         continue
-                    
+
                     # Look for production definition
                     prod_match = re.match(production_pattern, lines[j])
                     if prod_match:
                         endpoint.production_name = prod_match.group(1)
                         break
-                    
-                    # If we hit another line that's not a production, stop
+
+                    # If we hit another line that's not a production or comment, stop
                     break
-                    
+
                 j += 1
                 
                 self.endpoints.append(endpoint)
@@ -261,7 +265,7 @@ class EBNFToOpenAPITranslator:
         """Generate the complete OpenAPI specification"""
         # First, generate all schemas
         schemas = self._generate_all_schemas()
-        
+
         # Generate paths based on endpoints
         paths = self._generate_paths()
         
@@ -276,6 +280,12 @@ class EBNFToOpenAPITranslator:
             ("servers", [
                 {"url": "https://api.example.com/v1", "description": "Production server"},
                 {"url": "http://localhost:4010", "description": "Mock server"}
+            ]),
+            ("tags", [
+                {
+                    "name": "jobs",
+                    "description": "Job submission endpoints for mailing documents"
+                }
             ]),
             ("components", OrderedDict([
                 ("schemas", schemas),
@@ -299,12 +309,11 @@ class EBNFToOpenAPITranslator:
         schemas = OrderedDict()
         
         # Simple types that should be generated as schemas when referenced
+        # NOTE: Only include fields that are defined in EBNF data dictionary
         simple_type_schemas = {
             # String types
-            'documentName': {'type': 'string'},
             'firstName': {'type': 'string'},
             'lastName': {'type': 'string'},
-            'nickName': {'type': 'string'},
             'address1': {'type': 'string'},
             'address2': {'type': 'string'},
             'address3': {'type': 'string'},
@@ -313,45 +322,33 @@ class EBNFToOpenAPITranslator:
             'country': {'type': 'string'},
             'zip': {'type': 'string'},
             'phoneNumber': {'type': 'string'},
-            'externalUrl': {'type': 'string', 'format': 'uri'},
-            'tag': {'type': 'string'},
             'tags': {'type': 'array', 'items': {'type': 'string'}},  # Fix recursive definition
             'jobTemplate': {'type': 'string'},
             'invoiceNumber': {'type': 'string'},
             'routingNumber': {'type': 'string'},
             'accountNumber': {'type': 'string'},
             'cardNumber': {'type': 'string'},
-            'delimiter': {'type': 'string'},
-            'tbd': {'type': 'string'},
-            
+
             # Integer types
             'documentId': {'type': 'integer'},
-            'addressId': {'type': 'integer'},
             'addressListId': {'type': 'integer'},
-            'uploadRequestId': {'type': 'integer'},
-            'zipId': {'type': 'integer'},
             'startPage': {'type': 'integer'},
             'endPage': {'type': 'integer'},
             'month': {'type': 'integer', 'minimum': 1, 'maximum': 12},
             'year': {'type': 'integer'},
             'cvv': {'type': 'integer'},
             'checkDigit': {'type': 'integer'},
-            'pageOffset': {'type': 'integer'},
-            
+
             # Number types
             'amountDue': {'type': 'number'},
-            'amount': {'type': 'number'},
-            'x': {'type': 'number'},
-            'y': {'type': 'number'},
-            'width': {'type': 'number'},
-            'height': {'type': 'number'}
+            'amount': {'type': 'number'}
         }
         
         # Add simple type schemas first
         schemas.update(simple_type_schemas)
         
         # Skip these fundamental types that shouldn't have schemas
-        skip_types = {'string', 'integer', 'number', 'character', 'id'}
+        skip_types = {'string', 'integer', 'number', 'character'}
         
         # Generate schemas dynamically from EBNF productions
         for name, production in self.productions.items():
@@ -364,38 +361,7 @@ class EBNFToOpenAPITranslator:
             
             # Add the schema
             schemas[name] = schema
-        
-        # Add composed schemas that might be missing
-        if 'documentsToMerge' not in schemas:
-            schemas['documentsToMerge'] = {
-                'type': 'array',
-                'items': {'$ref': '#/components/schemas/documentSourceIdentifier'}
-            }
-        
-        if 'addressCapturePdfs' not in schemas:
-            schemas['addressCapturePdfs'] = {
-                'type': 'array',
-                'items': {'$ref': '#/components/schemas/addressListPdf'}
-            }
-        
-        if 'embeddedExtractionSpecs' not in schemas:
-            schemas['embeddedExtractionSpecs'] = {
-                'type': 'array',
-                'items': {'$ref': '#/components/schemas/extractionSpec'}
-            }
-            
-        if 'addressListRegion' not in schemas:
-            schemas['addressListRegion'] = {'type': 'string'}  # Placeholder for 'tbd'
-            
-        if 'exactlyOneNewAddress' not in schemas:
-            schemas['exactlyOneNewAddress'] = {'$ref': '#/components/schemas/recipientAddress'}
-            
-        if 'exactlyOneListId' not in schemas:
-            schemas['exactlyOneListId'] = {'type': 'integer'}  # addressListId
-            
-        if 'exactlyOneId' not in schemas:
-            schemas['exactlyOneId'] = {'type': 'integer'}  # addressId
-        
+
         # Add a standard response schema
         schemas["StandardResponse"] = {
             "type": "object",
@@ -406,7 +372,7 @@ class EBNFToOpenAPITranslator:
             }
         }
         
-        # Add any generated named schemas (e.g., for documentSourceIdentifier variants)
+        # Add any generated named schemas from concatenation structures
         schemas.update(self.generated_schemas)
         
         return schemas
@@ -414,7 +380,7 @@ class EBNFToOpenAPITranslator:
     def _generate_paths(self) -> OrderedDict:
         """Generate API paths dynamically from EBNF endpoints"""
         paths = OrderedDict()
-        
+
         # Generate endpoints dynamically from EBNF
         for endpoint in self.endpoints:
             if not endpoint.production_name:
@@ -431,20 +397,21 @@ class EBNFToOpenAPITranslator:
                 ))
                 continue
             
-            # Generate schema from EBNF production
-            request_schema = self._generate_schema_from_production(endpoint.production_name)
-            
+            # Use $ref to schema component instead of inlining
+            # This preserves proper field names like 'documentsWithRecipients' instead of 'items'
             if endpoint.path not in paths:
                 paths[endpoint.path] = OrderedDict()
-            
+
             operation = OrderedDict([
-                ("summary", f"Operation for {endpoint.path}"),
+                ("tags", ["jobs"]),
+                ("summary", self._generate_summary(endpoint)),
+                ("description", self._generate_description(endpoint)),
                 ("operationId", self._generate_operation_id(endpoint)),
                 ("requestBody", {
                     "required": True,
                     "content": {
                         "application/json": {
-                            "schema": request_schema
+                            "schema": {"$ref": f"#/components/schemas/{endpoint.production_name}"}
                         }
                     }
                 }),
@@ -470,7 +437,49 @@ class EBNFToOpenAPITranslator:
         """Generate operation ID from endpoint"""
         # Use the production name as the operation ID
         return endpoint.production_name
-    
+
+    def _generate_summary(self, endpoint: Endpoint) -> str:
+        """Generate a brief summary from endpoint path"""
+        # Extract meaningful parts from path
+        # Example: /jobs/submit/single/doc -> "Submit a single document job"
+        path_parts = [p for p in endpoint.path.strip('/').split('/') if p]
+
+        # Build summary based on path pattern
+        if len(path_parts) >= 3 and path_parts[0] == 'jobs' and path_parts[1] == 'submit':
+            variant = ' '.join(path_parts[2:])
+            return f"Submit a {variant} job"
+
+        # Fallback: use production name as readable text
+        return endpoint.production_name.replace('_', ' ').title()
+
+    def _generate_description(self, endpoint: Endpoint) -> str:
+        """Generate a detailed description from endpoint"""
+        # Extract path components
+        path_parts = [p for p in endpoint.path.strip('/').split('/') if p]
+
+        # Generate description based on path pattern
+        if len(path_parts) >= 3 and path_parts[0] == 'jobs' and path_parts[1] == 'submit':
+            variant = ' '.join(path_parts[2:])
+
+            # Add specific details based on variant
+            descriptions = {
+                'single doc': 'Submits a mailing job with a single document to be sent to one or more recipients.',
+                'multi doc': 'Submits a mailing job with multiple documents to be sent to recipients.',
+                'multi doc-merge': 'Submits a mailing job that merges multiple documents before mailing.',
+                'single pdf-split': 'Submits a mailing job that splits a single PDF into multiple mailings.',
+                'multi pdf-address-capture': 'Submits a mailing job that extracts addresses embedded in PDF documents.',
+                'single pdf-address-capture': 'Submits a mailing job that extracts addresses from a single PDF document.'
+            }
+
+            base_desc = descriptions.get(variant, f"Submits a {variant} mailing job.")
+
+            # Add common details
+            return (f"{base_desc} The request body contains job parameters including document source, "
+                   f"recipient address information, and payment details.")
+
+        # Fallback description
+        return f"API endpoint for {endpoint.production_name.replace('_', ' ')}"
+
     def _generate_schema_from_production(self, production_name: str) -> Dict[str, Any]:
         """Generate schema from EBNF production"""
         if production_name not in self.productions:
@@ -558,7 +567,12 @@ class EBNFToOpenAPITranslator:
             elif expr_type == 'symbol':
                 symbol_name = expr.get('name')
                 if symbol_name:
-                    if symbol_name in self.productions:
+                    # Check if this symbol resolves to a primitive that will be skipped
+                    skip_types = {'string', 'integer', 'number', 'character'}
+                    if symbol_name in skip_types:
+                        # Inline the primitive type instead of creating a $ref
+                        return {"type": symbol_name}
+                    elif symbol_name in self.productions:
                         return {"$ref": f"#/components/schemas/{symbol_name}"}
                     else:
                         return self._get_field_type(symbol_name)
@@ -584,12 +598,9 @@ class EBNFToOpenAPITranslator:
                     symbol_name = choice.get('name')
                     if symbol_name:
                         # Check if this is a simple/primitive type that needs wrapping in oneOf context
-                        # For documentSourceIdentifier: documentId and externalUrl need wrapping
                         # For recipientAddressSource: addressId and addressListId need wrapping
                         needs_wrapping = False
-                        if context == 'documentSourceIdentifier' and symbol_name in ['documentId', 'externalUrl']:
-                            needs_wrapping = True
-                        elif context == 'recipientAddressSource' and symbol_name in ['addressId', 'addressListId']:
+                        if context == 'recipientAddressSource' and symbol_name in ['addressId', 'addressListId']:
                             needs_wrapping = True
                         
                         if needs_wrapping:
@@ -610,7 +621,7 @@ class EBNFToOpenAPITranslator:
                 
                 elif choice_type == 'concatenation':
                     # Complex object type - create named schema for oneOf variants
-                    if context in ['documentSourceIdentifier', 'recipientAddressSource', 'paymentDetails']:
+                    if context in ['recipientAddressSource', 'paymentDetails']:
                         # Analyze the concatenation to determine schema name
                         schema_obj = self._expression_to_schema(choice, context)
                         schema_name = self._get_schema_name_for_concatenation(choice, context)
@@ -641,14 +652,7 @@ class EBNFToOpenAPITranslator:
                 properties.append(item.get('name'))
         
         # Special handling for specific oneOf patterns
-        if context == 'documentSourceIdentifier':
-            if 'uploadRequestId' in properties and 'zipId' in properties:
-                return 'DocumentSourceWithUploadAndZip'
-            elif 'uploadRequestId' in properties:
-                return 'DocumentSourceWithUpload'
-            elif 'zipId' in properties:
-                return 'DocumentSourceFromZip'
-        elif context == 'paymentDetails':
+        if context == 'paymentDetails':
             if 'creditCardDetails' in properties:
                 return 'creditCardPayment'
             elif 'invoiceDetails' in properties:
@@ -684,8 +688,21 @@ class EBNFToOpenAPITranslator:
     
     def _get_field_type(self, field_name: str, format: Optional[str] = None) -> Dict[str, Any]:
         """Get the OpenAPI type for a field, resolving from EBNF if needed"""
-        # Always use references for all fields that have schemas
-        # This ensures consistency and avoids missing reference errors
+        # Check if this field is a primitive alias (e.g., paymentData = string)
+        type_info = self._resolve_type(field_name)
+
+        # If it resolves to a primitive, inline it instead of creating a $ref
+        # This prevents broken references like $ref: "#/components/schemas/string"
+        if type_info.openapi_type in ('string', 'integer', 'number', 'boolean'):
+            schema = {"type": type_info.openapi_type}
+            if type_info.format:
+                schema["format"] = type_info.format
+            if type_info.enum_values:
+                schema["enum"] = type_info.enum_values
+            return schema
+
+        # For complex types (array, oneOf, object), use a reference
+        # This includes arrays like multiDocJobs, unions like paymentDetails, and objects
         return {"$ref": f"#/components/schemas/{field_name}"}
     
     def _resolve_type(self, name: str, visited: Set[str] = None) -> TypeInfo:
@@ -738,7 +755,18 @@ class EBNFToOpenAPITranslator:
                         )
                         self.type_cache[name] = type_info
                         return type_info
-                
+                    else:
+                        # This is a oneOf union - should use $ref
+                        type_info = TypeInfo(openapi_type="oneOf")
+                        self.type_cache[name] = type_info
+                        return type_info
+
+                elif expr_type == 'repeat':
+                    # This is an array type - should use $ref
+                    type_info = TypeInfo(openapi_type="array")
+                    self.type_cache[name] = type_info
+                    return type_info
+
                 elif expr_type == 'concatenation':
                     # This is an object type
                     type_info = TypeInfo(openapi_type="object")

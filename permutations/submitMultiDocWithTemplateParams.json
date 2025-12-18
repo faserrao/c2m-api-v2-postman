@@ -1,16 +1,12 @@
 {
-  "endpoint": "submitSingleDocWithTemplateParams",
+  "endpoint": "submitMultiDocWithTemplateParams",
   "paramsDefinition": [
-    "submitSingleDocWithTemplateParams =",
-    "      ( documentSourceIdentifier",
-    "      | { recipientAddressSource }",
-    "      | (documentSourceIdentifier + { recipientAddressSource}) )",
+    "submitMultiDocWithTemplateParams =",
+    "      documentsWithRecipients",
     "    + jobTemplate",
     "    + paymentDetails",
     "    + [ tags ] ;"
   ],
-
-
   "permutations": [
     {
       "documentSourceIdentifier": {

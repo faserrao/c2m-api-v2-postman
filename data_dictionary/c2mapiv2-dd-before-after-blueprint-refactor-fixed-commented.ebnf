@@ -170,67 +170,44 @@
      - Arrays are represented as { item }.
 *)
 
-
 (***********************************)
 (*        ENDPOINT DEFINITIONS      *)
 (***********************************)
 
 (* ------------------------------------------------------------------------- *)
-(* Endpoint: POST /jobs/submit/single/doc                                              *)
+(* POST /jobs/submit/single/doc                                              *)
 (* ------------------------------------------------------------------------- *)
-
 (* English meaning:
    - Body MAY include jobTemplate (preferred options selector).
-   - Body MUST include `docSourceAll` (document source).
-     `docSourceAll` can be:
-       - documentIdSource (documentId): References a stored document by ID
-       - requestIdSource (requestId + [filename]): References an uploaded file from a previous upload request
-       - urlSource (url): URL to fetch document from external source
-       - zipDocumentIdSource (zipDocumentId + filename): References a file within a stored zip archive
-       - zipRequestIdSource (requestId + zipFilename + filename): References a file within an uploaded zip archive
-
-     *** Mahesh: Can this endpoint be called with zipDocumentIdSource and zipRequestIdSource??
-
+   - Body MUST include documentSource (where the document comes from).
    - Body MUST include recipientAddressSource (single address OR list OR stored list).
-     recipientAddressSource can be:
-       - (mappingId + singleAddress [+addressName]): Single recipient with mapping
-       - (mappingId + addressList [+addressListName]): List of recipients with mapping
-       - addressListId: Reference to stored address list
-     Note: mappingId is optional. If omitted, the server will use the default mapping ID.
    - Body MAY include paymentDetails, returnAddress, jobOptions, tags.
 *)
-
 (* Decision / validation rules (implementation-required):
-   Document source (docSourceAll):
-     IF docSourceAll is documentIdSource (documentId)
+   Document source (documentSource):
+     IF documentSource is documentIdSource (documentId)
        THEN resolve stored document by documentId.
-     ELSE IF docSourceAll is requestIdSource (requestId [+filename])
+     ELSE IF documentSource is requestIdSource (requestId [+filename])
        THEN lookup upload request by requestId.
             IF upload request contains > 1 file
               THEN filename MUST be provided and MUST match a file in that request.
             ELSE filename MAY be omitted.
-     ELSE IF docSourceAll is urlSource (url)
+     ELSE IF documentSource is urlSource (url)
        THEN fetch document from url; reject if fetch fails or content-type not allowed.
-     ELSE IF docSourceAll is zipDocumentIdSource (zipDocumentId + filename)
+     ELSE IF documentSource is zipDocumentIdSource (zipDocumentId + filename)
        THEN resolve zip archive by zipDocumentId; filename MUST exist in zip.
-     ELSE IF docSourceAll is zipRequestIdSource (requestId + zipFilename + filename)
+     ELSE IF documentSource is zipRequestIdSource (requestId + zipFilename + filename)
        THEN resolve upload request by requestId; zipFilename MUST identify the uploaded zip;
             filename MUST exist in that zip.
-     ELSE reject (no supported docSourceAll variant).
+     ELSE reject (no supported documentSource variant).
 
    Recipient source (recipientAddressSource):
      IF recipientAddressSource is addressListId
        THEN load stored list by addressListId.
-     ELSE IF recipientAddressSource is ([mappingId] + singleAddress [+addressName])
+     ELSE IF recipientAddressSource is (mappingId + singleAddress [+addressName])
        THEN treat as single-recipient source; validate required address fields per product rules.
-            IF mappingId is omitted
-              THEN use server default mapping ID for merge-variable mapping.
-            ELSE apply provided mappingId for merge-variable mapping.
-     ELSE IF recipientAddressSource is ([mappingId] + addressList [+addressListName])
-       THEN validate addressList has >= 1 entry.
-            IF mappingId is omitted
-              THEN use server default mapping ID for merge-variable mapping.
-            ELSE apply provided mappingId for merge-variable mapping.
+     ELSE IF recipientAddressSource is (mappingId + addressList [+addressListName])
+       THEN validate addressList has >= 1 entry; apply mappingId for merge-variable mapping.
      ELSE reject (no supported recipientAddressSource variant).
 
    jobTemplate vs jobOptions:
@@ -244,7 +221,6 @@
        THEN exactly one payment variant must be used.
             ApplePay / GooglePay variants are excluded for initial testing (commented out).
 *)
-
 submitSingleDocParams =
       [ jobTemplate ]
     + docSourceAll
@@ -254,27 +230,23 @@ submitSingleDocParams =
     + [ jobOptions ]
     + [ tags ] ;
 
-
 (* ------------------------------------------------------------------------- *)
-(* Endpoint: POST /jobs/submit/single/pdf/addressCapture                               *)
+(* POST /jobs/submit/single/pdf/addressCapture                               *)
 (* ------------------------------------------------------------------------- *)
-
 (* English meaning:
    - Body MAY include jobTemplate.
-   - Body MUST include `docSourceStandard` (document source - non-zip variants only).
-     `docSourceStandard` can be: documentIdSource, requestIdSource, or urlSource (zip sources not allowed for this endpoint).
+   - Body MUST include documentSource.
    - Body MAY include paymentDetails, returnAddress, jobOptions, tags.
    - Body does NOT include recipientAddressSource because addresses are captured
-     via OCR/address extraction workflow after document upload, not provided in request body.
+     via an address capture workflow (outside this JSON body).
 *)
-
 (* Decision / validation rules (implementation-required):
    Address capture constraint:
      IF request body includes recipientAddressSource (directly or nested)
        THEN reject (this endpoint relies on address capture workflow, not inline addresses).
 
    Document source:
-     Apply the same docSourceStandard resolution rules as /jobs/submit/single/doc.
+     Apply the same documentSource resolution rules as /jobs/submit/single/doc.
 
    Job list constraint:
      IF request body includes jobs
@@ -286,7 +258,6 @@ submitSingleDocParams =
    Payment:
      Same paymentDetails rules as /jobs/submit/single/doc (Apple/Google excluded).
 *)
-
 submitSinglePdfAddressCaptureParams =
       [ jobTemplate ]
     + docSourceStandard
@@ -295,34 +266,31 @@ submitSinglePdfAddressCaptureParams =
     + [ jobOptions ]
     + [ tags ] ;
 
-
 (* ------------------------------------------------------------------------- *)
-(* Endpoint: POST /jobs/submit/single/pdf/split                                         *)
+(* POST /jobs/submit/single/pdf/split                                         *)
 (* ------------------------------------------------------------------------- *)
-
 (* English meaning:
    - Body MAY include jobTemplate.
-   - Body MUST include `docSourceStandard` (the PDF to split).
-   - Body MUST include `pdfSplitJobsWithAddress` (list of page ranges with recipient addresses).
-   - Each `pdfSplitJobsWithAddress[]` entry is a `pdfSplitJobItemWithAddress` containing:
-       startPage (integer) + endPage (integer) + recipientAddressSource (address reference)
+   - Body MUST include documentSource (the PDF to split).
+   - Body MUST include jobs (list of split instructions).
+   - For this endpoint, each jobs[] entry SHOULD include:
+       startPage + endPage + recipientAddressSource
    - Body MAY include paymentDetails, returnAddress, jobOptions, tags.
 *)
-
 (* Decision / validation rules (implementation-required):
    Document type constraint:
-     Resolve docSourceStandard.
+     Resolve documentSource.
      IF resolved document is not a PDF
        THEN reject.
 
-   pdfSplitJobsWithAddress constraint:
-     IF pdfSplitJobsWithAddress missing OR pdfSplitJobsWithAddress has 0 entries
+   jobs constraint:
+     IF jobs missing OR jobs has 0 entries
        THEN reject.
 
    Per job item constraint:
-     FOR EACH pdfSplitJobsWithAddress[i]:
-       IF pdfSplitJobsWithAddress[i] is not a pdfSplitJobItemWithAddress shape
-         THEN reject (only pdfSplitJobItemWithAddress allowed; multiDocJobItem and pdfSplitJobItemNoAddress not allowed).
+     FOR EACH jobs[i]:
+       IF jobs[i] is not a pdfSplitJobItem shape
+         THEN reject (multiDocJobItem not allowed on this endpoint).
        IF startPage missing OR endPage missing
          THEN reject.
        IF startPage < 1 OR endPage < 1
@@ -332,7 +300,6 @@ submitSinglePdfAddressCaptureParams =
        IF recipientAddressSource missing
          THEN reject (required for /single/pdf/split).
 *)
-
 submitSinglePdfSplitParams =
       [ jobTemplate ]
     + docSourceStandard   (* choose, see below *)
@@ -342,44 +309,41 @@ submitSinglePdfSplitParams =
     + [ jobOptions ]
     + [ tags ] ;
 
-
 (* ------------------------------------------------------------------------- *)
-(* Endpoint: POST /jobs/submit/single/pdf/split/addressCapture                          *)
+(* POST /jobs/submit/single/pdf/split/addressCapture                          *)
 (* ------------------------------------------------------------------------- *)
-
 (* English meaning:
    - Same as /single/pdf/split, but recipient addresses are captured externally.
    - Body MAY include jobTemplate.
-   - Body MUST include `docSourceStandard`.
-   - Body MUST include `pdfSplitJobsNoAddress` (list of page ranges without addresses).
-   - Each `pdfSplitJobsNoAddress[]` entry is a `pdfSplitJobItemNoAddress` containing:
-       startPage (integer) + endPage (integer)
+   - Body MUST include documentSource.
+   - Body MUST include jobs (list of page ranges).
+   - For this endpoint, each jobs[] entry SHOULD include:
+       startPage + endPage
+     and should NOT include recipientAddressSource.
    - Body MAY include paymentDetails, returnAddress, jobOptions, tags.
 
    Implementation note:
    - This DD models pdfSplitJobItem with [ recipientAddressSource ] (optional).
      Endpoint-level validation differentiates required/omitted usage per path.
 *)
-
 (* Decision / validation rules (implementation-required):
    Document type constraint:
-     Resolve docSourceStandard.
+     Resolve documentSource.
      IF resolved document is not a PDF
        THEN reject.
 
-   pdfSplitJobsNoAddress constraint:
-     IF pdfSplitJobsNoAddress missing OR pdfSplitJobsNoAddress has 0 entries
+   jobs constraint:
+     IF jobs missing OR jobs has 0 entries
        THEN reject.
 
    Per job item constraint:
-     FOR EACH pdfSplitJobsNoAddress[i]:
-       IF pdfSplitJobsNoAddress[i] is not a pdfSplitJobItemNoAddress shape
+     FOR EACH jobs[i]:
+       IF jobs[i] is not a pdfSplitJobItem shape
          THEN reject.
        Validate startPage/endPage same as /single/pdf/split.
        IF recipientAddressSource is present
          THEN reject (addresses must be captured externally for this endpoint).
 *)
-
 submitSinglePdfSplitAddressCaptureParams =
       [ jobTemplate ]
     + docSourceStandard
@@ -391,43 +355,40 @@ submitSinglePdfSplitAddressCaptureParams =
 
 
 (* ------------------------------------------------------------------------- *)
-(* Endpoint: POST /jobs/submit/multi/doc                                                *)
+(* POST /jobs/submit/multi/doc                                                *)
 (* ------------------------------------------------------------------------- *)
-
 (* English meaning:
    - Submits multiple jobs in one request.
    - Body MAY include a top-level jobTemplate.
-   - Body MUST include `multiDocJobs` (list of job items).
-   - Each `multiDocJobs[]` item is a `multiDocJobItem` containing:
+   - Body MUST include jobs (list of job items).
+   - Each jobs[] item SHOULD include:
        [ jobTemplate ] + documentSource + recipientAddressSource
      where per-job jobTemplate is optional when top-level jobTemplate is present.
    - Body MAY include paymentDetails and tags.
 *)
-
 (* Decision / validation rules (implementation-required):
-   multiDocJobs constraint:
-     IF multiDocJobs missing OR multiDocJobs has 0 entries
+   jobs constraint:
+     IF jobs missing OR jobs has 0 entries
        THEN reject.
 
    Allowed job item shape:
-     FOR EACH multiDocJobs[i]:
-       IF multiDocJobs[i] is not a multiDocJobItem shape
+     FOR EACH jobs[i]:
+       IF jobs[i] is not a multiDocJobItem shape
          THEN reject (pdfSplitJobItem not allowed).
 
    jobTemplate scoping:
      IF top-level jobTemplate present:
-       THEN it applies to all multiDocJobs by default.
+       THEN it applies to all jobs by default.
             IF a job item also includes jobTemplate:
               THEN enforce policy (allow per-job override OR reject; choose and document).
      ELSE (no top-level jobTemplate):
        THEN each job MUST include jobTemplate OR server must supply a default; otherwise reject.
 
    Document and recipient rules:
-     FOR EACH multiDocJobs[i]:
-       Resolve multiDocJobs[i].documentSource using the same rules as /single/doc.
-       Resolve multiDocJobs[i].recipientAddressSource using the same rules as /single/doc.
+     FOR EACH jobs[i]:
+       Resolve jobs[i].documentSource using the same rules as /single/doc.
+       Resolve jobs[i].recipientAddressSource using the same rules as /single/doc.
 *)
-
 submitMultiDocParams =
       [ jobTemplate ]
     + multiDocJobs
@@ -436,9 +397,8 @@ submitMultiDocParams =
 
 
 (* ------------------------------------------------------------------------- *)
-(* Endpoint: POST /jobs/submit/multi/doc/merge                                          *)
+(* POST /jobs/submit/multi/doc/merge                                          *)
 (* ------------------------------------------------------------------------- *)
-
 (* English meaning:
    - Merges multiple documents then submits the merged result as one job.
    - Body MAY include jobTemplate.
@@ -446,7 +406,6 @@ submitMultiDocParams =
    - Body MUST include recipientAddressSource.
    - Body MAY include paymentDetails, returnAddress, jobOptions, tags.
 *)
-
 (* Decision / validation rules (implementation-required):
    Merge list constraint:
      IF documentsToMerge missing OR documentsToMerge has 0 entries
@@ -469,7 +428,6 @@ submitMultiDocParams =
    Recipient:
      recipientAddressSource is REQUIRED and must resolve using /single/doc rules.
 *)
-
 submitMultiDocMergeParams =
       [ jobTemplate ]
     + mergeDocumentSource
@@ -479,48 +437,44 @@ submitMultiDocMergeParams =
     + [ jobOptions ]
     + [ tags ] ;
 
-
 (* ------------------------------------------------------------------------- *)
-(* Endpoint: POST /jobs/submit/multi/zip                                                *)
+(* POST /jobs/submit/multi/zip                                                *)
 (* ------------------------------------------------------------------------- *)
-
 (* English meaning:
    - Submits multiple jobs, intended to be ZIP-ONLY (each job references a file within a zip document source).
    - Body MAY include jobTemplate.
-   - Body MUST include `multiZipJobs` (list of zip-sourced job items).
-   - Each `multiZipJobs[]` item is a `multiZipJobItem` containing:
+   - Body MUST include jobs (list of job items).
+   - Each jobs[] item SHOULD include:
        [ jobTemplate ] + documentSource + recipientAddressSource
    - Body MAY include paymentDetails and tags.
 *)
-
 (* Decision / validation rules (implementation-required):
-   multiZipJobs constraint:
-     IF multiZipJobs missing OR multiZipJobs has 0 entries
+   jobs constraint:
+     IF jobs missing OR jobs has 0 entries
        THEN reject.
 
    Allowed job item shape:
-     FOR EACH multiZipJobs[i]:
-       IF multiZipJobs[i] is not a multiZipJobItem shape
+     FOR EACH jobs[i]:
+       IF jobs[i] is not a multiDocJobItem shape
          THEN reject.
 
    Zip policy:
      This endpoint is modeled as ZIP-ONLY in the grammar via:
        multiZipJobItem = [ jobTemplate ] + docSourceZipFile + recipientAddressSource ;
 
-     Therefore, each multiZipJobs[i] can only reference:
+     Therefore, each jobs[i] can only reference:
        - zipDocumentIdSource, OR
        - zipRequestIdSource
 
      Implementation should still validate:
-       IF multiZipJobs[i] uses zipRequestIdSource:
+       IF jobs[i] uses zipRequestIdSource:
          THEN zipFilename MUST identify a zip file within that upload request.
-       IF multiZipJobs[i] uses zipDocumentIdSource:
+       IF jobs[i] uses zipDocumentIdSource:
          THEN filename MUST exist inside the referenced zipDocumentId.
 
    jobTemplate scoping:
      Same as /jobs/submit/multi/doc.
 *)
-
 submitMultiZipParams =
       [ jobTemplate ]
     + multiZipJobs
@@ -529,9 +483,8 @@ submitMultiZipParams =
 
 
 (* ------------------------------------------------------------------------- *)
-(* Endpoint: POST /jobs/submit/multi/zip/addressCapture                                 *)
+(* POST /jobs/submit/multi/zip/addressCapture                                 *)
 (* ------------------------------------------------------------------------- *)
-
 (* English meaning:
    - Zip-based submission where addresses are captured externally.
    - Body MAY include jobTemplate.
@@ -540,7 +493,6 @@ submitMultiZipParams =
    - Body does NOT include recipientAddressSource because address capture occurs
      outside this JSON body.
 *)
-
 (* Decision / validation rules (implementation-required):
    Address capture constraint:
      IF request body includes recipientAddressSource (directly or nested)
@@ -563,13 +515,12 @@ submitMultiZipParams =
             (e.g., implicit enumeration, metadata inside zip, or subsequent capture step).
 
    Job list constraint:
-     IF request body includes multiDocJobs OR multiZipJobs OR pdfSplitJobsWithAddress OR pdfSplitJobsNoAddress (i.e., any jobs array)
+     IF request body includes jobs
        THEN reject.
 
    jobTemplate vs jobOptions:
      Apply the same mutual-exclusion/default policy as /single/doc.
 *)
-
 submitMultiZipAddressCaptureParams =
       [ jobTemplate ]
     + zipDocumentSource
@@ -640,8 +591,8 @@ address =
     + [ foo1 ] + [ foo2 ] ;
 
 recipientAddressSource =
-      ([ mappingId ] + singleAddress + [ addressName ])
-    | ([ mappingId ] + addressList  + [ addressListName ])
+      (mappingId + singleAddress + [ addressName ])
+    | (mappingId + addressList  + [ addressListName ])
     | addressListId ;
 
 mappingId = id ;
@@ -712,12 +663,25 @@ mergeByRequestId  = requestId + [ filename ] ;
 (*              JOB LISTS           *)
 (***********************************)
 
-multiDocJobs = { multiDocJobItem } ;
+(*
+jobs = { job } ;
+
+job =
+      multiDocJobItem
+    | pdfSplitJobItem ;
 
 multiDocJobItem =
       [ jobTemplate ]
     + docSourceAll
     + recipientAddressSource ;
+
+pdfSplitJobItem =
+      startPage
+    + endPage
+    + [ recipientAddressSource ] ;
+*)
+
+multiDocJobs = { multiDocJobItem } ;
 
 pdfSplitJobsWithAddress = { pdfSplitJobItemWithAddress } ;
 pdfSplitJobsNoAddress   = { pdfSplitJobItemNoAddress } ;
@@ -876,7 +840,7 @@ countryCode = string ;
 
 (********************************)
 (*      GOOGLE PAY (TOKENIZED)     *)
-(* Google Pay definitions intentionally commented out for initial testing *)
+(* Apple Pay definitions intentionally commented out for initial testing *)
 (********************************)
 
 (*

@@ -237,7 +237,7 @@
         <h2>Quick Examples</h2>
         
         <h3>1. Send a Single Document</h3>
-        <pre><code>curl -X POST https://api.c2m.com/v1/jobs/single-doc-job-template \
+        <pre><code>curl -X POST https://api.c2m.com/v1/jobs/submit/single/doc \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -250,7 +250,7 @@
   }'</code></pre>
         
         <h3>2. Send Multiple Documents</h3>
-        <pre><code>curl -X POST https://api.c2m.com/v1/jobs/multi-docs-job-template \
+        <pre><code>curl -X POST https://api.c2m.com/v1/jobs/submit/multi/docs \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -286,7 +286,7 @@
   }'</code></pre>
         
         <h3>3. Merge and Send Documents</h3>
-        <pre><code>curl -X POST https://api.c2m.com/v1/jobs/multi-doc-merge-job-template \
+        <pre><code>curl -X POST https://api.c2m.com/v1/jobs/submit/multi/doc/merge \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -353,18 +353,18 @@
             </thead>
             <tbody>
                 <tr>
-                    <td><code>/jobs/single-doc</code></td>
-                    <td><code>/jobs/single-doc-job-template</code></td>
+                    <td><code>/jobs/submit/single/doc</code></td>
+                    <td><code>/jobs/submit/single/doc</code></td>
                     <td><code>standard-letter</code></td>
                 </tr>
                 <tr>
-                    <td><code>/jobs/multi-doc</code></td>
-                    <td><code>/jobs/multi-docs-job-template</code></td>
+                    <td><code>/jobs/submit/multi/docs</code></td>
+                    <td><code>/jobs/submit/multi/docs</code></td>
                     <td><code>standard-letter</code></td>
                 </tr>
                 <tr>
-                    <td><code>/jobs/multi-doc-merge</code></td>
-                    <td><code>/jobs/multi-doc-merge-job-template</code></td>
+                    <td><code>/jobs/submit/multi/doc/merge</code></td>
+                    <td><code>/jobs/submit/multi/doc/merge</code></td>
                     <td><code>standard-letter</code></td>
                 </tr>
             </tbody>

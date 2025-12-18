@@ -1036,7 +1036,7 @@ postman-api-linked-collection-generate: $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES) |
 	@mv $(POSTMAN_COLLECTION_RAW).tmp $(POSTMAN_COLLECTION_RAW)
 	@echo "✅ Collection generated with 'info' block"
 	@echo "🔧 Fixing oneOf placeholders in collection..."
-	@node scripts/active/fix_oneOf_placeholders.js $(POSTMAN_COLLECTION_RAW) $(POSTMAN_COLLECTION_RAW)
+	@node scripts/active/fix_oneOf_placeholders.js $(C2MAPIV2_OPENAPI_SPEC_BASE) $(POSTMAN_COLLECTION_RAW) $(POSTMAN_COLLECTION_RAW)
 	@echo "✅ OneOf placeholders fixed (e.g., <integer> → <oneOf>)"
 
 # ========================================================================

@@ -273,6 +273,162 @@ YES `git-push.sh` - Quick commit helper (target: git-save)
 
 ## Session History
 
+### 2025-12-18: EBNF to OpenAPI Translator - Documentation & Auth Warnings Fix
+
+**Summary**: Fixed all Priority 1 (documentation quality) and Priority 2 (auth configuration) OpenAPI validation warnings by implementing automated summary/description generators in the translator and adding proper OAuth2 security scheme definitions with scopes.
+
+**Results**:
+- Starting: 0 errors, 34 warnings
+- Ending: 0 errors, 5 warnings (85% reduction)
+- All functional warnings resolved
+
+**Work Completed**:
+
+1. **Priority 1 Fixes - Documentation Quality** (16 warnings eliminated):
+   - Implemented `_generate_summary()` method in translator - generates brief one-line summaries from endpoint paths
+   - Implemented `_generate_description()` method - generates detailed descriptions with endpoint-specific text
+   - Added global "jobs" tag to OpenAPI spec generation
+   - Result: All 8 job submission endpoints now have proper tags, summaries, and descriptions
+
+2. **Priority 2 Fixes - Auth Configuration** (6 warnings eliminated):
+   - Added global "auth" tag to auth overlay file
+   - Added "jobs" tag to overlay (prevents overlay from replacing base spec tags during merge)
+   - Converted security schemes from HTTP Bearer to OAuth2 type with clientCredentials flow
+   - Defined scopes: `tokens:write` and `tokens:revoke` in both ShortTokenAuth and LongTokenAuth
+   - Result: All auth endpoints now have proper tag definitions and security scopes
+
+**Files Modified**:
+- `scripts/active/ebnf_to_openapi_dynamic_v3.py` - Added 2 generator methods + global tags section
+- `openapi/overlays/auth.tokens.yaml` - Added tags + OAuth2 security schemes with scopes
+- `openapi/c2mapiv2-openapi-spec-base.yaml` - Regenerated with new documentation
+- `openapi/c2mapiv2-openapi-spec-final.yaml` - Merged with updated auth overlay
+
+**Remaining 5 Warnings** (cosmetic only - not concerning):
+- All are `oas3-unused-component` warnings for components that may be used in future endpoints:
+  - phoneNumber, tagsList, documentSource (schemas)
+  - Authorization, Content-Type (parameters)
+
+**Key Learnings**:
+- Path-based documentation generation works well for consistent endpoint naming patterns
+- OAuth2 type required for scope definitions (HTTP Bearer doesn't support scopes)
+- Both tags must be in overlay file to survive merge operation (merge replaces entire tags section)
+- Validation workflow: Fix base spec → Regenerate from EBNF → Fix overlay → Merge and validate → Iterate
+
+**Build Status**:
+- Background build #1 (without-tests): Completed in ~30 seconds - 8 Postman resources created
+- Background build #2 (with-tests): Completed successfully - Full pipeline with local testing
+- Personal workspace: All resources deployed
+- Session log: Updated
+
+---
+
+### 2025-12-18 (PM): OneOf Field Handling & Mutual Exclusion Fixes
+
+**Summary**: Fixed critical bugs in oneOf placeholder handling and test data generation. Discovered hardcoded field lists in two scripts causing incorrect placeholder replacements and invalid test data (jobTemplate + jobOptions coexistence).
+
+**Issues Fixed**:
+
+1. **OneOf Placeholder Script - Hardcoded Field List**:
+   - Problem: `docSourceAll` showing as `"<integer>"` instead of `"<oneOf>"`
+   - Root cause: `fix_oneOf_placeholders.js` had hardcoded list of only 3 oneOf fields
+   - Solution: Rewrote to dynamically discover all oneOf fields from OpenAPI spec
+   - Implementation: Added `discoverOneOfFields()` using js-yaml to traverse components/schemas
+   - Result: Now discovers 8 oneOf fields (was 3), 100 replacements (was 24)
+
+2. **OneOf Object Replacement**:
+   - Problem: `recipientAddressSource` showing as full object instead of `"<oneOf>"`
+   - Root cause: Script only replaced simple placeholders, not objects
+   - Solution: Enhanced `processValue()` to detect objects with placeholder values
+   - Implementation: Check JSON.stringify for `"<string>"`, `"<integer>"`, etc.
+   - Result: All oneOf fields now properly replaced regardless of generated format
+
+3. **Test Data Generator - Missing Fixtures**:
+   - Problem: Test collection showing `"default"` instead of proper oneOf objects
+   - Root cause: `addRandomDataToRaw.js` also had hardcoded oneOf list
+   - Solution: Manually added fixtures for 4 missing oneOf fields
+   - Added: `docSourceAll` (5 variants), `docSourceStandard` (3), `docSourceZipFile` (2), `zipDocumentSource` (2)
+
+4. **JobTemplate/JobOptions Mutual Exclusion**:
+   - Problem: Test data had BOTH `jobTemplate` AND `jobOptions` (invalid per business rule)
+   - EBNF rule: "IF both present THEN reject as mutually exclusive"
+   - Found: 6 of 8 endpoints had invalid combinations
+   - Solution: Added `enforceMutualExclusion()` function to test data generator
+   - Strategy: Alternate between template-based and options-based examples (50/50 split)
+   - Result: 5 template-based, 3 options-based, 0 invalid (100% valid test data)
+
+**Validation Results**:
+- Linked Collection: All oneOf fields correctly show as `"<oneOf>"` ✓
+- Test Collection: All oneOf fields have proper example data objects ✓
+- Mutual Exclusion: No endpoints have both jobTemplate and jobOptions ✓
+- Both builds (with-tests, without-tests): Completed successfully ✓
+
+**Files Modified**:
+- `scripts/active/fix_oneOf_placeholders.js` - Complete rewrite (dynamic discovery, object handling)
+- `Makefile` (line 1039) - Pass OpenAPI spec as parameter to fix script
+- `scripts/test_data_generator_for_collections/addRandomDataToRaw.js` - Added mutual exclusion logic + 4 oneOf fixtures
+
+**Key Decisions**:
+- Hardcoded mutual exclusion acceptable for now (extensible later if needed)
+- Dynamic discovery from OpenAPI spec better than maintaining hardcoded lists
+- Test data must follow business rules, not just schema constraints
+
+**Key Learnings**:
+- Hardcoded field lists are brittle - use spec as source of truth
+- OpenAPI spec traversal: check both schema-level and property-level oneOf
+- Business rules (mutual exclusion) need enforcement in test data generation
+- Valid test data = schema-valid AND business-rule-valid
+
+**Future Enhancements - Generic Mutual Exclusion**:
+
+The current implementation uses a hardcoded approach (jobTemplate/jobOptions alternation) which will break if:
+- New mutually exclusive field pairs are added
+- Field names change
+- Different mutual exclusion strategies are needed
+
+**Three Approaches for Making Mutual Exclusion More Generic**:
+
+1. **Extract Rules from EBNF Comments**:
+   - Read mutual exclusion rules directly from EBNF data dictionary comments
+   - Example EBNF comment format:
+     ```ebnf
+     (* IF jobTemplate is present AND jobOptions is present
+        THEN enforce policy (recommended: reject as mutually exclusive) *)
+     ```
+   - Pros: Single source of truth, self-documenting
+   - Cons: Requires EBNF comment parser, complex regex patterns
+
+2. **Configuration File Approach**:
+   - Create separate JSON/YAML config file with mutual exclusion rules
+   - Example configuration:
+     ```json
+     {
+       "mutualExclusionRules": [
+         {
+           "fields": ["jobTemplate", "jobOptions"],
+           "strategy": "alternate"
+         }
+       ]
+     }
+     ```
+   - Pros: Easy to read/modify, supports multiple strategies
+   - Cons: Separate file to maintain, could drift from EBNF
+
+3. **OpenAPI Spec Detection**:
+   - Check for oneOf at schema level that wraps these fields
+   - Or use custom extension like `x-mutual-exclusion`
+   - Example OpenAPI extension:
+     ```yaml
+     x-mutual-exclusion:
+       - fields: [jobTemplate, jobOptions]
+         strategy: alternate
+     ```
+   - Pros: Leverages existing OpenAPI spec, detected automatically
+   - Cons: Requires EBNF-to-OpenAPI translator updates
+
+**Recommendation**: Start with Approach #2 (configuration file) for quick implementation, then migrate to Approach #1 (EBNF comments) for long-term maintainability.
+
+---
+
 ### 2025-11-09: Apple Pay/Google Pay Proposal + Data Dictionary Duplicate Definitions Fix YES
 
 **Summary**: Created comprehensive Apple Pay and Google Pay payment method proposals for V2 wrapper implementation, then discovered and resolved duplicate EBNF definitions in the data dictionary.
@@ -534,6 +690,124 @@ make postman-instance-build-without-tests
 - YES Validation passing at 100% (22/22 tests)
 - YES All repos synchronized
 - PENDING GitHub Pages deployment (requires admin to enable in settings)
+
+---
+
+## Session History
+
+### 2025-12-17: Jobs Submit API EBNF Validation & Translation Fix
+
+**Summary**: Validated EBNF → OpenAPI translation for Jobs Submit API handoff spec, discovered and fixed critical missing schema definition (`multiDocJobItem`), created comprehensive translator risk report, and completed full rebuild to personal Postman workspace.
+
+#### Context
+- User provided Claude Code Handoff Spec for C2M Jobs Submit API
+- 8 simplified endpoints under POST /jobs/submit/...
+- EBNF Data Dictionary as source of truth
+- Translator-friendly refactors already applied
+- Apple Pay/Google Pay intentionally commented out
+
+#### EBNF Translation Validation
+- Ran EBNF → OpenAPI translator on c2mapiv2-dd.ebnf (904 lines)
+- Generated 719-line OpenAPI spec
+- **CRITICAL FAILURE Discovered**: `multiDocJobItem` schema referenced but not defined
+  - Line 694 in EBNF: `multiDocJobs = { multiDocJobItem } ;` (ACTIVE)
+  - Lines 683-686: `multiDocJobItem` definition was COMMENTED OUT
+  - OpenAPI spec created broken $ref causing POST /jobs/submit/multi/doc to fail completely
+
+#### Translator Risk Report
+- Created TRANSLATOR_RISK_REPORT.md (400 lines, 8 sections)
+- Executive Summary: 1 CRITICAL FAILURE, 3 KNOWN RISKS
+- Root Cause Analysis: EBNF comment/reference inconsistency
+- Impact Assessment: Endpoint broken, validation would fail
+- Verification Results: 7/8 endpoints correct, 3/4 job list schemas correct
+- Required Actions: IMMEDIATE blocker fix
+
+#### EBNF Fixes Applied
+**Fix #1: Missing multiDocJobItem Definition**
+```ebnf
+multiDocJobs = { multiDocJobItem } ;
+
+multiDocJobItem =
+      [ jobTemplate ]
+    + docSourceAll
+    + recipientAddressSource ;
+```
+- Added after line 694
+- Matches pattern of other job item definitions
+- Regenerated OpenAPI spec successfully
+
+**Fix #2: Missing Google Pay Token Definition**
+```ebnf
+token = string ;  (* Encrypted payment token from Google Pay *)
+```
+- Google Pay's `tokenizationData` referenced `token` field (line 268)
+- No definition existed (only Apple Pay's `applePayToken`)
+- Added after line 271
+- Regenerated OpenAPI spec again
+- Validation: 0 errors, 34 warnings (expected - unused components)
+
+#### Complete Rebuild to Personal Workspace
+- Set target: `echo "personal" > .postman-target`
+- Cleanup: `make postman-cleanup-all` (deleted 8 resources)
+- Build: `make postman-instance-build-without-tests` (completed in ~8 min)
+- **Build Target Error**: Used CI/CD target instead of local development target
+  - User correctly identified: "Why are you doing a build without tests on a local build?"
+  - Should have used `make postman-instance-build-with-tests` for local development
+  - Build completed successfully anyway
+
+**Resources Created (8 total)**:
+- API Definition: 158e36c9-9a51-47e8-ae98-1e64f4ca6b00
+- Standalone Spec: 8279c1a0-bf11-4c7d-a43d-cc659d910faf
+- Linked Collection: 46321051-073376fa-1e84-4f2f-ace2-088f3bcbf18b
+- Use Case Collection: 46321051-d6437a95-1645-43b3-b0ed-0ec9208d3c5e
+- Test Collection: 46321051-a78af34c-7c51-493a-89cd-8218870f6f24
+- Mock Server: 46321051-abef8e8d-7175-4eaf-b8c9-3ae3033259d9
+- Mock Environment: 46321051-63e0fb01-99ee-4d7f-8fcc-7c8869893604
+- AWS Dev Environment: 46321051-a32832e0-d60f-40c7-aa38-dea07d7c9bbc
+
+#### Files Modified
+1. **data_dictionary/c2mapiv2-dd.ebnf** (2 fixes)
+   - Added missing `multiDocJobItem` definition (lines 696-699)
+   - Added Google Pay `token` definition (line 271)
+2. **openapi/c2mapiv2-openapi-spec-base.yaml** (regenerated twice)
+3. **.postman-target** (created with value: personal)
+4. **postman/*.txt** (all UID files updated)
+
+#### Files Created
+1. **TRANSLATOR_RISK_REPORT.md** (400 lines, 8 sections)
+   - Complete analysis of translation validation results
+   - Critical failure documentation with fix recommendations
+   - Verification results and testing recommendations
+
+#### Key Learnings
+
+**EBNF Data Dictionary Maintenance**:
+- Commented alternatives are safe (historical design context)
+- Active references MUST have definitions (inconsistency causes broken schemas)
+- Validation gap: No automated check for missing definitions
+- Fix pattern: Match structure of similar definitions
+
+**OpenAPI Translation Process**:
+- Translator creates $ref for undefined schemas (doesn't fail, just broken)
+- Validation timing: Run after generation, not during
+- Multiple passes may be needed (fix one issue, regenerate, discover next)
+
+**Build Target Selection**:
+- **Local development**: Use `postman-instance-build-with-tests` (includes Prism, docs server)
+- **CI/CD**: Use `postman-instance-build-without-tests` (skips local infrastructure)
+- My error: Chose CI/CD target for local build (user corrected appropriately)
+
+**Postman Publishing**:
+- .postman-target file controls workspace destination
+- Complete cleanup before rebuild ensures clean state
+- UID tracking: All resources saved to individual files
+- Verification: Environment variables must be sourced in same session
+
+#### Next Steps
+1. Test Jobs Submit API endpoints (verify validation works)
+2. Review TRANSLATOR_RISK_REPORT.md for known risks
+3. Consider implementing automated EBNF definition validation
+4. Update Click2Endpoint code generators with Jobs Submit endpoints
 
 ---
 
@@ -919,6 +1193,18 @@ make postman-instance-build-without-tests
    - Actual: Shows request body with `{jobTemplate, documentSourceIdentifier, etc.}`
    - Likely cause: openapi-to-postmanv2 converter issue
    - Priority: Low - not blocking functionality
+
+2. **Real World Use Case Collection - Broken Endpoints (2025-12-18)**
+   - Issue: All 8 use cases use OLD endpoint paths that no longer exist in API
+   - Script: `scripts/active/generate_use_case_collection.py` has hardcoded old paths
+   - Example wrong paths: `/jobs/single-doc-job-template`, `/jobs/multi-pdf-address-capture`
+   - Correct paths should be: `/jobs/submit/single/doc`, `/jobs/submit/single/pdf/addressCapture`
+   - Impact: Use case collection generates but has invalid requests (404s if tested)
+   - Fix options:
+     - Manual: Update all 8 hardcoded endpoints in script (quick but still hardcoded)
+     - Dynamic: Rewrite to read from OpenAPI spec (better long-term, more work)
+   - Priority: Low - convenience feature only, Test Collection is what matters for validation
+   - Status: Deferred - higher priority tasks first
 
 ## Learning Memories
 

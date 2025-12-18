@@ -316,7 +316,7 @@ USE_CASES = {
         "endpoint": "/jobs/multi-doc",
         "method": "POST",
         "payload": {
-            "items": [
+            "documentsWithRecipients": [
                 {
                     "documentSourceIdentifier": {
                         "uploadRequestId": 500,
@@ -504,8 +504,13 @@ def create_submit_job_request(use_case_key: str, use_case: Dict) -> Dict:
         # Update documentSourceIdentifier if present
         if "documentSourceIdentifier" in example_payload:
             example_payload["documentSourceIdentifier"] = doc_value
-        elif "items" in example_payload and isinstance(example_payload["items"], list):
+        elif "documentsWithRecipients" in example_payload and isinstance(example_payload["documentsWithRecipients"], list):
             # For multi-doc endpoints
+            for item in example_payload["documentsWithRecipients"]:
+                if "documentSourceIdentifier" in item:
+                    item["documentSourceIdentifier"] = doc_value
+        elif "items" in example_payload and isinstance(example_payload["items"], list):
+            # For split-pdf endpoints (still uses "items" for page ranges)
             for item in example_payload["items"]:
                 if "documentSourceIdentifier" in item:
                     item["documentSourceIdentifier"] = doc_value

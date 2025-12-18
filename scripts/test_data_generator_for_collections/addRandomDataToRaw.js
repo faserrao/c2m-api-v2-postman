@@ -175,6 +175,77 @@ const oneOfFixtures = {
                 googlePaymentDetails: {}
             }
         }
+    ],
+
+    docSourceAll: [
+        // Variant 1: documentIdSource (just documentId)
+        {
+            documentId: 1234
+        },
+        // Variant 2: requestIdSource (requestId + optional filename)
+        {
+            requestId: 100,
+            filename: "invoice_2024_01.pdf"
+        },
+        // Variant 3: urlSource (just url)
+        {
+            url: "https://api.example.com/v1/documents/5678"
+        },
+        // Variant 4: zipDocumentIdSource (zipDocumentId + filename)
+        {
+            zipDocumentId: 20,
+            filename: "report_q1_2024.pdf"
+        },
+        // Variant 5: zipRequestIdSource (requestId + zipFilename + filename)
+        {
+            requestId: 200,
+            zipFilename: "archive_jan_2024.zip",
+            filename: "statement_jan.pdf"
+        }
+    ],
+
+    docSourceStandard: [
+        // Variant 1: documentIdSource (just documentId)
+        {
+            documentId: 1234
+        },
+        // Variant 2: requestIdSource (requestId + optional filename)
+        {
+            requestId: 100,
+            filename: "invoice_2024_01.pdf"
+        },
+        // Variant 3: urlSource (just url)
+        {
+            url: "https://api.example.com/v1/documents/5678"
+        }
+    ],
+
+    docSourceZipFile: [
+        // Variant 1: zipDocumentIdSource (zipDocumentId + filename)
+        {
+            zipDocumentId: 20,
+            filename: "report_q1_2024.pdf"
+        },
+        // Variant 2: zipRequestIdSource (requestId + zipFilename + filename)
+        {
+            requestId: 200,
+            zipFilename: "archive_jan_2024.zip",
+            filename: "statement_jan.pdf"
+        }
+    ],
+
+    zipDocumentSource: [
+        // Variant 1: zipDocumentIdSource (zipDocumentId + filename)
+        {
+            zipDocumentId: 20,
+            filename: "report_q1_2024.pdf"
+        },
+        // Variant 2: zipRequestIdSource (requestId + zipFilename + filename)
+        {
+            requestId: 200,
+            zipFilename: "archive_jan_2024.zip",
+            filename: "statement_jan.pdf"
+        }
     ]
 };
 
@@ -367,6 +438,36 @@ function processBodyObject(obj, path = '') {
 }
 
 /**
+ * Counter for alternating between jobTemplate and jobOptions patterns
+ */
+let jobPatternCounter = 0;
+
+/**
+ * Enforce mutual exclusion for jobTemplate and jobOptions
+ * Business rule: Both are optional, but cannot coexist (API will reject)
+ * Strategy: Alternate between template-based and options-based examples
+ */
+function enforceMutualExclusion(bodyObj) {
+    // Only apply if both fields exist
+    if (!bodyObj.hasOwnProperty('jobTemplate') || !bodyObj.hasOwnProperty('jobOptions')) {
+        return; // Nothing to do - only one or neither exists
+    }
+
+    // Alternate between keeping template vs options
+    // Even requests: keep template, remove options
+    // Odd requests: keep options, remove template
+    if (jobPatternCounter % 2 === 0) {
+        delete bodyObj.jobOptions;
+        console.log('  [Mutual Exclusion] Keeping jobTemplate, removing jobOptions');
+    } else {
+        delete bodyObj.jobTemplate;
+        console.log('  [Mutual Exclusion] Keeping jobOptions, removing jobTemplate');
+    }
+
+    jobPatternCounter++;
+}
+
+/**
  * Process a single collection item (request)
  */
 function processItem(item) {
@@ -374,6 +475,11 @@ function processItem(item) {
     if (item.request && item.request.body && item.request.body.raw) {
         try {
             const bodyObj = JSON.parse(item.request.body.raw);
+
+            // Enforce jobTemplate/jobOptions mutual exclusion FIRST
+            enforceMutualExclusion(bodyObj);
+
+            // Then process normally
             processBodyObject(bodyObj);
             item.request.body.raw = JSON.stringify(bodyObj, null, 2);
             stats.modifiedRequests++;

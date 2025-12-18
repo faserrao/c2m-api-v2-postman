@@ -3,6 +3,12 @@ info:
   title: C2M API v2 - Auth Overlay
   version: 2.0.0
 
+tags:
+  - name: jobs
+    description: Job submission endpoints for mailing documents
+  - name: auth
+    description: Authentication and token management endpoints
+
 paths:
   /auth/tokens/short:
     post:
@@ -150,17 +156,25 @@ paths:
 components:
   securitySchemes:
     LongTokenAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+      type: oauth2
       description: Long-term JWT for exchanging to short-term tokens
-      
+      flows:
+        clientCredentials:
+          tokenUrl: /auth/tokens/long
+          scopes:
+            tokens:write: Create new long-term tokens
+            tokens:revoke: Revoke existing tokens
+
     ShortTokenAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+      type: oauth2
       description: Short-term JWT for API operations
-      
+      flows:
+        clientCredentials:
+          tokenUrl: /auth/tokens/short
+          scopes:
+            tokens:write: Create new long-term tokens
+            tokens:revoke: Revoke existing tokens
+
     ClientKey:
       type: apiKey
       in: header
