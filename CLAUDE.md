@@ -273,6 +273,96 @@ YES `git-push.sh` - Quick commit helper (target: git-save)
 
 ## Session History
 
+### 2025-12-18 (Evening): Getting Started Collection & CI/CD Workflow Fixes
+
+**Summary**: Fixed critical GitHub Actions workflow failures and created educational Getting Started collection for API onboarding. Resolved validation script workspace issue and response time test flakiness.
+
+**Context**: Continuation from previous session where permutation generator was updated and pushed to click2mail, triggering GitHub Actions workflow that failed.
+
+#### Part 1: GitHub Actions Workflow Failures (2 issues fixed)
+
+**Issue 1: Validation Script Workspace Choice Error**
+- **Problem**: `generate_report.py: error: argument --workspace: invalid choice: 'corporate'`
+- **Root Cause**: Workflow auto-detects workspace as "corporate" for click2mail org, but script only accepted ["personal", "team"]
+- **Fix**: Added 'corporate' to choices in `scripts/validation/generate_report.py` line 366
+- **Commit**: a7059c1
+
+**Issue 2: Newman Response Time Test Failures**
+- **Problem**: `AssertionError: Response time < 1s` causing intermittent workflow failures
+- **User Requirement**: "Make it a warning. The action flow should still complete."
+- **Fix**: Changed from hard assertion to informational logging in `scripts/active/add_tests.js`
+- **New Test**: Always passes, logs timing with warning if >1s: `Response time: ${rt}ms ${rt > 1000 ? '(>1s - SLOW)' : '(OK)'}`
+- **Commit**: 11f593d
+
+#### Part 2: Getting Started Collection Generator
+
+**User Intent**:
+- "Think in terms of api call categories rather than collections"
+- "Think of this as something that would be called to get a new user started with the click2mail api calls"
+- Educational/onboarding focus, organized by usage frequency
+
+**Created**: `scripts/active/generate_getting_started_collection.py` (570 lines)
+
+**Pattern-Based Architecture**:
+- Categories defined upfront as data structures (not hardcoded in loops)
+- 16 total patterns across 3 categories:
+  1. **Most Frequently Used** (3 patterns): Single recipient, mail merge, address capture
+  2. **Bulk Operations** (3 patterns): Split PDF, multi-ZIP with addresses
+  3. **Advanced Patterns** (10 patterns): Merge docs, jobOptions, URL source, tags, payment, saved resources
+
+**Features**:
+- Each pattern shows specific API usage variation
+- Educational descriptions explain what each demonstrates
+- Uses placeholder values (`<string>`, `<integer>`) for clarity
+- All endpoints use new paths: `/jobs/submit/...`
+
+**Makefile Integration**:
+- New targets: `postman-generate-getting-started-collection`, `postman-upload-getting-started-collection`
+- Added to both build pipelines: `with-tests` (local) and `without-tests` (CI/CD)
+
+**Commit**: fb5b83f
+
+#### Part 3: Verification & Results
+
+**GitHub Actions Workflow #20351251055**: SUCCESS (3m 56s)
+- Build API Spec, Collections, and Docs: SUCCESS
+- Workflow Summary: SUCCESS
+- Deploy to GitHub Pages: SKIPPED (requires admin)
+- NO validation failures (0/0)
+- NO Newman timing failures (0/0)
+- Only warnings: oas3-unused-component (expected - harmless)
+
+**Getting Started Collection Upload**:
+- Workspace: Corporate (click2mail organization)
+- Collection UID: 46321051-365772da-09ef-47d6-821d-7c229bbe208c
+- Status: Successfully uploaded to Postman
+- Verified in workflow logs: "Getting Started collection uploaded with UID: ..."
+
+**Local Build Verification**:
+- Build without-tests (CI mode): SUCCESS (~8 min) - All 8 Postman resources created
+- Build with-tests (local mode): PARTIAL - All Postman resources SUCCESS, Prism failed (port conflict - unrelated)
+
+**Files Modified**:
+1. `scripts/validation/generate_report.py` - Added 'corporate' workspace support
+2. `scripts/active/add_tests.js` - Response time as informational warning
+3. `scripts/active/generate_getting_started_collection.py` - NEW (570 lines)
+4. `Makefile` - Added 2 new targets + integration into build pipelines
+
+**Files Created**:
+1. `postman/generated/c2mapiv2-getting-started-collection.json` - 16 educational patterns
+2. `SESSION_SUMMARY_2025-12-18_GETTING_STARTED.md` - Comprehensive session documentation
+
+**Key Learnings**:
+- Workspace auto-detection: faserrao → personal, click2mail → corporate
+- Hard timing assertions create flaky tests - use informational logging instead
+- Educational collections more useful with pattern-based approach vs scenario-based
+- Categories as data structures (defined upfront) more maintainable than hardcoded loops
+- CI/CD scripts must support all workspace types
+
+**Result**: All GitHub Actions workflow failures resolved, Getting Started collection successfully deployed to corporate workspace, CI/CD pipeline fully functional.
+
+---
+
 ### 2025-12-18: EBNF to OpenAPI Translator - Documentation & Auth Warnings Fix
 
 **Summary**: Fixed all Priority 1 (documentation quality) and Priority 2 (auth configuration) OpenAPI validation warnings by implementing automated summary/description generators in the translator and adding proper OAuth2 security scheme definitions with scopes.
