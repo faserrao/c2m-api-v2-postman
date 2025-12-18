@@ -361,6 +361,43 @@ YES `git-push.sh` - Quick commit helper (target: git-save)
 
 **Result**: All GitHub Actions workflow failures resolved, Getting Started collection successfully deployed to corporate workspace, CI/CD pipeline fully functional.
 
+#### Part 4: Publishing to Both Workspaces
+
+**User Question**: "have both the corporate and personal workspace in Postman been updated"
+
+**Investigation**:
+- Found only personal workspace was updated initially (d8a1f479-a2aa-4471-869e-b12feea0a98c)
+- Corporate workspace NOT updated (c740f0f4-0de2-4db3-8ab6-f8a0fa6fbeb1)
+- Reason: `.postman-target` file was set to "personal"
+
+**User Request**: "publish to both"
+
+**Initial Attempt**: `make postman-publish-both` failed with API key error
+- **Problem**: `POSTMAN_C2M_API_KEY` not loaded from .env file
+- **Root Cause**: Makefile expects environment variable, but .env not sourced in shell
+
+**Solution**:
+- Sourced environment: `source .env`
+- Set target: `echo "corporate" > .postman-target`
+- Ran: `make postman-instance-build-without-tests`
+
+**Corporate Workspace Build Results** (8 resources created):
+- Getting Started Collection: 46321051-71422ca4-82dd-459b-8a80-2e8b7029f5b5
+- Test Collection: 46321051-47361a89-e47f-4ae1-979b-e58bb67de756
+- Linked Collection: 46321051-fd08af09-c49c-4f89-907b-bb87a4ed3d2d
+- Use Case Collection: 46321051-365772da-09ef-47d6-821d-7c229bbe208c
+- Mock Server: 46321051-57d0772a-9c35-4e40-8272-d92bd8fbcb2a
+- Mock Environment: 46321051-3cb2367e-9c7e-41f4-a665-0a2fa5245ec4
+- AWS Dev Environment: 46321051-f564e9de-97c6-4288-9060-04aafe07026d
+- API Definition: (created as part of build process)
+
+**Final Status**:
+- YES Personal workspace: Complete (all resources deployed)
+- YES Corporate workspace: Complete (all resources deployed)
+- YES Both workspaces synchronized with all collections and environments
+
+**Key Learning**: Environment variables in Makefile require explicit shell sourcing of .env file before running commands that need them.
+
 ---
 
 ### 2025-12-18: EBNF to OpenAPI Translator - Documentation & Auth Warnings Fix
