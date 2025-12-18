@@ -519,9 +519,10 @@ postman-instance-build-with-tests:
 	# Generate and link standard collection
 	$(MAKE) postman-create-linked-collection
 	$(MAKE) postman-create-test-collection
-	# Generate enhanced collections with all oneOf examples and use cases
+	# Generate enhanced collections with all oneOf examples, use cases, and getting started
 	$(MAKE) postman-extract-oneof-examples
 	$(MAKE) postman-generate-use-case-collection
+	$(MAKE) postman-generate-getting-started-collection
 	$(MAKE) postman-upload-all-enhanced-collections
 	$(MAKE) postman-create-mock-and-env
 	# Start local mock and run tests
@@ -542,9 +543,11 @@ postman-instance-build-without-tests:
 	$(MAKE) postman-spec-create-standalone
 	# Generate and link standard collection
 	$(MAKE) postman-create-linked-collection
-	# Generate and upload use case collection (needed for mock server)
+	# Generate and upload use case and getting started collections
 	$(MAKE) postman-generate-use-case-collection
+	$(MAKE) postman-generate-getting-started-collection
 	$(MAKE) postman-upload-use-case-collection
+	$(MAKE) postman-upload-getting-started-collection
 	$(MAKE) postman-create-test-collection
 	$(MAKE) postman-create-mock-and-env
 	# Skip local testing in CI
@@ -1435,9 +1438,36 @@ postman-upload-use-case-collection:
 		echo $$COLLECTION_UID > $(POSTMAN_GENERATED_DIR)/use-case-collection-uid.txt; \
 	fi
 
-# Upload all enhanced collections (both enhanced test and use case)
+# Generate Getting Started collection (educational/onboarding)
+.PHONY: postman-generate-getting-started-collection
+postman-generate-getting-started-collection:
+	@echo "📚 Generating Getting Started collection..."
+	@$(VENV_PYTHON) scripts/active/generate_getting_started_collection.py
+	@echo "✅ Getting Started collection generated"
+
+# Upload Getting Started collection
+.PHONY: postman-upload-getting-started-collection
+postman-upload-getting-started-collection:
+	@echo "📤 Uploading Getting Started collection..."
+	@GETTING_STARTED_FILE="$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-collection.json"; \
+	if [ ! -f "$$GETTING_STARTED_FILE" ]; then \
+		echo "⚠️  Getting Started collection not found. Run postman-generate-getting-started-collection first."; \
+		exit 1; \
+	fi; \
+	COLLECTION_UID=$$(jq -c '{collection: .}' "$$GETTING_STARTED_FILE" | \
+		curl --silent --location --request POST "$(POSTMAN_COLLECTIONS_URL)?workspace=$(POSTMAN_WS)" \
+			$(POSTMAN_CURL_HEADERS_XC) \
+			--data-binary @- | jq -r '.collection.uid'); \
+	if [ "$$COLLECTION_UID" = "null" ] || [ -z "$$COLLECTION_UID" ]; then \
+		echo "❌ Failed to upload Getting Started collection"; exit 1; \
+	else \
+		echo "✅ Getting Started collection uploaded with UID: $$COLLECTION_UID"; \
+		echo $$COLLECTION_UID > $(POSTMAN_GENERATED_DIR)/getting-started-collection-uid.txt; \
+	fi
+
+# Upload all enhanced collections (enhanced test, use case, and getting started)
 .PHONY: postman-upload-all-enhanced-collections
-postman-upload-all-enhanced-collections: postman-upload-enhanced-collection postman-upload-use-case-collection
+postman-upload-all-enhanced-collections: postman-upload-enhanced-collection postman-upload-use-case-collection postman-upload-getting-started-collection
 	@echo "✅ All enhanced collections uploaded successfully"
 
 # ========================================================================
