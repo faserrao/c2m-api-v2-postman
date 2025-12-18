@@ -8,7 +8,7 @@ Usage:
     python generate_report.py [options]
 
 Options:
-    --workspace TYPE        Workspace type (personal or team, default: personal)
+    --workspace TYPE        Workspace type (personal, team, or corporate, default: personal)
     --build-type TYPE       Build type (local or github, default: local)
     --output-dir DIR        Output directory (default: reports)
     --format FORMAT         Output format: markdown, json, both (default: both)
@@ -363,7 +363,7 @@ def main():
 
     parser.add_argument(
         '--workspace',
-        choices=['personal', 'team'],
+        choices=['personal', 'team', 'corporate'],
         default='personal',
         help='Workspace type (default: personal)'
     )
