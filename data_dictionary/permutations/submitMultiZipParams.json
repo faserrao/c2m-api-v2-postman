@@ -1,0 +1,2820 @@
+{
+  "endpoint": "submitMultiZipParams",
+  "paramsDefinition": [
+    "submitMultiZipParams =",
+    "      [ jobTemplate ]",
+    "    + multiZipJobs",
+    "    + [ paymentDetails ]",
+    "    + [ tags ] ;"
+  ],
+  "permutations": [
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "zipDocumentId": 5001,
+            "filename": "file1.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip1",
+              "lastName": "Test",
+              "address1": "555 Fifth St",
+              "city": "Miami",
+              "state": "FL",
+              "zip": "33101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiZipJobs": [
+        {
+          "docSourceZipFile": {
+            "requestId": 6001,
+            "zipFilename": "batch.zip",
+            "filename": "item1.pdf"
+          },
+          "recipientAddressSource": {
+            "addressListId": 200
+          }
+        },
+        {
+          "jobTemplate": "zip_template",
+          "docSourceZipFile": {
+            "zipDocumentId": 7001,
+            "filename": "item2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Zip2",
+              "lastName": "Test",
+              "address1": "666 Sixth Ave",
+              "city": "Atlanta",
+              "state": "GA",
+              "zip": "30301",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    }
+  ]
+}

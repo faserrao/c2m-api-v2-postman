@@ -1,0 +1,5486 @@
+{
+  "endpoint": "submitMultiZipAddressCaptureParams",
+  "paramsDefinition": [
+    "submitMultiZipAddressCaptureParams =",
+    "      [ jobTemplate ]",
+    "    + zipDocumentSource",
+    "    + [ paymentDetails ]",
+    "    + [ returnAddress ]",
+    "    + [ jobOptions ]",
+    "    + [ tags ] ;"
+  ],
+  "permutations": [
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "zipDocumentId": 3456,
+        "filename": "batch001.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Letter",
+        "layout": "AddressSide",
+        "productionTime": "NextDay",
+        "envelope": "#10",
+        "color": "BW",
+        "paperType": "White24",
+        "printOption": "Printing_One_Side",
+        "mailClass": "First"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "zipDocumentSource": {
+        "requestId": 7890,
+        "zipFilename": "mailings.zip",
+        "filename": "promo.pdf"
+      },
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "returnAddress": {
+        "firstName": "Acme",
+        "lastName": "Corp",
+        "address1": "100 Business Blvd",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601",
+        "country": "USA"
+      },
+      "jobOptions": {
+        "documentClass": "Postcard",
+        "layout": "6x9",
+        "productionTime": "SameDay",
+        "envelope": "None",
+        "color": "Color",
+        "paperType": "Glossy",
+        "printOption": "Printing_Two_Sides",
+        "mailClass": "Standard"
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    }
+  ]
+}

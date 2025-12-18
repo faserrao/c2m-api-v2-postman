@@ -429,6 +429,62 @@ The current implementation uses a hardcoded approach (jobTemplate/jobOptions alt
 
 ---
 
+### 2025-12-18 (Evening): Documentation Template Endpoints Fix & GitHub Workflow Dynamic Targeting
+
+**Summary**: Fixed documentation showing old endpoint paths, corrected GitHub workflow to use dynamic repository owner, and verified SDK generation architecture.
+
+**Context**: User discovered recommended template endpoints in documentation still referenced old paths instead of new `/jobs/submit/` paths.
+
+**Work Completed**:
+
+1. **Documentation Endpoint Path Updates** (3 HTML files):
+   - `docs/template-endpoints-quickstart.html` - Updated curl examples and migration table
+   - `docs/custom-redoc-template.hbs` - Updated embedded JavaScript template
+   - `docs/template-endpoints-banner.html` - Updated endpoint cards
+   - Changed paths:
+     - OLD: `/jobs/single-doc-job-template`, `/jobs/multi-docs-job-template`, `/jobs/multi-doc-merge-job-template`
+     - NEW: `/jobs/submit/single/doc`, `/jobs/submit/multi/docs`, `/jobs/submit/multi/doc/merge`
+
+2. **GitHub Workflow Dynamic Repository Fix**:
+   - Problem: Workflow hardcoded `click2mail` organization, always pushed to wrong repo
+   - Root cause: Lines 76, 83 in `.github/workflows/api-ci-cd.yml` used `repository: click2mail/...`
+   - Solution: Changed to `repository: ${{ github.repository_owner }}/...`
+   - Impact: Now correctly targets faserrao or click2mail based on which repo triggered workflow
+   - Prevents cross-organization artifact pollution
+
+3. **SDK Generation Architecture Clarification**:
+   - Local builds: SDK generation only runs during `make full-rebuild` (NOT standard builds)
+   - CI/CD builds: SDKs generated automatically for all 11 languages
+   - Artifacts repo: Contains complete SDK implementations from CI/CD builds
+   - User observation confirmed: Local `sdk/` directory doesn't exist (expected behavior)
+   - SDK script: `scripts/utilities/generate-sdk-v2.sh` creates full implementations with:
+     - API client code, model classes, JWT auth examples
+     - Documentation, test fixtures, package manifests
+     - Languages: Python, JavaScript, TypeScript, Java, Go, Ruby, PHP, C#, Swift, Kotlin, Rust
+
+4. **Build Verification**:
+   - YES `postman-instance-build-without-tests`: Completed successfully (8 min)
+   - YES `postman-instance-build-with-tests`: Completed successfully
+   - YES Documentation server: Running on http://localhost:8080
+   - YES All Postman resources created: API, collections, environments, mock server
+
+**Files Modified**:
+- `.github/workflows/api-ci-cd.yml` - Dynamic repository owner (lines 76, 83)
+- `docs/template-endpoints-quickstart.html` - Updated endpoint paths (3 locations)
+- `docs/custom-redoc-template.hbs` - Updated endpoint paths (3 locations)
+- `docs/template-endpoints-banner.html` - Updated endpoint paths (3 locations)
+- `docs/index.html` - Regenerated from template
+
+**Key Learnings**:
+- GitHub workflow variables must use dynamic context (`${{ github.repository_owner }}`) not hardcoded values
+- Documentation can drift from actual API implementation when paths change
+- SDK generation is expensive - only runs during full rebuilds, not every build
+- Artifacts repository pattern separates generated code from source code
+
+**Result**: All documentation now shows correct endpoint paths, workflow properly targets correct repository, SDK generation architecture understood and verified.
+
+---
+
 ### 2025-11-09: Apple Pay/Google Pay Proposal + Data Dictionary Duplicate Definitions Fix YES
 
 **Summary**: Created comprehensive Apple Pay and Google Pay payment method proposals for V2 wrapper implementation, then discovered and resolved duplicate EBNF definitions in the data dictionary.

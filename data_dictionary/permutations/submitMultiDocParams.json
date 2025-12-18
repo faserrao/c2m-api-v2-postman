@@ -1,0 +1,2676 @@
+{
+  "endpoint": "submitMultiDocParams",
+  "paramsDefinition": [
+    "submitMultiDocParams =",
+    "      [ jobTemplate ]",
+    "    + multiDocJobs",
+    "    + [ paymentDetails ]",
+    "    + [ tags ] ;"
+  ],
+  "permutations": [
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "legal_certified_mail",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "invoice_batch",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiDocJobs": [
+        {
+          "docSourceAll": {
+            "documentId": 1001
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi1",
+              "lastName": "Test",
+              "address1": "333 Third St",
+              "city": "Seattle",
+              "state": "WA",
+              "zip": "98101",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "creditCard": {
+          "cardType": "visa",
+          "cardNumber": "4111111111111111",
+          "expirationDate": {
+            "month": 12,
+            "year": 2025
+          },
+          "cvv": 123
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "invoice": {
+          "invoiceNumber": "INV-1001",
+          "amountDue": 200.5
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "ach": {
+          "routingNumber": "111000025",
+          "accountNumber": "123456789",
+          "checkDigit": 7
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "legal",
+        "certified"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "batch",
+        "invoice"
+      ]
+    },
+    {
+      "jobTemplate": "newsletter_monthly",
+      "multiDocJobs": [
+        {
+          "jobTemplate": "custom_template_1",
+          "docSourceAll": {
+            "documentId": 2001
+          },
+          "recipientAddressSource": {
+            "addressListId": 100
+          }
+        },
+        {
+          "docSourceAll": {
+            "url": "https://example.com/doc2.pdf"
+          },
+          "recipientAddressSource": {
+            "singleAddress": {
+              "firstName": "Multi2",
+              "lastName": "Test",
+              "address1": "444 Fourth Ave",
+              "city": "Portland",
+              "state": "OR",
+              "zip": "97201",
+              "country": "USA"
+            }
+          }
+        }
+      ],
+      "paymentDetails": {
+        "userCredit": {
+          "amount": 50.0,
+          "currency": "USD"
+        }
+      },
+      "tags": [
+        "campaign",
+        "newsletter"
+      ]
+    }
+  ]
+}
