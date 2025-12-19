@@ -69,7 +69,7 @@ make lint                               # Lint OpenAPI spec
 make diff                               # Diff spec vs origin/main
 make postman-publish                    # Push to Postman (reads .postman-target)
 make postman-publish-personal           # Explicitly publish to personal workspace
-make postman-publish-corporate          # Explicitly publish to corporate workspace
+make postman-publish-team          # Explicitly publish to team workspace
 
 # GitHub Actions specific behavior
 # The workflow reads .postman-target file to determine which workspace to use
@@ -247,7 +247,7 @@ Configure in GitHub Settings → Secrets:
 
 ### Workspace Publishing
 The workflow determines which workspace to publish to:
-1. Reads `.postman-target` file (contains "personal" or "corporate")
+1. Reads `.postman-target` file (contains "personal" or "team")
 2. Runs corresponding make target: `make postman-publish-{target}`
 3. Default is "personal" if file doesn't exist
 
@@ -282,9 +282,9 @@ YES `git-push.sh` - Quick commit helper (target: git-save)
 #### Part 1: GitHub Actions Workflow Failures (2 issues fixed)
 
 **Issue 1: Validation Script Workspace Choice Error**
-- **Problem**: `generate_report.py: error: argument --workspace: invalid choice: 'corporate'`
-- **Root Cause**: Workflow auto-detects workspace as "corporate" for click2mail org, but script only accepted ["personal", "team"]
-- **Fix**: Added 'corporate' to choices in `scripts/validation/generate_report.py` line 366
+- **Problem**: `generate_report.py: error: argument --workspace: invalid choice: 'team'`
+- **Root Cause**: Workflow auto-detects workspace as "team" for click2mail org, but script only accepted ["personal", "team"]
+- **Fix**: Added 'team' to choices in `scripts/validation/generate_report.py` line 366
 - **Commit**: a7059c1
 
 **Issue 2: Newman Response Time Test Failures**
@@ -333,7 +333,7 @@ YES `git-push.sh` - Quick commit helper (target: git-save)
 - Only warnings: oas3-unused-component (expected - harmless)
 
 **Getting Started Collection Upload**:
-- Workspace: Corporate (click2mail organization)
+- Workspace: Team (click2mail organization)
 - Collection UID: 46321051-365772da-09ef-47d6-821d-7c229bbe208c
 - Status: Successfully uploaded to Postman
 - Verified in workflow logs: "Getting Started collection uploaded with UID: ..."
@@ -343,7 +343,7 @@ YES `git-push.sh` - Quick commit helper (target: git-save)
 - Build with-tests (local mode): PARTIAL - All Postman resources SUCCESS, Prism failed (port conflict - unrelated)
 
 **Files Modified**:
-1. `scripts/validation/generate_report.py` - Added 'corporate' workspace support
+1. `scripts/validation/generate_report.py` - Added 'team' workspace support
 2. `scripts/active/add_tests.js` - Response time as informational warning
 3. `scripts/active/generate_getting_started_collection.py` - NEW (570 lines)
 4. `Makefile` - Added 2 new targets + integration into build pipelines
@@ -353,21 +353,21 @@ YES `git-push.sh` - Quick commit helper (target: git-save)
 2. `SESSION_SUMMARY_2025-12-18_GETTING_STARTED.md` - Comprehensive session documentation
 
 **Key Learnings**:
-- Workspace auto-detection: faserrao → personal, click2mail → corporate
+- Workspace auto-detection: faserrao → personal, click2mail → team
 - Hard timing assertions create flaky tests - use informational logging instead
 - Educational collections more useful with pattern-based approach vs scenario-based
 - Categories as data structures (defined upfront) more maintainable than hardcoded loops
 - CI/CD scripts must support all workspace types
 
-**Result**: All GitHub Actions workflow failures resolved, Getting Started collection successfully deployed to corporate workspace, CI/CD pipeline fully functional.
+**Result**: All GitHub Actions workflow failures resolved, Getting Started collection successfully deployed to team workspace, CI/CD pipeline fully functional.
 
 #### Part 4: Publishing to Both Workspaces
 
-**User Question**: "have both the corporate and personal workspace in Postman been updated"
+**User Question**: "have both the team and personal workspace in Postman been updated"
 
 **Investigation**:
 - Found only personal workspace was updated initially (d8a1f479-a2aa-4471-869e-b12feea0a98c)
-- Corporate workspace NOT updated (c740f0f4-0de2-4db3-8ab6-f8a0fa6fbeb1)
+- Team workspace NOT updated (c740f0f4-0de2-4db3-8ab6-f8a0fa6fbeb1)
 - Reason: `.postman-target` file was set to "personal"
 
 **User Request**: "publish to both"
@@ -378,10 +378,10 @@ YES `git-push.sh` - Quick commit helper (target: git-save)
 
 **Solution**:
 - Sourced environment: `source .env`
-- Set target: `echo "corporate" > .postman-target`
+- Set target: `echo "team" > .postman-target`
 - Ran: `make postman-instance-build-without-tests`
 
-**Corporate Workspace Build Results** (8 resources created):
+**Team Workspace Build Results** (8 resources created):
 - Getting Started Collection: 46321051-71422ca4-82dd-459b-8a80-2e8b7029f5b5
 - Test Collection: 46321051-47361a89-e47f-4ae1-979b-e58bb67de756
 - Linked Collection: 46321051-fd08af09-c49c-4f89-907b-bb87a4ed3d2d
@@ -393,7 +393,7 @@ YES `git-push.sh` - Quick commit helper (target: git-save)
 
 **Final Status**:
 - YES Personal workspace: Complete (all resources deployed)
-- YES Corporate workspace: Complete (all resources deployed)
+- YES Team workspace: Complete (all resources deployed)
 - YES Both workspaces synchronized with all collections and environments
 
 **Key Learning**: Environment variables in Makefile require explicit shell sourcing of .env file before running commands that need them.
