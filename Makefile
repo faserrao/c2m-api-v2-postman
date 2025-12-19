@@ -333,10 +333,12 @@ SERRAO_WS                        := d8a1f479-a2aa-4471-869e-b12feea0a98c
 C2M_WS                           := c740f0f4-0de2-4db3-8ab6-f8a0fa6fbeb1
 
 #--- Default workspace configuration ---
-# Default to personal workspace, allow override
-POSTMAN_WS                       := $(or $(POSTMAN_WORKSPACE_OVERRIDE),$(SERRAO_WS))
-# Check for API key in environment first (for GitHub Actions), then fall back to override
-POSTMAN_API_KEY                  := $(or $(POSTMAN_API_KEY_OVERRIDE),$(POSTMAN_SERRAO_API_KEY),$(POSTMAN_C2M_API_KEY))
+# Read workspace target from .postman-target file (corporate or personal)
+POSTMAN_TARGET                   := $(shell cat .postman-target 2>/dev/null || echo "personal")
+# Select workspace based on target file, allow override
+POSTMAN_WS                       := $(or $(POSTMAN_WORKSPACE_OVERRIDE),$(if $(filter corporate,$(POSTMAN_TARGET)),$(C2M_WS),$(SERRAO_WS)))
+# Select API key based on workspace
+POSTMAN_API_KEY                  := $(or $(POSTMAN_API_KEY_OVERRIDE),$(if $(filter corporate,$(POSTMAN_TARGET)),$(POSTMAN_C2M_API_KEY),$(POSTMAN_SERRAO_API_KEY)))
 
 #--- TOKENS ---
 # Extract token from environment file if it exists
@@ -522,7 +524,7 @@ postman-instance-build-with-tests:
 	# Generate enhanced collections with all oneOf examples, use cases, and getting started
 	$(MAKE) postman-extract-oneof-examples
 	$(MAKE) postman-generate-use-case-collection
-	$(MAKE) postman-generate-getting-started-collection
+	$(MAKE) postman-generate-getting-started-all
 	$(MAKE) postman-upload-all-enhanced-collections
 	$(MAKE) postman-create-mock-and-env
 	# Start local mock and run tests
@@ -545,9 +547,9 @@ postman-instance-build-without-tests:
 	$(MAKE) postman-create-linked-collection
 	# Generate and upload use case and getting started collections
 	$(MAKE) postman-generate-use-case-collection
-	$(MAKE) postman-generate-getting-started-collection
+	$(MAKE) postman-generate-getting-started-all
 	$(MAKE) postman-upload-use-case-collection
-	$(MAKE) postman-upload-getting-started-collection
+	$(MAKE) postman-upload-getting-started-all
 	$(MAKE) postman-create-test-collection
 	$(MAKE) postman-create-mock-and-env
 	# Skip local testing in CI
@@ -1441,9 +1443,21 @@ postman-upload-use-case-collection:
 # Generate Getting Started collection (educational/onboarding)
 .PHONY: postman-generate-getting-started-collection
 postman-generate-getting-started-collection:
-	@echo "📚 Generating Getting Started collection..."
-	@$(VENV_PYTHON) scripts/active/generate_getting_started_collection.py
-	@echo "✅ Getting Started collection generated"
+	@echo "📚 Generating Getting Started collection (placeholders)..."
+	@$(VENV_PYTHON) scripts/active/generate_getting_started_collection_v2.py
+	@echo "✅ Getting Started collection (placeholders) generated"
+
+# Generate Getting Started collection with realistic test data
+.PHONY: postman-generate-getting-started-with-examples
+postman-generate-getting-started-with-examples:
+	@echo "📚 Generating Getting Started collection (with examples)..."
+	@$(VENV_PYTHON) scripts/active/generate_getting_started_with_examples.py
+	@echo "✅ Getting Started collection (with examples) generated"
+
+# Generate both Getting Started collections
+.PHONY: postman-generate-getting-started-all
+postman-generate-getting-started-all: postman-generate-getting-started-collection postman-generate-getting-started-with-examples
+	@echo "✅ Both Getting Started collections generated"
 
 # Upload Getting Started collection
 .PHONY: postman-upload-getting-started-collection
@@ -1465,9 +1479,34 @@ postman-upload-getting-started-collection:
 		echo $$COLLECTION_UID > $(POSTMAN_GENERATED_DIR)/getting-started-collection-uid.txt; \
 	fi
 
+# Upload Getting Started collection with examples
+.PHONY: postman-upload-getting-started-with-examples
+postman-upload-getting-started-with-examples:
+	@echo "📤 Uploading Getting Started collection (with examples)..."
+	@GETTING_STARTED_FILE="$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-with-examples-collection.json"; \
+	if [ ! -f "$$GETTING_STARTED_FILE" ]; then \
+		echo "⚠️  Getting Started with examples collection not found. Run postman-generate-getting-started-with-examples first."; \
+		exit 1; \
+	fi; \
+	COLLECTION_UID=$$(jq -c '{collection: .}' "$$GETTING_STARTED_FILE" | \
+		curl --silent --location --request POST "$(POSTMAN_COLLECTIONS_URL)?workspace=$(POSTMAN_WS)" \
+			$(POSTMAN_CURL_HEADERS_XC) \
+			--data-binary @- | jq -r '.collection.uid'); \
+	if [ "$$COLLECTION_UID" = "null" ] || [ -z "$$COLLECTION_UID" ]; then \
+		echo "❌ Failed to upload Getting Started with examples collection"; exit 1; \
+	else \
+		echo "✅ Getting Started with examples collection uploaded with UID: $$COLLECTION_UID"; \
+		echo $$COLLECTION_UID > $(POSTMAN_GENERATED_DIR)/getting-started-with-examples-collection-uid.txt; \
+	fi
+
+# Upload both Getting Started collections
+.PHONY: postman-upload-getting-started-all
+postman-upload-getting-started-all: postman-upload-getting-started-collection postman-upload-getting-started-with-examples
+	@echo "✅ Both Getting Started collections uploaded successfully"
+
 # Upload all enhanced collections (enhanced test, use case, and getting started)
 .PHONY: postman-upload-all-enhanced-collections
-postman-upload-all-enhanced-collections: postman-upload-enhanced-collection postman-upload-use-case-collection postman-upload-getting-started-collection
+postman-upload-all-enhanced-collections: postman-upload-enhanced-collection postman-upload-use-case-collection postman-upload-getting-started-all
 	@echo "✅ All enhanced collections uploaded successfully"
 
 # ========================================================================
@@ -2079,9 +2118,7 @@ prism-test-select: ## Test endpoint with specific test body index
 # ========================================================================
 # Comprehensive validation orchestration for Local and GitHub builds
 # Integrates: pipeline validation, secret validation, mock tests, reporting
-
-# Detect workspace from .postman-target file (personal or corporate)
-POSTMAN_TARGET := $(shell cat .postman-target 2>/dev/null || echo "personal")
+# Note: POSTMAN_TARGET is defined at top of file (line 337)
 
 # Validate secrets and environment configuration
 .PHONY: validate-secrets

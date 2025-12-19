@@ -1473,3 +1473,328 @@ make postman-workspace-debug
 - **Main repo**: c2m-api-v2-postman (core API functionality)
 - **Security repo**: c2m-api-v2-postman-security (JWT auth implementation)
 - **Integration**: Minimal hooks, not full integration
+### 2025-12-19: Configuration-Driven Getting Started Collection - YAML Architecture Complete
+
+**Summary**: Successfully implemented configuration-driven architecture for Getting Started collections. Created YAML-based pattern definitions that generate both placeholder and realistic test data versions from a single source of truth.
+
+**Context**: User requested configuration-driven refactoring after initial Getting Started collection implementation.
+
+#### Implementation Completed
+
+**Phase 1: YAML Configuration File** (420 lines)
+- Extracted all 16 patterns from hardcoded Python to `config/getting-started-patterns.yaml`
+- Added comprehensive filter criteria for permutation matching:
+  - `has_jobTemplate`: true/false (uses template vs jobOptions)
+  - `documentSourceIdentifier`: requestId/documentId/url/documentsToMerge
+  - `recipientAddressSource`: singleAddress/addressList/addressListId/addressListName
+  - `paymentDetails`: any/creditCard/ach/invoice
+- Self-documenting structure with inline comments
+
+**Phase 2: Placeholder Generator Refactor** (255 lines)
+- Created `generate_getting_started_collection_v2.py`
+- Reads patterns from YAML (replaces hardcoded Python lists)
+- Dynamic category grouping via `group_patterns_by_category()`
+- Command-line arguments: `--config`, `--output`
+- Comprehensive error handling (FileNotFoundError, yaml.YAMLError)
+- **Verification**: Generated identical output to original script (480 lines, 20KB)
+
+**Phase 3: Realistic Data Generator** (570 lines)
+- Created `generate_getting_started_with_examples.py`
+- Comprehensive test data fixtures:
+  - Document sources: Random requestIds (10000-99999), documentIds, URLs
+  - Addresses: Realistic US addresses (John Smith, 1839 Maple Blvd, New York IL)
+  - Address lists: Pre-built with custom merge fields (foo1, foo2)
+  - Payment details: Test credit cards, ACH, invoices
+  - Job templates: Realistic names (legal_certified_mail, medical_correspondence)
+  - Tags: Customer segments, campaigns, priorities
+- Filter-based data generation matches pattern requirements
+- Separate collection name: "C2M API v2 - Getting Started (With Examples)"
+
+**Comparison - Placeholder vs Realistic**:
+```
+PLACEHOLDER:
+  "jobTemplate": "<string>"
+  "requestId": "<integer>"
+  "firstName": "<string>"
+
+REALISTIC:
+  "jobTemplate": "medical_correspondence"
+  "requestId": 11011
+  "firstName": "John"
+```
+
+#### Benefits Achieved
+
+**1. Single Source of Truth**:
+- Both scripts read same YAML configuration
+- Patterns stay synchronized automatically
+- Zero code duplication
+
+**2. Easy Maintenance**:
+- Non-developers can add patterns by editing YAML
+- No Python knowledge required
+- Clear, declarative structure
+
+**3. Flexibility**:
+- Generate placeholders for learning API structure
+- Generate realistic data for immediate testing
+- Same config serves both use cases
+
+**4. Extensibility**:
+- Add new patterns: Edit YAML file
+- Add new filter criteria: Update filters section
+- Add new test data: Extend TEST_DATA fixtures
+
+**5. Quality Assurance**:
+- YAML parsing validates syntax
+- Filter criteria ensure appropriate test data
+- Both collections guaranteed same structure
+
+#### Files Created
+
+1. **config/getting-started-patterns.yaml** (420 lines)
+   - All 16 patterns with filters
+   - 3 categories: Most Frequently Used (3), Bulk Operations (3), Advanced Patterns (10)
+
+2. **scripts/active/generate_getting_started_collection_v2.py** (255 lines)
+   - YAML-driven placeholder generator
+   - Replaces original hardcoded version
+
+3. **scripts/active/generate_getting_started_with_examples.py** (570 lines)
+   - Realistic test data generator
+   - Comprehensive fixtures for all field types
+
+4. **postman/generated/c2mapiv2-getting-started-collection.json** (480 lines)
+   - Educational collection with `<string>`, `<integer>` placeholders
+
+5. **postman/generated/c2mapiv2-getting-started-with-examples-collection.json** (480 lines)
+   - Hands-on collection with realistic test data
+
+6. **CONFIGURATION_DRIVEN_GETTING_STARTED.md** (comprehensive documentation)
+   - Architecture overview
+   - Usage instructions
+   - Benefits analysis
+   - Future enhancement ideas
+
+#### Testing Results
+
+**Script Execution**:
+- v2 placeholder script: SUCCESS (3 categories, 16 patterns)
+- Realistic data script: SUCCESS (3 categories, 16 patterns)
+- JSON validation: Both files valid Postman v2.1.0 collections
+
+**Output Verification**:
+- Placeholder version: All fields show `<string>`, `<integer>`, `<oneOf>`
+- Realistic version: All fields have actual data (names, addresses, IDs, templates)
+- Structure comparison: Identical (diff confirmed)
+- Payment details working: Credit cards with random expiration dates
+- Tags working: customer_segment_enterprise, campaign_q1_2024, priority_low
+- Bulk operations working: Jobs arrays with page ranges (1-5, 6-10)
+
+#### Key Decisions
+
+**1. YAML over JSON**: More readable, supports comments, easier for non-developers
+**2. Separate collections**: Different names distinguish purpose (placeholders vs examples)
+**3. Filter criteria**: Enable future permutation integration
+**4. Comprehensive fixtures**: Cover all common use cases
+**5. Preserve original**: Keep `generate_getting_started_collection.py` as reference
+
+#### Future Enhancements
+
+**Planned**:
+1. Makefile integration (generate both versions in build pipeline)
+2. Validation error examples (third generator for testing error handling)
+3. Permutation integration (use filter criteria to select from pre-generated data)
+4. Localization (international addresses: UK, Australia, Canada)
+5. Schema validation (validate generated examples against OpenAPI spec)
+
+**Makefile Targets** (proposed):
+```makefile
+postman-generate-getting-started-placeholder:
+    python3 scripts/active/generate_getting_started_collection_v2.py
+
+postman-generate-getting-started-examples:
+    python3 scripts/active/generate_getting_started_with_examples.py
+
+postman-generate-getting-started-all: \
+    postman-generate-getting-started-placeholder \
+    postman-generate-getting-started-examples
+```
+
+#### Session Statistics
+
+- Duration: ~90 minutes
+- Files created: 6 (YAML config, 2 Python scripts, 2 JSON collections, 1 documentation)
+- Lines of code: 1,245 lines (420 YAML + 255 v2 script + 570 realistic script)
+- Lines of documentation: 485 lines (CONFIGURATION_DRIVEN_GETTING_STARTED.md)
+- Test data fixtures: 8 major categories (document sources, addresses, payments, templates, tags)
+- Patterns covered: 16 total (3 frequent + 3 bulk + 10 advanced)
+
+#### Key Learnings
+
+**1. Configuration-driven > Hardcoded**: Declarative YAML easier to maintain than procedural Python
+**2. Single source crucial**: Both generators reading same config = guaranteed sync
+**3. Filters enable intelligence**: Pattern filters guide appropriate test data generation
+**4. Realistic data valuable**: Users test immediately without manual data entry
+**5. Documentation as code**: YAML comments serve as inline documentation
+**6. Separation of concerns**: Placeholder learning vs realistic testing = different collections
+
+#### Result
+
+Complete configuration-driven architecture enabling:
+- **Easy maintenance**: Edit YAML to add patterns (no code changes)
+- **Dual-purpose generation**: Educational placeholders + hands-on examples
+- **Single source of truth**: YAML config drives both versions
+- **Quality assurance**: Filter criteria ensure appropriate test data
+- **Future-proof**: Extensible architecture for validation errors, localization, permutations
+
+**Status**: Production-ready, tested, documented, ready for Makefile integration.
+
+---
+
+### 2025-12-18 (Evening Continuation): Dual Workspace Rebuild & Configuration-Driven Pattern Planning
+
+**Summary**: Clean rebuild of personal workspace, attempted corporate workspace rebuild (blocked by API key issue), comprehensive terminology audit (then reverted), and strategic planning for configuration-driven Getting Started collection enhancement.
+
+**Context**: Continuation from earlier session. User requested clean rebuild of both workspaces after discovering duplicate resources.
+
+#### Part 1: Workspace Rebuild Strategy
+
+**User Request**: "run clean all and build all for both instances of Postman (corporate and personal)"
+
+**Personal Workspace**:
+- Ran `make postman-cleanup-all` (deleted 2 mocks, 8 collections, 1 API, 4 environments, 1 spec)
+- Ran `make postman-instance-build-without-tests` (completed in ~8 minutes)
+- Result: 8 resources created successfully
+
+**Corporate Workspace Attempt**:
+- Discovered zsh doesn't support multiple inline env vars (fixed with export)
+- Hit HTTP 403 Forbidden error with POSTMAN_C2M_API_KEY
+- Root cause: Local API key appears invalid despite working in GitHub Actions
+- User decision: Use GitHub Actions for corporate workspace instead of local build
+
+#### Part 2: Terminology Audit & Reversal
+
+**Initial Correction**:
+- User corrected me: "it has always been team" (not "corporate")
+- Updated .postman-target, CLAUDE.md, logs to use "team"
+
+**Comprehensive Audit**:
+- User request: "check whole project across all repos for corporate and team and standardize on team"
+- User explicit: "Update the docs, but don't change any scripts until we discuss it"
+- Found 55 files using "corporate" terminology
+- Created CORPORATE_TO_TEAM_TERMINOLOGY_AUDIT.md
+- Updated 12 documentation files (257 replacements: "corporate" → "team")
+
+**Decision Reversal**:
+- User concern: "breaking scripts via these changes and spending time on fixing them rather than other more important tasks"
+- Discussion: "team" matches Postman UI vs "corporate" is current working state
+- User decision: REVERT - don't fix what isn't broken
+- Reverted all 12 files with `git restore`
+- Deleted audit document
+- Result: All scripts unchanged, no risk of breakage
+
+**Key Insight**: Working code > Perfect terminology. Don't refactor for cosmetic reasons.
+
+#### Part 3: Getting Started Collection Enhancement Planning
+
+**User Vision**: Mirror Getting Started collection with real test data instead of placeholders
+
+**Requirements**:
+- Use permutation generator to create realistic examples
+- Each pattern should have real data (not `<string>`, `<oneOf>`, etc.)
+- Leverage existing permutations (270-810 per endpoint)
+
+**Proposed Approach**:
+- Filter permutations based on pattern requirements
+- Example filters:
+  - `has_jobTemplate: true`
+  - `documentSourceIdentifier: "singleDoc"`
+  - `recipientAddressSource: "recipientAddress"`
+  - `paymentDetails: "any"`
+
+**Strategic Decision**: Configuration-Driven Refactoring
+- User insight: "modify first script to get endpoint params from json file"
+- Better approach: Extract patterns from Python code to YAML config
+- Benefits:
+  1. Single config serves BOTH scripts (placeholders + real data)
+  2. Non-developers can add patterns without editing code
+  3. Patterns are declarative data, not embedded in logic
+  4. Easy to review and maintain
+
+**Proposed YAML Structure**:
+```yaml
+patterns:
+  - name: "Single Recipient"
+    category: "Most Frequently Used"
+    endpoint: "/jobs/submit/single/doc"
+    description: "Send a personalized document to one recipient"
+    filters:
+      has_jobTemplate: true
+      documentSourceIdentifier: "singleDoc"
+      recipientAddressSource: "recipientAddress"
+      paymentDetails: "any"
+```
+
+**Deferred to Tomorrow**: Implementation of configuration-driven approach with fresh perspective
+
+#### Key Decisions
+
+1. **Workspace Strategy**: Personal via local builds, corporate via GitHub Actions (local API key issue)
+2. **Terminology**: Keeping "corporate" throughout (preserve working state)
+3. **Enhancement Approach**: Configuration-driven patterns in YAML file
+4. **Risk Management**: Don't change working scripts for cosmetic improvements
+
+#### Technical Discoveries
+
+1. **Zsh vs Bash**: Inline environment variables require explicit export
+2. **API Key Mystery**: Local POSTMAN_C2M_API_KEY invalid, GitHub Secrets work
+3. **Workspace Synchronization**: CI/CD more reliable than local builds for corporate workspace
+4. **Configuration-Driven Design**: Better than hardcoded patterns for maintainability
+
+#### Build Results
+
+**Personal Workspace** (Completed):
+- API Definition, Standalone Spec, Linked Collection
+- Use Case Collection, Getting Started Collection, Test Collection
+- Mock Server, Mock Environment, AWS Dev Environment
+
+**Corporate Workspace** (Via GitHub Actions):
+- Triggered by push to click2mail/c2m-api-v2-postman
+- Workflow pending verification
+
+#### Next Session Plan
+
+**Tomorrow's Work**:
+
+1. **Refactor Getting Started Generator**:
+   - Extract hardcoded patterns to `config/getting-started-patterns.yaml`
+   - Script reads config instead of hardcoded data structures
+
+2. **Create Real Data Script**:
+   - New: `generate_getting_started_with_examples.py`
+   - Reads same YAML config
+   - Filters permutation files by pattern requirements
+   - Outputs: `c2mapiv2-getting-started-with-examples-collection.json`
+
+3. **Implementation Benefits**:
+   - Single source of truth for patterns
+   - Easy to add patterns (edit YAML, no code changes)
+   - Both collections stay synchronized
+   - Configuration-driven approach (industry best practice)
+
+#### Files Modified (Then Reverted)
+
+- 12 documentation files: 257 replacements "corporate" → "team" (all reverted)
+- CORPORATE_TO_TEAM_TERMINOLOGY_AUDIT.md created then deleted
+
+#### Session Statistics
+
+- Duration: ~2 hours
+- Workspaces Updated: 1 (personal)
+- Changes Made Then Reverted: 257 replacements in 12 files
+- Key Decision: Preserve working state over cosmetic improvements
+- Planning Completed: Configuration-driven pattern enhancement
+
+---
+
