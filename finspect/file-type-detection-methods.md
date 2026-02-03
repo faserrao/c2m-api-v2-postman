@@ -1,1 +1,0 @@
-../user-guides/finspect-file-type-detection-methods.md
