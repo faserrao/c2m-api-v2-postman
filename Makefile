@@ -333,12 +333,13 @@ SERRAO_WS                        := d8a1f479-a2aa-4471-869e-b12feea0a98c
 C2M_WS                           := c740f0f4-0de2-4db3-8ab6-f8a0fa6fbeb1
 
 #--- Default workspace configuration ---
-# Read workspace target from .postman-target file (corporate or personal)
-POSTMAN_TARGET                   := $(shell cat .postman-target 2>/dev/null || echo "personal")
-# Select workspace based on target file, allow override
-POSTMAN_WS                       := $(or $(POSTMAN_WORKSPACE_OVERRIDE),$(if $(filter corporate,$(POSTMAN_TARGET)),$(C2M_WS),$(SERRAO_WS)))
-# Select API key based on workspace
-POSTMAN_API_KEY                  := $(or $(POSTMAN_API_KEY_OVERRIDE),$(if $(filter corporate,$(POSTMAN_TARGET)),$(POSTMAN_C2M_API_KEY),$(POSTMAN_SERRAO_API_KEY)))
+# Read context from .git-context file (personal or click2mail)
+# This enforces 1:1 relationship: faserrao repo → personal Postman, click2mail repo → corporate Postman
+GIT_CONTEXT                      := $(shell cat .git-context 2>/dev/null || echo "personal")
+# Select workspace based on context, allow override
+POSTMAN_WS                       := $(or $(POSTMAN_WORKSPACE_OVERRIDE),$(if $(filter click2mail,$(GIT_CONTEXT)),$(C2M_WS),$(SERRAO_WS)))
+# Select API key based on context
+POSTMAN_API_KEY                  := $(or $(POSTMAN_API_KEY_OVERRIDE),$(if $(filter click2mail,$(GIT_CONTEXT)),$(POSTMAN_C2M_API_KEY),$(POSTMAN_SERRAO_API_KEY)))
 
 #--- TOKENS ---
 # Extract token from environment file if it exists
@@ -2471,61 +2472,56 @@ lint: openapi-spec-lint ## Lint OpenAPI spec [CI alias]
 diff: openapi-spec-diff ## Diff OpenAPI spec vs origin/main [CI alias]
 
 .PHONY: postman-publish
-postman-publish: ## Push API + collection to current workspace (use POSTMAN_TARGET to control)
-	@if [ "$(POSTMAN_TARGET)" = "both" ]; then \
-		$(MAKE) postman-publish-both; \
-	elif [ "$(POSTMAN_TARGET)" = "team" ]; then \
-		$(MAKE) postman-publish-team; \
-	elif [ "$(POSTMAN_TARGET)" = "personal" ]; then \
-		$(MAKE) postman-publish-personal; \
+postman-publish: ## Push API + collection to workspace based on current context
+	@echo "📍 Publishing to workspace based on context: $(GIT_CONTEXT)"
+	@if [ "$(GIT_CONTEXT)" = "personal" ]; then \
+		echo "🏠 Target: PERSONAL workspace ($(SERRAO_WS))"; \
+		echo "🔑 Using: POSTMAN_SERRAO_API_KEY"; \
 	else \
-		echo "📍 Publishing to default workspace (personal)..."; \
-		$(MAKE) postman-import-openapi-as-api; \
-		$(MAKE) postman-linked-collection-upload; \
-		$(MAKE) postman-linked-collection-link; \
+		echo "👥 Target: CORPORATE workspace ($(C2M_WS))"; \
+		echo "🔑 Using: POSTMAN_C2M_API_KEY"; \
 	fi
+	@echo ""
+	@$(MAKE) postman-import-openapi-as-api
+	@$(MAKE) postman-linked-collection-upload
+	@$(MAKE) postman-linked-collection-link
 
 .PHONY: postman-publish-personal
-postman-publish-personal: ## Push complete suite to personal workspace
-	@echo "🏠 Publishing to PERSONAL workspace..."
-	@if [ -z "$(SKIP_TARGET_SAVE)" ]; then \
-		echo "personal" > .postman-target; \
-		echo "📝 Saved target 'personal' to .postman-target for CI/CD"; \
-	fi
-	@echo "🔧 Setting workspace to: $(SERRAO_WS)"
-	@echo "🔑 Using API key: POSTMAN_SERRAO_API_KEY"
+postman-publish-personal: ## [Deprecated] Use 'make context-set-personal' then 'make postman-publish'
+	@echo "⚠️  DEPRECATED: This target is deprecated."
+	@echo "   Please use: make context-set-personal && make postman-publish"
 	@echo ""
-	@POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_SERRAO_API_KEY}" \
-		$(MAKE) rebuild-all-with-delete-ci
+	@if [ "$(GIT_CONTEXT)" != "personal" ]; then \
+		echo "❌ ERROR: Current context is '$(GIT_CONTEXT)', not 'personal'"; \
+		echo "   Run: make context-set-personal"; \
+		exit 1; \
+	fi
+	@$(MAKE) postman-publish
 
 .PHONY: postman-publish-team
-postman-publish-team: ## Push complete suite to team workspace
-	@echo "👥 Publishing to TEAM workspace..."
-	@if [ -z "$(SKIP_TARGET_SAVE)" ]; then \
-		echo "team" > .postman-target; \
-		echo "📝 Saved target 'team' to .postman-target for CI/CD"; \
-	fi
-	@echo "🔧 Setting workspace to: $(C2M_WS)"
-	@echo "🔑 Using API key: POSTMAN_C2M_API_KEY"
+postman-publish-team: ## [Deprecated] Use 'make context-set-click2mail' then 'make postman-publish'
+	@echo "⚠️  DEPRECATED: This target is deprecated."
+	@echo "   Please use: make context-set-click2mail && make postman-publish"
 	@echo ""
-	@POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE="$${POSTMAN_C2M_API_KEY}" \
-		$(MAKE) rebuild-all-with-delete-ci
+	@if [ "$(GIT_CONTEXT)" != "click2mail" ]; then \
+		echo "❌ ERROR: Current context is '$(GIT_CONTEXT)', not 'click2mail'"; \
+		echo "   Run: make context-set-click2mail"; \
+		exit 1; \
+	fi
+	@$(MAKE) postman-publish
 
 .PHONY: postman-publish-both
-postman-publish-both: ## Push API + collection to BOTH workspaces
-	@echo "🚀 Publishing to BOTH workspaces..."
-	@if [ -z "$(SKIP_TARGET_SAVE)" ]; then \
-		echo "both" > .postman-target; \
-		echo "📝 Saved target 'both' to .postman-target for CI/CD"; \
-	fi
+postman-publish-both: ## [Removed] Cross-publishing not allowed with strict 1:1 enforcement
+	@echo "❌ ERROR: This target has been removed."
 	@echo ""
-	@echo "──── Publishing to PERSONAL workspace ────"
-	@SKIP_TARGET_SAVE=1 $(MAKE) postman-publish-personal
+	@echo "With strict 1:1 enforcement:"
+	@echo "  • faserrao repo → personal Postman ONLY"
+	@echo "  • click2mail repo → corporate Postman ONLY"
 	@echo ""
-	@echo "──── Publishing to TEAM workspace ────"
-	@SKIP_TARGET_SAVE=1 $(MAKE) postman-publish-team
-	@echo ""
-	@echo "🎉 Both workspaces updated successfully!"
+	@echo "To publish to both workspaces:"
+	@echo "  1. Push to faserrao repo (triggers personal Postman via GitHub Actions)"
+	@echo "  2. Push to click2mail repo (triggers corporate Postman via GitHub Actions)"
+	@exit 1
 
 # Show all available targets with descriptions
 .PHONY: help
@@ -2539,37 +2535,67 @@ help:## Show help
 workspace-info: ## Show current Postman workspace configuration
 	@echo "🔍 Postman Workspace Configuration:"
 	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-	@echo "Current Workspace: $(if $(findstring $(POSTMAN_WS),$(C2M_WS)),C2M Team,Personal/Serrao)"
+	@echo "Context: $(GIT_CONTEXT)"
+	@echo "Current Workspace: $(if $(findstring $(POSTMAN_WS),$(C2M_WS)),C2M Corporate,Personal/Serrao)"
 	@echo "Workspace ID: $(POSTMAN_WS)"
-	@echo "API Key: $(if $(findstring $(POSTMAN_API_KEY),$(POSTMAN_C2M_API_KEY)),C2M Team Key,Personal Key)"
-	@if [ -f .postman-target ]; then \
-		echo "CI/CD Target: $$(cat .postman-target) (from .postman-target file)"; \
-	else \
-		echo "CI/CD Target: personal (default - no .postman-target file)"; \
-	fi
+	@echo "API Key: $(if $(findstring $(POSTMAN_API_KEY),$(POSTMAN_C2M_API_KEY)),C2M Corporate Key,Personal Key)"
 	@echo ""
-	@echo "📚 Available Publishing Options:"
-	@echo "  • make postman-publish-personal → Publish to personal workspace"
-	@echo "  • make postman-publish-team     → Publish to team workspace"
-	@echo "  • make postman-publish-both     → Publish to BOTH workspaces"
+	@echo "📚 Available Commands:"
+	@echo "  • make context-show              → Show current context"
+	@echo "  • make context-set-personal      → Switch to personal context"
+	@echo "  • make context-set-click2mail    → Switch to click2mail context"
+	@echo "  • make postman-publish           → Publish to current context workspace"
 	@echo ""
-	@echo "💡 These commands also save the target for CI/CD in .postman-target"
+	@echo "💡 Strict 1:1 enforcement:"
+	@echo "   • faserrao repo → personal Postman ONLY"
+	@echo "   • click2mail repo → corporate Postman ONLY"
 
 .PHONY: use-team-workspace
-use-team-workspace: ## Force use of C2M team workspace
-	@echo "🔄 Forcing C2M team workspace..."
-	POSTMAN_WORKSPACE_OVERRIDE=$(C2M_WS) POSTMAN_API_KEY_OVERRIDE=$(POSTMAN_C2M_API_KEY) $(MAKE) workspace-info
+use-team-workspace: ## [Deprecated] Use 'make context-set-click2mail' instead
+	@echo "⚠️  DEPRECATED: Use 'make context-set-click2mail' instead"
+	@$(MAKE) context-set-click2mail
 
 .PHONY: use-personal-workspace
-use-personal-workspace: ## Force use of personal workspace
-	@echo "🔄 Forcing personal workspace..."
-	POSTMAN_WORKSPACE_OVERRIDE=$(SERRAO_WS) POSTMAN_API_KEY_OVERRIDE=$(POSTMAN_SERRAO_API_KEY) $(MAKE) workspace-info
+use-personal-workspace: ## [Deprecated] Use 'make context-set-personal' instead
+	@echo "⚠️  DEPRECATED: Use 'make context-set-personal' instead"
+	@$(MAKE) context-set-personal
 
 # ========================================================================
 # LOGGING
 # ========================================================================
 CUR-DIR := $(shell pwd)
 LOG-DIR := $(CUR-DIR)/make-logs
+
+# ========================================================================
+# CONTEXT MANAGEMENT
+# ========================================================================
+.PHONY: context-show
+context-show: ## Show current development context
+	@echo "========================================="
+	@echo "Current Development Context"
+	@echo "========================================="
+	@echo "Context: $(GIT_CONTEXT)"
+	@echo ""
+	@echo "This affects:"
+	@if [ "$(GIT_CONTEXT)" = "personal" ]; then \
+		echo "  Postman Workspace: Personal ($(SERRAO_WS))"; \
+		echo "  API Key: POSTMAN_SERRAO_API_KEY"; \
+		echo "  Git Remote: origin (faserrao)"; \
+	else \
+		echo "  Postman Workspace: Corporate ($(C2M_WS))"; \
+		echo "  API Key: POSTMAN_C2M_API_KEY"; \
+		echo "  Git Remote: click2mail"; \
+	fi
+	@echo ""
+	@echo "To switch context: make context-set-personal or make context-set-click2mail"
+
+.PHONY: context-set-personal
+context-set-personal: ## Set context to personal (faserrao repo → personal Postman)
+	@./scripts/utilities/set-context.sh personal
+
+.PHONY: context-set-click2mail
+context-set-click2mail: ## Set context to click2mail (click2mail repo → corporate Postman)
+	@./scripts/utilities/set-context.sh click2mail
 
 # ========================================================================
 # VARIABLE DEBUGGING

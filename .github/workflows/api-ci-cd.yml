@@ -202,22 +202,28 @@ jobs:
             echo "⚠️  Skipping Postman publish: No API keys configured"
             echo "   Add POSTMAN_SERRAO_API_KEY and/or POSTMAN_C2M_API_KEY secrets"
           else
-            # Auto-detect workspace from repository owner (identical workflow in both repos)
+            # Auto-detect context from repository owner (enforces 1:1 relationship)
+            # faserrao repo → personal Postman ONLY
+            # click2mail repo → corporate Postman ONLY
             if [ "${{ github.repository_owner }}" = "faserrao" ]; then
-              POSTMAN_TARGET="personal"
-              echo "🎯 Auto-detected workspace from repository owner: personal"
+              GIT_CONTEXT="personal"
+              echo "personal" > .git-context
+              echo "🎯 Auto-detected context from repository owner: personal"
               echo "   Repository: ${{ github.repository }}"
               echo "   Owner: faserrao (personal account)"
+              echo "   Postman: Personal workspace ONLY"
             else
-              POSTMAN_TARGET="corporate"
-              echo "🎯 Auto-detected workspace from repository owner: corporate"
+              GIT_CONTEXT="click2mail"
+              echo "click2mail" > .git-context
+              echo "🎯 Auto-detected context from repository owner: click2mail"
               echo "   Repository: ${{ github.repository }}"
               echo "   Owner: ${{ github.repository_owner }} (organization)"
+              echo "   Postman: Corporate workspace ONLY"
             fi
 
             echo ""
             echo "🚀 FULL CLEANUP AND REBUILD of Postman workspace..."
-            echo "   Target: $POSTMAN_TARGET"
+            echo "   Context: $GIT_CONTEXT"
             echo "   API Keys available: SERRAO=$([ -n "$POSTMAN_SERRAO_API_KEY" ] && echo "Yes" || echo "No"), C2M=$([ -n "$POSTMAN_C2M_API_KEY" ] && echo "Yes" || echo "No")"
             echo ""
             echo "   This will DELETE and RECREATE:"
@@ -231,8 +237,8 @@ jobs:
             export POSTMAN_C2M_API_KEY
             make workspace-info
             echo ""
-            POSTMAN_TARGET=$POSTMAN_TARGET make postman-cleanup-all
-            POSTMAN_TARGET=$POSTMAN_TARGET make postman-instance-build-without-tests
+            make postman-cleanup-all
+            make postman-instance-build-without-tests
           fi
 
       # ---------- Post-Build Validation ----------
