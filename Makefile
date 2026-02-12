@@ -1442,18 +1442,19 @@ postman-upload-use-case-collection:
 	fi
 
 # Generate Getting Started collection (educational/onboarding)
+# NOTE: This generates from the linked collection (ensures correct field names from EBNF)
 .PHONY: postman-generate-getting-started-collection
-postman-generate-getting-started-collection:
-	@echo "📚 Generating Getting Started collection (placeholders)..."
-	@$(VENV_PYTHON) scripts/active/generate_getting_started_collection_v2.py
-	@echo "✅ Getting Started collection (placeholders) generated"
+postman-generate-getting-started-collection: postman-api-linked-collection-generate
+	@echo "📚 Generating Getting Started collection from linked collection..."
+	@$(VENV_PYTHON) scripts/active/generate_getting_started_from_linked.py
+	@echo "✅ Getting Started collection generated (correct field names from EBNF)"
 
-# Generate Getting Started collection with realistic test data
+# Generate Getting Started collection with realistic test data from test collection
 .PHONY: postman-generate-getting-started-with-examples
-postman-generate-getting-started-with-examples:
-	@echo "📚 Generating Getting Started collection (with examples)..."
-	@$(VENV_PYTHON) scripts/active/generate_getting_started_with_examples.py
-	@echo "✅ Getting Started collection (with examples) generated"
+postman-generate-getting-started-with-examples: postman-create-test-collection
+	@echo "📚 Generating Getting Started collection from test collection..."
+	@$(VENV_PYTHON) scripts/active/generate_getting_started_with_examples_from_test.py
+	@echo "✅ Getting Started collection (with examples) generated from test collection"
 
 # Generate both Getting Started collections
 .PHONY: postman-generate-getting-started-all

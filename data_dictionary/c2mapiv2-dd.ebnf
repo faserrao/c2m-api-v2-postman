@@ -83,11 +83,11 @@
    ----------------------------------------------------------------------------
    6) Alternatives: A | B
    ----------------------------------------------------------------------------
-   The vertical bar means “one of these alternatives”.
+   The vertical bar means "one of these alternatives".
 
-     documentSource = documentIdSource | requestIdSource | urlSource ;
+     docSourceStandard = documentIdSource | requestIdSource | urlSource ;
 
-   Read as: documentSource can be provided in exactly one of these modes.
+   Read as: docSourceStandard can be provided in exactly one of these modes.
 
    In OpenAPI this often becomes a 'oneOf' (depending on translator behavior).
 
@@ -119,12 +119,12 @@
      submitSingleDocParams = ... ;
 
    This rule defines the JSON body shape for that endpoint. It is built from the
-   shared building blocks (documentSource, recipientAddressSource, etc.).
+   shared building blocks (docSourceAll, recipientAddressSource, etc.).
 
    Example:
      submitSingleDocParams =
            [ jobTemplate ]
-         + documentSource
+         + docSourceAll
          + recipientAddressSource
          + [ paymentDetails ]
          + ... ;
@@ -165,7 +165,7 @@
 
    Conventions:
      - Endpoint param sets (submit...Params) represent the JSON request body shape for that endpoint.
-     - Each 'Params' rule is composed from reusable building blocks (documentSource, recipientAddressSource, etc.).
+     - Each 'Params' rule is composed from reusable building blocks (document source variants, recipientAddressSource, etc.).
      - Optional fields are wrapped in [ ... ].
      - Arrays are represented as { item }.
 *)
@@ -399,7 +399,7 @@ submitSinglePdfSplitAddressCaptureParams =
    - Body MAY include a top-level jobTemplate.
    - Body MUST include `multiDocJobs` (list of job items).
    - Each `multiDocJobs[]` item is a `multiDocJobItem` containing:
-       [ jobTemplate ] + documentSource + recipientAddressSource
+       [ jobTemplate ] + docSourceAll + recipientAddressSource
      where per-job jobTemplate is optional when top-level jobTemplate is present.
    - Body MAY include paymentDetails and tags.
 *)
@@ -424,7 +424,7 @@ submitSinglePdfSplitAddressCaptureParams =
 
    Document and recipient rules:
      FOR EACH multiDocJobs[i]:
-       Resolve multiDocJobs[i].documentSource using the same rules as /single/doc.
+       Resolve multiDocJobs[i].docSourceAll using the same rules as /single/doc.
        Resolve multiDocJobs[i].recipientAddressSource using the same rules as /single/doc.
 *)
 
@@ -489,7 +489,7 @@ submitMultiDocMergeParams =
    - Body MAY include jobTemplate.
    - Body MUST include `multiZipJobs` (list of zip-sourced job items).
    - Each `multiZipJobs[]` item is a `multiZipJobItem` containing:
-       [ jobTemplate ] + documentSource + recipientAddressSource
+       [ jobTemplate ] + docSourceZipFile + recipientAddressSource
    - Body MAY include paymentDetails and tags.
 *)
 
@@ -656,13 +656,6 @@ addressList   = { address } ;
 (*        DOCUMENT SOURCE MODES     *)
 (***********************************)
 
-documentSource =
-      documentIdSource
-    | requestIdSource
-    | urlSource
-    | zipDocumentIdSource
-    | zipRequestIdSource ;
-
 documentIdSource = documentId ;
 documentId = id ;
 
@@ -684,8 +677,8 @@ zipDocumentSource =
     | zipRequestIdSource ;
 
 (* Translator note:
-   - docSourceStandard/docSourceZipFile/docSourceAll are “scoped” documentSource variants used to keep
-     endpoint schemas tight.
+   - docSourceStandard/docSourceZipFile/docSourceAll are specialized document source variants used to keep
+     endpoint schemas tight (only accepting the source types each endpoint supports).
    - zipDocumentSource is used only by /jobs/submit/multi/zip/addressCapture and is intentionally zip-only.
    - Zip-only behavior for /jobs/submit/multi/zip is enforced indirectly via multiZipJobItem using docSourceZipFile.
 *)
