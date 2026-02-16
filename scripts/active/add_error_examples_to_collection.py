@@ -10,9 +10,17 @@ Traceability:
   EBNF Data Dictionary → OpenAPI Spec → add_response_examples.py → This Script → Collection → Mock Server
 
 Usage:
-  python3 add_error_examples_to_collection.py <openapi_spec.yaml> <collection.json> <output.json>
+  python3 add_error_examples_to_collection.py <openapi_spec.yaml> <collection.json> [output.json]
 
-Example:
+  - 2 arguments: Modifies collection in-place
+  - 3 arguments: Creates new output file
+
+Example (in-place):
+  python3 add_error_examples_to_collection.py \
+    openapi/c2mapiv2-openapi-spec-final.yaml \
+    postman/generated/c2mapiv2-test-collection-flat.json
+
+Example (new file):
   python3 add_error_examples_to_collection.py \
     openapi/c2mapiv2-openapi-spec-final.yaml \
     postman/generated/c2mapiv2-test-collection-with-tests.json \
@@ -275,15 +283,17 @@ def process_collection(spec, collection):
 
 
 def main():
-    if len(sys.argv) != 4:
+    if len(sys.argv) not in [3, 4]:
         print(__doc__)
         print("\n❌ Error: Incorrect number of arguments")
-        print(f"   Usage: {sys.argv[0]} <openapi_spec.yaml> <input_collection.json> <output_collection.json>")
+        print(f"   Usage: {sys.argv[0]} <openapi_spec.yaml> <collection.json> [output_collection.json]")
+        print(f"   - 2 args: Modifies collection in-place")
+        print(f"   - 3 args: Creates new output file")
         sys.exit(1)
 
     spec_path = sys.argv[1]
     input_path = sys.argv[2]
-    output_path = sys.argv[3]
+    output_path = sys.argv[3] if len(sys.argv) == 4 else input_path  # In-place if no output specified
 
     # Validate input files exist
     if not Path(spec_path).exists():
