@@ -228,7 +228,9 @@ validate_postman_artifacts() {
             # Local file may be sanitized after upload - this is acceptable
             local build_type="${BUILD_TYPE:-local}"
             if [ "$build_type" = "github" ]; then
+                # Don't count as failure in CI/CD - credentials are in GitHub Secrets
                 log_info "Auth credentials not in local file (expected in CI/CD - credentials uploaded to Postman)"
+                VALIDATIONS_PASSED=$((VALIDATIONS_PASSED + 1))
             else
                 log_fail "Auth credentials missing from environment"
             fi
