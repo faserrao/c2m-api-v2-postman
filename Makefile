@@ -440,6 +440,7 @@ postman-create-linked-collection-legacy:
 postman-create-test-collection:
 	$(MAKE) postman-test-collection-generate
 	$(MAKE) postman-test-collection-add-examples || echo "⚠️  Skipping examples (optional step)."
+	$(MAKE) postman-test-collection-add-error-responses || echo "⚠️  Skipping error responses (optional step)."
 	$(MAKE) postman-test-collection-merge-overrides
 	$(MAKE) postman-test-collection-add-tests || echo "⚠️  Skipping adding tests (optional step)."
 	$(MAKE) postman-auth-setup || echo "⚠️  Skipping auth setup (provider not available)."
@@ -533,6 +534,8 @@ postman-instance-build-with-tests:
 	$(MAKE) postman-mock
 	# Generate and serve documentation
 	$(MAKE) postman-docs-build-and-serve-up
+	# Validate pipeline outputs
+	$(MAKE) validate-pipeline
 
 # CI version - skips local testing
 .PHONY: postman-instance-build-without-tests
@@ -553,6 +556,8 @@ postman-instance-build-without-tests:
 	$(MAKE) postman-upload-use-case-collection
 	$(MAKE) postman-upload-getting-started-all
 	$(MAKE) postman-create-mock-and-env
+	# Validate pipeline outputs
+	$(MAKE) validate-pipeline
 	# Skip local testing in CI
 
 # ---
@@ -1161,6 +1166,24 @@ postman-test-collection-add-examples:
 	fi
 	$(ADD_EXAMPLES_TO_COLLECTION)
 	@echo "✅ Examples added and saved to $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES)"
+	@echo " "
+	@echo " "
+	@echo " "
+	@echo " "
+
+# ========================================================================
+# ERROR RESPONSE ADDITION
+# ========================================================================
+# Add realistic error response examples to collection (for mock server variety)
+.PHONY: postman-test-collection-add-error-responses
+postman-test-collection-add-error-responses:
+	@echo "⚠️  Adding error response examples to Postman collection..."
+	@if [ ! -f $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES) ]; then \
+		echo "❌ Collection $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES) not found. Run postman-test-collection-add-examples first."; \
+		exit 1; \
+	fi
+	node scripts/active/add_error_responses_to_collection.js $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES) $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES)
+	@echo "✅ Error responses added to $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES)"
 	@echo " "
 	@echo " "
 	@echo " "
