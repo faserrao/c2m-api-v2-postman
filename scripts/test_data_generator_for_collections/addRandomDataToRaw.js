@@ -492,15 +492,14 @@ function processItem(item) {
     if (item.response && Array.isArray(item.response)) {
         item.response.forEach(response => {
             // Process response body
+            // NOTE: Response bodies are NOT processed to preserve error examples from OpenAPI spec
+            // Error examples have correlated fields (errorType + errorCode + errorMessage)
+            // Randomizing them independently creates invalid combinations
+            // The OpenAPI spec already has correct, correlated error examples - preserve them as-is
             if (response.body) {
-                try {
-                    const responseBody = JSON.parse(response.body);
-                    processBodyObject(responseBody);
-                    response.body = JSON.stringify(responseBody, null, 2);
-                    stats.modifiedResponses++;
-                } catch (e) {
-                    // Skip non-JSON bodies
-                }
+                // Response bodies are preserved from OpenAPI spec (no modification)
+                // This ensures error examples remain valid and correlated
+                // stats.modifiedResponses++; // Not counted since we're not modifying
             }
 
             // Process originalRequest in responses

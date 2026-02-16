@@ -2116,6 +2116,33 @@ prism-test-select: ## Test endpoint with specific test body index
 	@$(SCRIPTS_DIR)/utilities/prism_test.sh "$(PRISM_TEST_ENDPOINT)" --select "$(PRISM_TEST_INDEX)"
 
 # ========================================================================
+# DEVELOPER HELPER TARGETS
+# ========================================================================
+# Convenience targets for common development tasks
+# These wrap helper scripts for easier workflow integration
+
+.PHONY: validate-ebnf
+validate-ebnf: ## Validate EBNF data dictionary before committing
+	@echo "🔍 Validating EBNF data dictionary..."
+	@chmod +x scripts/validate-before-commit.sh
+	@scripts/validate-before-commit.sh
+
+.PHONY: preview-changes
+preview-changes: ## Preview what will change in OpenAPI spec
+	@echo "👀 Previewing OpenAPI spec changes..."
+	@chmod +x scripts/preview-ebnf-changes.sh
+	@scripts/preview-ebnf-changes.sh
+
+.PHONY: safe-push
+safe-push: ## Complete safe workflow: validate → preview → build → commit → push
+	@if [ -z "$(MSG)" ]; then \
+		echo "❌ Commit message required. Usage: make safe-push MSG=\"Your commit message\""; \
+		exit 1; \
+	fi
+	@chmod +x scripts/safe-push.sh
+	@scripts/safe-push.sh "$(MSG)"
+
+# ========================================================================
 # POST-BUILD VALIDATION SYSTEM
 # ========================================================================
 # Comprehensive validation orchestration for Local and GitHub builds
