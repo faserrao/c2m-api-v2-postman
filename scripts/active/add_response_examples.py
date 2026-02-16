@@ -2,12 +2,101 @@
 """
 Add meaningful example responses to OpenAPI spec
 Specifically targets StandardResponse to provide better mock data
+Adds both SUCCESS and ERROR response examples for mock server variety
 """
 
 import yaml
 import sys
 import copy
+import random
+import string
 from datetime import datetime, timezone
+
+# Error example templates (realistic data, not placeholders)
+ERROR_EXAMPLES = {
+    '400': {
+        'missing_field': {
+            'summary': 'Missing required field',
+            'value': {
+                'errorType': 'ValidationError',
+                'errorMessage': 'Required field is missing from request body',
+                'errorCode': 'MISSING_REQUIRED_FIELD',
+                'errorDetails': '{"field": "documentId", "location": "requestBody"}',
+                'errorTrackingId': 'TRK-20260216-ABC123'
+            }
+        },
+        'invalid_format': {
+            'summary': 'Invalid field format',
+            'value': {
+                'errorType': 'ValidationError',
+                'errorMessage': 'Field contains invalid format or value',
+                'errorCode': 'INVALID_FORMAT',
+                'errorDetails': '{"field": "postalCode", "provided": "1234", "expected": "5 or 9 digits"}',
+                'errorTrackingId': 'TRK-20260216-DEF456'
+            }
+        }
+    },
+    '401': {
+        'missing_token': {
+            'summary': 'Missing authentication',
+            'value': {
+                'errorType': 'AuthenticationError',
+                'errorMessage': 'Authorization header is missing or invalid',
+                'errorCode': 'MISSING_AUTH_HEADER',
+                'errorDetails': '{"expected": "Bearer <token>", "received": "none"}',
+                'errorTrackingId': 'TRK-20260216-GHI789'
+            }
+        }
+    },
+    '403': {
+        'insufficient_permissions': {
+            'summary': 'Insufficient permissions',
+            'value': {
+                'errorType': 'AuthorizationError',
+                'errorMessage': 'User does not have required permissions for this operation',
+                'errorCode': 'INSUFFICIENT_PERMISSIONS',
+                'errorDetails': '{"required": "jobs:write", "user": "read-only-user"}',
+                'errorTrackingId': 'TRK-20260216-JKL012'
+            }
+        }
+    },
+    '404': {
+        'resource_not_found': {
+            'summary': 'Resource not found',
+            'value': {
+                'errorType': 'ResourceNotFoundError',
+                'errorMessage': 'Requested resource does not exist',
+                'errorCode': 'RESOURCE_NOT_FOUND',
+                'errorDetails': '{"resourceType": "document", "resourceId": "DOC-12345"}',
+                'errorTrackingId': 'TRK-20260216-MNO345'
+            }
+        }
+    },
+    '422': {
+        'validation_failed': {
+            'summary': 'Validation failed',
+            'value': {
+                'errorType': 'ValidationError',
+                'errorMessage': 'Request validation failed for multiple fields',
+                'errorCode': 'VALIDATION_FAILED',
+                'errorDetails': '{"errors": [{"field": "documentId", "issue": "not found"}, {"field": "recipientAddress.postalCode", "issue": "invalid format"}]}',
+                'errorTrackingId': 'TRK-20260216-PQR678'
+            }
+        }
+    },
+    '500': {
+        'server_error': {
+            'summary': 'Internal server error',
+            'value': {
+                'errorType': 'ServerError',
+                'errorMessage': 'An unexpected error occurred while processing the request',
+                'errorCode': 'INTERNAL_SERVER_ERROR',
+                'errorDetails': '{"timestamp": "2026-02-16T18:30:45Z", "requestId": "req-abc123"}',
+                'errorTrackingId': 'TRK-20260216-STU901'
+            }
+        }
+    }
+}
 
 def add_response_examples(spec):
     """Add example values to StandardResponse and response schemas"""
@@ -64,7 +153,18 @@ def add_response_examples(spec):
                                                 }
                                             }
                                         }
-    
+
+                                        # Add error examples to error responses (400, 401, 403, 404, 422, 500)
+                                        for error_code in ['400', '401', '403', '404', '422', '500']:
+                                            if error_code in operation['responses']:
+                                                error_response = operation['responses'][error_code]
+                                                if 'content' in error_response and 'application/json' in error_response['content']:
+                                                    error_json = error_response['content']['application/json']
+
+                                                    # Add error examples from ERROR_EXAMPLES dictionary
+                                                    if error_code in ERROR_EXAMPLES:
+                                                        error_json['examples'] = ERROR_EXAMPLES[error_code]
+
     return spec
 
 def main():
