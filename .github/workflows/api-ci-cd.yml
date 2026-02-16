@@ -235,6 +235,7 @@ jobs:
             echo ""
             export POSTMAN_SERRAO_API_KEY
             export POSTMAN_C2M_API_KEY
+            export BUILD_TYPE=github
             make workspace-info
             echo ""
             make postman-cleanup-all
