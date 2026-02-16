@@ -492,8 +492,6 @@ function processItem(item) {
     if (item.response && Array.isArray(item.response)) {
         item.response.forEach(response => {
             // Process response body
-            // NOTE: This processes SUCCESS response bodies only
-            // Error response bodies are added later by add_error_examples_to_collection.py
             if (response.body) {
                 try {
                     const responseBody = JSON.parse(response.body);

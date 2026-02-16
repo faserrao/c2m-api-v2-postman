@@ -424,54 +424,8 @@ class EBNFToOpenAPITranslator:
                             }
                         }
                     }),
-                    ("400", {
-                        "description": "Bad Request - Invalid request parameters",
-                        "content": {
-                            "application/json": {
-                                "schema": {"$ref": "#/components/schemas/HTTP_400_BAD_REQUEST"}
-                            }
-                        }
-                    }),
-                    ("401", {
-                        "description": "Unauthorized - Missing or invalid authentication",
-                        "content": {
-                            "application/json": {
-                                "schema": {"$ref": "#/components/schemas/HTTP_401_UNAUTHORIZED"}
-                            }
-                        }
-                    }),
-                    ("403", {
-                        "description": "Forbidden - Insufficient permissions",
-                        "content": {
-                            "application/json": {
-                                "schema": {"$ref": "#/components/schemas/HTTP_403_FORBIDDEN"}
-                            }
-                        }
-                    }),
-                    ("404", {
-                        "description": "Not Found - Resource not found",
-                        "content": {
-                            "application/json": {
-                                "schema": {"$ref": "#/components/schemas/HTTP_404_NOT_FOUND"}
-                            }
-                        }
-                    }),
-                    ("422", {
-                        "description": "Unprocessable Entity - Validation failed",
-                        "content": {
-                            "application/json": {
-                                "schema": {"$ref": "#/components/schemas/HTTP_422_UNPROCESSABLE_ENTITY"}
-                            }
-                        }
-                    }),
-                    ("500", {
-                        "description": "Internal Server Error - Server encountered an error",
-                        "content": {
-                            "application/json": {
-                                "schema": {"$ref": "#/components/schemas/HTTP_500_INTERNAL_SERVER_ERROR"}
-                            }
-                        }
-                    })
+                    ("400", {"description": "Invalid request"}),
+                    ("401", {"description": "Unauthorized"})
                 ]))
             ])
             

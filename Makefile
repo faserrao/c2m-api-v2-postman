@@ -452,7 +452,6 @@ postman-create-test-collection:
 	$(MAKE) postman-test-collection-validate
 	$(MAKE) postman-test-collection-flatten-rename
 	$(MAKE) postman-test-collection-add-auth-examples || echo "⚠️  Skipping auth examples (optional step)."
-	$(MAKE) postman-test-collection-add-error-examples || echo "⚠️  Skipping error examples (optional step)."
 	$(MAKE) postman-test-collection-upload
 
 # Legacy test collection workflow with post-process flattening
@@ -1334,22 +1333,6 @@ postman-test-collection-add-auth-examples:
 		echo "⚠️  Auth examples script not found"; \
 	fi
 
-.PHONY: postman-test-collection-add-error-examples
-postman-test-collection-add-error-examples:
-	@echo "⚠️  Adding error examples to test collection..."
-	@if [ ! -f "$(POSTMAN_TEST_COLLECTION_FLAT)" ]; then \
-		echo "⚠️  Flattened test collection not found. Skipping error examples."; \
-		exit 0; \
-	fi
-	@if [ -f "$(SCRIPTS_DIR)/active/add_error_examples_to_collection.py" ]; then \
-		./scripts/python_env/e2o.venv/bin/python $(SCRIPTS_DIR)/active/add_error_examples_to_collection.py \
-			$(OPENAPI_SPEC_FINAL) \
-			$(POSTMAN_TEST_COLLECTION_FLAT) || echo "⚠️  Failed to add error examples"; \
-		echo "✅ Error examples added to test collection"; \
-	else \
-		echo "⚠️  Error examples script not found"; \
-	fi
-
 # ========================================================================
 # TEST COLLECTION UPLOAD
 # ========================================================================
@@ -2131,33 +2114,6 @@ prism-test-select: ## Test endpoint with specific test body index
 		exit 1; \
 	fi
 	@$(SCRIPTS_DIR)/utilities/prism_test.sh "$(PRISM_TEST_ENDPOINT)" --select "$(PRISM_TEST_INDEX)"
-
-# ========================================================================
-# DEVELOPER HELPER TARGETS
-# ========================================================================
-# Convenience targets for common development tasks
-# These wrap helper scripts for easier workflow integration
-
-.PHONY: validate-ebnf
-validate-ebnf: ## Validate EBNF data dictionary before committing
-	@echo "🔍 Validating EBNF data dictionary..."
-	@chmod +x scripts/validate-before-commit.sh
-	@scripts/validate-before-commit.sh
-
-.PHONY: preview-changes
-preview-changes: ## Preview what will change in OpenAPI spec
-	@echo "👀 Previewing OpenAPI spec changes..."
-	@chmod +x scripts/preview-ebnf-changes.sh
-	@scripts/preview-ebnf-changes.sh
-
-.PHONY: safe-push
-safe-push: ## Complete safe workflow: validate → preview → build → commit → push
-	@if [ -z "$(MSG)" ]; then \
-		echo "❌ Commit message required. Usage: make safe-push MSG=\"Your commit message\""; \
-		exit 1; \
-	fi
-	@chmod +x scripts/safe-push.sh
-	@scripts/safe-push.sh "$(MSG)"
 
 # ========================================================================
 # POST-BUILD VALIDATION SYSTEM
