@@ -273,9 +273,9 @@ class EBNFToOpenAPITranslator:
         spec = OrderedDict([
             ("openapi", "3.0.3"),
             ("info", OrderedDict([
-                ("title", "C2M Job Submission API"),
-                ("version", "V2.0.0"),
-                ("description", "API for submitting documents with various routing options")
+                ("title", "C2M API v2"),
+                ("version", "2.0.0"),
+                ("description", "API for submitting mailing jobs with various document routing options")
             ])),
             ("servers", [
                 {"url": "https://api.example.com/v1", "description": "Production server"},
@@ -283,8 +283,12 @@ class EBNFToOpenAPITranslator:
             ]),
             ("tags", [
                 {
+                    "name": "templates",
+                    "description": "Recommended endpoints - use a saved Job Template to define mailing settings once and reuse across submissions"
+                },
+                {
                     "name": "jobs",
-                    "description": "Job submission endpoints for mailing documents"
+                    "description": "Specialized job submission endpoints for PDF, ZIP, and address-capture workflows"
                 }
             ]),
             ("components", OrderedDict([
@@ -368,7 +372,7 @@ class EBNFToOpenAPITranslator:
             "properties": {
                 "status": {"type": "string"},
                 "message": {"type": "string"},
-                "jobId": {"type": "string"}
+                "requestId": {"type": "string"}
             }
         }
         
@@ -402,8 +406,16 @@ class EBNFToOpenAPITranslator:
             if endpoint.path not in paths:
                 paths[endpoint.path] = OrderedDict()
 
+            # The 3 recommended template endpoints appear first in Redoc sidebar
+            TEMPLATE_ENDPOINTS = {
+                "/jobs/submit/single/doc",
+                "/jobs/submit/multi/doc",
+                "/jobs/submit/multi/doc/merge"
+            }
+            endpoint_tags = ["templates"] if endpoint.path in TEMPLATE_ENDPOINTS else ["jobs"]
+
             operation = OrderedDict([
-                ("tags", ["jobs"]),
+                ("tags", endpoint_tags),
                 ("summary", self._generate_summary(endpoint)),
                 ("description", self._generate_description(endpoint)),
                 ("operationId", self._generate_operation_id(endpoint)),

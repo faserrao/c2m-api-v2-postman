@@ -1,11 +1,10 @@
 openapi: 3.0.3
-info:
-  title: C2M API v2 - Auth Overlay
-  version: 2.0.0
 
 tags:
+  - name: templates
+    description: Recommended endpoints - use a saved Job Template to define mailing settings once and reuse across submissions
   - name: jobs
-    description: Job submission endpoints for mailing documents
+    description: Specialized job submission endpoints for PDF, ZIP, and address-capture workflows
   - name: auth
     description: Authentication and token management endpoints
 

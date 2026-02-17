@@ -184,7 +184,7 @@ def add_response_examples(spec):
             schemas['StandardResponse']['example'] = {
                 'status': 'success',
                 'message': 'Job created successfully',
-                'jobId': 'job_20241227_123456'
+                'requestId': 'job_20241227_123456'
             }
         
         # Don't add 'examples' to schema level - only 'example' is valid
@@ -215,7 +215,7 @@ def add_response_examples(spec):
                                                 'value': {
                                                     'status': 'success',
                                                     'message': f'{endpoint_name} job created successfully',
-                                                    'jobId': f'{endpoint_name}_job_123456'
+                                                    'requestId': f'{endpoint_name}_job_123456'
                                                 }
                                             },
                                             'queued': {
@@ -223,7 +223,7 @@ def add_response_examples(spec):
                                                 'value': {
                                                     'status': 'queued',
                                                     'message': f'{endpoint_name} job queued for processing',
-                                                    'jobId': f'{endpoint_name}_job_789012'
+                                                    'requestId': f'{endpoint_name}_job_789012'
                                                 }
                                             }
                                         }

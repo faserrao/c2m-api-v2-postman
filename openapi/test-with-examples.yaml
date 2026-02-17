@@ -1,0 +1,1788 @@
+openapi: 3.0.3
+info:
+  title: C2M API v2 - Auth Overlay
+  version: 2.0.0
+  description: API for submitting documents with various routing options
+servers:
+- url: https://api.example.com/v1
+  description: Production server
+- url: http://localhost:4010
+  description: Mock server
+tags:
+- name: jobs
+  description: Job submission endpoints for mailing documents
+- name: auth
+  description: Authentication and token management endpoints
+components:
+  schemas:
+    firstName:
+      type: string
+    lastName:
+      type: string
+    address1:
+      type: string
+    address2:
+      type: string
+    address3:
+      type: string
+    city:
+      type: string
+    state:
+      type: string
+    country:
+      type: string
+    zip:
+      type: string
+    phoneNumber:
+      type: string
+    tags:
+      type: array
+      items:
+        type: string
+    jobTemplate:
+      type: string
+    invoiceNumber:
+      type: string
+    routingNumber:
+      type: string
+    accountNumber:
+      type: string
+    cardNumber:
+      type: string
+    documentId:
+      type: integer
+    addressListId:
+      type: integer
+    startPage:
+      type: integer
+    endPage:
+      type: integer
+    month:
+      type: integer
+      minimum: 1
+      maximum: 12
+    year:
+      type: integer
+    cvv:
+      type: integer
+    checkDigit:
+      type: integer
+    amountDue:
+      type: number
+    amount:
+      type: number
+    submitSingleDocParams:
+      type: object
+      properties:
+        jobTemplate:
+          type: string
+        docSourceAll:
+          $ref: '#/components/schemas/docSourceAll'
+        recipientAddressSource:
+          $ref: '#/components/schemas/recipientAddressSource'
+        paymentDetails:
+          $ref: '#/components/schemas/paymentDetails'
+        returnAddress:
+          $ref: '#/components/schemas/returnAddress'
+        jobOptions:
+          $ref: '#/components/schemas/jobOptions'
+        tags:
+          $ref: '#/components/schemas/tags'
+      required:
+      - docSourceAll
+      - recipientAddressSource
+    submitSinglePdfAddressCaptureParams:
+      type: object
+      properties:
+        jobTemplate:
+          type: string
+        docSourceStandard:
+          $ref: '#/components/schemas/docSourceStandard'
+        paymentDetails:
+          $ref: '#/components/schemas/paymentDetails'
+        returnAddress:
+          $ref: '#/components/schemas/returnAddress'
+        jobOptions:
+          $ref: '#/components/schemas/jobOptions'
+        tags:
+          $ref: '#/components/schemas/tags'
+      required:
+      - docSourceStandard
+    submitSinglePdfSplitParams:
+      type: object
+      properties:
+        jobTemplate:
+          type: string
+        docSourceStandard:
+          $ref: '#/components/schemas/docSourceStandard'
+        pdfSplitJobsWithAddress:
+          $ref: '#/components/schemas/pdfSplitJobsWithAddress'
+        paymentDetails:
+          $ref: '#/components/schemas/paymentDetails'
+        returnAddress:
+          $ref: '#/components/schemas/returnAddress'
+        jobOptions:
+          $ref: '#/components/schemas/jobOptions'
+        tags:
+          $ref: '#/components/schemas/tags'
+      required:
+      - docSourceStandard
+      - pdfSplitJobsWithAddress
+    submitSinglePdfSplitAddressCaptureParams:
+      type: object
+      properties:
+        jobTemplate:
+          type: string
+        docSourceStandard:
+          $ref: '#/components/schemas/docSourceStandard'
+        pdfSplitJobsNoAddress:
+          $ref: '#/components/schemas/pdfSplitJobsNoAddress'
+        paymentDetails:
+          $ref: '#/components/schemas/paymentDetails'
+        returnAddress:
+          $ref: '#/components/schemas/returnAddress'
+        jobOptions:
+          $ref: '#/components/schemas/jobOptions'
+        tags:
+          $ref: '#/components/schemas/tags'
+      required:
+      - docSourceStandard
+      - pdfSplitJobsNoAddress
+    submitMultiDocParams:
+      type: object
+      properties:
+        jobTemplate:
+          type: string
+        multiDocJobs:
+          $ref: '#/components/schemas/multiDocJobs'
+        paymentDetails:
+          $ref: '#/components/schemas/paymentDetails'
+        tags:
+          $ref: '#/components/schemas/tags'
+      required:
+      - multiDocJobs
+    submitMultiDocMergeParams:
+      type: object
+      properties:
+        jobTemplate:
+          type: string
+        mergeDocumentSource:
+          $ref: '#/components/schemas/mergeDocumentSource'
+        recipientAddressSource:
+          $ref: '#/components/schemas/recipientAddressSource'
+        paymentDetails:
+          $ref: '#/components/schemas/paymentDetails'
+        returnAddress:
+          $ref: '#/components/schemas/returnAddress'
+        jobOptions:
+          $ref: '#/components/schemas/jobOptions'
+        tags:
+          $ref: '#/components/schemas/tags'
+      required:
+      - mergeDocumentSource
+      - recipientAddressSource
+    submitMultiZipParams:
+      type: object
+      properties:
+        jobTemplate:
+          type: string
+        multiZipJobs:
+          $ref: '#/components/schemas/multiZipJobs'
+        paymentDetails:
+          $ref: '#/components/schemas/paymentDetails'
+        tags:
+          $ref: '#/components/schemas/tags'
+      required:
+      - multiZipJobs
+    submitMultiZipAddressCaptureParams:
+      type: object
+      properties:
+        jobTemplate:
+          type: string
+        zipDocumentSource:
+          $ref: '#/components/schemas/zipDocumentSource'
+        paymentDetails:
+          $ref: '#/components/schemas/paymentDetails'
+        returnAddress:
+          $ref: '#/components/schemas/returnAddress'
+        jobOptions:
+          $ref: '#/components/schemas/jobOptions'
+        tags:
+          $ref: '#/components/schemas/tags'
+      required:
+      - zipDocumentSource
+    returnAddress:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        address1:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        zip:
+          type: string
+        country:
+          type: string
+        address2:
+          type: string
+        address3:
+          type: string
+      required:
+      - firstName
+      - lastName
+      - address1
+      - city
+      - state
+      - zip
+      - country
+    jobOptions:
+      type: object
+      properties:
+        documentClass:
+          type: string
+        layout:
+          type: string
+        productionTime:
+          type: string
+        envelope:
+          type: string
+        color:
+          type: string
+        paperType:
+          type: string
+        printOption:
+          type: string
+        mailClass:
+          type: string
+      required:
+      - documentClass
+      - layout
+      - productionTime
+      - envelope
+      - color
+      - paperType
+      - printOption
+      - mailClass
+    documentClass:
+      type: string
+    layout:
+      type: string
+    productionTime:
+      type: string
+    envelope:
+      type: string
+    color:
+      type: string
+    paperType:
+      type: string
+    printOption:
+      type: string
+    mailClass:
+      type: string
+    tagsList:
+      type: array
+      items:
+        type: string
+    foo1:
+      type: string
+    foo2:
+      type: string
+    address:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        address1:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        zip:
+          type: string
+        country:
+          type: string
+        address2:
+          type: string
+        address3:
+          type: string
+        foo1:
+          type: string
+        foo2:
+          type: string
+      required:
+      - firstName
+      - lastName
+      - address1
+      - city
+      - state
+      - zip
+      - country
+    recipientAddressSource:
+      oneOf:
+      - $ref: '#/components/schemas/RecipientaddresssourceVariant1'
+      - $ref: '#/components/schemas/RecipientaddresssourceVariant2'
+      - type: object
+        properties:
+          addressListId:
+            $ref: '#/components/schemas/addressListId'
+        required:
+        - addressListId
+    mappingId:
+      $ref: '#/components/schemas/id'
+    addressName:
+      type: string
+    addressListName:
+      type: string
+    singleAddress:
+      $ref: '#/components/schemas/address'
+    addressList:
+      type: array
+      items:
+        $ref: '#/components/schemas/address'
+    documentIdSource:
+      $ref: '#/components/schemas/documentId'
+    requestIdSource:
+      type: object
+      properties:
+        requestId:
+          type: integer
+        filename:
+          type: string
+      required:
+      - requestId
+    requestId:
+      $ref: '#/components/schemas/id'
+    filename:
+      type: string
+    urlSource:
+      $ref: '#/components/schemas/url'
+    url:
+      type: string
+    zipDocumentIdSource:
+      type: object
+      properties:
+        zipDocumentId:
+          type: integer
+        filename:
+          type: string
+      required:
+      - zipDocumentId
+      - filename
+    zipDocumentId:
+      $ref: '#/components/schemas/id'
+    zipRequestIdSource:
+      type: object
+      properties:
+        requestId:
+          type: integer
+        zipFilename:
+          type: string
+        filename:
+          type: string
+      required:
+      - requestId
+      - zipFilename
+      - filename
+    zipFilename:
+      type: string
+    zipDocumentSource:
+      oneOf:
+      - $ref: '#/components/schemas/zipDocumentIdSource'
+      - $ref: '#/components/schemas/zipRequestIdSource'
+    docSourceStandard:
+      oneOf:
+      - $ref: '#/components/schemas/documentIdSource'
+      - $ref: '#/components/schemas/requestIdSource'
+      - $ref: '#/components/schemas/urlSource'
+    docSourceZipFile:
+      oneOf:
+      - $ref: '#/components/schemas/zipDocumentIdSource'
+      - $ref: '#/components/schemas/zipRequestIdSource'
+    docSourceAll:
+      oneOf:
+      - $ref: '#/components/schemas/docSourceStandard'
+      - $ref: '#/components/schemas/docSourceZipFile'
+    mergeDocumentSource:
+      $ref: '#/components/schemas/documentsToMerge'
+    documentsToMerge:
+      type: array
+      items:
+        $ref: '#/components/schemas/mergeDocumentRef'
+    mergeDocumentRef:
+      oneOf:
+      - $ref: '#/components/schemas/mergeByDocumentId'
+      - $ref: '#/components/schemas/mergeByRequestId'
+    mergeByDocumentId:
+      $ref: '#/components/schemas/documentId'
+    mergeByRequestId:
+      type: object
+      properties:
+        requestId:
+          type: integer
+        filename:
+          type: string
+      required:
+      - requestId
+    multiDocJobs:
+      type: array
+      items:
+        $ref: '#/components/schemas/multiDocJobItem'
+    multiDocJobItem:
+      type: object
+      properties:
+        jobTemplate:
+          type: string
+        docSourceAll:
+          $ref: '#/components/schemas/docSourceAll'
+        recipientAddressSource:
+          $ref: '#/components/schemas/recipientAddressSource'
+      required:
+      - docSourceAll
+      - recipientAddressSource
+    pdfSplitJobsWithAddress:
+      type: array
+      items:
+        $ref: '#/components/schemas/pdfSplitJobItemWithAddress'
+    pdfSplitJobsNoAddress:
+      type: array
+      items:
+        $ref: '#/components/schemas/pdfSplitJobItemNoAddress'
+    pdfSplitJobItemWithAddress:
+      type: object
+      properties:
+        startPage:
+          type: integer
+        endPage:
+          type: integer
+        recipientAddressSource:
+          $ref: '#/components/schemas/recipientAddressSource'
+      required:
+      - startPage
+      - endPage
+      - recipientAddressSource
+    pdfSplitJobItemNoAddress:
+      type: object
+      properties:
+        startPage:
+          type: integer
+        endPage:
+          type: integer
+      required:
+      - startPage
+      - endPage
+    multiZipJobs:
+      type: array
+      items:
+        $ref: '#/components/schemas/multiZipJobItem'
+    multiZipJobItem:
+      type: object
+      properties:
+        jobTemplate:
+          type: string
+        docSourceZipFile:
+          $ref: '#/components/schemas/docSourceZipFile'
+        recipientAddressSource:
+          $ref: '#/components/schemas/recipientAddressSource'
+      required:
+      - docSourceZipFile
+      - recipientAddressSource
+    id:
+      type: integer
+    paymentDetails:
+      oneOf:
+      - $ref: '#/components/schemas/creditCardPayment'
+      - $ref: '#/components/schemas/invoicePayment'
+      - $ref: '#/components/schemas/achPayment'
+      - $ref: '#/components/schemas/userCreditPayment'
+    creditCardPayment:
+      type: object
+      properties:
+        creditCardDetails:
+          $ref: '#/components/schemas/creditCardDetails'
+      required:
+      - creditCardDetails
+    invoicePayment:
+      type: object
+      properties:
+        invoiceDetails:
+          $ref: '#/components/schemas/invoiceDetails'
+      required:
+      - invoiceDetails
+    achPayment:
+      type: object
+      properties:
+        achDetails:
+          $ref: '#/components/schemas/achDetails'
+      required:
+      - achDetails
+    userCreditPayment:
+      type: object
+      properties:
+        creditAmount:
+          $ref: '#/components/schemas/creditAmount'
+      required:
+      - creditAmount
+    creditCardDetails:
+      type: object
+      properties:
+        cardType:
+          type: string
+          enum:
+          - visa
+          - mastercard
+          - discover
+          - americanExpress
+        cardNumber:
+          type: string
+        expirationDate:
+          $ref: '#/components/schemas/expirationDate'
+        cvv:
+          type: integer
+      required:
+      - cardType
+      - cardNumber
+      - expirationDate
+      - cvv
+    invoiceDetails:
+      type: object
+      properties:
+        invoiceNumber:
+          type: string
+        amountDue:
+          type: number
+      required:
+      - invoiceNumber
+      - amountDue
+    achDetails:
+      type: object
+      properties:
+        routingNumber:
+          type: string
+        accountNumber:
+          type: string
+        checkDigit:
+          type: integer
+      required:
+      - routingNumber
+      - accountNumber
+      - checkDigit
+    creditAmount:
+      type: object
+      properties:
+        amount:
+          type: number
+        currency:
+          type: string
+          enum:
+          - USD
+          - EUR
+          - GBP
+          - CAD
+          - AUD
+      required:
+      - amount
+      - currency
+    currency:
+      type: string
+      enum:
+      - USD
+      - EUR
+      - GBP
+      - CAD
+      - AUD
+    expirationDate:
+      type: object
+      properties:
+        month:
+          type: integer
+        year:
+          type: integer
+      required:
+      - month
+      - year
+    cardType:
+      type: string
+      enum:
+      - visa
+      - mastercard
+      - discover
+      - americanExpress
+    errorResponse:
+      type: object
+      properties:
+        errorType:
+          type: string
+          enum:
+          - ValidationError
+          - AuthenticationError
+          - AuthorizationError
+          - ResourceNotFoundError
+          - ServerError
+        errorMessage:
+          type: string
+        errorCode:
+          type: string
+          enum:
+          - MISSING_REQUIRED_FIELD
+          - INVALID_ONEOF
+          - INVALID_JSON
+          - MISSING_AUTH_HEADER
+          - INVALID_TOKEN
+          - EXPIRED_TOKEN
+          - INSUFFICIENT_PERMISSIONS
+          - ACCOUNT_SUSPENDED
+          - JOB_NOT_FOUND
+          - RESOURCE_NOT_FOUND
+          - INVALID_ENUM_VALUE
+          - MUTUAL_EXCLUSION_VIOLATION
+          - INVALID_FORMAT
+          - SERVER_ERROR
+          - DATABASE_ERROR
+          - EXTERNAL_SERVICE_ERROR
+        errorDetails:
+          type: string
+        errorTrackingId:
+          type: string
+      required:
+      - errorType
+      - errorMessage
+      - errorCode
+    errorType:
+      type: string
+      enum:
+      - ValidationError
+      - AuthenticationError
+      - AuthorizationError
+      - ResourceNotFoundError
+      - ServerError
+    errorMessage:
+      type: string
+    errorCode:
+      type: string
+      enum:
+      - MISSING_REQUIRED_FIELD
+      - INVALID_ONEOF
+      - INVALID_JSON
+      - MISSING_AUTH_HEADER
+      - INVALID_TOKEN
+      - EXPIRED_TOKEN
+      - INSUFFICIENT_PERMISSIONS
+      - ACCOUNT_SUSPENDED
+      - JOB_NOT_FOUND
+      - RESOURCE_NOT_FOUND
+      - INVALID_ENUM_VALUE
+      - MUTUAL_EXCLUSION_VIOLATION
+      - INVALID_FORMAT
+      - SERVER_ERROR
+      - DATABASE_ERROR
+      - EXTERNAL_SERVICE_ERROR
+    errorDetails:
+      type: string
+    errorTrackingId:
+      type: string
+    HTTP_400_BAD_REQUEST:
+      $ref: '#/components/schemas/errorResponse'
+    HTTP_401_UNAUTHORIZED:
+      $ref: '#/components/schemas/errorResponse'
+    HTTP_403_FORBIDDEN:
+      $ref: '#/components/schemas/errorResponse'
+    HTTP_404_NOT_FOUND:
+      $ref: '#/components/schemas/errorResponse'
+    HTTP_422_UNPROCESSABLE_ENTITY:
+      $ref: '#/components/schemas/errorResponse'
+    HTTP_500_INTERNAL_SERVER_ERROR:
+      $ref: '#/components/schemas/errorResponse'
+    StandardResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+        jobId:
+          type: string
+      example:
+        status: success
+        message: Job created successfully
+        jobId: job_20241227_123456
+    RecipientaddresssourceVariant1:
+      type: object
+      properties:
+        mappingId:
+          type: integer
+        singleAddress:
+          $ref: '#/components/schemas/singleAddress'
+        addressName:
+          type: string
+      required:
+      - singleAddress
+    RecipientaddresssourceVariant2:
+      type: object
+      properties:
+        mappingId:
+          type: integer
+        addressList:
+          $ref: '#/components/schemas/addressList'
+        addressListName:
+          type: string
+      required:
+      - addressList
+    ShortTokenRequest:
+      type: object
+      properties:
+        long_token:
+          type: string
+          description: Optional if the long-term token is provided in Authorization header
+        scopes:
+          type: array
+          items:
+            type: string
+          description: Optional scope narrowing; defaults to the long-term token's scopes
+      additionalProperties: false
+    ShortTokenResponse:
+      type: object
+      required:
+      - token_type
+      - access_token
+      - expires_in
+      - expires_at
+      properties:
+        token_type:
+          type: string
+          enum:
+          - Bearer
+        access_token:
+          type: string
+          description: Short-lived JWT
+        expires_in:
+          type: integer
+          description: Lifetime in seconds (e.g., 900 for 15 minutes)
+        expires_at:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp of expiration
+        scopes:
+          type: array
+          items:
+            type: string
+          description: Granted scopes
+        token_id:
+          type: string
+          description: Server-issued identifier for this token
+    LongTokenRequest:
+      type: object
+      description: One of several credential mechanisms must be provided.
+      required:
+      - grant_type
+      - client_id
+      properties:
+        grant_type:
+          type: string
+          enum:
+          - client_credentials
+          - assertion
+          description: The authentication grant type
+        client_id:
+          type: string
+          description: Client identifier issued by Click2Mail
+        client_secret:
+          type: string
+          description: Required if using client_credentials with secret
+        otp_code:
+          type: string
+          description: Required if your policy mandates OTP for issuance
+        assertion_type:
+          type: string
+          description: Required when grant_type=assertion
+        assertion:
+          type: string
+          description: Signed JWT or other accepted assertion
+        scopes:
+          type: array
+          items:
+            type: string
+          description: Scopes to assign to the long-term token
+        ttl_seconds:
+          type: integer
+          minimum: 3600
+          maximum: 7776000
+          description: Requested lifetime (1 hour - 90 days). Server may clamp.
+      additionalProperties: false
+    LongTokenResponse:
+      type: object
+      required:
+      - token_type
+      - access_token
+      - expires_in
+      - expires_at
+      properties:
+        token_type:
+          type: string
+          enum:
+          - Bearer
+        access_token:
+          type: string
+          description: Long-lived token (opaque or JWT depending on deployment)
+        expires_in:
+          type: integer
+          description: Lifetime in seconds
+        expires_at:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp of expiration
+        scopes:
+          type: array
+          items:
+            type: string
+          description: Granted scopes
+        token_id:
+          type: string
+          description: Server-issued identifier for this token
+    AuthError:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          example: invalid_grant
+          description: OAuth-style error code
+        message:
+          type: string
+          example: The provided client credentials are invalid.
+          description: Human-readable error message
+        details:
+          type: object
+          description: Additional error details
+  parameters:
+    Authorization:
+      name: Authorization
+      in: header
+      required: true
+      schema:
+        type: string
+        example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+    Content-Type:
+      name: Content-Type
+      in: header
+      required: true
+      schema:
+        type: string
+        example: application/json
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    LongTokenAuth:
+      type: oauth2
+      description: Long-term JWT for exchanging to short-term tokens
+      flows:
+        clientCredentials:
+          tokenUrl: /auth/tokens/long
+          scopes:
+            tokens:write: Create new long-term tokens
+            tokens:revoke: Revoke existing tokens
+    ShortTokenAuth:
+      type: oauth2
+      description: Short-term JWT for API operations
+      flows:
+        clientCredentials:
+          tokenUrl: /auth/tokens/short
+          scopes:
+            tokens:write: Create new long-term tokens
+            tokens:revoke: Revoke existing tokens
+    ClientKey:
+      type: apiKey
+      in: header
+      name: X-Client-Id
+      description: Client identifier for additional security
+  responses:
+    Error400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthError'
+          examples:
+            invalidGrant:
+              value:
+                code: invalid_grant
+                message: The grant type is not supported
+    Error401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthError'
+          examples:
+            invalidToken:
+              value:
+                code: invalid_token
+                message: The provided token is expired or invalid
+    Error403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthError'
+          examples:
+            insufficientScope:
+              value:
+                code: insufficient_scope
+                message: The token lacks the required scope for this operation
+    Error404:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthError'
+          examples:
+            notFound:
+              value:
+                code: not_found
+                message: The requested resource was not found
+    Error429:
+      description: Too Many Requests
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthError'
+          examples:
+            rateLimited:
+              value:
+                code: rate_limited
+                message: Too many requests. Please retry after 60 seconds.
+security:
+- bearerAuth: []
+paths:
+  /jobs/submit/single/doc:
+    post:
+      tags:
+      - jobs
+      summary: Submit a single doc job
+      description: Submits a mailing job with a single document to be sent to one or more recipients. The request body contains job parameters including document source, recipient address information, and payment details.
+      operationId: submitSingleDocParams
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/submitSingleDocParams'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              examples:
+                success:
+                  summary: Successful job creation
+                  value:
+                    status: success
+                    message: doc job created successfully
+                    jobId: doc_job_123456
+                queued:
+                  summary: Job queued for processing
+                  value:
+                    status: queued
+                    message: doc job queued for processing
+                    jobId: doc_job_789012
+        '400':
+          description: Bad Request - Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_400_BAD_REQUEST'
+              examples: &id001
+                missing_field:
+                  summary: Missing required field
+                  value:
+                    errorType: ValidationError
+                    errorMessage: Required field is missing from request body
+                    errorCode: MISSING_REQUIRED_FIELD
+                    errorDetails: '{"field": "documentId", "location": "requestBody"}'
+                    errorTrackingId: TRK-20260216-ABC123
+                invalid_format:
+                  summary: Invalid field format
+                  value:
+                    errorType: ValidationError
+                    errorMessage: Field contains invalid format or value
+                    errorCode: INVALID_FORMAT
+                    errorDetails: '{"field": "postalCode", "provided": "1234", "expected": "5 or 9 digits"}'
+                    errorTrackingId: TRK-20260216-DEF456
+        '401':
+          description: Unauthorized - Missing or invalid authentication
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_401_UNAUTHORIZED'
+              examples: &id002
+                missing_token:
+                  summary: Missing authentication
+                  value:
+                    errorType: AuthenticationError
+                    errorMessage: Authorization header is missing or invalid
+                    errorCode: MISSING_AUTH_HEADER
+                    errorDetails: '{"expected": "Bearer <token>", "received": "none"}'
+                    errorTrackingId: TRK-20260216-GHI789
+        '403':
+          description: Forbidden - Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_403_FORBIDDEN'
+              examples: &id003
+                insufficient_permissions:
+                  summary: Insufficient permissions
+                  value:
+                    errorType: AuthorizationError
+                    errorMessage: User does not have required permissions for this operation
+                    errorCode: INSUFFICIENT_PERMISSIONS
+                    errorDetails: '{"required": "jobs:write", "user": "read-only-user"}'
+                    errorTrackingId: TRK-20260216-JKL012
+        '404':
+          description: Not Found - Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_404_NOT_FOUND'
+              examples: &id004
+                resource_not_found:
+                  summary: Resource not found
+                  value:
+                    errorType: ResourceNotFoundError
+                    errorMessage: Requested resource does not exist
+                    errorCode: RESOURCE_NOT_FOUND
+                    errorDetails: '{"resourceType": "document", "resourceId": "DOC-12345"}'
+                    errorTrackingId: TRK-20260216-MNO345
+        '422':
+          description: Unprocessable Entity - Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_422_UNPROCESSABLE_ENTITY'
+              examples: &id005
+                validation_failed:
+                  summary: Validation failed
+                  value:
+                    errorType: ValidationError
+                    errorMessage: Request validation failed for multiple fields
+                    errorCode: VALIDATION_FAILED
+                    errorDetails: '{"errors": [{"field": "documentId", "issue": "not found"}, {"field": "recipientAddress.postalCode", "issue": "invalid format"}]}'
+                    errorTrackingId: TRK-20260216-PQR678
+        '500':
+          description: Internal Server Error - Server encountered an error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_500_INTERNAL_SERVER_ERROR'
+              examples: &id006
+                server_error:
+                  summary: Internal server error
+                  value:
+                    errorType: ServerError
+                    errorMessage: An unexpected error occurred while processing the request
+                    errorCode: INTERNAL_SERVER_ERROR
+                    errorDetails: '{"timestamp": "2026-02-16T18:30:45Z", "requestId": "req-abc123"}'
+                    errorTrackingId: TRK-20260216-STU901
+  /jobs/submit/single/pdf/addressCapture:
+    post:
+      tags:
+      - jobs
+      summary: Submit a single pdf addressCapture job
+      description: Submits a single pdf addressCapture mailing job. The request body contains job parameters including document source, recipient address information, and payment details.
+      operationId: submitSinglePdfAddressCaptureParams
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/submitSinglePdfAddressCaptureParams'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              examples:
+                success:
+                  summary: Successful job creation
+                  value:
+                    status: success
+                    message: addressCapture job created successfully
+                    jobId: addressCapture_job_123456
+                queued:
+                  summary: Job queued for processing
+                  value:
+                    status: queued
+                    message: addressCapture job queued for processing
+                    jobId: addressCapture_job_789012
+        '400':
+          description: Bad Request - Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_400_BAD_REQUEST'
+              examples: *id001
+        '401':
+          description: Unauthorized - Missing or invalid authentication
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_401_UNAUTHORIZED'
+              examples: *id002
+        '403':
+          description: Forbidden - Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_403_FORBIDDEN'
+              examples: *id003
+        '404':
+          description: Not Found - Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_404_NOT_FOUND'
+              examples: *id004
+        '422':
+          description: Unprocessable Entity - Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_422_UNPROCESSABLE_ENTITY'
+              examples: *id005
+        '500':
+          description: Internal Server Error - Server encountered an error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_500_INTERNAL_SERVER_ERROR'
+              examples: *id006
+  /jobs/submit/single/pdf/split:
+    post:
+      tags:
+      - jobs
+      summary: Submit a single pdf split job
+      description: Submits a single pdf split mailing job. The request body contains job parameters including document source, recipient address information, and payment details.
+      operationId: submitSinglePdfSplitParams
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/submitSinglePdfSplitParams'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              examples:
+                success:
+                  summary: Successful job creation
+                  value:
+                    status: success
+                    message: split job created successfully
+                    jobId: split_job_123456
+                queued:
+                  summary: Job queued for processing
+                  value:
+                    status: queued
+                    message: split job queued for processing
+                    jobId: split_job_789012
+        '400':
+          description: Bad Request - Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_400_BAD_REQUEST'
+              examples: *id001
+        '401':
+          description: Unauthorized - Missing or invalid authentication
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_401_UNAUTHORIZED'
+              examples: *id002
+        '403':
+          description: Forbidden - Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_403_FORBIDDEN'
+              examples: *id003
+        '404':
+          description: Not Found - Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_404_NOT_FOUND'
+              examples: *id004
+        '422':
+          description: Unprocessable Entity - Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_422_UNPROCESSABLE_ENTITY'
+              examples: *id005
+        '500':
+          description: Internal Server Error - Server encountered an error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_500_INTERNAL_SERVER_ERROR'
+              examples: *id006
+  /jobs/submit/single/pdf/split/addressCapture:
+    post:
+      tags:
+      - jobs
+      summary: Submit a single pdf split addressCapture job
+      description: Submits a single pdf split addressCapture mailing job. The request body contains job parameters including document source, recipient address information, and payment details.
+      operationId: submitSinglePdfSplitAddressCaptureParams
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/submitSinglePdfSplitAddressCaptureParams'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              examples:
+                success:
+                  summary: Successful job creation
+                  value:
+                    status: success
+                    message: addressCapture job created successfully
+                    jobId: addressCapture_job_123456
+                queued:
+                  summary: Job queued for processing
+                  value:
+                    status: queued
+                    message: addressCapture job queued for processing
+                    jobId: addressCapture_job_789012
+        '400':
+          description: Bad Request - Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_400_BAD_REQUEST'
+              examples: *id001
+        '401':
+          description: Unauthorized - Missing or invalid authentication
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_401_UNAUTHORIZED'
+              examples: *id002
+        '403':
+          description: Forbidden - Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_403_FORBIDDEN'
+              examples: *id003
+        '404':
+          description: Not Found - Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_404_NOT_FOUND'
+              examples: *id004
+        '422':
+          description: Unprocessable Entity - Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_422_UNPROCESSABLE_ENTITY'
+              examples: *id005
+        '500':
+          description: Internal Server Error - Server encountered an error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_500_INTERNAL_SERVER_ERROR'
+              examples: *id006
+  /jobs/submit/multi/doc:
+    post:
+      tags:
+      - jobs
+      summary: Submit a multi doc job
+      description: Submits a mailing job with multiple documents to be sent to recipients. The request body contains job parameters including document source, recipient address information, and payment details.
+      operationId: submitMultiDocParams
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/submitMultiDocParams'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              examples:
+                success:
+                  summary: Successful job creation
+                  value:
+                    status: success
+                    message: doc job created successfully
+                    jobId: doc_job_123456
+                queued:
+                  summary: Job queued for processing
+                  value:
+                    status: queued
+                    message: doc job queued for processing
+                    jobId: doc_job_789012
+        '400':
+          description: Bad Request - Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_400_BAD_REQUEST'
+              examples: *id001
+        '401':
+          description: Unauthorized - Missing or invalid authentication
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_401_UNAUTHORIZED'
+              examples: *id002
+        '403':
+          description: Forbidden - Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_403_FORBIDDEN'
+              examples: *id003
+        '404':
+          description: Not Found - Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_404_NOT_FOUND'
+              examples: *id004
+        '422':
+          description: Unprocessable Entity - Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_422_UNPROCESSABLE_ENTITY'
+              examples: *id005
+        '500':
+          description: Internal Server Error - Server encountered an error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_500_INTERNAL_SERVER_ERROR'
+              examples: *id006
+  /jobs/submit/multi/doc/merge:
+    post:
+      tags:
+      - jobs
+      summary: Submit a multi doc merge job
+      description: Submits a multi doc merge mailing job. The request body contains job parameters including document source, recipient address information, and payment details.
+      operationId: submitMultiDocMergeParams
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/submitMultiDocMergeParams'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              examples:
+                success:
+                  summary: Successful job creation
+                  value:
+                    status: success
+                    message: merge job created successfully
+                    jobId: merge_job_123456
+                queued:
+                  summary: Job queued for processing
+                  value:
+                    status: queued
+                    message: merge job queued for processing
+                    jobId: merge_job_789012
+        '400':
+          description: Bad Request - Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_400_BAD_REQUEST'
+              examples: *id001
+        '401':
+          description: Unauthorized - Missing or invalid authentication
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_401_UNAUTHORIZED'
+              examples: *id002
+        '403':
+          description: Forbidden - Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_403_FORBIDDEN'
+              examples: *id003
+        '404':
+          description: Not Found - Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_404_NOT_FOUND'
+              examples: *id004
+        '422':
+          description: Unprocessable Entity - Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_422_UNPROCESSABLE_ENTITY'
+              examples: *id005
+        '500':
+          description: Internal Server Error - Server encountered an error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_500_INTERNAL_SERVER_ERROR'
+              examples: *id006
+  /jobs/submit/multi/zip:
+    post:
+      tags:
+      - jobs
+      summary: Submit a multi zip job
+      description: Submits a multi zip mailing job. The request body contains job parameters including document source, recipient address information, and payment details.
+      operationId: submitMultiZipParams
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/submitMultiZipParams'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              examples:
+                success:
+                  summary: Successful job creation
+                  value:
+                    status: success
+                    message: zip job created successfully
+                    jobId: zip_job_123456
+                queued:
+                  summary: Job queued for processing
+                  value:
+                    status: queued
+                    message: zip job queued for processing
+                    jobId: zip_job_789012
+        '400':
+          description: Bad Request - Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_400_BAD_REQUEST'
+              examples: *id001
+        '401':
+          description: Unauthorized - Missing or invalid authentication
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_401_UNAUTHORIZED'
+              examples: *id002
+        '403':
+          description: Forbidden - Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_403_FORBIDDEN'
+              examples: *id003
+        '404':
+          description: Not Found - Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_404_NOT_FOUND'
+              examples: *id004
+        '422':
+          description: Unprocessable Entity - Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_422_UNPROCESSABLE_ENTITY'
+              examples: *id005
+        '500':
+          description: Internal Server Error - Server encountered an error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_500_INTERNAL_SERVER_ERROR'
+              examples: *id006
+  /jobs/submit/multi/zip/addressCapture:
+    post:
+      tags:
+      - jobs
+      summary: Submit a multi zip addressCapture job
+      description: Submits a multi zip addressCapture mailing job. The request body contains job parameters including document source, recipient address information, and payment details.
+      operationId: submitMultiZipAddressCaptureParams
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/submitMultiZipAddressCaptureParams'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+              examples:
+                success:
+                  summary: Successful job creation
+                  value:
+                    status: success
+                    message: addressCapture job created successfully
+                    jobId: addressCapture_job_123456
+                queued:
+                  summary: Job queued for processing
+                  value:
+                    status: queued
+                    message: addressCapture job queued for processing
+                    jobId: addressCapture_job_789012
+        '400':
+          description: Bad Request - Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_400_BAD_REQUEST'
+              examples: *id001
+        '401':
+          description: Unauthorized - Missing or invalid authentication
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_401_UNAUTHORIZED'
+              examples: *id002
+        '403':
+          description: Forbidden - Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_403_FORBIDDEN'
+              examples: *id003
+        '404':
+          description: Not Found - Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_404_NOT_FOUND'
+              examples: *id004
+        '422':
+          description: Unprocessable Entity - Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_422_UNPROCESSABLE_ENTITY'
+              examples: *id005
+        '500':
+          description: Internal Server Error - Server encountered an error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP_500_INTERNAL_SERVER_ERROR'
+              examples: *id006
+  /auth/tokens/short:
+    post:
+      tags:
+      - auth
+      operationId: issueShortTermToken
+      summary: Issue a short-term access token
+      description: 'Exchange a valid long-term token for a short-lived JWT (e.g., 15 minutes).
+
+        The long-term token must be sent in the Authorization header as `Bearer <long_token>`.
+
+        '
+      security:
+      - LongTokenAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShortTokenRequest'
+            examples:
+              withScopes:
+                value:
+                  scopes:
+                  - jobs:submit
+                  - templates:read
+      responses:
+        '201':
+          description: Short-term token issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShortTokenResponse'
+              examples:
+                success:
+                  value:
+                    token_type: Bearer
+                    access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                    expires_in: 900
+                    expires_at: '2025-08-26T22:45:00Z'
+                    scopes:
+                    - jobs:submit
+                    - templates:read
+                    token_id: tok_st_9f3d2c
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '429':
+          $ref: '#/components/responses/Error429'
+  /auth/tokens/long:
+    post:
+      tags:
+      - auth
+      operationId: issueLongTermToken
+      summary: Issue or rotate a long-term token
+      description: 'Issues a long-term token (e.g., 30-90 days) for automation or server-to-server use.
+
+        Requires step-up authentication. Choose one of the supported grant types:
+
+
+        - `client_credentials` + `client_secret`
+
+        - `client_credentials` + one-time `otp_code`
+
+        - `assertion` (e.g., signed JWT by your private key)
+
+        - Or an existing short-term token with the `tokens:write` scope
+
+
+        Only one mechanism is required per call.
+
+        '
+      security:
+      - ShortTokenAuth:
+        - tokens:write
+      - ClientKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LongTokenRequest'
+            examples:
+              clientSecret:
+                value:
+                  grant_type: client_credentials
+                  client_id: c2m_abc123
+                  client_secret: supersecret123
+                  scopes:
+                  - jobs:submit
+                  - templates:read
+                  ttl_seconds: 7776000
+              otp:
+                value:
+                  grant_type: client_credentials
+                  client_id: c2m_abc123
+                  otp_code: '123456'
+                  scopes:
+                  - jobs:*
+                  ttl_seconds: 2592000
+              assertion:
+                value:
+                  grant_type: assertion
+                  client_id: c2m_abc123
+                  assertion_type: urn:ietf:params:oauth:client-assertion-type:jwt-bearer
+                  assertion: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+                  scopes:
+                  - jobs:submit
+                  - templates:read
+      responses:
+        '201':
+          description: Long-term token issued
+          headers:
+            X-Token-Id:
+              description: Server-generated identifier for revocation and audit
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LongTokenResponse'
+              examples:
+                success:
+                  value:
+                    token_type: Bearer
+                    access_token: lt_0d51e9bd2f6449cf...
+                    expires_in: 2592000
+                    expires_at: '2025-09-25T22:45:00Z'
+                    scopes:
+                    - jobs:*
+                    token_id: tok_lt_b8e0aa
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '429':
+          $ref: '#/components/responses/Error429'
+  /auth/tokens/{tokenId}/revoke:
+    post:
+      tags:
+      - auth
+      operationId: revokeToken
+      summary: Revoke a token
+      description: Revokes a short- or long-term token by its `tokenId`. Idempotent.
+      security:
+      - ShortTokenAuth:
+        - tokens:revoke
+      - LongTokenAuth:
+        - tokens:revoke
+      parameters:
+      - name: tokenId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The token ID to revoke
+      responses:
+        '204':
+          description: Revoked (idempotent)
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'

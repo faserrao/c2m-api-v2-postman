@@ -374,11 +374,11 @@ def create_submit_job_request(use_case_key: str, use_case: Dict) -> Dict:
                 "listen": "test",
                 "script": {
                     "exec": [
-                        "// Save jobId for follow-up requests",
+                        "// Save requestId for follow-up requests",
                         "const response = pm.response.json();",
-                        "if (response.jobId) {",
-                        "    pm.collectionVariables.set('jobId', response.jobId);",
-                        "    console.log('Job ID saved:', response.jobId);",
+                        "if (response.requestId) {",
+                        "    pm.collectionVariables.set('requestId', response.requestId);",
+                        "    console.log('Request ID saved:', response.requestId);",
                         "}",
                         "",
                         "// Basic tests",
@@ -386,8 +386,8 @@ def create_submit_job_request(use_case_key: str, use_case: Dict) -> Dict:
                         "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
                         "});",
                         "",
-                        "pm.test('Response has jobId', function () {",
-                        "    pm.expect(response).to.have.property('jobId');",
+                        "pm.test('Response has requestId', function () {",
+                        "    pm.expect(response).to.have.property('requestId');",
                         "});"
                     ],
                     "type": "text/javascript"
@@ -581,7 +581,7 @@ def create_submit_job_request(use_case_key: str, use_case: Dict) -> Dict:
                 "body": json.dumps({
                     "status": "success",
                     "message": "Job created successfully",
-                    "jobId": 123456
+                    "requestId": 123456
                 }, indent=2)
             })
     
@@ -605,7 +605,7 @@ def create_get_job_details_request() -> Dict:
                         "",
                         "pm.test('Response has job details', function () {",
                         "    const response = pm.response.json();",
-                        "    pm.expect(response).to.have.property('jobId');",
+                        "    pm.expect(response).to.have.property('requestId');",
                         "    pm.expect(response).to.have.property('status');",
                         "});"
                     ],
@@ -623,11 +623,11 @@ def create_get_job_details_request() -> Dict:
                 }
             ],
             "url": {
-                "raw": f"{BASE_URL}/jobs/{{{{jobId}}}}",
+                "raw": f"{BASE_URL}/jobs/{{{{requestId}}}}",
                 "host": [BASE_URL],
-                "path": ["jobs", "{{jobId}}"]
+                "path": ["jobs", "{{requestId}}"]
             },
-            "description": "Retrieve detailed information about the job using the jobId from the Submit Job request."
+            "description": "Retrieve detailed information about the job using the requestId from the Submit Job request."
         },
         "response": []
     }
@@ -665,9 +665,9 @@ def create_get_job_status_request() -> Dict:
                 }
             ],
             "url": {
-                "raw": f"{BASE_URL}/jobs/{{{{jobId}}}}/status",
+                "raw": f"{BASE_URL}/jobs/{{{{requestId}}}}/status",
                 "host": [BASE_URL],
-                "path": ["jobs", "{{jobId}}", "status"]
+                "path": ["jobs", "{{requestId}}", "status"]
             },
             "description": "Check the processing status of the job (queued, processing, completed, failed)."
         },

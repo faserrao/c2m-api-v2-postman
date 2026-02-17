@@ -220,11 +220,11 @@ def create_submit_job_request(use_case_key: str, use_case: Dict, permutations: L
                 "listen": "test",
                 "script": {
                     "exec": [
-                        "// Save jobId for follow-up requests",
+                        "// Save requestId for follow-up requests",
                         "const response = pm.response.json();",
-                        "if (response.jobId) {",
-                        "    pm.collectionVariables.set('jobId', response.jobId);",
-                        "    console.log('Job ID saved:', response.jobId);",
+                        "if (response.requestId) {",
+                        "    pm.collectionVariables.set('requestId', response.requestId);",
+                        "    console.log('Request ID saved:', response.requestId);",
                         "}",
                         "",
                         "// Basic tests",
@@ -232,8 +232,8 @@ def create_submit_job_request(use_case_key: str, use_case: Dict, permutations: L
                         "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
                         "});",
                         "",
-                        "pm.test('Response has jobId', function () {",
-                        "    pm.expect(response).to.have.property('jobId');",
+                        "pm.test('Response has requestId', function () {",
+                        "    pm.expect(response).to.have.property('requestId');",
                         "});"
                     ],
                     "type": "text/javascript"
@@ -299,7 +299,7 @@ def create_submit_job_request(use_case_key: str, use_case: Dict, permutations: L
             "body": json.dumps({
                 "status": "success",
                 "message": "Job created successfully",
-                "jobId": 123456
+                "requestId": 123456
             }, indent=2)
         })
     
@@ -356,7 +356,7 @@ def create_get_job_details_request() -> Dict:
                         "",
                         "pm.test('Response has job details', function () {",
                         "    const response = pm.response.json();",
-                        "    pm.expect(response).to.have.property('jobId');",
+                        "    pm.expect(response).to.have.property('requestId');",
                         "    pm.expect(response).to.have.property('status');",
                         "});"
                     ],
@@ -374,11 +374,11 @@ def create_get_job_details_request() -> Dict:
                 }
             ],
             "url": {
-                "raw": f"{BASE_URL}/jobs/{{{{jobId}}}}",
+                "raw": f"{BASE_URL}/jobs/{{{{requestId}}}}",
                 "host": [BASE_URL],
-                "path": ["jobs", "{{jobId}}"]
+                "path": ["jobs", "{{requestId}}"]
             },
-            "description": "Retrieve detailed information about the job using the jobId from the Submit Job request."
+            "description": "Retrieve detailed information about the job using the requestId from the Submit Job request."
         },
         "response": []
     }
@@ -416,9 +416,9 @@ def create_get_job_status_request() -> Dict:
                 }
             ],
             "url": {
-                "raw": f"{BASE_URL}/jobs/{{{{jobId}}}}/status",
+                "raw": f"{BASE_URL}/jobs/{{{{requestId}}}}/status",
                 "host": [BASE_URL],
-                "path": ["jobs", "{{jobId}}", "status"]
+                "path": ["jobs", "{{requestId}}", "status"]
             },
             "description": "Check the processing status of the job (queued, processing, completed, failed)."
         },
@@ -440,7 +440,7 @@ def create_collection() -> Dict:
                 "5. **Expand the POST request** → Click arrow next to 'POST [single-doc-job-template]'\n"
                 "6. **Select an example** → Click one of the pre-filled examples (e.g., 'legal_firm - DocID - CreditCard - Ex1')\n"
                 "7. **Review the Body tab** → See the pre-populated request data for this scenario\n"
-                "8. **Click Send** → Response includes jobId for the submitted job\n\n"
+                "8. **Click Send** → Response includes requestId for the submitted job\n\n"
                 "**Use Case Scenarios:**\n\n"
                 "**Legal Firm** - We have letters that we need to send all day. Each letter is sent to a specific recipient via Certified Mail. A copy is sent to their legal representative via First Class mail. Our system generates the PDF of the letter.\n"
                 "`[single-doc-job-template]`\n\n"
@@ -603,7 +603,7 @@ def create_collection() -> Dict:
                 "description": "JWT authentication token (auto-populated)"
             },
             {
-                "key": "jobId",
+                "key": "requestId",
                 "value": "",
                 "type": "string",
                 "description": "Current job ID (automatically set by Submit Job requests)"
