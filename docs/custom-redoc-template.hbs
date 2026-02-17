@@ -289,9 +289,31 @@
 
     /* Increase Redoc API title font size - Redoc renders it small by default */
     [data-section-id] h1,
-    .api-info h1 {
+    .api-info h1,
+    h1 {
       font-size: 42px !important;
       line-height: 1.2 !important;
+      font-weight: 700 !important;
+    }
+
+    /* Tag section headers (templates, jobs, auth) - make them prominent */
+    [id^="tag/"] h2,
+    [data-section-id^="tag/"] h2,
+    .api-content h2 {
+      font-size: 30px !important;
+      font-weight: 700 !important;
+      color: #333 !important;
+      text-transform: capitalize !important;
+      letter-spacing: 0 !important;
+      margin-bottom: 8px !important;
+    }
+
+    /* Tag section description text */
+    [id^="tag/"] p,
+    [data-section-id^="tag/"] p {
+      font-size: 16px !important;
+      color: #555 !important;
+      line-height: 1.5 !important;
     }
   </style>
   {{{redocHead}}}
@@ -407,7 +429,7 @@
               </div>
 
               <div class="endpoint-card">
-                <h4>/jobs/submit/multi/docs <span class="tag">Recommended</span></h4>
+                <h4>/jobs/submit/multi/doc <span class="tag">Recommended</span></h4>
                 <p>Send different documents to different recipients in one batch. Great for personalized mailings.</p>
                 <p><strong>Required parameters:</strong> items[], jobTemplate, paymentDetails</p>
               </div>
