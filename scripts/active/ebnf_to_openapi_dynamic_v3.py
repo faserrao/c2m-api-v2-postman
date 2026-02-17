@@ -424,8 +424,60 @@ class EBNFToOpenAPITranslator:
                             }
                         }
                     }),
-                    ("400", {"description": "Invalid request"}),
-                    ("401", {"description": "Unauthorized"})
+                    ("400", {
+                        "description": "Bad Request - Invalid request parameters",
+                        "content": {
+                            "application/json": {
+                                "schema": {"$ref": "#/components/schemas/errorResponse"},
+                                "examples": self._generate_error_examples("400", endpoint)
+                            }
+                        }
+                    }),
+                    ("401", {
+                        "description": "Unauthorized - Missing or invalid authentication",
+                        "content": {
+                            "application/json": {
+                                "schema": {"$ref": "#/components/schemas/errorResponse"},
+                                "examples": self._generate_error_examples("401", endpoint)
+                            }
+                        }
+                    }),
+                    ("403", {
+                        "description": "Forbidden - Insufficient permissions",
+                        "content": {
+                            "application/json": {
+                                "schema": {"$ref": "#/components/schemas/errorResponse"},
+                                "examples": self._generate_error_examples("403", endpoint)
+                            }
+                        }
+                    }),
+                    ("404", {
+                        "description": "Not Found - Resource not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {"$ref": "#/components/schemas/errorResponse"},
+                                "examples": self._generate_error_examples("404", endpoint)
+                            }
+                        }
+                    }),
+                    ("422", {
+                        "description": "Unprocessable Entity - Validation failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {"$ref": "#/components/schemas/errorResponse"},
+                                "examples": self._generate_error_examples("422", endpoint)
+                            }
+                        }
+                    }),
+                    ("500", {
+                        "description": "Internal Server Error - Server encountered an error",
+                        "content": {
+                            "application/json": {
+                                "schema": {"$ref": "#/components/schemas/errorResponse"},
+                                "examples": self._generate_error_examples("500", endpoint)
+                            }
+                        }
+                    })
                 ]))
             ])
             
@@ -479,6 +531,247 @@ class EBNFToOpenAPITranslator:
 
         # Fallback description
         return f"API endpoint for {endpoint.production_name.replace('_', ' ')}"
+
+    def _generate_error_examples(self, status_code: str, endpoint: Endpoint) -> Dict[str, Any]:
+        """Generate error response examples from EBNF error schemas
+
+        Dynamically reads errorType and errorCode enums from EBNF and maps
+        them to appropriate HTTP status codes. No hardcoding.
+        """
+        import random
+        import string
+        from datetime import datetime
+
+        # Extract error codes and types from EBNF
+        error_codes = self._get_enum_values('errorCode')
+        error_types = self._get_enum_values('errorType')
+
+        # Map HTTP status codes to appropriate errorType
+        status_to_type = {
+            '400': 'ValidationError',
+            '401': 'AuthenticationError',
+            '403': 'AuthorizationError',
+            '404': 'ResourceNotFoundError',
+            '422': 'ValidationError',
+            '500': 'ServerError'
+        }
+
+        # Map HTTP status codes to appropriate errorCode values (multiple per status)
+        status_to_codes = {
+            '400': ['MISSING_REQUIRED_FIELD', 'INVALID_ONEOF', 'INVALID_JSON'],
+            '401': ['MISSING_AUTH_HEADER', 'INVALID_TOKEN', 'EXPIRED_TOKEN'],
+            '403': ['INSUFFICIENT_PERMISSIONS', 'ACCOUNT_SUSPENDED'],
+            '404': ['JOB_NOT_FOUND', 'RESOURCE_NOT_FOUND'],
+            '422': ['INVALID_ENUM_VALUE', 'MUTUAL_EXCLUSION_VIOLATION', 'INVALID_FORMAT'],
+            '500': ['SERVER_ERROR', 'DATABASE_ERROR', 'EXTERNAL_SERVICE_ERROR']
+        }
+
+        # Map HTTP status codes to descriptive messages
+        status_to_messages = {
+            '400': [
+                "Missing required field in request",
+                "Invalid oneOf field value",
+                "Malformed JSON in request body"
+            ],
+            '401': [
+                "Authorization header is missing or invalid",
+                "Authentication token is invalid",
+                "Authentication token has expired"
+            ],
+            '403': [
+                "Insufficient permissions to access this resource",
+                "Account has been suspended"
+            ],
+            '404': [
+                "Job not found",
+                "Requested resource does not exist"
+            ],
+            '422': [
+                "Invalid enum value provided",
+                "Mutually exclusive fields both present",
+                "Field format validation failed"
+            ],
+            '500': [
+                "Internal server error occurred",
+                "Database error occurred",
+                "External service error"
+            ]
+        }
+
+        # Extract endpoint-specific field names for contextual error details
+        field_names = self._extract_endpoint_field_names(endpoint)
+
+        # Generate examples for this status code
+        examples = {}
+        error_type = status_to_type.get(status_code, 'ServerError')
+        codes = status_to_codes.get(status_code, ['SERVER_ERROR'])
+        messages = status_to_messages.get(status_code, ['An error occurred'])
+
+        # Create one example per error code for this status
+        for idx, (code, message) in enumerate(zip(codes, messages)):
+            # Generate unique tracking ID
+            suffix = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+            tracking_id = f"TRK-{datetime.now().strftime('%Y%m%d')}-{suffix}"
+
+            # Generate contextual error details
+            details = self._generate_error_details(status_code, code, field_names)
+
+            # Create example
+            example_name = f"example-{idx+1}"
+            examples[example_name] = {
+                "value": {
+                    "errorType": error_type,
+                    "errorMessage": message,
+                    "errorCode": code,
+                    "errorDetails": details,
+                    "errorTrackingId": tracking_id
+                }
+            }
+
+        return examples
+
+    def _get_enum_values(self, production_name: str) -> List[str]:
+        """Extract enum values from an EBNF alternation production"""
+        if production_name not in self.productions:
+            return []
+
+        production = self.productions[production_name]
+        expr = production.expression
+
+        if isinstance(expr, dict) and expr.get('type') == 'alternation':
+            values = []
+            for item in expr.get('items', []):
+                if isinstance(item, dict) and item.get('type') == 'literal':
+                    values.append(item.get('value', ''))
+            return values
+
+        return []
+
+    def _extract_endpoint_field_names(self, endpoint: Endpoint) -> Dict[str, str]:
+        """Extract relevant field names from endpoint's request body schema"""
+        # Try to get the production for this endpoint
+        if not endpoint.production_name or endpoint.production_name not in self.productions:
+            return {'field': 'unknownField', 'field1': 'unknownField1'}
+
+        production = self.productions[endpoint.production_name]
+
+        # Look for common field names in the schema
+        field_names = {}
+
+        # Check for document source variants
+        doc_fields = ['docSourceAll', 'docSourceStandard', 'docSourceZipFile', 'documentSource']
+        for field in doc_fields:
+            if self._has_field_in_production(production, field):
+                field_names['documentField'] = field
+                break
+
+        # Check for address fields
+        addr_fields = ['recipientAddressSource', 'recipientAddress', 'addressListId']
+        for field in addr_fields:
+            if self._has_field_in_production(production, field):
+                field_names['addressField'] = field
+                break
+
+        # Default field names if not found
+        if 'documentField' not in field_names:
+            field_names['documentField'] = 'documentId'
+        if 'addressField' not in field_names:
+            field_names['addressField'] = 'recipientAddress'
+
+        return field_names
+
+    def _has_field_in_production(self, production: EBNFProduction, field_name: str) -> bool:
+        """Check if a field exists in a production"""
+        expr = production.expression
+        if isinstance(expr, dict) and expr.get('type') == 'concatenation':
+            for item in expr.get('items', []):
+                if isinstance(item, dict):
+                    if item.get('type') == 'symbol' and item.get('name') == field_name:
+                        return True
+                    if item.get('type') == 'optional':
+                        opt_expr = item.get('expression')
+                        if isinstance(opt_expr, dict) and opt_expr.get('type') == 'symbol':
+                            if opt_expr.get('name') == field_name:
+                                return True
+        return False
+
+    def _generate_error_details(self, status_code: str, error_code: str, field_names: Dict[str, str]) -> str:
+        """Generate contextual error details based on error type"""
+        details_map = {
+            'MISSING_REQUIRED_FIELD': {
+                "field": field_names.get('documentField', 'documentId'),
+                "location": "requestBody"
+            },
+            'INVALID_ONEOF': {
+                "field": field_names.get('documentField', 'docSourceAll'),
+                "issue": "exactly one variant must be provided"
+            },
+            'INVALID_JSON': {
+                "error": "unexpected token at position 42"
+            },
+            'MISSING_AUTH_HEADER': {
+                "expected": "Bearer <token>",
+                "received": "none"
+            },
+            'INVALID_TOKEN': {
+                "issue": "token signature verification failed"
+            },
+            'EXPIRED_TOKEN': {
+                "expiresAt": "2026-02-15T10:30:00Z",
+                "currentTime": "2026-02-16T14:00:00Z"
+            },
+            'INSUFFICIENT_PERMISSIONS': {
+                "required": "jobs:write",
+                "provided": "jobs:read"
+            },
+            'ACCOUNT_SUSPENDED': {
+                "reason": "billing overdue",
+                "contactSupport": "support@click2mail.com"
+            },
+            'JOB_NOT_FOUND': {
+                "jobId": "JOB-12345"
+            },
+            'RESOURCE_NOT_FOUND': {
+                "resourceType": "document",
+                "resourceId": "DOC-67890"
+            },
+            'INVALID_ENUM_VALUE': {
+                "field": field_names.get('documentField', 'documentType'),
+                "value": "invalid_value",
+                "allowedValues": ["pdf", "doc", "docx"]
+            },
+            'MUTUAL_EXCLUSION_VIOLATION': {
+                "fields": ["jobTemplate", "jobOptions"],
+                "issue": "only one may be provided"
+            },
+            'INVALID_FORMAT': {
+                "errors": [
+                    {
+                        "field": field_names.get('documentField', 'documentId'),
+                        "issue": "not found in document library"
+                    },
+                    {
+                        "field": f"{field_names.get('addressField', 'recipientAddress')}.postalCode",
+                        "issue": "invalid format - must be 5 or 9 digits"
+                    }
+                ]
+            },
+            'SERVER_ERROR': {
+                "message": "An unexpected error occurred"
+            },
+            'DATABASE_ERROR': {
+                "operation": "insert",
+                "table": "jobs"
+            },
+            'EXTERNAL_SERVICE_ERROR': {
+                "service": "payment-gateway",
+                "status": "timeout"
+            }
+        }
+
+        details = details_map.get(error_code, {"message": "An error occurred"})
+        import json
+        return json.dumps(details)
 
     def _generate_schema_from_production(self, production_name: str) -> Dict[str, Any]:
         """Generate schema from EBNF production"""
