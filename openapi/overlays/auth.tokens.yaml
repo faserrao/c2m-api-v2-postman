@@ -1,10 +1,10 @@
 openapi: 3.0.3
 
 tags:
-  - name: templates
-    description: Recommended endpoints - use a saved Job Template to define mailing settings once and reuse across submissions
+  - name: recommended
+    description: Recommended starting points - the most commonly used job submission endpoints. All endpoints support Job Templates.
   - name: jobs
-    description: Specialized job submission endpoints for PDF, ZIP, and address-capture workflows
+    description: Additional job submission endpoints for PDF split, ZIP, and address-capture workflows
   - name: auth
     description: Authentication and token management endpoints
 

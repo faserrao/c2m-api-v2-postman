@@ -283,12 +283,12 @@ class EBNFToOpenAPITranslator:
             ]),
             ("tags", [
                 {
-                    "name": "templates",
-                    "description": "Recommended endpoints - use a saved Job Template to define mailing settings once and reuse across submissions"
+                    "name": "recommended",
+                    "description": "Recommended starting points - the most commonly used job submission endpoints. All endpoints support Job Templates."
                 },
                 {
                     "name": "jobs",
-                    "description": "Specialized job submission endpoints for PDF, ZIP, and address-capture workflows"
+                    "description": "Additional job submission endpoints for PDF split, ZIP, and address-capture workflows"
                 }
             ]),
             ("components", OrderedDict([
@@ -406,13 +406,13 @@ class EBNFToOpenAPITranslator:
             if endpoint.path not in paths:
                 paths[endpoint.path] = OrderedDict()
 
-            # The 3 recommended template endpoints appear first in Redoc sidebar
-            TEMPLATE_ENDPOINTS = {
+            # The 3 recommended endpoints appear first in Redoc sidebar (all endpoints support templates)
+            RECOMMENDED_ENDPOINTS = {
                 "/jobs/submit/single/doc",
                 "/jobs/submit/multi/doc",
                 "/jobs/submit/multi/doc/merge"
             }
-            endpoint_tags = ["templates"] if endpoint.path in TEMPLATE_ENDPOINTS else ["jobs"]
+            endpoint_tags = ["recommended"] if endpoint.path in RECOMMENDED_ENDPOINTS else ["jobs"]
 
             operation = OrderedDict([
                 ("tags", endpoint_tags),
