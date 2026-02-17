@@ -246,6 +246,94 @@ const oneOfFixtures = {
             zipFilename: "archive_jan_2024.zip",
             filename: "statement_jan.pdf"
         }
+    ],
+
+    errorResponse: [
+        // Variant 1: ValidationError - Missing Field
+        {
+            errorType: "ValidationError",
+            errorMessage: "Required field is missing from request body",
+            errorCode: "MISSING_REQUIRED_FIELD",
+            errorDetails: JSON.stringify({ field: "documentId", location: "requestBody" }),
+            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
+        },
+        // Variant 2: ValidationError - Invalid OneOf
+        {
+            errorType: "ValidationError",
+            errorMessage: "Request contains invalid oneOf field structure",
+            errorCode: "INVALID_ONEOF",
+            errorDetails: JSON.stringify({ field: "documentSourceIdentifier", issue: "must contain exactly one variant" }),
+            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
+        },
+        // Variant 3: ValidationError - Invalid Format
+        {
+            errorType: "ValidationError",
+            errorMessage: "Field contains invalid format or value",
+            errorCode: "INVALID_FORMAT",
+            errorDetails: JSON.stringify({ field: "postalCode", provided: "1234", expected: "5 or 9 digits" }),
+            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
+        },
+        // Variant 4: AuthenticationError - Missing Auth
+        {
+            errorType: "AuthenticationError",
+            errorMessage: "Authorization header is missing or invalid",
+            errorCode: "MISSING_AUTH_HEADER",
+            errorDetails: JSON.stringify({ expected: "Bearer <token>", received: "none" }),
+            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
+        },
+        // Variant 5: AuthenticationError - Expired Token
+        {
+            errorType: "AuthenticationError",
+            errorMessage: "Authentication token has expired",
+            errorCode: "EXPIRED_TOKEN",
+            errorDetails: JSON.stringify({ expiredAt: "2026-02-16T12:00:00Z", currentTime: "2026-02-16T15:30:00Z" }),
+            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
+        },
+        // Variant 6: AuthorizationError - Insufficient Permissions
+        {
+            errorType: "AuthorizationError",
+            errorMessage: "User does not have required permissions for this operation",
+            errorCode: "INSUFFICIENT_PERMISSIONS",
+            errorDetails: JSON.stringify({ required: "jobs:write", user: "read-only-user" }),
+            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
+        },
+        // Variant 7: ResourceNotFoundError - Job Not Found
+        {
+            errorType: "ResourceNotFoundError",
+            errorMessage: "Requested job does not exist",
+            errorCode: "JOB_NOT_FOUND",
+            errorDetails: JSON.stringify({ resourceType: "job", jobId: "JOB-12345" }),
+            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
+        },
+        // Variant 8: ResourceNotFoundError - Resource Not Found
+        {
+            errorType: "ResourceNotFoundError",
+            errorMessage: "Requested resource does not exist",
+            errorCode: "RESOURCE_NOT_FOUND",
+            errorDetails: JSON.stringify({ resourceType: "document", resourceId: "DOC-67890" }),
+            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
+        },
+        // Variant 9: ValidationError - Multiple Field Errors
+        {
+            errorType: "ValidationError",
+            errorMessage: "Request validation failed for multiple fields",
+            errorCode: "INVALID_FORMAT",
+            errorDetails: JSON.stringify({
+                errors: [
+                    { field: "documentId", issue: "not found in document library" },
+                    { field: "recipientAddress.postalCode", issue: "invalid format - must be 5 or 9 digits" }
+                ]
+            }),
+            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
+        },
+        // Variant 10: ServerError - Internal Error
+        {
+            errorType: "ServerError",
+            errorMessage: "An unexpected error occurred while processing the request",
+            errorCode: "INTERNAL_SERVER_ERROR",
+            errorDetails: JSON.stringify({ timestamp: new Date().toISOString(), requestId: `req-${Math.random().toString(36).substr(2, 9)}` }),
+            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
+        }
     ]
 };
 
@@ -491,7 +579,13 @@ function processItem(item) {
     // Process response examples
     if (item.response && Array.isArray(item.response)) {
         item.response.forEach(response => {
-            // Process response body
+            // Skip error responses (400-599) - they have realistic examples already
+            const statusCode = parseInt(response.code || response.status || 200);
+            if (statusCode >= 400 && statusCode < 600) {
+                return; // Skip this error response
+            }
+
+            // Process success response body (200-299)
             if (response.body) {
                 try {
                     const responseBody = JSON.parse(response.body);

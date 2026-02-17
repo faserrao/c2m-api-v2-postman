@@ -96,7 +96,7 @@ const ERROR_RESPONSES = {
       body: JSON.stringify({
         errorType: 'ValidationError',
         errorMessage: 'Request validation failed for multiple fields',
-        errorCode: 'VALIDATION_FAILED',
+        errorCode: 'INVALID_FORMAT',
         errorDetails: '{"errors": [{"field": "documentId", "issue": "not found"}, {"field": "recipientAddress.postalCode", "issue": "invalid format"}]}',
         errorTrackingId: 'TRK-20260216-PQR678'
       }, null, 2)
@@ -111,7 +111,7 @@ const ERROR_RESPONSES = {
       body: JSON.stringify({
         errorType: 'ServerError',
         errorMessage: 'An unexpected error occurred while processing the request',
-        errorCode: 'INTERNAL_SERVER_ERROR',
+        errorCode: 'SERVER_ERROR',
         errorDetails: '{"timestamp": "2026-02-16T18:30:45Z", "requestId": "req-abc123"}',
         errorTrackingId: 'TRK-20260216-STU901'
       }, null, 2)
@@ -136,6 +136,16 @@ function processItems(items) {
       if (!item.response) {
         item.response = [];
       }
+
+      // Remove existing error responses (bad placeholders from OpenAPI spec)
+      // Keep only success responses (200-299) and auth responses (403 for /auth/*)
+      const isAuthEndpoint = item.request.url &&
+        (item.request.url.path || []).some(p => p.includes('auth'));
+
+      item.response = item.response.filter(resp => {
+        const code = parseInt(resp.code || resp.status || 200);
+        return (code >= 200 && code < 300) || (isAuthEndpoint && code === 403);
+      });
 
       // Add all error responses (400, 401, 403, 404, 422, 500)
       Object.keys(ERROR_RESPONSES).forEach(errorCode => {
