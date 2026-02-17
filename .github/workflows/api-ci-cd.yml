@@ -345,8 +345,8 @@ jobs:
             exit 0
           }
           
-          # Push to artifacts repo
-          git push origin main
+          # Push to artifacts repo (force to avoid rejection from diverged history)
+          git push origin main --force
 
       # ---------- Upload artifacts ----------
       - name: Upload build artifacts
