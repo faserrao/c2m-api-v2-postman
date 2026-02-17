@@ -78,7 +78,7 @@ ERROR_EXAMPLES = {
             'value': {
                 'errorType': 'ValidationError',
                 'errorMessage': 'Request validation failed for multiple fields',
-                'errorCode': 'VALIDATION_FAILED',
+                'errorCode': 'INVALID_FORMAT',
                 'errorDetails': '{"errors": [{"field": "documentId", "issue": "not found"}, {"field": "recipientAddress.postalCode", "issue": "invalid format"}]}',
                 'errorTrackingId': 'TRK-20260216-PQR678'
             }
@@ -90,7 +90,7 @@ ERROR_EXAMPLES = {
             'value': {
                 'errorType': 'ServerError',
                 'errorMessage': 'An unexpected error occurred while processing the request',
-                'errorCode': 'INTERNAL_SERVER_ERROR',
+                'errorCode': 'SERVER_ERROR',
                 'errorDetails': '{"timestamp": "2026-02-16T18:30:45Z", "requestId": "req-abc123"}',
                 'errorTrackingId': 'TRK-20260216-STU901'
             }
