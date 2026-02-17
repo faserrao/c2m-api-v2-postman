@@ -12,7 +12,81 @@ import random
 import string
 from datetime import datetime, timezone
 
+def extract_error_code_enum(spec):
+    """
+    Extract valid errorCode enum values from OpenAPI spec.
+
+    The OpenAPI spec is generated from EBNF data dictionary, which is the
+    single source of truth for errorCode values. This function reads the
+    authoritative enum to validate hardcoded examples.
+
+    Returns:
+        list: Valid errorCode enum values, or empty list if not found
+    """
+    try:
+        if 'components' in spec and 'schemas' in spec['components']:
+            if 'errorCode' in spec['components']['schemas']:
+                error_code_schema = spec['components']['schemas']['errorCode']
+                if 'enum' in error_code_schema:
+                    return error_code_schema['enum']
+    except (KeyError, TypeError):
+        pass
+    return []
+
+def validate_error_examples(spec, error_examples):
+    """
+    Validate that all errorCode values in ERROR_EXAMPLES match the EBNF enum.
+
+    This ensures the script stays synchronized with the EBNF data dictionary.
+    If validation fails, the script will exit with a clear error message.
+
+    Args:
+        spec: OpenAPI specification dictionary
+        error_examples: ERROR_EXAMPLES dictionary to validate
+
+    Returns:
+        bool: True if all errorCode values are valid
+
+    Raises:
+        SystemExit: If any errorCode values don't match EBNF enum
+    """
+    valid_codes = extract_error_code_enum(spec)
+
+    if not valid_codes:
+        print("⚠️  WARNING: Could not extract errorCode enum from OpenAPI spec")
+        print("    Skipping validation - ensure EBNF errorCode definition exists")
+        return False
+
+    print(f"✓ Found {len(valid_codes)} valid errorCode values in EBNF enum")
+
+    # Collect all errorCode values used in examples
+    invalid_codes = []
+    for http_code, examples in error_examples.items():
+        for example_name, example_data in examples.items():
+            error_code = example_data['value'].get('errorCode')
+            if error_code and error_code not in valid_codes:
+                invalid_codes.append({
+                    'http_code': http_code,
+                    'example': example_name,
+                    'invalid_value': error_code
+                })
+
+    if invalid_codes:
+        print("\n❌ ERROR: Found errorCode values that don't match EBNF enum:")
+        for item in invalid_codes:
+            print(f"   - HTTP {item['http_code']} ({item['example']}): '{item['invalid_value']}'")
+        print(f"\nValid errorCode values from EBNF:")
+        for code in valid_codes:
+            print(f"   - {code}")
+        print("\nFix: Update ERROR_EXAMPLES dictionary to use valid EBNF errorCode values")
+        sys.exit(1)
+
+    print(f"✓ All errorCode values in ERROR_EXAMPLES are valid")
+    return True
+
 # Error example templates (realistic data, not placeholders)
+# NOTE: errorCode values MUST match the enum defined in EBNF data dictionary
+# Validation runs automatically on every execution to ensure synchronization
 ERROR_EXAMPLES = {
     '400': {
         'missing_field': {
@@ -171,21 +245,25 @@ def main():
     if len(sys.argv) != 3:
         print("Usage: python add_response_examples.py <input.yaml> <output.yaml>")
         sys.exit(1)
-    
+
     input_file = sys.argv[1]
     output_file = sys.argv[2]
-    
+
     # Load the OpenAPI spec
     with open(input_file, 'r') as f:
         spec = yaml.safe_load(f)
-    
+
+    # Validate errorCode values against EBNF enum (via OpenAPI spec)
+    print("\n🔍 Validating errorCode values against EBNF data dictionary...")
+    validate_error_examples(spec, ERROR_EXAMPLES)
+
     # Add examples
     spec = add_response_examples(spec)
-    
+
     # Save the updated spec
     with open(output_file, 'w') as f:
         yaml.dump(spec, f, default_flow_style=False, sort_keys=False, width=1000)
-    
+
     print(f"✅ Added response examples to {output_file}")
 
 if __name__ == '__main__':
