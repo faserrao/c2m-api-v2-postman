@@ -283,8 +283,7 @@ class EBNFToOpenAPITranslator:
             ]),
             ("tags", [
                 {
-                    "name": "recommended",
-                    "description": "Recommended starting points - the most commonly used job submission endpoints. All endpoints support Job Templates."
+                    "name": "most-common"
                 },
                 {
                     "name": "jobs",
@@ -412,7 +411,7 @@ class EBNFToOpenAPITranslator:
                 "/jobs/submit/multi/doc",
                 "/jobs/submit/multi/doc/merge"
             }
-            endpoint_tags = ["recommended"] if endpoint.path in RECOMMENDED_ENDPOINTS else ["jobs"]
+            endpoint_tags = ["most-common"] if endpoint.path in RECOMMENDED_ENDPOINTS else ["jobs"]
 
             operation = OrderedDict([
                 ("tags", endpoint_tags),
