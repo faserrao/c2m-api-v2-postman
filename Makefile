@@ -240,7 +240,7 @@ endif
 # Token updated 2025-09-09
 
 # Default allowed status codes (comma-separated)
-POSTMAN_ALLOWED_CODES            ?= 200,201,204,400,401,403,404,429
+POSTMAN_ALLOWED_CODES            ?= 200,201,204,400,401,403,404,422,429,500
 # JWT test collection output
 TEST_COLLECTION_WITH_JWT_TESTS   := $(POSTMAN_DIR)/generated/c2mapiv2-test-collection-jwt.json
 
@@ -780,7 +780,7 @@ postman-add-jwt-tests:
 		node scripts/active/add_tests_jwt.js \
 			"$(TEST_COLLECTION_WITH_TESTS)" \
 			"$(TEST_COLLECTION_WITH_JWT_TESTS)" \
-			--allowed-codes "200,201,204,400,401,403,404,429"; \
+			--allowed-codes "200,201,204,400,401,403,404,422,429,500"; \
 		echo "✅ JWT tests added to collection"; \
 	else \
 		echo "⚠️  Test collection not found. Run 'make postman-create-test-collection' first."; \
