@@ -283,11 +283,8 @@ class EBNFToOpenAPITranslator:
             ]),
             ("tags", [
                 {
-                    "name": "most-common"
-                },
-                {
                     "name": "jobs",
-                    "description": "Additional job submission endpoints for PDF split, ZIP, and address-capture workflows"
+                    "description": "Job submission endpoints"
                 }
             ]),
             ("components", OrderedDict([
@@ -411,7 +408,7 @@ class EBNFToOpenAPITranslator:
                 "/jobs/submit/multi/doc",
                 "/jobs/submit/multi/doc/merge"
             }
-            endpoint_tags = ["most-common"] if endpoint.path in RECOMMENDED_ENDPOINTS else ["jobs"]
+            endpoint_tags = ["jobs"]
 
             operation = OrderedDict([
                 ("tags", endpoint_tags),
