@@ -640,9 +640,18 @@ address =
     + [ foo1 ] + [ foo2 ] ;
 
 recipientAddressSource =
-      ([ mappingId ] + singleAddress + [ addressName ])
-    | ([ mappingId ] + addressList  + [ addressListName ])
-    | addressListId ;
+      recipientAddressBySingle
+    | recipientAddressByList
+    | recipientAddressByListId ;
+
+recipientAddressBySingle =
+    [ mappingId ] + singleAddress + [ addressName ] ;
+
+recipientAddressByList =
+    [ mappingId ] + addressList + [ addressListName ] ;
+
+recipientAddressByListId =
+    addressListId ;
 
 mappingId = id ;
 addressName = string ;

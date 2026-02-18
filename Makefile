@@ -1812,6 +1812,11 @@ docs-build:
 	fi
 	$(REDOCLY) build-docs $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES) -o $(REDOC_HTML_OUTPUT) -t $(DOCS_DIR)/custom-redoc-template.hbs
 	$(SWAGGER) bundle $(C2MAPIV2_OPENAPI_SPEC) --outfile $(OPENAPI_BUNDLED_FILE) --type yaml
+	@echo "Injecting mock server URL into Swagger UI..."
+	@MOCK_URL=$$(cat $(POSTMAN_MOCK_URL_FILE) 2>/dev/null || echo ""); \
+	sed "s|__MOCK_SERVER_URL__|$$MOCK_URL|g" $(DOCS_DIR)/swagger-initializer.js.template > $(DOCS_DIR)/swagger-initializer.js; \
+	echo "Swagger UI mock server URL: $$MOCK_URL"
+	@cp $(OPENAPI_BUNDLED_FILE) $(DOCS_DIR)/swagger.yaml
 
 # Serve documentation in background
 .PHONY: docs-serve-bg

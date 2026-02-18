@@ -129,15 +129,16 @@ function processValue(value, key, oneOfFields) {
 
 /**
  * Recursively process an object to fix oneOf placeholders
+ * replacedFields: Set that collects field names actually changed to <oneOf>
  */
-function processObject(obj, oneOfFields, parentKey = '') {
+function processObject(obj, oneOfFields, replacedFields, parentKey = '') {
     if (!obj || typeof obj !== 'object') {
         return obj;
     }
 
     // Handle arrays
     if (Array.isArray(obj)) {
-        return obj.map((item, index) => processObject(item, oneOfFields, parentKey));
+        return obj.map((item) => processObject(item, oneOfFields, replacedFields, parentKey));
     }
 
     // Handle objects
@@ -146,9 +147,14 @@ function processObject(obj, oneOfFields, parentKey = '') {
         // Check if this value should be replaced
         const processedValue = processValue(value, key, oneOfFields);
 
+        // Track actual replacements (value changed to <oneOf>)
+        if (processedValue === '<oneOf>' && value !== '<oneOf>') {
+            replacedFields.add(key);
+        }
+
         // Recursively process nested objects/arrays
         if (processedValue !== '<oneOf>' && typeof processedValue === 'object') {
-            result[key] = processObject(processedValue, oneOfFields, key);
+            result[key] = processObject(processedValue, oneOfFields, replacedFields, key);
         } else {
             result[key] = processedValue;
         }
@@ -160,7 +166,7 @@ function processObject(obj, oneOfFields, parentKey = '') {
 /**
  * Process a raw body string (JSON in a string)
  */
-function processRawBody(rawStr, oneOfFields) {
+function processRawBody(rawStr, oneOfFields, replacedFields) {
     if (!rawStr || typeof rawStr !== 'string') {
         return rawStr;
     }
@@ -170,7 +176,7 @@ function processRawBody(rawStr, oneOfFields) {
         const bodyObj = JSON.parse(rawStr);
 
         // Process the object
-        const processed = processObject(bodyObj, oneOfFields);
+        const processed = processObject(bodyObj, oneOfFields, replacedFields);
 
         // Convert back to formatted JSON string
         return JSON.stringify(processed, null, 2);
@@ -184,10 +190,10 @@ function processRawBody(rawStr, oneOfFields) {
 /**
  * Process a single collection item (request)
  */
-function processItem(item, oneOfFields) {
+function processItem(item, oneOfFields, replacedFields) {
     // Process request body
     if (item.request && item.request.body && item.request.body.raw) {
-        item.request.body.raw = processRawBody(item.request.body.raw, oneOfFields);
+        item.request.body.raw = processRawBody(item.request.body.raw, oneOfFields, replacedFields);
     }
 
     // Process response examples
@@ -195,19 +201,19 @@ function processItem(item, oneOfFields) {
         item.response.forEach(response => {
             // Process response body
             if (response.body) {
-                response.body = processRawBody(response.body, oneOfFields);
+                response.body = processRawBody(response.body, oneOfFields, replacedFields);
             }
 
             // Process originalRequest in responses
             if (response.originalRequest && response.originalRequest.body && response.originalRequest.body.raw) {
-                response.originalRequest.body.raw = processRawBody(response.originalRequest.body.raw, oneOfFields);
+                response.originalRequest.body.raw = processRawBody(response.originalRequest.body.raw, oneOfFields, replacedFields);
             }
         });
     }
 
     // Recursively process sub-items (folders)
     if (item.item && Array.isArray(item.item)) {
-        item.item.forEach(subItem => processItem(subItem, oneOfFields));
+        item.item.forEach(subItem => processItem(subItem, oneOfFields, replacedFields));
     }
 }
 
@@ -232,28 +238,22 @@ function main() {
 
         console.log(`Processing collection: ${collection.info ? collection.info.name : 'Unnamed'}`);
 
-        // Step 3: Process all items in the collection
+        // Step 3: Process all items in the collection, tracking actual replacements
+        const replacedFields = new Set();
         if (collection.item && Array.isArray(collection.item)) {
-            collection.item.forEach(item => processItem(item, oneOfFields));
+            collection.item.forEach(item => processItem(item, oneOfFields, replacedFields));
         }
 
-        // Step 4: Count replacements
-        const newData = JSON.stringify(collection);
-        const matches = newData.match(/<oneOf>/g);
-        const replacementCount = matches ? matches.length : 0;
-
-        // Step 5: Write the output
+        // Step 4: Write the output
         fs.writeFileSync(options.output, JSON.stringify(collection, null, 2));
         console.log(`\nProcessed collection written to: ${options.output}`);
-        console.log(`Replaced ${replacementCount} oneOf placeholders`);
+        console.log(`Replaced ${replacedFields.size} oneOf field(s)`);
 
         // Show which fields were actually replaced
-        if (replacementCount > 0) {
+        if (replacedFields.size > 0) {
             console.log('\nOneOf fields replaced in the collection:');
-            Array.from(oneOfFields).sort().forEach(field => {
-                if (newData.includes(`"${field}"`) && newData.includes('<oneOf>')) {
-                    console.log(`  - ${field}`);
-                }
+            Array.from(replacedFields).sort().forEach(field => {
+                console.log(`  - ${field}`);
             });
         }
 

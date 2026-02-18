@@ -16,8 +16,11 @@ Features:
 import re
 import sys
 import json
+import random
+import string
 import yaml
 import textwrap
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Tuple, Set, Optional, Any, Union
 from dataclasses import dataclass, field
@@ -277,10 +280,6 @@ class EBNFToOpenAPITranslator:
                 ("version", "2.0.0"),
                 ("description", "API for submitting mailing jobs with various document routing options")
             ])),
-            ("servers", [
-                {"url": "https://api.example.com/v1", "description": "Production server"},
-                {"url": "http://localhost:4010", "description": "Mock server"}
-            ]),
             ("tags", [
                 {
                     "name": "jobs",
@@ -308,40 +307,14 @@ class EBNFToOpenAPITranslator:
         """Generate all schemas dynamically from EBNF productions"""
         schemas = OrderedDict()
         
-        # Simple types that should be generated as schemas when referenced
-        # NOTE: Only include fields that are defined in EBNF data dictionary
+        # OpenAPI constraint overrides - only for fields where EBNF cannot express
+        # the full constraint (standard EBNF has no range syntax).
+        # All other simple types (string aliases, integer aliases, etc.) are
+        # generated dynamically from the EBNF productions below.
+        # TODO (Option C): Replace this dict by parsing structured EBNF directive
+        # comments, e.g.:  month = integer ; (* openapi: minimum=1, maximum=12 *)
         simple_type_schemas = {
-            # String types
-            'firstName': {'type': 'string'},
-            'lastName': {'type': 'string'},
-            'address1': {'type': 'string'},
-            'address2': {'type': 'string'},
-            'address3': {'type': 'string'},
-            'city': {'type': 'string'},
-            'state': {'type': 'string'},
-            'country': {'type': 'string'},
-            'zip': {'type': 'string'},
-            'phoneNumber': {'type': 'string'},
-            'tags': {'type': 'array', 'items': {'type': 'string'}},  # Fix recursive definition
-            'jobTemplate': {'type': 'string'},
-            'invoiceNumber': {'type': 'string'},
-            'routingNumber': {'type': 'string'},
-            'accountNumber': {'type': 'string'},
-            'cardNumber': {'type': 'string'},
-
-            # Integer types
-            'documentId': {'type': 'integer'},
-            'addressListId': {'type': 'integer'},
-            'startPage': {'type': 'integer'},
-            'endPage': {'type': 'integer'},
             'month': {'type': 'integer', 'minimum': 1, 'maximum': 12},
-            'year': {'type': 'integer'},
-            'cvv': {'type': 'integer'},
-            'checkDigit': {'type': 'integer'},
-
-            # Number types
-            'amountDue': {'type': 'number'},
-            'amount': {'type': 'number'}
         }
         
         # Add simple type schemas first
@@ -402,12 +375,6 @@ class EBNFToOpenAPITranslator:
             if endpoint.path not in paths:
                 paths[endpoint.path] = OrderedDict()
 
-            # The 3 recommended endpoints appear first in Redoc sidebar (all endpoints support templates)
-            RECOMMENDED_ENDPOINTS = {
-                "/jobs/submit/single/doc",
-                "/jobs/submit/multi/doc",
-                "/jobs/submit/multi/doc/merge"
-            }
             endpoint_tags = ["jobs"]
 
             operation = OrderedDict([
@@ -520,22 +487,9 @@ class EBNFToOpenAPITranslator:
         # Generate description based on path pattern
         if len(path_parts) >= 3 and path_parts[0] == 'jobs' and path_parts[1] == 'submit':
             variant = ' '.join(path_parts[2:])
-
-            # Add specific details based on variant
-            descriptions = {
-                'single doc': 'Submits a mailing job with a single document to be sent to one or more recipients.',
-                'multi doc': 'Submits a mailing job with multiple documents to be sent to recipients.',
-                'multi doc-merge': 'Submits a mailing job that merges multiple documents before mailing.',
-                'single pdf-split': 'Submits a mailing job that splits a single PDF into multiple mailings.',
-                'multi pdf-address-capture': 'Submits a mailing job that extracts addresses embedded in PDF documents.',
-                'single pdf-address-capture': 'Submits a mailing job that extracts addresses from a single PDF document.'
-            }
-
-            base_desc = descriptions.get(variant, f"Submits a {variant} mailing job.")
-
-            # Add common details
-            return (f"{base_desc} The request body contains job parameters including document source, "
-                   f"recipient address information, and payment details.")
+            return (f"Submits a mailing job ({variant}). "
+                    f"The request body contains job parameters including document source, "
+                    f"recipient address information, and payment details.")
 
         # Fallback description
         return f"API endpoint for {endpoint.production_name.replace('_', ' ')}"
@@ -546,10 +500,6 @@ class EBNFToOpenAPITranslator:
         Dynamically reads errorType and errorCode enums from EBNF and maps
         them to appropriate HTTP status codes. No hardcoding.
         """
-        import random
-        import string
-        from datetime import datetime
-
         # Extract error codes and types from EBNF
         error_codes = self._get_enum_values('errorCode')
         error_types = self._get_enum_values('errorType')
@@ -778,7 +728,6 @@ class EBNFToOpenAPITranslator:
         }
 
         details = details_map.get(error_code, {"message": "An error occurred"})
-        import json
         return json.dumps(details)
 
     def _generate_schema_from_production(self, production_name: str) -> Dict[str, Any]:
@@ -898,41 +847,10 @@ class EBNFToOpenAPITranslator:
                 if choice_type == 'symbol':
                     symbol_name = choice.get('name')
                     if symbol_name:
-                        # Check if this is a simple/primitive type that needs wrapping in oneOf context
-                        # For recipientAddressSource: addressId and addressListId need wrapping
-                        needs_wrapping = False
-                        if context == 'recipientAddressSource' and symbol_name in ['addressId', 'addressListId']:
-                            needs_wrapping = True
-                        
-                        if needs_wrapping:
-                            # Wrap simple types in an object to preserve field name in oneOf contexts
-                            wrapped_schema = {
-                                "type": "object",
-                                "properties": {
-                                    symbol_name: {"$ref": f"#/components/schemas/{symbol_name}"}
-                                },
-                                "required": [symbol_name]
-                            }
-                            schemas.append(wrapped_schema)
-                        elif symbol_name in self.productions:
-                            schemas.append({"$ref": f"#/components/schemas/{symbol_name}"})
-                        else:
-                            # Simple type reference
-                            schemas.append({"$ref": f"#/components/schemas/{symbol_name}"})
-                
+                        schemas.append({"$ref": f"#/components/schemas/{symbol_name}"})
+
                 elif choice_type == 'concatenation':
-                    # Complex object type - create named schema for oneOf variants
-                    if context in ['recipientAddressSource', 'paymentDetails']:
-                        # Analyze the concatenation to determine schema name
-                        schema_obj = self._expression_to_schema(choice, context)
-                        schema_name = self._get_schema_name_for_concatenation(choice, context)
-                        
-                        # Store this as a named schema
-                        self.generated_schemas[schema_name] = schema_obj
-                        schemas.append({"$ref": f"#/components/schemas/{schema_name}"})
-                    else:
-                        # For other contexts, use inline schema
-                        schemas.append(self._expression_to_schema(choice, context))
+                    schemas.append(self._expression_to_schema(choice, context))
                 
                 elif choice_type == 'group':
                     # Process the grouped expression
@@ -942,34 +860,6 @@ class EBNFToOpenAPITranslator:
             return schemas[0]
         else:
             return {"oneOf": schemas}
-    
-    def _get_schema_name_for_concatenation(self, concatenation: Dict[str, Any], context: str) -> str:
-        """Generate a descriptive schema name based on concatenation properties"""
-        items = concatenation.get('items', [])
-        properties = []
-        
-        for item in items:
-            if isinstance(item, dict) and item.get('type') == 'symbol':
-                properties.append(item.get('name'))
-        
-        # Special handling for specific oneOf patterns
-        if context == 'paymentDetails':
-            if 'creditCardDetails' in properties:
-                return 'creditCardPayment'
-            elif 'invoiceDetails' in properties:
-                return 'invoicePayment'
-            elif 'achDetails' in properties:
-                return 'achPayment'
-            elif 'creditAmount' in properties:
-                return 'userCreditPayment'
-            elif 'applePaymentDetails' in properties:
-                return 'applePayPayment'
-            elif 'googlePaymentDetails' in properties:
-                return 'googlePayPayment'
-        
-        # Fallback to generic naming
-        self.schema_counter += 1
-        return f"{context.title()}Variant{self.schema_counter}"
     
     def _is_enum(self, choices: List[Any]) -> bool:
         """Check if alternation represents an enum"""
@@ -1242,12 +1132,12 @@ class EBNFToOpenAPITranslator:
         if self.issues:
             lines.append("Issues:")
             for issue in self.issues:
-                prefix = {"error": "❌", "warning": "⚠️ ", "info": "ℹ️ "}[issue.severity]
-                lines.append(f"  {prefix} {issue.message}")
+                prefix = {"error": "ERROR", "warning": "WARNING", "info": "INFO"}[issue.severity]
+                lines.append(f"  [{prefix}] {issue.message}")
                 if issue.suggestion:
-                    lines.append(f"     → {issue.suggestion}")
+                    lines.append(f"     -> {issue.suggestion}")
         else:
-            lines.append("✅ No issues found!")
+            lines.append("No issues found.")
         
         lines.append("")
         

@@ -218,8 +218,8 @@ validate_postman_artifacts() {
         fi
         
         # Check for auth variables
-        local has_client_id=$(jq '.values[] | select(.key == "clientId") | length' postman/mock-env.json 2>/dev/null || echo "0")
-        local has_client_secret=$(jq '.values[] | select(.key == "clientSecret") | length' postman/mock-env.json 2>/dev/null || echo "0")
+        local has_client_id=$(jq '.environment.values[] | select(.key == "clientId") | length' postman/mock-env.json 2>/dev/null || echo "0")
+        local has_client_secret=$(jq '.environment.values[] | select(.key == "clientSecret") | length' postman/mock-env.json 2>/dev/null || echo "0")
 
         if [ "$has_client_id" -gt "0" ] && [ "$has_client_secret" -gt "0" ]; then
             log_pass "Auth credentials found in environment"
