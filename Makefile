@@ -514,6 +514,8 @@ postman-docs-build-and-serve-up:
 .PHONY: postman-instance-build-with-tests
 postman-instance-build-with-tests:
 	@echo "🚀 Starting Postman build and test..."
+	# Lint OpenAPI spec first (catches errors before publishing)
+	$(MAKE) openapi-spec-lint
 	# Authentication
 	$(MAKE) postman-login
 	# Import OpenAPI spec into Postman
@@ -537,10 +539,12 @@ postman-instance-build-with-tests:
 	# Validate pipeline outputs
 	$(MAKE) validate-pipeline
 
-# CI version - skips local testing
+# CI version - skips local testing (prism-start, postman-mock, docs-serve)
 .PHONY: postman-instance-build-without-tests
 postman-instance-build-without-tests:
-	@echo "🚀 Starting Postman build (CI mode - no local testing)..."
+	@echo "🚀 Starting Postman build (no local testing)..."
+	# Lint OpenAPI spec first (catches errors before publishing)
+	$(MAKE) openapi-spec-lint
 	# Authentication
 	$(MAKE) postman-login
 	# Import OpenAPI spec into Postman
@@ -549,16 +553,17 @@ postman-instance-build-without-tests:
 	$(MAKE) postman-spec-create-standalone
 	# Generate and link standard collection
 	$(MAKE) postman-create-linked-collection
-	# Generate and upload use case and getting started collections
+	# Generate enhanced collections with all oneOf examples, use cases, and getting started
 	# NOTE: Test collection created as dependency of postman-generate-getting-started-all
+	$(MAKE) postman-extract-oneof-examples
 	$(MAKE) postman-generate-use-case-collection
 	$(MAKE) postman-generate-getting-started-all
-	$(MAKE) postman-upload-use-case-collection
-	$(MAKE) postman-upload-getting-started-all
+	$(MAKE) postman-upload-all-enhanced-collections
 	$(MAKE) postman-create-mock-and-env
+	# Build documentation
+	$(MAKE) docs-build
 	# Validate pipeline outputs
 	$(MAKE) validate-pipeline
-	# Skip local testing in CI
 
 # ---
 # TODO: Need to determine if there is a need for this.

@@ -280,6 +280,12 @@ class EBNFToOpenAPITranslator:
                 ("version", "2.0.0"),
                 ("description", "API for submitting mailing jobs with various document routing options")
             ])),
+            ("servers", [
+                {
+                    "url": "https://api.click2mail.com/v2",
+                    "description": "Production server"
+                }
+            ]),
             ("tags", [
                 {
                     "name": "jobs",
