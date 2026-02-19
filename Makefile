@@ -522,12 +522,12 @@ postman-instance-build-with-tests:
 	$(MAKE) postman-spec-create-standalone
 	# Generate and link standard collection
 	$(MAKE) postman-create-linked-collection
-	# Generate enhanced collections with all oneOf examples, use cases, and getting started
+	# Generate and upload use case and getting started collections
 	# NOTE: Test collection created as dependency of postman-generate-getting-started-all
-	$(MAKE) postman-extract-oneof-examples
 	$(MAKE) postman-generate-use-case-collection
 	$(MAKE) postman-generate-getting-started-all
-	$(MAKE) postman-upload-all-enhanced-collections
+	$(MAKE) postman-upload-use-case-collection
+	$(MAKE) postman-upload-getting-started-all
 	$(MAKE) postman-create-mock-and-env
 	# Start local mock and run tests
 	$(MAKE) prism-start
