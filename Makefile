@@ -424,7 +424,10 @@ postman-create-linked-collection:
 	$(MAKE) postman-api-linked-collection-generate
 	$(MAKE) postman-linked-collection-flatten
 	$(MAKE) postman-linked-collection-upload
-	$(MAKE) postman-linked-collection-link
+	# NOTE: Collection-to-API linking commented out 2026-02-19
+	# Reason: API resources removed to avoid 3 API limit (see lines 590, 926)
+	# Collections work independently without API linkage
+	#$(MAKE) postman-linked-collection-link
 
 # Legacy workflow with post-process flattening (if needed)
 .PHONY: postman-create-linked-collection-legacy
