@@ -7,7 +7,8 @@ test collection (generated from EBNF with realistic faker data), just reorganize
 for educational purposes.
 
 The test collection is the source of truth for realistic example data. This script
-reorganizes those endpoints into educational categories.
+reorganizes those endpoints into educational categories and filters to include
+only success responses (HTTP 200-299) to demonstrate successful API usage patterns.
 """
 
 import json
@@ -175,11 +176,21 @@ def create_pattern_request(source_request: Dict, pattern: Dict) -> Dict:
     """
     Create a Getting Started request from a source request.
 
-    This clones the source request (which has realistic faker data from test collection)
-    and adds educational metadata from the pattern definition.
+    This clones the source request (which has realistic faker data from test collection),
+    filters to include only success responses (HTTP 200-299), and adds educational
+    metadata from the pattern definition. This ensures Getting Started collections
+    demonstrate successful API usage patterns only.
     """
     # Deep clone the request
     request = json.loads(json.dumps(source_request))
+
+    # Filter responses to only include success responses (200-299)
+    # Getting Started collections should demonstrate successful API usage
+    if 'response' in request:
+        request['response'] = [
+            r for r in request['response']
+            if 200 <= int(r.get('code', 200)) < 300
+        ]
 
     # Update name and description for educational purposes
     request['name'] = pattern['name']
@@ -208,7 +219,8 @@ def generate_getting_started_with_examples(
     Generate Getting Started collection with examples from test collection.
 
     The test collection has realistic faker-generated data. We reorganize
-    those endpoints into educational categories with friendly names.
+    those endpoints into educational categories with friendly names, filtering
+    to include only success responses (HTTP 200-299) for demonstration purposes.
     """
 
     # Read source collection

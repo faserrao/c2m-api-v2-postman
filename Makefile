@@ -550,11 +550,13 @@ postman-instance-build-without-tests:
 	# Generate and link standard collection
 	$(MAKE) postman-create-linked-collection
 	# Generate and upload use case and getting started collections
-	# NOTE: Test collection created as dependency of postman-generate-getting-started-all
+	# NOTE: Test collection generated as dependency of postman-generate-getting-started-all
 	$(MAKE) postman-generate-use-case-collection
 	$(MAKE) postman-generate-getting-started-all
 	$(MAKE) postman-upload-use-case-collection
 	$(MAKE) postman-upload-getting-started-all
+	# Upload test collection (required for mock server creation)
+	$(MAKE) postman-create-test-collection
 	$(MAKE) postman-create-mock-and-env
 	# Validate pipeline outputs
 	$(MAKE) validate-pipeline
@@ -581,23 +583,26 @@ postman-cleanup-all:
 	@echo "🧹 Starting FULL cleanup of Postman resources for workspace $(POSTMAN_WS)..."
 	$(MAKE) postman-delete-mock-servers
 	$(MAKE) postman-delete-collections
-	$(MAKE) postman-delete-apis
+	# NOTE: Postman API resource deletion commented out 2026-02-19
+	# Reason: API resource is purely organizational (provides sync status UI, visual hub)
+	# Impact: None - collections, mock servers, environments unaffected
+	# Collections are generated locally from OpenAPI spec, not from API resource
+	#$(MAKE) postman-delete-apis
 	$(MAKE) postman-delete-environments
 	$(MAKE) postman-api-clean-trash
 	$(MAKE) postman-delete-specs
 	@echo "🔍 Verifying cleanup..."
+	# NOTE: API verification updated 2026-02-19 (no longer deleting API resources)
 	@REMAINING_APIS=$$(curl --silent --location \
 		--request GET "$(POSTMAN_APIS_URL)$(POSTMAN_Q_ID)" \
 		--header "X-Api-Key: $(POSTMAN_API_KEY)" | jq -r '.apis | length' || echo 0); \
 	if [ "$$REMAINING_APIS" -gt 0 ]; then \
-		echo "⚠️  Warning: $$REMAINING_APIS APIs still remain in workspace after cleanup!"; \
+		echo "ℹ️  Note: $$REMAINING_APIS API(s) exist in workspace (not deleted - API resources no longer used)"; \
 		curl --silent --location \
 			--request GET "$(POSTMAN_APIS_URL)$(POSTMAN_Q_ID)" \
 			--header "X-Api-Key: $(POSTMAN_API_KEY)" | jq -r '.apis[] | "  - \(.id): \(.name)"'; \
-		echo "🔄 Attempting cleanup again..."; \
-		$(MAKE) postman-delete-apis; \
 	else \
-		echo "✅ All APIs successfully deleted"; \
+		echo "ℹ️  No API resources found in workspace"; \
 	fi
 	@echo "✅ Postman cleanup complete for workspace $(POSTMAN_WS)."
 
@@ -825,52 +830,59 @@ postman-import-openapi-flat-native:
 		echo $$COLLECTION_UID > $(POSTMAN_DIR)/native-flat-collection-uid.txt; \
 	fi
 
-# OPTION A2: Import and create API definition (shows under APIs, not Specs)
-.PHONY: postman-import-openapi-as-api
-postman-import-openapi-as-api:
-	@echo "📥 Importing OpenAPI as API definition (shows under APIs)..."
-	@if [ -z "$(POSTMAN_API_KEY)" ]; then \
-		echo "❌ Error: POSTMAN_API_KEY is not set"; \
-		exit 1; \
-	fi
-	@echo "🧹 Pre-import cleanup: Deleting existing APIs with same name..."
-	@$(MAKE) postman-delete-apis
-	@echo "🔑 Using API Key: $$(echo $(POSTMAN_API_KEY) | head -c 8)..."
-	@echo "📍 Target Workspace: $(POSTMAN_WS)"
-	@echo "🌐 API URL: $(POSTMAN_APIS_URL)?workspaceId=$(POSTMAN_WS)"
-	@CONTENT=$$(cat "$(C2MAPIV2_OPENAPI_SPEC)"); \
-	PAYLOAD=$$(jq -n \
-		--arg name "$(POSTMAN_API_NAME)" \
-		--arg schema "$$CONTENT" \
-		'{ name: $$name, schema: { type: "openapi3", language: "yaml", schema: $$schema } }'); \
-	echo "🔧 Headers: X-Api-Key: $$(echo $(POSTMAN_API_KEY) | head -c 8)..."; \
-	echo "📤 Sending request to Postman API..."; \
-	HTTP_CODE=$$(curl --silent --show-error --write-out "%{http_code}" --output postman/import-api-response.json \
-		--location --request POST "$(POSTMAN_APIS_URL)?workspaceId=$(POSTMAN_WS)" \
-		--header "X-Api-Key: $(POSTMAN_API_KEY)" \
-		--header "Content-Type: application/json" \
-		--header "Accept: application/vnd.api.v10+json" \
-		--header "Authorization: Bearer $(POSTMAN_API_KEY)" \
-		--data "$$PAYLOAD"); \
-	echo "📡 HTTP Response Code: $$HTTP_CODE"; \
-	if [ "$$HTTP_CODE" != "200" ] && [ "$$HTTP_CODE" != "201" ]; then \
-		echo "❌ API request failed with HTTP code: $$HTTP_CODE"; \
-		echo "📄 Response body:"; \
-		cat postman/import-api-response.json 2>/dev/null || echo "No response body"; \
-		exit 1; \
-	fi; \
-	API_RESPONSE=$$(cat postman/import-api-response.json); \
-	echo "$$API_RESPONSE" | jq . > postman/import-api-debug.json || echo "$$API_RESPONSE" > postman/import-api-debug.json; \
-	API_ID=$$(echo "$$API_RESPONSE" | jq -r '.id // empty'); \
-	if [ -z "$$API_ID" ]; then \
-		echo "❌ Failed to import API. Check postman/import-api-debug.json for details."; \
-		echo "📄 Response:"; \
-		cat postman/import-api-debug.json 2>/dev/null || echo "No response"; \
-		exit 1; \
-	else \
-		echo "✅ Imported API with ID: $$API_ID"; \
-		echo $$API_ID > $(POSTMAN_API_UID_FILE); \
-	fi
+# NOTE: Postman API resource creation target commented out 2026-02-19
+# Reason: API resource is purely organizational (provides sync status UI, visual hub)
+# Impact: None - collections, mock servers, environments unaffected
+# Collections are generated locally from OpenAPI spec, not from API resource
+# Build now creates 9 resources instead of 10 (removed: 1 API organizational container)
+# The linked collection is still generated and uploaded, but not associated with an API resource
+#
+# OPTION A2: Import and create API definition (shows under APIs, not Specs) [COMMENTED OUT]
+#.PHONY: postman-import-openapi-as-api
+#postman-import-openapi-as-api:
+#	@echo "📥 Importing OpenAPI as API definition (shows under APIs)..."
+#	@if [ -z "$(POSTMAN_API_KEY)" ]; then \
+#		echo "❌ Error: POSTMAN_API_KEY is not set"; \
+#		exit 1; \
+#	fi
+#	@echo "🧹 Pre-import cleanup: Deleting existing APIs with same name..."
+#	@$(MAKE) postman-delete-apis
+#	@echo "🔑 Using API Key: $$(echo $(POSTMAN_API_KEY) | head -c 8)..."
+#	@echo "📍 Target Workspace: $(POSTMAN_WS)"
+#	@echo "🌐 API URL: $(POSTMAN_APIS_URL)?workspaceId=$(POSTMAN_WS)"
+#	@CONTENT=$$(cat "$(C2MAPIV2_OPENAPI_SPEC)"); \
+#	PAYLOAD=$$(jq -n \
+#		--arg name "$(POSTMAN_API_NAME)" \
+#		--arg schema "$$CONTENT" \
+#		'{ name: $$name, schema: { type: "openapi3", language: "yaml", schema: $$schema } }'); \
+#	echo "🔧 Headers: X-Api-Key: $$(echo $(POSTMAN_API_KEY) | head -c 8)..."; \
+#	echo "📤 Sending request to Postman API..."; \
+#	HTTP_CODE=$$(curl --silent --show-error --write-out "%{http_code}" --output postman/import-api-response.json \
+#		--location --request POST "$(POSTMAN_APIS_URL)?workspaceId=$(POSTMAN_WS)" \
+#		--header "X-Api-Key: $(POSTMAN_API_KEY)" \
+#		--header "Content-Type: application/json" \
+#		--header "Accept: application/vnd.api.v10+json" \
+#		--header "Authorization: Bearer $(POSTMAN_API_KEY)" \
+#		--data "$$PAYLOAD"); \
+#	echo "📡 HTTP Response Code: $$HTTP_CODE"; \
+#	if [ "$$HTTP_CODE" != "200" ] && [ "$$HTTP_CODE" != "201" ]; then \
+#		echo "❌ API request failed with HTTP code: $$HTTP_CODE"; \
+#		echo "📄 Response body:"; \
+#		cat postman/import-api-response.json 2>/dev/null || echo "No response body"; \
+#		exit 1; \
+#	fi; \
+#	API_RESPONSE=$$(cat postman/import-api-response.json); \
+#	echo "$$API_RESPONSE" | jq . > postman/import-api-debug.json || echo "$$API_RESPONSE" > postman/import-api-debug.json; \
+#	API_ID=$$(echo "$$API_RESPONSE" | jq -r '.id // empty'); \
+#	if [ -z "$$API_ID" ]; then \
+#		echo "❌ Failed to import API. Check postman/import-api-debug.json for details."; \
+#		echo "📄 Response:"; \
+#		cat postman/import-api-debug.json 2>/dev/null || echo "No response"; \
+#		exit 1; \
+#	else \
+#		echo "✅ Imported API with ID: $$API_ID"; \
+#		echo $$API_ID > $(POSTMAN_API_UID_FILE); \
+#	fi
 
 # OPTION B: Current implementation - post-process flattening
 .PHONY: postman-import-openapi-then-flatten
@@ -912,8 +924,12 @@ postman-import-help:
 .PHONY: postman-import-openapi-spec
 postman-import-openapi-spec:
 	@echo "📥 Importing OpenAPI and creating API definition..."
-	# Create the API definition
-	$(MAKE) postman-import-openapi-as-api
+	# NOTE: Postman API resource creation commented out 2026-02-19
+	# Reason: API resource is purely organizational (provides sync status UI, visual hub)
+	# Impact: None - collections, mock servers, environments unaffected
+	# Collections are generated locally from OpenAPI spec, not from API resource
+	# Build now creates 9 resources instead of 10 (removed: 1 API organizational container)
+	#$(MAKE) postman-import-openapi-as-api
 
 # ========================================================================
 # POSTMAN SPEC MANAGEMENT (Shows under "Specs" tab)
@@ -1474,8 +1490,8 @@ postman-generate-getting-started-collection: postman-api-linked-collection-gener
 
 # Generate Getting Started collection with realistic test data from test collection
 .PHONY: postman-generate-getting-started-with-examples
-postman-generate-getting-started-with-examples: postman-create-test-collection
-	@echo "📚 Generating Getting Started collection from test collection..."
+postman-generate-getting-started-with-examples: postman-test-collection-add-examples
+	@echo "📚 Generating Getting Started collection from test collection (with success examples only)..."
 	@$(VENV_PYTHON) scripts/active/generate_getting_started_with_examples_from_test.py
 	@echo "✅ Getting Started collection (with examples) generated from test collection"
 
@@ -1903,39 +1919,45 @@ postman-delete-collections:
 		done; \
 	fi
 
-# Delete all APIs in workspace
-.PHONY: postman-delete-apis
-postman-delete-apis:
-	@echo "🔍 Fetching APIs from workspace $(POSTMAN_WS)..."
-	@RESPONSE=$$(curl --silent --location \
-		--request GET "$(POSTMAN_APIS_URL)$(POSTMAN_Q_ID)" \
-		--header "X-Api-Key: $(POSTMAN_API_KEY)"); \
-	echo "$$RESPONSE" | jq -r '.apis[] | "\(.id) - \(.name)"' 2>/dev/null || echo "📊 Checking for APIs..."; \
-	APIS=$$(echo "$$RESPONSE" | jq -r '.apis[]?.id' 2>/dev/null | grep -v '^null$$' || true); \
-	API_COUNT=$$(echo "$$APIS" | grep -c . || echo 0); \
-	echo "📊 Found $$API_COUNT APIs to delete"; \
-	if [ -z "$$APIS" ]; then \
-		echo "ℹ️  No APIs found in workspace"; \
-	else \
-		echo "📋 API IDs to delete:"; \
-		echo "$$APIS" | sed 's/^/  - /'; \
-		echo "$$APIS" | while IFS= read -r API; do \
-			if [ -n "$$API" ]; then \
-				echo "🗑 Deleting API $$API..."; \
-			DELETE_RESPONSE=$$(curl --silent --location --write-out "\n%{http_code}" \
-				--request DELETE "$(POSTMAN_APIS_URL)/$$API" \
-				--header "X-Api-Key: $(POSTMAN_API_KEY)"); \
-			HTTP_CODE=$$(echo "$$DELETE_RESPONSE" | tail -n1); \
-			BODY=$$(echo "$$DELETE_RESPONSE" | sed '$$d'); \
-			if [ "$$HTTP_CODE" = "200" ] || [ "$$HTTP_CODE" = "204" ]; then \
-				echo "✅ Successfully deleted API $$API"; \
-			else \
-				echo "⚠️  Failed to delete API $$API (HTTP $$HTTP_CODE)"; \
-				echo "$$BODY" | jq . 2>/dev/null || echo "$$BODY"; \
-			fi; \
-		fi; \
-		done; \
-	fi
+# NOTE: Postman API deletion target commented out 2026-02-19
+# Reason: API resource is purely organizational (provides sync status UI, visual hub)
+# Impact: None - collections, mock servers, environments unaffected
+# Collections are generated locally from OpenAPI spec, not from API resource
+# Build now creates 9 resources instead of 10 (removed: 1 API organizational container)
+#
+# Delete all APIs in workspace [COMMENTED OUT]
+#.PHONY: postman-delete-apis
+#postman-delete-apis:
+#	@echo "🔍 Fetching APIs from workspace $(POSTMAN_WS)..."
+#	@RESPONSE=$$(curl --silent --location \
+#		--request GET "$(POSTMAN_APIS_URL)$(POSTMAN_Q_ID)" \
+#		--header "X-Api-Key: $(POSTMAN_API_KEY)"); \
+#	echo "$$RESPONSE" | jq -r '.apis[] | "\(.id) - \(.name)"' 2>/dev/null || echo "📊 Checking for APIs..."; \
+#	APIS=$$(echo "$$RESPONSE" | jq -r '.apis[]?.id' 2>/dev/null | grep -v '^null$$' || true); \
+#	API_COUNT=$$(echo "$$APIS" | grep -c . || echo 0); \
+#	echo "📊 Found $$API_COUNT APIs to delete"; \
+#	if [ -z "$$APIS" ]; then \
+#		echo "ℹ️  No APIs found in workspace"; \
+#	else \
+#		echo "📋 API IDs to delete:"; \
+#		echo "$$APIS" | sed 's/^/  - /'; \
+#		echo "$$APIS" | while IFS= read -r API; do \
+#			if [ -n "$$API" ]; then \
+#				echo "🗑 Deleting API $$API..."; \
+#			DELETE_RESPONSE=$$(curl --silent --location --write-out "\n%{http_code}" \
+#				--request DELETE "$(POSTMAN_APIS_URL)/$$API" \
+#				--header "X-Api-Key: $(POSTMAN_API_KEY)"); \
+#			HTTP_CODE=$$(echo "$$DELETE_RESPONSE" | tail -n1); \
+#			BODY=$$(echo "$$DELETE_RESPONSE" | sed '$$d'); \
+#			if [ "$$HTTP_CODE" = "200" ] || [ "$$HTTP_CODE" = "204" ]; then \
+#				echo "✅ Successfully deleted API $$API"; \
+#			else \
+#				echo "⚠️  Failed to delete API $$API (HTTP $$HTTP_CODE)"; \
+#				echo "$$BODY" | jq . 2>/dev/null || echo "$$BODY"; \
+#			fi; \
+#		fi; \
+#		done; \
+#	fi
 
 # Delete all environments in workspace
 .PHONY: postman-delete-environments
@@ -2511,7 +2533,12 @@ postman-publish: ## Push API + collection to workspace based on current context
 		echo "🔑 Using: POSTMAN_C2M_API_KEY"; \
 	fi
 	@echo ""
-	@$(MAKE) postman-import-openapi-as-api
+	# NOTE: Postman API resource creation commented out 2026-02-19
+	# Reason: API resource is purely organizational (provides sync status UI, visual hub)
+	# Impact: None - collections, mock servers, environments unaffected
+	# Collections are generated locally from OpenAPI spec, not from API resource
+	# Build now creates 9 resources instead of 10 (removed: 1 API organizational container)
+	#@$(MAKE) postman-import-openapi-as-api
 	@$(MAKE) postman-linked-collection-upload
 	@$(MAKE) postman-linked-collection-link
 
