@@ -526,9 +526,10 @@ postman-instance-build-with-tests:
 	$(MAKE) postman-create-linked-collection
 	# Generate enhanced collections with all oneOf examples, use cases, and getting started
 	# NOTE: Test collection created as dependency of postman-generate-getting-started-all
-	$(MAKE) postman-extract-oneof-examples
+	# NOTE: postman-extract-oneof-examples must run AFTER getting-started-all (which creates test collection)
 	$(MAKE) postman-generate-use-case-collection
 	$(MAKE) postman-generate-getting-started-all
+	$(MAKE) postman-extract-oneof-examples
 	$(MAKE) postman-upload-all-enhanced-collections
 	$(MAKE) postman-create-mock-and-env
 	# Start local mock and run tests
@@ -555,9 +556,10 @@ postman-instance-build-without-tests:
 	$(MAKE) postman-create-linked-collection
 	# Generate enhanced collections with all oneOf examples, use cases, and getting started
 	# NOTE: Test collection created as dependency of postman-generate-getting-started-all
-	$(MAKE) postman-extract-oneof-examples
+	# NOTE: postman-extract-oneof-examples must run AFTER getting-started-all (which creates test collection)
 	$(MAKE) postman-generate-use-case-collection
 	$(MAKE) postman-generate-getting-started-all
+	$(MAKE) postman-extract-oneof-examples
 	$(MAKE) postman-upload-all-enhanced-collections
 	$(MAKE) postman-create-mock-and-env
 	# Build documentation
