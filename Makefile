@@ -184,7 +184,7 @@ POSTMAN_ENV_NAME                 := $(C2MAPIV2_POSTMAN_API_NAME_PC)Env
 POSTMAN_ENV_FILE_TEMP            := $(POSTMAN_DIR)/mock-env-temp.json
 POSTMAN_ENV_FILE_NEW             := $(POSTMAN_DIR)/mock-env-new.json
 POSTMAN_ENV_UID_FILE             := $(POSTMAN_DIR)/postman_env_uid.txt
-POSTMAN_ENV_UID                  := $(shell cat $(POSTMAN_ENV_UID_FILE))
+POSTMAN_ENV_UID                  := $(shell cat $(POSTMAN_ENV_UID_FILE) 2>/dev/null)
 POSTMAN_ENV_UPLOAD_DEBUG         := $(POSTMAN_DIR)/env-upload-debug.json
 POSTMAN_ENVIRONMENTS_URL         := $(POSTMAN_BASE_URL)/environments
 
@@ -1652,7 +1652,7 @@ update-mock-env:
 	@curl --silent --show-error --fail --location \
 		--request PUT "$(POSTMAN_MOCKS_URL)/$(POSTMAN_MOCK_ID)" \
 		$(POSTMAN_CURL_HEADERS_XC) \
-		--data-raw "$$(jq -n --arg coll "$$(cat $(POSTMAN_TEST_COLLECTION_UID_FILE))" --arg env "$(POSTMAN_ENV_UID)" '{ "mock": { "name": "C2mApiV2MockServer", "collection": $$coll, "environment": $$env, "description": "Mock server with TEST Collection (all endpoints).", "private": false } }')" \
+		--data-raw "$$(jq -n --arg coll "$$(cat $(POSTMAN_TEST_COLLECTION_UID_FILE))" --arg env "$$(cat $(POSTMAN_ENV_UID_FILE))" '{ "mock": { "name": "C2mApiV2MockServer", "collection": $$coll, "environment": $$env, "description": "Mock server with TEST Collection (all endpoints).", "private": false } }')" \
 		--output /dev/null \
 		&& echo "✅ Mock server environment updated." \
 		|| (echo "❌ Failed to update mock server. Check UID/ID values and API key." && exit 1)
