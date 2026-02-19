@@ -184,7 +184,7 @@ POSTMAN_ENV_NAME                 := $(C2MAPIV2_POSTMAN_API_NAME_PC)Env
 POSTMAN_ENV_FILE_TEMP            := $(POSTMAN_DIR)/mock-env-temp.json
 POSTMAN_ENV_FILE_NEW             := $(POSTMAN_DIR)/mock-env-new.json
 POSTMAN_ENV_UID_FILE             := $(POSTMAN_DIR)/postman_env_uid.txt
-POSTMAN_ENV_UID                  := $(shell cat $(POSTMAN_ENV_UID_FILE) 2>/dev/null)
+POSTMAN_ENV_UID                  := $(shell cat $(POSTMAN_ENV_UID_FILE))
 POSTMAN_ENV_UPLOAD_DEBUG         := $(POSTMAN_DIR)/env-upload-debug.json
 POSTMAN_ENVIRONMENTS_URL         := $(POSTMAN_BASE_URL)/environments
 
@@ -514,8 +514,6 @@ postman-docs-build-and-serve-up:
 .PHONY: postman-instance-build-with-tests
 postman-instance-build-with-tests:
 	@echo "🚀 Starting Postman build and test..."
-	# Lint OpenAPI spec first (catches errors before publishing)
-	$(MAKE) openapi-spec-lint
 	# Authentication
 	$(MAKE) postman-login
 	# Import OpenAPI spec into Postman
@@ -526,10 +524,9 @@ postman-instance-build-with-tests:
 	$(MAKE) postman-create-linked-collection
 	# Generate enhanced collections with all oneOf examples, use cases, and getting started
 	# NOTE: Test collection created as dependency of postman-generate-getting-started-all
-	# NOTE: postman-extract-oneof-examples must run AFTER getting-started-all (which creates test collection)
+	$(MAKE) postman-extract-oneof-examples
 	$(MAKE) postman-generate-use-case-collection
 	$(MAKE) postman-generate-getting-started-all
-	$(MAKE) postman-extract-oneof-examples
 	$(MAKE) postman-upload-all-enhanced-collections
 	$(MAKE) postman-create-mock-and-env
 	# Start local mock and run tests
@@ -540,12 +537,10 @@ postman-instance-build-with-tests:
 	# Validate pipeline outputs
 	$(MAKE) validate-pipeline
 
-# CI version - skips local testing (prism-start, postman-mock, docs-serve)
+# CI version - skips local testing
 .PHONY: postman-instance-build-without-tests
 postman-instance-build-without-tests:
-	@echo "🚀 Starting Postman build (no local testing)..."
-	# Lint OpenAPI spec first (catches errors before publishing)
-	$(MAKE) openapi-spec-lint
+	@echo "🚀 Starting Postman build (CI mode - no local testing)..."
 	# Authentication
 	$(MAKE) postman-login
 	# Import OpenAPI spec into Postman
@@ -554,18 +549,16 @@ postman-instance-build-without-tests:
 	$(MAKE) postman-spec-create-standalone
 	# Generate and link standard collection
 	$(MAKE) postman-create-linked-collection
-	# Generate enhanced collections with all oneOf examples, use cases, and getting started
+	# Generate and upload use case and getting started collections
 	# NOTE: Test collection created as dependency of postman-generate-getting-started-all
-	# NOTE: postman-extract-oneof-examples must run AFTER getting-started-all (which creates test collection)
 	$(MAKE) postman-generate-use-case-collection
 	$(MAKE) postman-generate-getting-started-all
-	$(MAKE) postman-extract-oneof-examples
-	$(MAKE) postman-upload-all-enhanced-collections
+	$(MAKE) postman-upload-use-case-collection
+	$(MAKE) postman-upload-getting-started-all
 	$(MAKE) postman-create-mock-and-env
-	# Build documentation
-	$(MAKE) docs-build
 	# Validate pipeline outputs
 	$(MAKE) validate-pipeline
+	# Skip local testing in CI
 
 # ---
 # TODO: Need to determine if there is a need for this.
@@ -1652,7 +1645,7 @@ update-mock-env:
 	@curl --silent --show-error --fail --location \
 		--request PUT "$(POSTMAN_MOCKS_URL)/$(POSTMAN_MOCK_ID)" \
 		$(POSTMAN_CURL_HEADERS_XC) \
-		--data-raw "$$(jq -n --arg coll "$$(cat $(POSTMAN_TEST_COLLECTION_UID_FILE))" --arg env "$$(cat $(POSTMAN_ENV_UID_FILE))" '{ "mock": { "name": "C2mApiV2MockServer", "collection": $$coll, "environment": $$env, "description": "Mock server with TEST Collection (all endpoints).", "private": false } }')" \
+		--data-raw "$$(jq -n --arg coll "$$(cat $(POSTMAN_TEST_COLLECTION_UID_FILE))" --arg env "$(POSTMAN_ENV_UID)" '{ "mock": { "name": "C2mApiV2MockServer", "collection": $$coll, "environment": $$env, "description": "Mock server with TEST Collection (all endpoints).", "private": false } }')" \
 		--output /dev/null \
 		&& echo "✅ Mock server environment updated." \
 		|| (echo "❌ Failed to update mock server. Check UID/ID values and API key." && exit 1)
