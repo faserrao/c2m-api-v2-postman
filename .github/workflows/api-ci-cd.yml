@@ -5,24 +5,23 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'openapi/**'
-      - 'data_dictionary/**'
-      - 'docs/**'
-      - 'postman/**'
-      - 'scripts/**'
-      - 'tests/**'
-      - 'Makefile'
-      - '.github/workflows/api-ci-cd.yml'
+      # Source files that require regeneration
+      - 'data_dictionary/**'           # EBNF data dictionary (source of truth)
+      - 'Makefile'                      # Build configuration
+      - 'scripts/active/**'             # Generation scripts
+      - 'scripts/validation/**'         # Validation scripts
+      - 'scripts/test_data_generator_for_collections/**'  # Test data generation
+      - '.github/workflows/api-ci-cd.yml'  # Workflow changes
   pull_request:
     branches: [ main ]
     paths:
-      - 'openapi/**'
-      - 'data_dictionary/**'
-      - 'docs/**'
-      - 'postman/**'
-      - 'scripts/**'
-      - 'Makefile'
-      - '.github/workflows/api-ci-cd.yml'
+      # Source files that require regeneration
+      - 'data_dictionary/**'           # EBNF data dictionary (source of truth)
+      - 'Makefile'                      # Build configuration
+      - 'scripts/active/**'             # Generation scripts
+      - 'scripts/validation/**'         # Validation scripts
+      - 'scripts/test_data_generator_for_collections/**'  # Test data generation
+      - '.github/workflows/api-ci-cd.yml'  # Workflow changes
   workflow_dispatch:
     inputs:
       publish_to_postman:
