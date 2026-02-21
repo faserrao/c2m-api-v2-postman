@@ -561,6 +561,8 @@ postman-instance-build-without-tests:
 	# Upload test collection (required for mock server creation)
 	$(MAKE) postman-create-test-collection
 	$(MAKE) postman-create-mock-and-env
+	# Build documentation
+	$(MAKE) docs-build
 	# Validate pipeline outputs
 	$(MAKE) validate-pipeline
 	# Skip local testing in CI
