@@ -1432,8 +1432,8 @@ postman-extract-oneof-examples:
 # Generate curated use case collection
 .PHONY: postman-generate-use-case-collection
 postman-generate-use-case-collection:
-	@echo "📚 Generating curated use case collection..."
-	@$(VENV_PYTHON) scripts/active/generate_use_case_collection.py \
+	@echo "📚 Generating curated use case collection (v3 - dynamic from linked collection)..."
+	@$(VENV_PYTHON) scripts/active/generate_use_case_collection_v3.py \
 		$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-use-case-collection.json
 	@echo "✅ Use case collection generated"
 
