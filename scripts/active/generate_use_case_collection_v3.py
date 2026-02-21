@@ -246,25 +246,19 @@ def merge_values_into_template(template_body, scenario_values):
     """
     Merge scenario-specific values into the template body structure
 
-    This recursively replaces placeholder values with scenario values,
-    keeping the template structure intact.
+    This creates a new body using ONLY the fields specified in scenario_values,
+    removing all placeholder fields that aren't needed for this use case.
 
     Args:
         template_body: Parsed JSON from linked collection (with <oneOf>, <string>, etc.)
         scenario_values: Dict of values to fill in
 
     Returns:
-        Merged body with scenario values
+        Merged body with ONLY scenario values (no unused placeholders)
     """
-    import copy
-    result = copy.deepcopy(template_body)
-
-    # For each key in scenario values, replace in result
-    for key, value in scenario_values.items():
-        if key in result:
-            result[key] = value
-
-    return result
+    # Use case collections should only show the fields actually used in the scenario
+    # Don't include optional fields with placeholder values - that's confusing
+    return scenario_values
 
 
 def create_use_case_request(scenario_key, scenario, linked_collection):
