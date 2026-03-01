@@ -26,9 +26,9 @@ BASE_URL = "{{baseUrl}}"
 USE_CASES = {
     "legal_firm": {
         "name": "Legal Firm",
-        "scenario_type": "[single-doc-job-template]",
+        "scenario_type": "POST /jobs/submit/single/doc",
         "description": "We have letters that we need to send all day. Each letter is sent to a specific recipient via Certified Mail. A copy is sent to their legal representative via First Class mail. Our system generates the PDF of the letter.",
-        "endpoint": "/jobs/single-doc-job-template",
+        "endpoint": "/jobs/submit/single/doc",
         "method": "POST",
         "payload": {
             "documentSourceIdentifier": {"documentId": 1234},
@@ -68,9 +68,9 @@ USE_CASES = {
     
     "company_invoice_batch": {
         "name": "Company #1",
-        "scenario_type": "[multi-pdf-address-capture]",
+        "scenario_type": "POST /jobs/submit/single/pdf/addressCapture",
         "description": "We send invoices at the end of the month. Each invoice is in its own PDF. The address of the recipient is in the invoice.",
-        "endpoint": "/jobs/multi-pdf-address-capture",
+        "endpoint": "/jobs/submit/single/pdf/addressCapture",
         "method": "POST",
         "payload": {
             "addressCapturePdfs": [
@@ -134,9 +134,9 @@ USE_CASES = {
     
     "company_split_invoices": {
         "name": "Company #2",
-        "scenario_type": "[single-pdf-split-addressCapture]", 
+        "scenario_type": "POST /jobs/submit/single/pdf/split/addressCapture", 
         "description": "We send invoices at the end of the month. All the invoices are in a single big PDF. The addresses of the recipients are in the invoices.",
-        "endpoint": "/jobs/single-pdf-split-addressCapture",
+        "endpoint": "/jobs/submit/single/pdf/split/addressCapture",
         "method": "POST",
         "payload": {
             "documentSourceIdentifier": {
@@ -181,9 +181,9 @@ USE_CASES = {
     
     "real_estate_agent": {
         "name": "Real Estate Agent",
-        "scenario_type": "[single-doc-job-template]",
+        "scenario_type": "POST /jobs/submit/single/doc",
         "description": "We send postcards as part of our campaign. The postcards have a specific template and use mail merge.",
-        "endpoint": "/jobs/single-doc-job-template",
+        "endpoint": "/jobs/submit/single/doc",
         "method": "POST",
         "payload": {
             "documentSourceIdentifier": {"externalUrl": "https://api.example.com/v1/marketing/postcards/luxury-homes"},
@@ -204,9 +204,9 @@ USE_CASES = {
     
     "medical_agency": {
         "name": "Medical Agency",
-        "scenario_type": "[multi-doc-merge-job-template]",
+        "scenario_type": "POST /jobs/submit/multi/doc/merge",
         "description": "We send medical reports to patients. Each report is a custom PDF. In addition, a few boiler-plate pages of generic medical information are sent with each report.",
-        "endpoint": "/jobs/multi-doc-merge-job-template",
+        "endpoint": "/jobs/submit/multi/doc/merge",
         "method": "POST",
         "payload": {
             "documentsToMerge": [
@@ -239,9 +239,9 @@ USE_CASES = {
     
     "monthly_newsletters": {
         "name": "Monthly Newsletters",
-        "scenario_type": "[single-doc-job-template]",
+        "scenario_type": "POST /jobs/submit/single/doc",
         "description": "We are an organization that sends out flyers at the beginning of each month to our subscribers. The flyer is a static document and we have a mailing list it has to go out to.",
-        "endpoint": "/jobs/single-doc-job-template",
+        "endpoint": "/jobs/submit/single/doc",
         "method": "POST", 
         "payload": {
             "documentSourceIdentifier": {
@@ -268,9 +268,9 @@ USE_CASES = {
     
     "reseller_merge_pdfs": {
         "name": "Reseller #1",
-        "scenario_type": "[single-pdf-split]", 
+        "scenario_type": "POST /jobs/submit/single/pdf/split", 
         "description": "We receive PDFs from our customers. Each PDF is unique. We want to batch the PDFs into a single big PDF and send them in one go.",
-        "endpoint": "/jobs/single-pdf-split", 
+        "endpoint": "/jobs/submit/single/pdf/split", 
         "method": "POST",
         "payload": {
             "documentSourceIdentifier": {
@@ -311,9 +311,9 @@ USE_CASES = {
     
     "reseller_zip_pdfs": {
         "name": "Reseller #2",
-        "scenario_type": "[multi-doc]",
+        "scenario_type": "POST /jobs/submit/multi/doc",
         "description": "We receive PDFs from our customers. Each PDF is unique. We want to zip the PDFs and send them in one go.",
-        "endpoint": "/jobs/multi-doc",
+        "endpoint": "/jobs/submit/multi/doc",
         "method": "POST",
         "payload": {
             "documentsWithRecipients": [
