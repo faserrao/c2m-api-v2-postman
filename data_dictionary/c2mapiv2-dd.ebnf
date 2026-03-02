@@ -253,10 +253,11 @@ submitSingleDocParams =
     + [ returnAddress ]
     + [ jobOptions ]
     + [ priority ]
+    + [ color ]
     + [ tags ] ;
 
-    priority = "standard" | "rush" | "overnight" ;
-
+    priority = "standard" | "rush" | "overnight" | "Bobbu Priority";
+    color =  "red" | "blue";
 
 (* ------------------------------------------------------------------------- *)
 (* Endpoint: POST /jobs/submit/single/pdf/addressCapture                               *)
