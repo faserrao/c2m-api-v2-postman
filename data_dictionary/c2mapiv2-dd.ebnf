@@ -250,13 +250,13 @@ submitSingleDocParams =
     + docSourceAll
     + recipientAddressSource
     + [ paymentDetails ]
-    + [ prioritySpec ]           (* NEW - add this line *)
     + [ returnAddress ]
-    + [ priority ]
     + [ jobOptions ]
     + [ tags ] ;
 
-prioritySpec = "standard" | "rush" | "overnight" ;
+(* 
+    priority = "standard" | "rush" | "overnight" ;
+*)
 
 
 (* ------------------------------------------------------------------------- *)
