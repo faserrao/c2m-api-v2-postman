@@ -83,84 +83,114 @@ function parseArgs() {
 const oneOfFixtures = {
     documentSourceIdentifier: [
         // Variant 1: Just documentId (integer)
-        { "documentId": 1234 },
+        { "documentId": "<integer>" },
         // Variant 2: Just externalUrl (string with URI format)
-        { "externalUrl": "https://api.example.com/v1/documents/5678" },
+        { "externalUrl": "<string>" },
         // Variant 3: uploadRequestId + documentName
         {
-            uploadRequestId: 100,
-            documentName: "invoice_2024_01.pdf"
+            uploadRequestId: "<integer>",
+            documentName: "<string>"
         },
         // Variant 4: uploadRequestId + zipId + documentName
         {
-            uploadRequestId: 200,
-            zipId: 10,
-            documentName: "statement_jan.pdf"
+            uploadRequestId: "<integer>",
+            zipId: "<integer>",
+            documentName: "<string>"
         },
         // Variant 5: zipId + documentName
         {
-            zipId: 20,
-            documentName: "report_q1_2024.pdf"
+            zipId: "<integer>",
+            documentName: "<string>"
         }
     ],
     
     recipientAddressSource: [
-        // Variant 1: exactlyOneId (addressId)
+        // Variant 1: recipientAddressBySingle (full address)
+        // Note: All non-oneOf fields will be populated dynamically by generateRandomValue()
+        {
+            mappingId: "<string>",
+            firstName: "<string>",
+            lastName: "<string>",
+            address1: "<string>",
+            address2: "<string>",
+            address3: "<string>",
+            city: "<string>",
+            state: "<string>",
+            zip: "<string>",
+            country: "USA",
+            nickName: "<string>",
+            phoneNumber: "<string>",
+            addressName: "<string>"
+        },
+        // Variant 2: recipientAddressByList (address list array)
+        // Note: addressList array items will be populated dynamically by generateRandomValue()
+        {
+            mappingId: "<string>",
+            addressList: [
+                {
+                    firstName: "<string>",
+                    lastName: "<string>",
+                    address1: "<string>",
+                    city: "<string>",
+                    state: "<string>",
+                    zip: "<string>",
+                    country: "USA"
+                },
+                {
+                    firstName: "<string>",
+                    lastName: "<string>",
+                    address1: "<string>",
+                    city: "<string>",
+                    state: "<string>",
+                    zip: "<string>",
+                    country: "USA"
+                }
+            ],
+            addressListName: "<string>"
+        },
+        // Variant 3: recipientAddressByAddressId (addressId)
         {
             addressId: 5000
         },
-        // Variant 2: exactlyOneListId
+        // Variant 4: recipientAddressByListId (addressListId)
         {
             addressListId: 100
-        },
-        // Variant 3: exactlyOneNewAddress (full address)
-        {
-            firstName: "John",
-            lastName: "Smith",
-            address1: "123 Main Street",
-            address2: "Apt 4B",
-            address3: "",
-            city: "New York",
-            state: "NY",
-            zip: "10001",
-            country: "USA",
-            nickName: "Johnny",
-            phoneNumber: "+1-555-123-4567"
         }
     ],
     
     paymentDetails: [
         // Variant 1: creditCardPayment
+        // Note: All non-oneOf fields will be populated dynamically by generateRandomValue()
         {
             creditCardDetails: {
                 cardType: "visa",
-                cardNumber: "4111111111111111",
+                cardNumber: "<string>",
                 expirationDate: {
-                    month: 12,
-                    year: 2025
+                    month: "<integer>",
+                    year: "<integer>"
                 },
-                cvv: 123
+                cvv: "<integer>"
             }
         },
         // Variant 2: invoicePayment
         {
             invoiceDetails: {
-                invoiceNumber: "INV-2024-001",
-                amountDue: 150.00
+                invoiceNumber: "<string>",
+                amountDue: "<number>"
             }
         },
         // Variant 3: achPayment
         {
             achDetails: {
-                routingNumber: "021000021",
-                accountNumber: "1234567890",
-                checkDigit: 7
+                routingNumber: "<string>",
+                accountNumber: "<string>",
+                checkDigit: "<integer>"
             }
         },
         // Variant 4: userCreditPayment
         {
             userCreditDetails: {
-                creditAmount: 50.00
+                creditAmount: "<number>"
             }
         },
         // Variant 5: applePayPayment
@@ -180,71 +210,71 @@ const oneOfFixtures = {
     docSourceAll: [
         // Variant 1: documentIdSource (just documentId)
         {
-            documentId: 1234
+            documentId: "<integer>"
         },
         // Variant 2: requestIdSource (requestId + optional filename)
         {
-            requestId: 100,
-            filename: "invoice_2024_01.pdf"
+            requestId: "<integer>",
+            filename: "<string>"
         },
         // Variant 3: urlSource (just url)
         {
-            url: "https://api.example.com/v1/documents/5678"
+            url: "<string>"
         },
         // Variant 4: zipDocumentIdSource (zipDocumentId + filename)
         {
-            zipDocumentId: 20,
-            filename: "report_q1_2024.pdf"
+            zipDocumentId: "<integer>",
+            filename: "<string>"
         },
         // Variant 5: zipRequestIdSource (requestId + zipFilename + filename)
         {
-            requestId: 200,
-            zipFilename: "archive_jan_2024.zip",
-            filename: "statement_jan.pdf"
+            requestId: "<integer>",
+            zipFilename: "<string>",
+            filename: "<string>"
         }
     ],
 
     docSourceStandard: [
         // Variant 1: documentIdSource (just documentId)
         {
-            documentId: 1234
+            documentId: "<integer>"
         },
         // Variant 2: requestIdSource (requestId + optional filename)
         {
-            requestId: 100,
-            filename: "invoice_2024_01.pdf"
+            requestId: "<integer>",
+            filename: "<string>"
         },
         // Variant 3: urlSource (just url)
         {
-            url: "https://api.example.com/v1/documents/5678"
+            url: "<string>"
         }
     ],
 
     docSourceZipFile: [
         // Variant 1: zipDocumentIdSource (zipDocumentId + filename)
         {
-            zipDocumentId: 20,
-            filename: "report_q1_2024.pdf"
+            zipDocumentId: "<integer>",
+            filename: "<string>"
         },
         // Variant 2: zipRequestIdSource (requestId + zipFilename + filename)
         {
-            requestId: 200,
-            zipFilename: "archive_jan_2024.zip",
-            filename: "statement_jan.pdf"
+            requestId: "<integer>",
+            zipFilename: "<string>",
+            filename: "<string>"
         }
     ],
 
     zipDocumentSource: [
         // Variant 1: zipDocumentIdSource (zipDocumentId + filename)
         {
-            zipDocumentId: 20,
-            filename: "report_q1_2024.pdf"
+            zipDocumentId: "<integer>",
+            filename: "<string>"
         },
         // Variant 2: zipRequestIdSource (requestId + zipFilename + filename)
         {
-            requestId: 200,
-            zipFilename: "archive_jan_2024.zip",
-            filename: "statement_jan.pdf"
+            requestId: "<integer>",
+            zipFilename: "<string>",
+            filename: "<string>"
         }
     ],
 
