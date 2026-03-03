@@ -400,6 +400,10 @@ function getNextOneOfValue(fieldName) {
     // Track statistics
     stats.oneOfReplacements[fieldName] = (stats.oneOfReplacements[fieldName] || 0) + 1;
 
+    // CRITICAL FIX: Recursively replace placeholders within the oneOf object
+    // The fixtures contain placeholders like "<integer>" and "<string>" that need to be replaced
+    processBodyObject(value, fieldName);
+
     return value;
 }
 
