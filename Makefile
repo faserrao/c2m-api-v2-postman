@@ -1475,24 +1475,41 @@ postman-upload-enhanced-collection:
 		echo "❌ Failed to update test collection: $$RESPONSE"; exit 1; \
 	fi
 
-# Upload use case collection
+# Upload curated use case collections (real-world + getting-started)
 .PHONY: postman-upload-use-case-collection
 postman-upload-use-case-collection:
-	@echo "📤 Uploading use case collection..."
-	@USE_CASE_FILE="$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-use-case-collection.json"; \
-	if [ ! -f "$$USE_CASE_FILE" ]; then \
-		echo "⚠️  Use case collection not found. Run postman-generate-use-case-collection first."; \
+	@echo "📤 Uploading curated use case collections..."
+	@REAL_WORLD_FILE="$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-real-world-use-cases-collection.json"; \
+	GETTING_STARTED_FILE="$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-curated-collection.json"; \
+	if [ ! -f "$$REAL_WORLD_FILE" ]; then \
+		echo "⚠️  Real World collection not found. Run postman-generate-use-case-collection first."; \
 		exit 1; \
 	fi; \
-	COLLECTION_UID=$$(jq -c '{collection: .}' "$$USE_CASE_FILE" | \
+	if [ ! -f "$$GETTING_STARTED_FILE" ]; then \
+		echo "⚠️  Getting Started curated collection not found. Run postman-generate-use-case-collection first."; \
+		exit 1; \
+	fi; \
+	echo "📤 Uploading Real World Use Cases collection..."; \
+	RW_UID=$$(jq -c '{collection: .}' "$$REAL_WORLD_FILE" | \
 		curl --silent --location --request POST "$(POSTMAN_COLLECTIONS_URL)?workspace=$(POSTMAN_WS)" \
 			$(POSTMAN_CURL_HEADERS_XC) \
 			--data-binary @- | jq -r '.collection.uid'); \
-	if [ "$$COLLECTION_UID" = "null" ] || [ -z "$$COLLECTION_UID" ]; then \
-		echo "❌ Failed to upload use case collection"; exit 1; \
+	if [ "$$RW_UID" = "null" ] || [ -z "$$RW_UID" ]; then \
+		echo "❌ Failed to upload Real World collection"; exit 1; \
 	else \
-		echo "✅ Use case collection uploaded with UID: $$COLLECTION_UID"; \
-		echo $$COLLECTION_UID > $(POSTMAN_GENERATED_DIR)/use-case-collection-uid.txt; \
+		echo "✅ Real World collection uploaded with UID: $$RW_UID"; \
+		echo $$RW_UID > $(POSTMAN_GENERATED_DIR)/real-world-collection-uid.txt; \
+	fi; \
+	echo "📤 Uploading Getting Started curated collection..."; \
+	GS_UID=$$(jq -c '{collection: .}' "$$GETTING_STARTED_FILE" | \
+		curl --silent --location --request POST "$(POSTMAN_COLLECTIONS_URL)?workspace=$(POSTMAN_WS)" \
+			$(POSTMAN_CURL_HEADERS_XC) \
+			--data-binary @- | jq -r '.collection.uid'); \
+	if [ "$$GS_UID" = "null" ] || [ -z "$$GS_UID" ]; then \
+		echo "❌ Failed to upload Getting Started curated collection"; exit 1; \
+	else \
+		echo "✅ Getting Started curated collection uploaded with UID: $$GS_UID"; \
+		echo $$GS_UID > $(POSTMAN_GENERATED_DIR)/getting-started-curated-collection-uid.txt; \
 	fi
 
 # Generate Getting Started collection (educational/onboarding)
