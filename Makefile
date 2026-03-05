@@ -1435,13 +1435,13 @@ postman-generate-use-case-collection:
 	@echo "📚 Generating curated collections from YAML catalog (v4 - values only)..."
 	@$(VENV_PYTHON) scripts/active/generate_curated_collections_v4.py \
 		--config config/curated-examples-catalog.yaml \
-		--linked $(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_LINKED_COLLECTION_FLAT_FILENAME) \
+		--linked $(POSTMAN_LINKED_COLLECTION_FLAT) \
 		--output-dir $(POSTMAN_GENERATED_DIR) \
 		--tags real-world \
 		--output-name $(C2MAPIV2_POSTMAN_API_NAME_KC)-real-world-use-cases-collection
 	@$(VENV_PYTHON) scripts/active/generate_curated_collections_v4.py \
 		--config config/curated-examples-catalog.yaml \
-		--linked $(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_LINKED_COLLECTION_FLAT_FILENAME) \
+		--linked $(POSTMAN_LINKED_COLLECTION_FLAT) \
 		--output-dir $(POSTMAN_GENERATED_DIR) \
 		--tags getting-started \
 		--output-name $(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-curated-collection
