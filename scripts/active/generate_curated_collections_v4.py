@@ -1,0 +1,370 @@
+#!/usr/bin/env python3
+"""
+Generate Curated Postman Collections from YAML Catalog (v4)
+
+This script implements the "Read structure, write values" pattern:
+1. Reads canonical request structure from Linked Collection (EBNF source of truth)
+2. Reads example values from YAML catalog (business data only)
+3. Applies oneOf selections and fills leaf values
+4. Generates collections by tag filtering
+
+Architecture:
+- YAML catalog contains ONLY leaf values, never structure
+- Linked Collection provides complete canonical structure
+- Generator discovers structure, applies selections, fills values
+- No hardcoded request structure anywhere
+
+Validations:
+1. Endpoint validation: Fail if method+path not in Linked Collection
+2. Field validation: Warn if YAML value field doesn't exist after oneOf selection
+3. Tag-based filtering: Generate multiple collections from one catalog
+
+Usage:
+    python3 generate_curated_collections_v4.py --config config/curated-examples-catalog.yaml --linked postman/generated/c2mapiv2-linked-collection-flat.json --output-dir postman/generated/ --tags real-world
+
+Author: Claude Code
+Date: 2026-03-05
+"""
+
+import json
+import yaml
+import argparse
+import sys
+import copy
+from pathlib import Path
+
+
+def load_yaml_catalog(catalog_path):
+    """Load YAML catalog with examples."""
+    try:
+        with open(catalog_path, 'r') as f:
+            catalog = yaml.safe_load(f)
+        return catalog.get('examples', [])
+    except FileNotFoundError:
+        print(f"ERROR: Catalog file not found: {catalog_path}", file=sys.stderr)
+        sys.exit(1)
+    except yaml.YAMLError as e:
+        print(f"ERROR: Invalid YAML syntax: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def load_linked_collection(linked_path):
+    """Load Linked Collection (canonical request structure)."""
+    try:
+        with open(linked_path, 'r') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        print(f"ERROR: Linked collection not found: {linked_path}", file=sys.stderr)
+        sys.exit(1)
+    except json.JSONDecodeError as e:
+        print(f"ERROR: Invalid JSON in linked collection: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
+def find_canonical_request(linked_collection, method, path):
+    """
+    Find canonical request template in Linked Collection.
+
+    Returns: (item, request_body_dict) or (None, None)
+    """
+    for item in linked_collection.get('item', []):
+        if item.get('request', {}).get('method') == method:
+            url = item['request'].get('url', {})
+            item_path = '/' + '/'.join(url.get('path', []))
+
+            if item_path == path:
+                # Found matching endpoint
+                body_raw = item['request'].get('body', {}).get('raw', '{}')
+                try:
+                    body_dict = json.loads(body_raw)
+                    return item, body_dict
+                except json.JSONDecodeError:
+                    print(f"WARNING: Cannot parse body for {method} {path}", file=sys.stderr)
+                    return None, None
+
+    return None, None
+
+
+def apply_oneof_selection(body_dict, field_name, variant_name):
+    """
+    Apply oneOf selection by determining which variant to use.
+
+    For fields like docSourceAll with <oneOf> placeholder:
+    - Reads variant_name (e.g., "documentId", "url", "requestId")
+    - Returns the structure needed for that variant
+
+    This is a simplified implementation - in reality, would need to read
+    OpenAPI spec to determine exact structure of each variant.
+    """
+    # Placeholder marker check
+    if isinstance(body_dict.get(field_name), str) and body_dict[field_name] == '<oneOf>':
+        # For now, return empty dict - will be filled by fill_leaf_values
+        # In full implementation, would read OpenAPI to get variant structure
+        return {}
+
+    # If field already has structure (not placeholder), return as-is
+    return body_dict.get(field_name, {})
+
+
+def fill_leaf_values(obj, values_dict, path=""):
+    """
+    Recursively fill leaf values from flat values dictionary.
+
+    Args:
+        obj: Nested object to fill (from canonical structure)
+        values_dict: Flat dictionary of field_name: value
+        path: Current path (for debugging)
+
+    Returns:
+        Modified object with values filled
+    """
+    if isinstance(obj, dict):
+        result = {}
+        for key, value in obj.items():
+            # Check if we have a value for this field in flat dict
+            if key in values_dict:
+                # This is a leaf value - replace with actual value
+                result[key] = values_dict[key]
+            elif isinstance(value, dict):
+                # Recurse into nested object
+                result[key] = fill_leaf_values(value, values_dict, f"{path}.{key}")
+            elif isinstance(value, list):
+                # Recurse into array
+                result[key] = [fill_leaf_values(item, values_dict, f"{path}.{key}[]") for item in value]
+            elif isinstance(value, str) and value.startswith('<'):
+                # Placeholder - check if we have value in flat dict
+                if key in values_dict:
+                    result[key] = values_dict[key]
+                else:
+                    # Keep placeholder
+                    result[key] = value
+            else:
+                # Keep original value
+                result[key] = value
+        return result
+    elif isinstance(obj, list):
+        return [fill_leaf_values(item, values_dict, f"{path}[]") for item in obj]
+    else:
+        return obj
+
+
+def validate_endpoint_exists(linked_collection, method, path):
+    """
+    Validation 1: Endpoint Existence
+
+    Fail if method+path not found in Linked Collection.
+    """
+    item, body = find_canonical_request(linked_collection, method, path)
+    if item is None:
+        return False, f"Endpoint not found: {method} {path}"
+    return True, "OK"
+
+
+def validate_field_patchability(body_dict, values_dict, selections):
+    """
+    Validation 2: Field Patchability
+
+    Warn if YAML contains field names that don't exist in canonical structure
+    after oneOf selections are applied.
+
+    Returns: (is_valid, warnings_list)
+    """
+    warnings = []
+
+    # Get all field names in canonical structure (after oneOf selection)
+    def get_all_field_names(obj, prefix=""):
+        """Recursively get all field names in nested structure."""
+        fields = set()
+        if isinstance(obj, dict):
+            for key, value in obj.items():
+                fields.add(key)
+                if isinstance(value, dict):
+                    fields.update(get_all_field_names(value, f"{prefix}.{key}"))
+        return fields
+
+    canonical_fields = get_all_field_names(body_dict)
+
+    # Check each value in YAML
+    for field_name in values_dict.keys():
+        if field_name not in canonical_fields and not field_name.startswith('_'):
+            # Special fields (tags, jobTemplate, etc.) are always valid
+            special_fields = {'tags', 'jobTemplate', 'jobOptions'}
+            if field_name not in special_fields:
+                warnings.append(f"Field '{field_name}' not found in canonical structure (may be unused)")
+
+    return True, warnings
+
+
+def generate_collection(examples, linked_collection, collection_name, tag_filter=None):
+    """
+    Generate a Postman collection from filtered examples.
+
+    Args:
+        examples: List of example dictionaries from YAML
+        linked_collection: Linked collection (canonical structure)
+        collection_name: Name for generated collection
+        tag_filter: List of tags to filter by (None = include all)
+
+    Returns:
+        Postman collection dictionary
+    """
+    # Filter examples by tags
+    filtered_examples = []
+    for example in examples:
+        if tag_filter is None:
+            filtered_examples.append(example)
+        else:
+            example_tags = example.get('tags', [])
+            if any(tag in example_tags for tag in tag_filter):
+                filtered_examples.append(example)
+
+    print(f"Generating '{collection_name}' with {len(filtered_examples)} examples")
+
+    # Create collection structure
+    collection = {
+        "info": {
+            "name": collection_name,
+            "description": f"Generated from YAML catalog with tag filter: {tag_filter or 'all'}",
+            "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+        },
+        "item": []
+    }
+
+    # Process each example
+    validation_errors = []
+    validation_warnings = []
+
+    for example in filtered_examples:
+        name = example.get('name')
+        method = example.get('method')
+        path = example.get('path')
+        description = example.get('description', '')
+        selections = example.get('select', {})
+        values = example.get('values', {})
+
+        print(f"  Processing: {name}")
+
+        # Validation 1: Endpoint exists
+        valid, msg = validate_endpoint_exists(linked_collection, method, path)
+        if not valid:
+            validation_errors.append(f"{name}: {msg}")
+            print(f"    ERROR: {msg}", file=sys.stderr)
+            continue
+
+        # Find canonical request
+        canonical_item, canonical_body = find_canonical_request(linked_collection, method, path)
+
+        # Clone canonical request (deep copy - don't modify original)
+        request_item = copy.deepcopy(canonical_item)
+
+        # Apply oneOf selections
+        for field_name, variant_name in selections.items():
+            if field_name in canonical_body:
+                canonical_body[field_name] = apply_oneof_selection(canonical_body, field_name, variant_name)
+
+        # Validation 2: Field patchability
+        valid, warnings = validate_field_patchability(canonical_body, values, selections)
+        if warnings:
+            for warning in warnings:
+                validation_warnings.append(f"{name}: {warning}")
+                print(f"    WARNING: {warning}", file=sys.stderr)
+
+        # Fill leaf values from YAML
+        filled_body = fill_leaf_values(canonical_body, values)
+
+        # Update request body with filled values
+        request_item['request']['body']['raw'] = json.dumps(filled_body, indent=2)
+
+        # Update item metadata
+        request_item['name'] = name
+        request_item['request']['description'] = description
+
+        # Add to collection
+        collection['item'].append(request_item)
+
+    # Report validation results
+    print(f"\nValidation Results for '{collection_name}':")
+    print(f"  Errors: {len(validation_errors)}")
+    print(f"  Warnings: {len(validation_warnings)}")
+
+    if validation_errors:
+        print("\nERRORS (collection generation failed):", file=sys.stderr)
+        for error in validation_errors:
+            print(f"  - {error}", file=sys.stderr)
+        sys.exit(1)
+
+    if validation_warnings:
+        print("\nWARNINGS (collection generated with issues):")
+        for warning in validation_warnings:
+            print(f"  - {warning}")
+
+    return collection
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Generate curated Postman collections from YAML catalog (v4)'
+    )
+    parser.add_argument(
+        '--config',
+        required=True,
+        help='Path to YAML catalog file'
+    )
+    parser.add_argument(
+        '--linked',
+        required=True,
+        help='Path to Linked Collection (canonical structure)'
+    )
+    parser.add_argument(
+        '--output-dir',
+        default='postman/generated/',
+        help='Output directory for generated collections'
+    )
+    parser.add_argument(
+        '--tags',
+        nargs='+',
+        help='Filter examples by tags (e.g., --tags real-world getting-started)'
+    )
+    parser.add_argument(
+        '--output-name',
+        help='Output filename (without .json extension)'
+    )
+
+    args = parser.parse_args()
+
+    # Load catalog and linked collection
+    print(f"Loading YAML catalog: {args.config}")
+    examples = load_yaml_catalog(args.config)
+    print(f"  Loaded {len(examples)} examples")
+
+    print(f"\nLoading Linked Collection: {args.linked}")
+    linked_collection = load_linked_collection(args.linked)
+    print(f"  Loaded {len(linked_collection.get('item', []))} endpoints")
+
+    # Generate collection
+    tag_filter = args.tags
+    if tag_filter:
+        collection_name = f"C2M API v2 - {' + '.join(tag_filter).title()}"
+        output_name = args.output_name or f"c2mapiv2-{'-'.join(tag_filter)}-collection"
+    else:
+        collection_name = "C2M API v2 - All Examples"
+        output_name = args.output_name or "c2mapiv2-all-examples-collection"
+
+    print(f"\nGenerating collection: {collection_name}")
+    collection = generate_collection(examples, linked_collection, collection_name, tag_filter)
+
+    # Write output
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    output_path = output_dir / f"{output_name}.json"
+    print(f"\nWriting collection: {output_path}")
+    with open(output_path, 'w') as f:
+        json.dump(collection, f, indent=2)
+
+    print(f"\nSUCCESS: Generated {len(collection['item'])} requests")
+    print(f"Output: {output_path}")
+
+
+if __name__ == '__main__':
+    main()

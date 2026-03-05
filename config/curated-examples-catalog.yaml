@@ -1,0 +1,315 @@
+# C2M API V2 - Curated Examples Catalog
+# Single source of truth for all curated collection examples
+#
+# Architecture: Read structure from Linked Collection, write values only
+# This catalog contains ONLY the example values (leaf data), never request structure
+#
+# The generator will:
+# 1. Read canonical request template from Linked Collection
+# 2. Apply oneOf selections (choose which variant to materialize)
+# 3. Fill leaf values from this catalog into the canonical structure
+# 4. No other structural manipulation allowed
+#
+# Key Principle: FLAT VALUES ONLY
+# - No nested objects (generator knows nesting from Linked Collection)
+# - Only leaf primitive values (strings, numbers, booleans)
+# - Arrays are okay (tags, documentIds list)
+#
+# Collections generated:
+# - Real World Use Cases (curated business scenarios)
+# - Getting Started (educational patterns)
+
+examples:
+  # ============================================================================
+  # REAL WORLD USE CASES - Business Scenario Examples
+  # ============================================================================
+
+  - name: Legal Firm - Court Notices
+    method: POST
+    path: /jobs/submit/single/doc
+    tags:
+      - real-world
+      - legal
+      - certified-mail
+    description: Law firm sends certified court appearance notices to clients with proof of delivery tracking
+    select:
+      docSourceAll: documentId
+      recipientAddressSource: singleAddress
+      paymentDetails: creditCard
+    values:
+      # Document source
+      documentId: 12345
+      # Recipient address (flat values - structure from Linked Collection)
+      firstName: John
+      lastName: Doe
+      address1: 123 Main Street
+      city: New York
+      state: NY
+      zip: "10001"
+      country: USA
+      # Job template
+      jobTemplate: legal_certified_mail
+      # Payment (flat values - creditCard structure from Linked Collection)
+      cardType: visa
+      cardNumber: "4111111111111111"
+      expirationMonth: 12
+      expirationYear: 2025
+      cvv: 123
+      # Tags
+      tags:
+        - legal
+        - certified
+        - client-correspondence
+
+  - name: Real Estate Agent - Property Marketing
+    method: POST
+    path: /jobs/submit/single/doc
+    tags:
+      - real-world
+      - real-estate
+      - bulk-marketing
+    description: Real estate agent sends property listings to address list with merge fields
+    select:
+      docSourceAll: documentId
+      recipientAddressSource: addressListId
+      paymentDetails: invoice
+    values:
+      documentId: 67890
+      addressListId: "LIST-2024-001"
+      jobTemplate: real_estate_marketing
+      customerAccountId: "ACCT-987654"
+      tags:
+        - real-estate
+        - marketing
+        - bulk-mail
+
+  - name: Medical Agency - Patient Reminders
+    method: POST
+    path: /jobs/submit/multi/doc/merge
+    tags:
+      - real-world
+      - medical
+      - document-merging
+    description: Medical office merges patient test results with consultation letters
+    select:
+      documentsToMerge: documentIds
+      recipientAddressSource: singleAddress
+      paymentDetails: ach
+    values:
+      documentIds:
+        - 11111
+        - 22222
+      firstName: Jane
+      lastName: Smith
+      address1: 456 Oak Avenue
+      city: Los Angeles
+      state: CA
+      zip: "90001"
+      country: USA
+      jobTemplate: medical_correspondence
+      accountType: checking
+      routingNumber: "123456789"
+      accountNumber: "9876543210"
+      tags:
+        - medical
+        - hipaa
+        - patient-correspondence
+
+  - name: Monthly Newsletters - Bulk Distribution
+    method: POST
+    path: /jobs/submit/single/doc
+    tags:
+      - real-world
+      - newsletter
+      - recurring
+    description: Organization sends monthly newsletter to subscriber list
+    select:
+      docSourceAll: url
+      recipientAddressSource: addressListId
+      paymentDetails: creditCard
+    values:
+      url: "https://storage.example.com/newsletters/march-2024.pdf"
+      addressListId: "SUBSCRIBERS-MARCH-2024"
+      jobTemplate: newsletter_monthly
+      cardType: mastercard
+      cardNumber: "5555555555554444"
+      expirationMonth: 6
+      expirationYear: 2026
+      cvv: 456
+      tags:
+        - newsletter
+        - recurring
+        - bulk-mail
+
+  - name: E-commerce Company - Product Catalog
+    method: POST
+    path: /jobs/submit/single/pdf/addressCapture
+    tags:
+      - real-world
+      - e-commerce
+      - address-capture
+    description: E-commerce company sends catalogs using addresses embedded in PDF
+    select:
+      docSourceAll: documentId
+      paymentDetails: creditCard
+    values:
+      documentId: 33333
+      cardType: americanExpress
+      cardNumber: "378282246310005"
+      expirationMonth: 9
+      expirationYear: 2027
+      cvv: 789
+      tags:
+        - e-commerce
+        - catalog
+        - address-capture
+
+  - name: Marketing Agency - Multi-Document Campaign
+    method: POST
+    path: /jobs/submit/multi/doc/merge
+    tags:
+      - real-world
+      - marketing
+      - multi-document
+    description: Marketing agency sends personalized multi-page campaign materials
+    select:
+      documentsToMerge: documentIds
+      recipientAddressSource: addressListId
+      paymentDetails: invoice
+    values:
+      documentIds:
+        - 44444
+        - 55555
+        - 66666
+      addressListId: "CAMPAIGN-Q1-2024"
+      customerAccountId: "ACCT-MARKETING-789"
+      tags:
+        - marketing
+        - campaign
+        - multi-document
+
+  - name: Reseller - Multi-ZIP Batch Processing
+    method: POST
+    path: /jobs/submit/multi/zip
+    tags:
+      - real-world
+      - reseller
+      - batch-processing
+    description: Mail service bureau processes multiple ZIP files with embedded addresses
+    select:
+      docSourceAll: zipDocumentIds
+      paymentDetails: ach
+    values:
+      zipDocumentIds:
+        - 77777
+        - 88888
+      accountType: business
+      routingNumber: "987654321"
+      accountNumber: "1234567890"
+      tags:
+        - reseller
+        - batch
+        - zip-processing
+
+  - name: Non-Profit - Fundraising Appeal
+    method: POST
+    path: /jobs/submit/single/doc
+    tags:
+      - real-world
+      - non-profit
+      - fundraising
+    description: Non-profit organization sends personalized donation appeal letters
+    select:
+      docSourceAll: requestId
+      recipientAddressSource: addressListId
+      paymentDetails: creditCard
+    values:
+      requestId: 99999
+      filename: fundraising-appeal-spring-2024.pdf
+      addressListId: "DONORS-SPRING-2024"
+      jobTemplate: non_profit_appeal
+      cardType: discover
+      cardNumber: "6011111111111117"
+      expirationMonth: 3
+      expirationYear: 2028
+      cvv: 321
+      tags:
+        - non-profit
+        - fundraising
+        - donor-appeal
+
+  # ============================================================================
+  # GETTING STARTED - Educational Pattern Examples (3 most frequent)
+  # ============================================================================
+
+  - name: Single Document to Single Recipient
+    method: POST
+    path: /jobs/submit/single/doc
+    tags:
+      - getting-started
+      - frequent
+      - basic
+    description: Send a personalized document to one recipient (most common use case)
+    select:
+      docSourceAll: documentId
+      recipientAddressSource: singleAddress
+      paymentDetails: creditCard
+    values:
+      documentId: 1001
+      firstName: Alice
+      lastName: Johnson
+      address1: 789 Pine Street
+      city: Chicago
+      state: IL
+      zip: "60601"
+      country: USA
+      jobTemplate: standard_letter
+      cardType: visa
+      cardNumber: "4111111111111111"
+      expirationMonth: 1
+      expirationYear: 2026
+      cvv: 111
+      tags:
+        - example
+        - basic
+
+  - name: Mail Merge to Address List
+    method: POST
+    path: /jobs/submit/single/doc
+    tags:
+      - getting-started
+      - frequent
+      - mail-merge
+    description: Send personalized document to multiple recipients with merge fields
+    select:
+      docSourceAll: documentId
+      recipientAddressSource: addressListId
+      paymentDetails: ach
+    values:
+      documentId: 1002
+      addressListId: "EXAMPLE-LIST-001"
+      jobTemplate: mail_merge_template
+      accountType: checking
+      routingNumber: "111000025"
+      accountNumber: "1234567890"
+      tags:
+        - example
+        - mail-merge
+
+  - name: Embedded Address Capture
+    method: POST
+    path: /jobs/submit/single/pdf/addressCapture
+    tags:
+      - getting-started
+      - frequent
+      - address-capture
+    description: Send documents where recipient addresses are embedded in the PDF
+    select:
+      docSourceAll: documentId
+      paymentDetails: invoice
+    values:
+      documentId: 1003
+      customerAccountId: "EXAMPLE-ACCT-001"
+      tags:
+        - example
+        - address-capture
