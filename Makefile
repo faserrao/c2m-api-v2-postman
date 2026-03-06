@@ -556,6 +556,9 @@ postman-instance-build-without-tests:
 	# NOTE: Test collection generated as dependency of postman-generate-getting-started-all
 	$(MAKE) postman-generate-use-case-collection
 	$(MAKE) postman-generate-getting-started-all
+	# Inject documentation links into all collections
+	$(MAKE) postman-inject-docs-link-all
+	# Upload collections with documentation links
 	$(MAKE) postman-upload-use-case-collection
 	$(MAKE) postman-upload-getting-started-all
 	# Upload test collection (required for mock server creation)
@@ -1436,12 +1439,14 @@ postman-generate-use-case-collection:
 	@$(VENV_PYTHON) scripts/active/generate_curated_collections_v4.py \
 		--config config/curated-examples-catalog.yaml \
 		--linked $(POSTMAN_LINKED_COLLECTION_FLAT) \
+		--openapi openapi/c2mapiv2-openapi-spec-base.yaml \
 		--output-dir $(POSTMAN_GENERATED_DIR) \
 		--tags real-world \
 		--output-name $(C2MAPIV2_POSTMAN_API_NAME_KC)-real-world-use-cases-collection
 	@$(VENV_PYTHON) scripts/active/generate_curated_collections_v4.py \
 		--config config/curated-examples-catalog.yaml \
 		--linked $(POSTMAN_LINKED_COLLECTION_FLAT) \
+		--openapi openapi/c2mapiv2-openapi-spec-base.yaml \
 		--output-dir $(POSTMAN_GENERATED_DIR) \
 		--tags getting-started \
 		--output-name $(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-curated-collection
@@ -1581,6 +1586,43 @@ postman-upload-getting-started-all: postman-upload-getting-started-collection po
 .PHONY: postman-upload-all-enhanced-collections
 postman-upload-all-enhanced-collections: postman-upload-enhanced-collection postman-upload-use-case-collection postman-upload-getting-started-all
 	@echo "✅ All enhanced collections uploaded successfully"
+
+# ========================================================================
+# DOCUMENTATION LINK INJECTION
+# ========================================================================
+# Documentation URL (can be overridden via environment variable)
+REDOC_DOCS_URL ?= https://click2mail.github.io/c2m-api-v2-postman-artifacts/
+
+# Inject documentation link into a single collection
+.PHONY: postman-inject-docs-link
+postman-inject-docs-link:
+	@if [ -z "$(COLLECTION_FILE)" ]; then \
+		echo "❌ Usage: make postman-inject-docs-link COLLECTION_FILE=path/to/collection.json"; \
+		exit 1; \
+	fi; \
+	if [ ! -f "$(COLLECTION_FILE)" ]; then \
+		echo "❌ Collection file not found: $(COLLECTION_FILE)"; \
+		exit 1; \
+	fi; \
+	node scripts/active/inject_documentation_link.js "$(COLLECTION_FILE)" "$(REDOC_DOCS_URL)"
+
+# Inject documentation link into all generated collections
+.PHONY: postman-inject-docs-link-all
+postman-inject-docs-link-all:
+	@echo "📝 Injecting documentation links into all collections..."
+	@for collection in \
+		"$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-linked-collection-flat.json" \
+		"$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-test-collection-flat.json" \
+		"$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-test-collection-enhanced.json" \
+		"$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-real-world-use-cases-collection.json" \
+		"$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-curated-collection.json" \
+		"$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-collection.json" \
+		"$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-with-examples-collection.json"; do \
+		if [ -f "$$collection" ]; then \
+			node scripts/active/inject_documentation_link.js "$$collection" "$(REDOC_DOCS_URL)" || true; \
+		fi; \
+	done; \
+	echo "✅ Documentation links injected into all collections"
 
 # ========================================================================
 # ENVIRONMENT CREATION
