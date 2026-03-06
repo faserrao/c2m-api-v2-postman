@@ -1432,10 +1432,10 @@ postman-extract-oneof-examples:
 		$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-test-collection-enhanced.json
 	@echo "✅ Enhanced test collection with all oneOf examples"
 
-# Generate curated use case collection
+# Generate curated use case collection (Real World Use Cases only)
 .PHONY: postman-generate-use-case-collection
 postman-generate-use-case-collection:
-	@echo "📚 Generating curated collections from YAML catalog (v4 - values only)..."
+	@echo "📚 Generating Real World Use Cases collection from YAML catalog (v4 - values only)..."
 	@$(VENV_PYTHON) scripts/active/generate_curated_collections_v4.py \
 		--config config/curated-examples-catalog.yaml \
 		--linked $(POSTMAN_LINKED_COLLECTION_FLAT) \
@@ -1443,14 +1443,7 @@ postman-generate-use-case-collection:
 		--output-dir $(POSTMAN_GENERATED_DIR) \
 		--tags real-world \
 		--output-name $(C2MAPIV2_POSTMAN_API_NAME_KC)-real-world-use-cases-collection
-	@$(VENV_PYTHON) scripts/active/generate_curated_collections_v4.py \
-		--config config/curated-examples-catalog.yaml \
-		--linked $(POSTMAN_LINKED_COLLECTION_FLAT) \
-		--openapi openapi/c2mapiv2-openapi-spec-base.yaml \
-		--output-dir $(POSTMAN_GENERATED_DIR) \
-		--tags getting-started \
-		--output-name $(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-curated-collection
-	@echo "✅ Curated collections generated (real-world + getting-started)"
+	@echo "✅ Real World Use Cases collection generated"
 
 # Upload enhanced test collection with all oneOf examples
 .PHONY: postman-upload-enhanced-collection
@@ -1480,21 +1473,16 @@ postman-upload-enhanced-collection:
 		echo "❌ Failed to update test collection: $$RESPONSE"; exit 1; \
 	fi
 
-# Upload curated use case collections (real-world + getting-started)
+# Upload Real World Use Cases collection only
+# NOTE: Getting Started collections uploaded by postman-upload-getting-started-all
 .PHONY: postman-upload-use-case-collection
 postman-upload-use-case-collection:
-	@echo "📤 Uploading curated use case collections..."
+	@echo "📤 Uploading Real World Use Cases collection..."
 	@REAL_WORLD_FILE="$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-real-world-use-cases-collection.json"; \
-	GETTING_STARTED_FILE="$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-curated-collection.json"; \
 	if [ ! -f "$$REAL_WORLD_FILE" ]; then \
 		echo "⚠️  Real World collection not found. Run postman-generate-use-case-collection first."; \
 		exit 1; \
 	fi; \
-	if [ ! -f "$$GETTING_STARTED_FILE" ]; then \
-		echo "⚠️  Getting Started curated collection not found. Run postman-generate-use-case-collection first."; \
-		exit 1; \
-	fi; \
-	echo "📤 Uploading Real World Use Cases collection..."; \
 	RW_UID=$$(jq -c '{collection: .}' "$$REAL_WORLD_FILE" | \
 		curl --silent --location --request POST "$(POSTMAN_COLLECTIONS_URL)?workspace=$(POSTMAN_WS)" \
 			$(POSTMAN_CURL_HEADERS_XC) \
@@ -1504,17 +1492,6 @@ postman-upload-use-case-collection:
 	else \
 		echo "✅ Real World collection uploaded with UID: $$RW_UID"; \
 		echo $$RW_UID > $(POSTMAN_GENERATED_DIR)/real-world-collection-uid.txt; \
-	fi; \
-	echo "📤 Uploading Getting Started curated collection..."; \
-	GS_UID=$$(jq -c '{collection: .}' "$$GETTING_STARTED_FILE" | \
-		curl --silent --location --request POST "$(POSTMAN_COLLECTIONS_URL)?workspace=$(POSTMAN_WS)" \
-			$(POSTMAN_CURL_HEADERS_XC) \
-			--data-binary @- | jq -r '.collection.uid'); \
-	if [ "$$GS_UID" = "null" ] || [ -z "$$GS_UID" ]; then \
-		echo "❌ Failed to upload Getting Started curated collection"; exit 1; \
-	else \
-		echo "✅ Getting Started curated collection uploaded with UID: $$GS_UID"; \
-		echo $$GS_UID > $(POSTMAN_GENERATED_DIR)/getting-started-curated-collection-uid.txt; \
 	fi
 
 # OLD Getting Started generators - DEPRECATED (keeping scripts for reference)
