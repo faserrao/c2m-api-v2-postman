@@ -1539,7 +1539,7 @@ postman-generate-getting-started-collection: postman-api-linked-collection-gener
 	@$(VENV_PYTHON) scripts/active/generate_curated_collections_v4.py \
 		--config config/curated-examples-catalog.yaml \
 		--linked $(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-linked-collection-flat.json \
-		--openapi $(OPENAPI_DIR)/$(C2MAPIV2_OPENAPI_SPEC_BASE_YAML) \
+		--openapi $(C2MAPIV2_OPENAPI_SPEC_BASE) \
 		--output-dir $(POSTMAN_GENERATED_DIR)/ \
 		--tags getting-started \
 		--mode placeholders \
@@ -1553,7 +1553,7 @@ postman-generate-getting-started-with-examples: postman-api-linked-collection-ge
 	@$(VENV_PYTHON) scripts/active/generate_curated_collections_v4.py \
 		--config config/curated-examples-catalog.yaml \
 		--linked $(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-linked-collection-flat.json \
-		--openapi $(OPENAPI_DIR)/$(C2MAPIV2_OPENAPI_SPEC_BASE_YAML) \
+		--openapi $(C2MAPIV2_OPENAPI_SPEC_BASE) \
 		--output-dir $(POSTMAN_GENERATED_DIR)/ \
 		--tags getting-started \
 		--mode examples \
@@ -1569,9 +1569,9 @@ postman-generate-getting-started-all: postman-generate-getting-started-collectio
 .PHONY: postman-upload-getting-started-collection
 postman-upload-getting-started-collection:
 	@echo "📤 Uploading Getting Started collection..."
-	@GETTING_STARTED_FILE="$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-collection.json"; \
+	@GETTING_STARTED_FILE="$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-curated-collection.json"; \
 	if [ ! -f "$$GETTING_STARTED_FILE" ]; then \
-		echo "⚠️  Getting Started collection not found. Run postman-generate-getting-started-collection first."; \
+		echo "⚠️  Getting Started collection not found. Run postman-generate-getting-started-curated first."; \
 		exit 1; \
 	fi; \
 	COLLECTION_UID=$$(jq -c '{collection: .}' "$$GETTING_STARTED_FILE" | \
@@ -1582,7 +1582,7 @@ postman-upload-getting-started-collection:
 		echo "❌ Failed to upload Getting Started collection"; exit 1; \
 	else \
 		echo "✅ Getting Started collection uploaded with UID: $$COLLECTION_UID"; \
-		echo $$COLLECTION_UID > $(POSTMAN_GENERATED_DIR)/getting-started-collection-uid.txt; \
+		echo $$COLLECTION_UID > $(POSTMAN_GENERATED_DIR)/getting-started-curated-collection-uid.txt; \
 	fi
 
 # Upload Getting Started collection with examples
