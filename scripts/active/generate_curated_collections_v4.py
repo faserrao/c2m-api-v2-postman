@@ -36,11 +36,11 @@ from pathlib import Path
 
 
 def load_yaml_catalog(catalog_path):
-    """Load YAML catalog with examples."""
+    """Load YAML catalog with examples and groups."""
     try:
         with open(catalog_path, 'r') as f:
             catalog = yaml.safe_load(f)
-        return catalog.get('examples', [])
+        return catalog.get('examples', []), catalog.get('groups', [])
     except FileNotFoundError:
         print(f"ERROR: Catalog file not found: {catalog_path}", file=sys.stderr)
         sys.exit(1)
@@ -586,12 +586,54 @@ def validate_field_patchability(template_body, values_dict, selections):
     return True, warnings
 
 
-def generate_collection(examples, linked_collection, openapi_spec, collection_name, tag_filter=None, mode='examples'):
+def categorize_getting_started_examples(filtered_examples, groups):
+    """
+    Categorize Getting Started examples into folders based on group field.
+
+    Args:
+        filtered_examples: List of examples from YAML
+        groups: List of group definitions from YAML with logical_name, display_name, order, description
+
+    Returns:
+        List of tuples: [(display_name, description, order, examples), ...]
+        Sorted by order for consistent folder structure
+    """
+    # Build mapping from logical_name to group definition
+    group_map = {g['logical_name']: g for g in groups}
+
+    # Build mapping from logical_name to examples list
+    categorized = {}
+    for example in filtered_examples:
+        group_name = example.get('group')
+        if group_name and group_name in group_map:
+            if group_name not in categorized:
+                categorized[group_name] = []
+            categorized[group_name].append(example)
+
+    # Convert to list of tuples with display info, sorted by order
+    result = []
+    for logical_name, examples in categorized.items():
+        group_def = group_map[logical_name]
+        result.append((
+            group_def['display_name'],
+            group_def.get('description', ''),
+            group_def.get('order', 999),
+            examples
+        ))
+
+    # Sort by order
+    result.sort(key=lambda x: x[2])
+
+    return result
+
+
+def generate_collection(examples, groups, linked_collection, openapi_spec, collection_name, tag_filter=None, mode='examples'):
     """
     Generate a Postman collection from filtered examples.
 
     Args:
         examples: List of example dictionaries from YAML
+        groups: List of group definitions from YAML (for hierarchical structure)
         linked_collection: Linked collection (canonical structure)
         openapi_spec: OpenAPI specification (for deep oneOf structures)
         collection_name: Name for generated collection
@@ -623,41 +665,102 @@ def generate_collection(examples, linked_collection, openapi_spec, collection_na
         "item": []
     }
 
-    # Process each example
-    validation_errors = []
-    validation_warnings = []
+    # Check if this is a Getting Started collection (hierarchical folders)
+    is_getting_started = tag_filter and 'getting-started' in tag_filter
 
-    for example in filtered_examples:
-        name = example.get('name')
-        method = example.get('method')
-        path = example.get('path')
+    if is_getting_started:
+        # Group examples by category (returns list of tuples sorted by order)
+        categories = categorize_getting_started_examples(filtered_examples, groups)
 
-        print(f"  Processing: {name}")
+        # Process each category as a folder
+        for display_name, description, order, category_examples in categories:
+            if not category_examples:
+                continue
 
-        # Validation 1: Endpoint exists
-        valid, msg = validate_endpoint_exists(linked_collection, method, path)
-        if not valid:
-            validation_errors.append(f"{name}: {msg}")
-            print(f"    ERROR: {msg}", file=sys.stderr)
-            continue
+            print(f"  Category: {display_name} ({len(category_examples)} examples)")
 
-        # Find canonical request
-        canonical_item, canonical_body = find_canonical_request(linked_collection, method, path)
+            # Create folder for this category with description
+            folder = {
+                "name": display_name,
+                "description": description,
+                "item": []
+            }
 
-        # Validation 2: Field patchability
-        selections = example.get('select', {})
-        values = example.get('values', {})
-        valid, warnings = validate_field_patchability(canonical_body, values, selections)
-        if warnings:
-            for warning in warnings:
-                validation_warnings.append(f"{name}: {warning}")
-                print(f"    WARNING: {warning}", file=sys.stderr)
+            # Process examples in this category
+            validation_errors = []
+            validation_warnings = []
 
-        # Materialize request body (clone → select → overlay → filter → placeholders → serialize)
-        request_item = materialize_request_body(canonical_item, example, openapi_spec, mode)
+            for example in category_examples:
+                name = example.get('name')
+                method = example.get('method')
+                path = example.get('path')
 
-        # Add to collection
-        collection['item'].append(request_item)
+                print(f"    Processing: {name}")
+
+                # Validation 1: Endpoint exists
+                valid, msg = validate_endpoint_exists(linked_collection, method, path)
+                if not valid:
+                    validation_errors.append(f"{name}: {msg}")
+                    print(f"      ERROR: {msg}", file=sys.stderr)
+                    continue
+
+                # Find canonical request
+                canonical_item, canonical_body = find_canonical_request(linked_collection, method, path)
+
+                # Validation 2: Field patchability
+                selections = example.get('select', {})
+                values = example.get('values', {})
+                valid, warnings = validate_field_patchability(canonical_body, values, selections)
+                if warnings:
+                    for warning in warnings:
+                        validation_warnings.append(f"{name}: {warning}")
+                        print(f"      WARNING: {warning}", file=sys.stderr)
+
+                # Materialize request body
+                request_item = materialize_request_body(canonical_item, example, openapi_spec, mode)
+
+                # Add to folder
+                folder['item'].append(request_item)
+
+            # Add folder to collection
+            collection['item'].append(folder)
+
+    else:
+        # Flat structure for other collections (e.g., Real World)
+        validation_errors = []
+        validation_warnings = []
+
+        for example in filtered_examples:
+            name = example.get('name')
+            method = example.get('method')
+            path = example.get('path')
+
+            print(f"  Processing: {name}")
+
+            # Validation 1: Endpoint exists
+            valid, msg = validate_endpoint_exists(linked_collection, method, path)
+            if not valid:
+                validation_errors.append(f"{name}: {msg}")
+                print(f"    ERROR: {msg}", file=sys.stderr)
+                continue
+
+            # Find canonical request
+            canonical_item, canonical_body = find_canonical_request(linked_collection, method, path)
+
+            # Validation 2: Field patchability
+            selections = example.get('select', {})
+            values = example.get('values', {})
+            valid, warnings = validate_field_patchability(canonical_body, values, selections)
+            if warnings:
+                for warning in warnings:
+                    validation_warnings.append(f"{name}: {warning}")
+                    print(f"    WARNING: {warning}", file=sys.stderr)
+
+            # Materialize request body (clone → select → overlay → filter → placeholders → serialize)
+            request_item = materialize_request_body(canonical_item, example, openapi_spec, mode)
+
+            # Add to collection
+            collection['item'].append(request_item)
 
     # Report validation results
     print(f"\nValidation Results for '{collection_name}':")
@@ -722,8 +825,8 @@ def main():
 
     # Load catalog, linked collection, and OpenAPI spec
     print(f"Loading YAML catalog: {args.config}")
-    examples = load_yaml_catalog(args.config)
-    print(f"  Loaded {len(examples)} examples")
+    examples, groups = load_yaml_catalog(args.config)
+    print(f"  Loaded {len(examples)} examples, {len(groups)} groups")
 
     print(f"\nLoading Linked Collection: {args.linked}")
     linked_collection = load_linked_collection(args.linked)
@@ -743,7 +846,7 @@ def main():
         output_name = args.output_name or "c2mapiv2-all-examples-collection"
 
     print(f"\nGenerating collection: {collection_name} (mode={args.mode})")
-    collection = generate_collection(examples, linked_collection, openapi_spec, collection_name, tag_filter, args.mode)
+    collection = generate_collection(examples, groups, linked_collection, openapi_spec, collection_name, tag_filter, args.mode)
 
     # Write output
     output_dir = Path(args.output_dir)

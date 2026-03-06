@@ -17,7 +17,27 @@
 #
 # Collections generated:
 # - Real World Use Cases (curated business scenarios)
-# - Getting Started (educational patterns)
+# - Getting Started (educational patterns with hierarchical folders)
+#
+# NEW: Groups support for hierarchical folder structure in Postman
+# Groups are used only for collections with 'getting-started' tag
+# Each group becomes a Postman folder with display_name and order
+
+groups:
+  - logical_name: most-frequently-used
+    display_name: Most Frequently Used
+    order: 1
+    description: The three most common API usage patterns
+
+  - logical_name: bulk-operations
+    display_name: Bulk Operations
+    order: 2
+    description: Processing multiple documents or recipients
+
+  - logical_name: advanced-patterns
+    display_name: Advanced Patterns
+    order: 3
+    description: Specialized use cases and advanced features
 
 examples:
   # ============================================================================
@@ -239,12 +259,17 @@ examples:
         - donor-appeal
 
   # ============================================================================
-  # GETTING STARTED - Educational Pattern Examples (3 most frequent)
+  # GETTING STARTED - Educational Pattern Examples
+  # ============================================================================
+
+  # ============================================================================
+  # MOST FREQUENT
   # ============================================================================
 
   - name: Single Document to Single Recipient
     method: POST
     path: /jobs/submit/single/doc
+    group: most-frequently-used
     tags:
       - getting-started
       - frequent
@@ -276,6 +301,7 @@ examples:
   - name: Mail Merge to Address List
     method: POST
     path: /jobs/submit/single/doc
+    group: most-frequently-used
     tags:
       - getting-started
       - frequent
@@ -299,6 +325,7 @@ examples:
   - name: Embedded Address Capture
     method: POST
     path: /jobs/submit/single/pdf/addressCapture
+    group: most-frequently-used
     tags:
       - getting-started
       - frequent
@@ -321,6 +348,7 @@ examples:
   - name: Split PDF with Address Capture
     method: POST
     path: /jobs/submit/single/pdf/split/addressCapture
+    group: bulk-operations
     tags:
       - getting-started
       - bulk
@@ -343,6 +371,7 @@ examples:
   - name: Split PDF with Specified Addresses
     method: POST
     path: /jobs/submit/single/pdf/split
+    group: bulk-operations
     tags:
       - getting-started
       - bulk
@@ -365,6 +394,7 @@ examples:
   - name: Multiple Documents from ZIP with Address Capture
     method: POST
     path: /jobs/submit/multi/zip/addressCapture
+    group: bulk-operations
     tags:
       - getting-started
       - bulk
@@ -388,6 +418,7 @@ examples:
   - name: Merge Multiple Documents
     method: POST
     path: /jobs/submit/multi/doc/merge
+    group: advanced-patterns
     tags:
       - getting-started
       - advanced
@@ -421,6 +452,7 @@ examples:
   - name: Using jobOptions Instead of Template
     method: POST
     path: /jobs/submit/single/doc
+    group: advanced-patterns
     tags:
       - getting-started
       - advanced
@@ -455,6 +487,7 @@ examples:
   - name: Using Document URL Instead of Upload
     method: POST
     path: /jobs/submit/single/doc
+    group: advanced-patterns
     tags:
       - getting-started
       - advanced
@@ -478,6 +511,7 @@ examples:
   - name: Adding Tags for Organization
     method: POST
     path: /jobs/submit/single/doc
+    group: advanced-patterns
     tags:
       - getting-started
       - advanced
@@ -506,6 +540,7 @@ examples:
   - name: Naming an Address List for Reuse
     method: POST
     path: /jobs/submit/single/doc
+    group: advanced-patterns
     tags:
       - getting-started
       - advanced
@@ -539,6 +574,7 @@ examples:
   - name: Specifying Payment Method
     method: POST
     path: /jobs/submit/single/doc
+    group: advanced-patterns
     tags:
       - getting-started
       - advanced
@@ -568,6 +604,7 @@ examples:
   - name: Multiple Documents from ZIP - Specify Addresses
     method: POST
     path: /jobs/submit/multi/zip
+    group: advanced-patterns
     tags:
       - getting-started
       - advanced
@@ -588,7 +625,8 @@ examples:
 
   - name: Multiple Separate Documents
     method: POST
-    path: /jobs/submit/multi/docs
+    path: /jobs/submit/multi/doc
+    group: advanced-patterns
     tags:
       - getting-started
       - advanced
@@ -616,6 +654,7 @@ examples:
   - name: Using Stored documentId
     method: POST
     path: /jobs/submit/single/doc
+    group: advanced-patterns
     tags:
       - getting-started
       - advanced
@@ -647,6 +686,7 @@ examples:
   - name: Using Saved addressListId
     method: POST
     path: /jobs/submit/single/doc
+    group: advanced-patterns
     tags:
       - getting-started
       - advanced
