@@ -254,6 +254,7 @@ submitSingleDocParams =
     + [ jobOptions ]
     + [ tags ] ;
 
+
 (* ------------------------------------------------------------------------- *)
 (* Endpoint: POST /jobs/submit/single/pdf/addressCapture                               *)
 (* ------------------------------------------------------------------------- *)
@@ -586,7 +587,6 @@ jobTemplate = string ;
 
 returnAddress =
       firstName + lastName
-    + [ company ]
     + address1
     + city + state + zip + country
     + [ address2 ] + [ address3 ] ;
@@ -640,28 +640,14 @@ address =
     + [ foo1 ] + [ foo2 ] ;
 
 recipientAddressSource =
-      recipientAddressBySingle
-    | recipientAddressByList
-    | recipientAddressByAddressId
-    | recipientAddressByListId ;
-
-recipientAddressBySingle =
-    [ mappingId ] + singleAddress + [ addressName ] ;
-
-recipientAddressByList =
-    [ mappingId ] + addressList + [ addressListName ] ;
-
-recipientAddressByListId =
-    addressListId ;
-
-recipientAddressByAddressId =
-    addressId ;
+      ([ mappingId ] + singleAddress + [ addressName ])
+    | ([ mappingId ] + addressList  + [ addressListName ])
+    | addressListId ;
 
 mappingId = id ;
 addressName = string ;
 addressListName = string ;
 addressListId = id ;
-addressId = id ;
 
 singleAddress = address ;
 addressList   = { address } ;

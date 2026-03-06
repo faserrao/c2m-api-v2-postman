@@ -1517,25 +1517,53 @@ postman-upload-use-case-collection:
 		echo $$GS_UID > $(POSTMAN_GENERATED_DIR)/getting-started-curated-collection-uid.txt; \
 	fi
 
-# Generate Getting Started collection (educational/onboarding)
-# NOTE: This generates from the linked collection (ensures correct field names from EBNF)
+# OLD Getting Started generators - DEPRECATED (keeping scripts for reference)
+# NOTE: Now using YAML-based v4 generator for Getting Started collections
+# .PHONY: postman-generate-getting-started-collection
+# postman-generate-getting-started-collection: postman-api-linked-collection-generate
+# 	@echo "📚 Generating Getting Started collection from linked collection..."
+# 	@$(VENV_PYTHON) scripts/active/generate_getting_started_from_linked.py
+# 	@echo "✅ Getting Started collection generated (correct field names from EBNF)"
+#
+# .PHONY: postman-generate-getting-started-with-examples
+# postman-generate-getting-started-with-examples: postman-test-collection-add-examples
+# 	@echo "📚 Generating Getting Started collection from test collection (with success examples only)..."
+# 	@$(VENV_PYTHON) scripts/active/generate_getting_started_with_examples_from_test.py
+# 	@echo "✅ Getting Started collection (with examples) generated from test collection"
+
+# NEW Getting Started generators - YAML-based v4 (Phase 1 implementation)
+# Generates Getting Started collection with placeholders (shows structure)
 .PHONY: postman-generate-getting-started-collection
 postman-generate-getting-started-collection: postman-api-linked-collection-generate
-	@echo "📚 Generating Getting Started collection from linked collection..."
-	@$(VENV_PYTHON) scripts/active/generate_getting_started_from_linked.py
-	@echo "✅ Getting Started collection generated (correct field names from EBNF)"
+	@echo "📚 Generating Getting Started collection (placeholders) from YAML catalog..."
+	@$(VENV_PYTHON) scripts/active/generate_curated_collections_v4.py \
+		--config config/curated-examples-catalog.yaml \
+		--linked $(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-linked-collection-flat.json \
+		--openapi $(OPENAPI_DIR)/$(C2MAPIV2_OPENAPI_SPEC_BASE_YAML) \
+		--output-dir $(POSTMAN_GENERATED_DIR)/ \
+		--tags getting-started \
+		--mode placeholders \
+		--output-name $(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-collection
+	@echo "✅ Getting Started collection (placeholders) generated"
 
-# Generate Getting Started collection with realistic test data from test collection
+# Generates Getting Started collection with examples (shows only YAML fields with values)
 .PHONY: postman-generate-getting-started-with-examples
-postman-generate-getting-started-with-examples: postman-test-collection-add-examples
-	@echo "📚 Generating Getting Started collection from test collection (with success examples only)..."
-	@$(VENV_PYTHON) scripts/active/generate_getting_started_with_examples_from_test.py
-	@echo "✅ Getting Started collection (with examples) generated from test collection"
+postman-generate-getting-started-with-examples: postman-api-linked-collection-generate
+	@echo "📚 Generating Getting Started collection (with examples) from YAML catalog..."
+	@$(VENV_PYTHON) scripts/active/generate_curated_collections_v4.py \
+		--config config/curated-examples-catalog.yaml \
+		--linked $(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-linked-collection-flat.json \
+		--openapi $(OPENAPI_DIR)/$(C2MAPIV2_OPENAPI_SPEC_BASE_YAML) \
+		--output-dir $(POSTMAN_GENERATED_DIR)/ \
+		--tags getting-started \
+		--mode examples \
+		--output-name $(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-with-examples-collection
+	@echo "✅ Getting Started collection (with examples) generated"
 
 # Generate both Getting Started collections
 .PHONY: postman-generate-getting-started-all
 postman-generate-getting-started-all: postman-generate-getting-started-collection postman-generate-getting-started-with-examples
-	@echo "✅ Both Getting Started collections generated"
+	@echo "✅ Both Getting Started collections generated (YAML-based v4)"
 
 # Upload Getting Started collection
 .PHONY: postman-upload-getting-started-collection

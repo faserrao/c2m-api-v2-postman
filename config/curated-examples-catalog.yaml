@@ -313,3 +313,356 @@ examples:
       tags:
         - example
         - address-capture
+
+  # ============================================================================
+  # BULK OPERATIONS - Processing Multiple Items (3 patterns)
+  # ============================================================================
+
+  - name: Split PDF with Address Capture
+    method: POST
+    path: /jobs/submit/single/pdf/split/addressCapture
+    tags:
+      - getting-started
+      - bulk
+      - split-pdf
+    description: Split a multi-page PDF where each page has embedded recipient address
+    select:
+      docSourceAll: documentId
+      paymentDetails: creditCard
+    values:
+      documentId: 2001
+      cardType: mastercard
+      cardNumber: "5555555555554444"
+      expirationMonth: 6
+      expirationYear: 2027
+      cvv: 222
+      tags:
+        - bulk
+        - split-pdf
+
+  - name: Split PDF with Specified Addresses
+    method: POST
+    path: /jobs/submit/single/pdf/split
+    tags:
+      - getting-started
+      - bulk
+      - split-pdf
+    description: Split a multi-page PDF and specify recipient addresses separately
+    select:
+      docSourceAll: documentId
+      recipientAddressSource: addressListId
+      paymentDetails: ach
+    values:
+      documentId: 2002
+      addressListId: "BULK-LIST-001"
+      accountType: savings
+      routingNumber: "222222226"
+      accountNumber: "9876543210"
+      tags:
+        - bulk
+        - split-pdf
+
+  - name: Multiple Documents from ZIP with Address Capture
+    method: POST
+    path: /jobs/submit/multi/zip/addressCapture
+    tags:
+      - getting-started
+      - bulk
+      - zip-processing
+    description: Process multiple documents from ZIP file with embedded addresses
+    select:
+      docSourceAll: zipDocumentId
+      paymentDetails: invoice
+    values:
+      zipDocumentId: 2003
+      filename: bulk_documents.zip
+      customerAccountId: "BULK-ACCT-001"
+      tags:
+        - bulk
+        - zip
+
+  # ============================================================================
+  # ADVANCED PATTERNS - Specialized Use Cases (10 patterns)
+  # ============================================================================
+
+  - name: Merge Multiple Documents
+    method: POST
+    path: /jobs/submit/multi/doc/merge
+    tags:
+      - getting-started
+      - advanced
+      - merge
+    description: Merge multiple separate documents into one mailing per recipient
+    select:
+      documentsToMerge: documentIds
+      recipientAddressSource: singleAddress
+      paymentDetails: creditCard
+    values:
+      documentIds:
+        - 3001
+        - 3002
+        - 3003
+      firstName: Bob
+      lastName: Smith
+      address1: 456 Oak Avenue
+      city: Seattle
+      state: WA
+      zip: "98101"
+      country: USA
+      cardType: visa
+      cardNumber: "4111111111111111"
+      expirationMonth: 12
+      expirationYear: 2026
+      cvv: 333
+      tags:
+        - advanced
+        - merge
+
+  - name: Using jobOptions Instead of Template
+    method: POST
+    path: /jobs/submit/single/doc
+    tags:
+      - getting-started
+      - advanced
+      - job-options
+    description: Specify mailing options directly without using a saved template
+    select:
+      docSourceAll: documentId
+      recipientAddressSource: singleAddress
+      paymentDetails: creditCard
+    values:
+      documentId: 3004
+      firstName: Carol
+      lastName: White
+      address1: 789 Elm Street
+      city: Boston
+      state: MA
+      zip: "02101"
+      country: USA
+      mailClass: firstClass
+      color: fullColor
+      paperType: glossy
+      envelopeType: windowed
+      cardType: mastercard
+      cardNumber: "5555555555554444"
+      expirationMonth: 3
+      expirationYear: 2028
+      cvv: 444
+      tags:
+        - advanced
+        - job-options
+
+  - name: Using Document URL Instead of Upload
+    method: POST
+    path: /jobs/submit/single/doc
+    tags:
+      - getting-started
+      - advanced
+      - url-source
+    description: Provide document via URL instead of uploading file
+    select:
+      docSourceAll: url
+      recipientAddressSource: addressListId
+      paymentDetails: ach
+    values:
+      url: "https://example.com/documents/newsletter.pdf"
+      addressListId: "URL-LIST-001"
+      jobTemplate: standard_letter
+      accountType: checking
+      routingNumber: "333333338"
+      accountNumber: "5555555555"
+      tags:
+        - advanced
+        - url
+
+  - name: Adding Tags for Organization
+    method: POST
+    path: /jobs/submit/single/doc
+    tags:
+      - getting-started
+      - advanced
+      - tags
+    description: Add custom tags to organize and track your mailings
+    select:
+      docSourceAll: documentId
+      recipientAddressSource: singleAddress
+      paymentDetails: invoice
+    values:
+      documentId: 3005
+      firstName: David
+      lastName: Brown
+      address1: 321 Maple Drive
+      city: Denver
+      state: CO
+      zip: "80201"
+      country: USA
+      jobTemplate: marketing_postcard
+      customerAccountId: "TAG-ACCT-001"
+      tags:
+        - campaign-q1
+        - region-west
+        - priority-high
+
+  - name: Naming an Address List for Reuse
+    method: POST
+    path: /jobs/submit/single/doc
+    tags:
+      - getting-started
+      - advanced
+      - address-naming
+    description: Give your address list a name so you can reuse it later
+    select:
+      docSourceAll: documentId
+      recipientAddressSource: addressList
+      paymentDetails: creditCard
+    values:
+      documentId: 3006
+      mappingId: "REUSABLE-LIST-Q1-2024"
+      addressListName: "Q1 2024 Marketing Campaign"
+      addressList:
+        - firstName: Emma
+          lastName: Davis
+          address1: 654 Birch Lane
+          city: Miami
+          state: FL
+          zip: "33101"
+          country: USA
+      cardType: americanExpress
+      cardNumber: "378282246310005"
+      expirationMonth: 9
+      expirationYear: 2027
+      cvv: 555
+      tags:
+        - advanced
+        - list-naming
+
+  - name: Specifying Payment Method
+    method: POST
+    path: /jobs/submit/single/doc
+    tags:
+      - getting-started
+      - advanced
+      - payment
+    description: Choose between credit card, ACH, or invoice billing
+    select:
+      docSourceAll: documentId
+      recipientAddressSource: singleAddress
+      paymentDetails: ach
+    values:
+      documentId: 3007
+      firstName: Frank
+      lastName: Miller
+      address1: 987 Cedar Court
+      city: Portland
+      state: OR
+      zip: "97201"
+      country: USA
+      jobTemplate: invoice_statement
+      accountType: business
+      routingNumber: "444444440"
+      accountNumber: "7777777777"
+      tags:
+        - advanced
+        - ach-payment
+
+  - name: Multiple Documents from ZIP - Specify Addresses
+    method: POST
+    path: /jobs/submit/multi/zip
+    tags:
+      - getting-started
+      - advanced
+      - zip-with-addresses
+    description: Process ZIP with multiple documents and provide addresses separately
+    select:
+      docSourceAll: zipDocumentId
+      recipientAddressSource: addressListId
+      paymentDetails: invoice
+    values:
+      zipDocumentId: 3008
+      filename: multi_docs.zip
+      addressListId: "ZIP-ADDRESS-LIST-001"
+      customerAccountId: "ZIP-ACCT-001"
+      tags:
+        - advanced
+        - zip
+
+  - name: Multiple Separate Documents
+    method: POST
+    path: /jobs/submit/multi/docs
+    tags:
+      - getting-started
+      - advanced
+      - multi-docs
+    description: Send multiple different documents (not merged, each goes separately)
+    select:
+      docSourceAll: documentIds
+      recipientAddressSource: addressListId
+      paymentDetails: creditCard
+    values:
+      documentIds:
+        - 3009
+        - 3010
+      addressListId: "MULTI-DOC-LIST-001"
+      jobTemplate: standard_letter
+      cardType: visa
+      cardNumber: "4111111111111111"
+      expirationMonth: 5
+      expirationYear: 2027
+      cvv: 666
+      tags:
+        - advanced
+        - multiple-docs
+
+  - name: Using Stored documentId
+    method: POST
+    path: /jobs/submit/single/doc
+    tags:
+      - getting-started
+      - advanced
+      - stored-document
+    description: Reference a previously uploaded document by its ID
+    select:
+      docSourceAll: documentId
+      recipientAddressSource: singleAddress
+      paymentDetails: creditCard
+    values:
+      documentId: 99999
+      firstName: Grace
+      lastName: Taylor
+      address1: 135 Willow Way
+      city: Austin
+      state: TX
+      zip: "73301"
+      country: USA
+      jobTemplate: stored_template
+      cardType: discover
+      cardNumber: "6011111111111117"
+      expirationMonth: 8
+      expirationYear: 2028
+      cvv: 777
+      tags:
+        - advanced
+        - stored-id
+
+  - name: Using Saved addressListId
+    method: POST
+    path: /jobs/submit/single/doc
+    tags:
+      - getting-started
+      - advanced
+      - saved-list
+    description: Reference a previously saved address list by its ID
+    select:
+      docSourceAll: documentId
+      recipientAddressSource: addressListId
+      paymentDetails: ach
+    values:
+      documentId: 3011
+      addressListId: "SAVED-LIST-12345"
+      jobTemplate: bulk_mailing
+      accountType: checking
+      routingNumber: "555555552"
+      accountNumber: "8888888888"
+      tags:
+        - advanced
+        - saved-list

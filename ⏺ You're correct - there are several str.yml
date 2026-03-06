@@ -1,0 +1,84 @@
+⏺ You're correct - there are several structural issues in the Getting Started collection. Here's my analysis:
+
+  Critical Issues Found
+
+  1. Wrong Field Names Throughout (Highest Priority)
+
+  The collection uses documentSource (old field name) instead of docSourceAll (current EBNF).
+
+  Affected Requests:
+  - Single recipient
+  - Mail merge
+  - Address capture
+  - Split PDF
+  - Merge docs
+  - Using options
+  - Using URL
+  - Setting tags
+  - Payment option
+  - All multi-doc/multi-zip requests
+
+  Root Cause: generate_getting_started_collection.py has hardcoded body templates from before EBNF finalization (lines
+  32, 53, 88, etc.). These were never updated when the field was renamed to docSourceAll.
+
+  2. Missing Required Fields (Breaks API Contract)
+
+  Mail merge requests MISSING documentSource:
+  - Request #2: "mail merge" - Has addressList but NO document
+  - Request #11: "naming addressList" - Has addressList but NO document
+
+  EBNF requires: docSourceAll + recipientAddressSource (both required for /jobs/submit/single/doc)
+
+  3. Inconsistent Structure (Data Quality Issue)
+
+  Request #6: "/jobs/submit/single/pdf/split"
+  - First job: recipientAddressSource WITHOUT singleAddress wrapper (bare fields)
+  - Second/third jobs: recipientAddressSource WITH singleAddress wrapper (correct)
+
+  Should be:
+  "recipientAddressSource": {
+    "singleAddress": {  // ← Missing in first job
+      "firstName": "<String>",
+      ...
+    }
+  }
+
+  4. Incomplete Payment Example (Misleading)
+
+  Request #12: "payment option"
+  "paymentDetails": {
+    "paymentType": "<String>"  // ← Only shows type, not complete structure
+  }
+
+  Should show complete payment structure:
+  "paymentDetails": {
+    "creditCard": {
+      "cardType": "<String>",
+      "cardNumber": "<String>",
+      "expirationMonth": "<Integer>",
+      "expirationYear": "<Integer>",
+      "cvv": "<Integer>"
+    }
+  }
+
+  5. Path Typos
+
+  - Request #1: /jobs/submit//single/doc (double slash)
+  - Request #12: /jobs/submit//single/doc (double slash)
+
+  Summary Statistics
+
+  - Total requests examined: 18
+  - Requests with wrong field names: 13 (all using documentSource)
+  - Requests with missing required fields: 2 (mail merge patterns)
+  - Requests with structural inconsistencies: 1 (split PDF first job)
+  - Requests with incomplete examples: 1 (payment details)
+  - Requests with path typos: 2 (double slashes)
+
+  Recommendation
+
+  This aligns with the Feb 11-12 investigation that discovered Getting Started collections use hardcoded outdated
+  structures. The proposed fix from that session (generate Getting Started FROM linked collection) would resolve ALL
+  these issues automatically by reading the correct structure from the EBNF-generated linked collection.
+
+  Would you like me to implement that fix now?
