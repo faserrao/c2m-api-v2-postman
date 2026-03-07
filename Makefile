@@ -1537,30 +1537,17 @@ postman-generate-getting-started-with-examples: postman-api-linked-collection-ge
 		--output-name $(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-with-examples-collection
 	@echo "✅ Getting Started collection (with examples) generated"
 
-# Generate both Getting Started collections
+# Generate Getting Started collection (examples only)
 .PHONY: postman-generate-getting-started-all
-postman-generate-getting-started-all: postman-generate-getting-started-collection postman-generate-getting-started-with-examples
-	@echo "✅ Both Getting Started collections generated (YAML-based v4)"
+postman-generate-getting-started-all: postman-generate-getting-started-with-examples
+	@echo "✅ Getting Started collection generated (with examples, YAML-based v4)"
 
-# Upload Getting Started collection
+# Upload Getting Started collection (placeholder version - REMOVED)
+# Note: Placeholders collection no longer generated or uploaded (user decision 2026-03-07)
+# Only the "with examples" collection is now created and uploaded
 .PHONY: postman-upload-getting-started-collection
 postman-upload-getting-started-collection:
-	@echo "📤 Uploading Getting Started collection..."
-	@GETTING_STARTED_FILE="$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-collection.json"; \
-	if [ ! -f "$$GETTING_STARTED_FILE" ]; then \
-		echo "⚠️  Getting Started collection not found. Run postman-generate-getting-started-collection first."; \
-		exit 1; \
-	fi; \
-	COLLECTION_UID=$$(jq -c '{collection: .}' "$$GETTING_STARTED_FILE" | \
-		curl --silent --location --request POST "$(POSTMAN_COLLECTIONS_URL)?workspace=$(POSTMAN_WS)" \
-			$(POSTMAN_CURL_HEADERS_XC) \
-			--data-binary @- | jq -r '.collection.uid'); \
-	if [ "$$COLLECTION_UID" = "null" ] || [ -z "$$COLLECTION_UID" ]; then \
-		echo "❌ Failed to upload Getting Started collection"; exit 1; \
-	else \
-		echo "✅ Getting Started collection uploaded with UID: $$COLLECTION_UID"; \
-		echo $$COLLECTION_UID > $(POSTMAN_GENERATED_DIR)/getting-started-collection-uid.txt; \
-	fi
+	@echo "⚠️  Note: Placeholders collection no longer uploaded. Use postman-upload-getting-started-with-examples instead."
 
 # Upload Getting Started collection with examples
 .PHONY: postman-upload-getting-started-with-examples
@@ -1582,10 +1569,10 @@ postman-upload-getting-started-with-examples:
 		echo $$COLLECTION_UID > $(POSTMAN_GENERATED_DIR)/getting-started-with-examples-collection-uid.txt; \
 	fi
 
-# Upload both Getting Started collections
+# Upload Getting Started collection (examples only)
 .PHONY: postman-upload-getting-started-all
-postman-upload-getting-started-all: postman-upload-getting-started-collection postman-upload-getting-started-with-examples
-	@echo "✅ Both Getting Started collections uploaded successfully"
+postman-upload-getting-started-all: postman-upload-getting-started-with-examples
+	@echo "✅ Getting Started collection uploaded successfully (with examples)"
 
 # Upload all enhanced collections (enhanced test, use case, and getting started)
 .PHONY: postman-upload-all-enhanced-collections
