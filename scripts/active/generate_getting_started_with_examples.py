@@ -379,7 +379,7 @@ def generate_getting_started_with_examples(patterns: List[Dict[str, Any]]) -> Di
     """
     collection = {
         "info": {
-            "name": "C2M API v2 - Getting Started (With Examples)",
+            "name": "C2M API v2 - Getting Started - With Examples",
             "description": "Educational collection showing common API usage patterns with realistic test data.\n\n"
                           "**Categories:**\n"
                           "- **Most Frequently Used**: Essential calls every user needs\n"

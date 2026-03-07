@@ -459,7 +459,7 @@ def generate_getting_started_collection() -> Dict[str, Any]:
     """
     collection = {
         "info": {
-            "name": "C2M API v2 - Getting Started",
+            "name": "C2M API v2 - Getting Started - With Placeholders",
             "description": "Educational collection showing common API usage patterns organized by frequency.\n\n"
                           "**Categories:**\n"
                           "- **Most Frequently Used**: Essential calls every user needs\n"
