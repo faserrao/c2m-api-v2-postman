@@ -1,0 +1,176 @@
+# Blank Collection Template
+# Copy this file to create new collection templates
+#
+# This template defines the structure for generating custom Postman collections.
+# Edit the sections below to customize your collection.
+#
+# Schema References:
+# - OpenAPI Spec: openapi/c2mapiv2-openapi-spec-base.yaml
+#   Provides: Field types, oneOf variants, validation rules
+# - Linked Collection: postman/generated/c2mapiv2-linked-collection-flat.json
+#   Provides: Canonical request structures with all possible fields
+#
+# Two collections will be generated from this template:
+# 1. Linked Collection (placeholders like <String>) - for documentation
+# 2. Test Collection (realistic values) - for actual testing
+
+collection:
+  name: "YOUR COLLECTION NAME HERE"
+  description: "Description of your collection purpose and use cases"
+  version: "1.0.0"
+
+schema_references:
+  openapi_spec: openapi/c2mapiv2-openapi-spec-base.yaml
+  linked_collection: postman/generated/c2mapiv2-linked-collection-flat.json
+  note: "OpenAPI spec provides types, oneOf variants, and validation. Linked collection provides canonical request structures."
+
+# Groups define the folder hierarchy in Postman
+# Each group becomes a folder with display_name and order
+groups:
+  - logical_name: group-one
+    display_name: "Group One"
+    order: 1
+    description: "Description for first group/folder"
+
+  - logical_name: group-two
+    display_name: "Group Two"
+    order: 2
+    description: "Description for second group/folder"
+
+# Examples define the actual API requests in your collection
+# Each example will be generated with both placeholders (linked) and realistic values (test)
+examples:
+  # Example 1: Single document submission with single address
+  - name: "Example Request Name"
+    method: POST
+    path: /jobs/submit/single/doc
+    group: group-one
+    tags:
+      - your-tag-1
+      - your-tag-2
+    description: "Description of what this request demonstrates"
+
+    # Select which oneOf variants to use
+    # Available oneOf fields: docSourceAll, documentSource, recipientAddressSource, paymentDetails, documentsToMerge
+    # Check OpenAPI spec for available variants
+    select:
+      documentSource: requestId               # OPTIONS: documentId, requestId, url
+      recipientAddressSource: singleAddress    # OPTIONS: singleAddress, addressList, addressListId, addressListName
+      paymentDetails: creditCard              # OPTIONS: creditCard, ach, invoice
+
+    # Values define the fields to include in the request body
+    # Use placeholders (<String>, <Integer>) - generator will create realistic values for test collection
+    # Check OpenAPI spec for available fields
+    values:
+      jobTemplate: <String>
+      requestId: <Integer>
+      firstName: <String>
+      lastName: <String>
+      address1: <String>
+      city: <String>
+      state: <String>
+      zip: <String>
+      country: <String>
+      cardType: <String>
+      cardNumber: <String>
+      expirationMonth: <Integer>
+      expirationYear: <Integer>
+      cvv: <Integer>
+
+  # Example 2: Mail merge pattern
+  - name: "Mail Merge Example"
+    method: POST
+    path: /jobs/submit/single/doc
+    group: group-one
+    tags:
+      - mail-merge
+    description: "Send one document to multiple recipients"
+
+    select:
+      documentSource: documentId
+      recipientAddressSource: addressList
+
+    values:
+      jobTemplate: <String>
+      documentId: <Integer>
+      addressList:
+        - firstName: <String>
+          lastName: <String>
+          address1: <String>
+          city: <String>
+          state: <String>
+          zip: <String>
+          country: <String>
+        - firstName: <String>
+          lastName: <String>
+          address1: <String>
+          city: <String>
+          state: <String>
+          zip: <String>
+          country: <String>
+
+  # Example 3: Address capture (no recipient address needed)
+  - name: "Address Capture Example"
+    method: POST
+    path: /jobs/submit/single/pdf/addressCapture
+    group: group-two
+    tags:
+      - address-capture
+    description: "Submit PDF with embedded recipient addresses"
+
+    select:
+      documentSource: requestId
+
+    values:
+      jobTemplate: <String>
+      requestId: <Integer>
+
+# Instructions for creating your own collection:
+#
+# 1. Copy this file to config/your-collection-name-template.yaml
+#
+# 2. Edit collection metadata:
+#    - Change collection name and description
+#    - Update version if needed
+#
+# 3. Define your folder structure:
+#    - Edit groups section
+#    - Add/remove/rename groups as needed
+#    - Set display_name and order for each group
+#
+# 4. Create your examples:
+#    - Copy example blocks and customize
+#    - Set method and path (must match OpenAPI spec)
+#    - Choose oneOf variants in "select" section
+#    - List fields to include in "values" section
+#    - Use placeholders (<String>, <Integer>, etc.)
+#
+# 5. Generate collections:
+#    python3 scripts/utilities/generate_getting_started_collections.py \
+#        --template config/your-collection-name-template.yaml \
+#        --output-linked postman/generated/your-collection-linked.json \
+#        --output-test postman/generated/your-collection-test.json
+#
+# 6. Validate template (optional):
+#    python3 scripts/utilities/validate_template.py \
+#        --template config/your-collection-name-template.yaml
+#
+# Available endpoints (check OpenAPI spec for complete list):
+# - POST /jobs/submit/single/doc
+# - POST /jobs/submit/single/pdf/addressCapture
+# - POST /jobs/submit/single/pdf/split
+# - POST /jobs/submit/single/pdf/split/addressCapture
+# - POST /jobs/submit/multi/doc
+# - POST /jobs/submit/multi/doc/merge
+# - POST /jobs/submit/multi/zip
+# - POST /jobs/submit/multi/zip/addressCapture
+# - GET /jobs/{jobId}
+# - DELETE /jobs/{jobId}
+# - GET /templates/{templateId}
+#
+# Available oneOf variants (check OpenAPI spec for details):
+# - docSourceAll: documentId, requestId, url, zipDocumentId, zipRequestId
+# - documentSource: documentId, requestId, url
+# - recipientAddressSource: singleAddress, addressList, addressListId, addressListName
+# - paymentDetails: creditCard, ach, invoice
+# - documentsToMerge: documentIds, requestIds

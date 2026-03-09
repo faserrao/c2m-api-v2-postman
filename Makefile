@@ -1523,39 +1523,28 @@ postman-generate-getting-started-collection: postman-api-linked-collection-gener
 		--output-name $(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-collection
 	@echo "✅ Getting Started collection (placeholders) generated"
 
-# Generates Getting Started collection with examples (shows only YAML fields with values)
+# Generates Getting Started collections (both placeholder and test versions) from template
 .PHONY: postman-generate-getting-started-with-examples
-postman-generate-getting-started-with-examples: postman-api-linked-collection-generate
-	@echo "📚 Generating Getting Started collection (with examples) from YAML catalog..."
-	@$(VENV_PYTHON) scripts/active/generate_curated_collections_v4.py \
-		--config config/curated-examples-catalog.yaml \
-		--linked $(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-linked-collection-flat.json \
-		--openapi $(C2MAPIV2_OPENAPI_SPEC_BASE) \
-		--output-dir $(POSTMAN_GENERATED_DIR)/ \
-		--tags getting-started \
-		--mode examples \
-		--output-name $(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-with-examples-collection
-	@echo "✅ Getting Started collection (with examples) generated"
+postman-generate-getting-started-with-examples:
+	@echo "📚 Generating Getting Started collections from template..."
+	@$(VENV_PYTHON) scripts/utilities/generate_getting_started_collections.py \
+		--template config/getting-started-template.yaml \
+		--output-linked $(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-linked-collection.json \
+		--output-test $(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-test-collection.json
+	@echo "✅ Getting Started collections generated (linked + test, template-based)"
 
-# Generate Getting Started collection (examples only)
+# Generate Getting Started collection (both versions)
 .PHONY: postman-generate-getting-started-all
 postman-generate-getting-started-all: postman-generate-getting-started-with-examples
-	@echo "✅ Getting Started collection generated (with examples, YAML-based v4)"
+	@echo "✅ Getting Started collections generated (template-based system)"
 
-# Upload Getting Started collection (placeholder version - REMOVED)
-# Note: Placeholders collection no longer generated or uploaded (user decision 2026-03-07)
-# Only the "with examples" collection is now created and uploaded
-.PHONY: postman-upload-getting-started-collection
-postman-upload-getting-started-collection:
-	@echo "⚠️  Note: Placeholders collection no longer uploaded. Use postman-upload-getting-started-with-examples instead."
-
-# Upload Getting Started collection with examples
-.PHONY: postman-upload-getting-started-with-examples
-postman-upload-getting-started-with-examples:
-	@echo "📤 Uploading Getting Started collection (with examples)..."
-	@GETTING_STARTED_FILE="$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-with-examples-collection.json"; \
+# Upload Getting Started linked collection (placeholders)
+.PHONY: postman-upload-getting-started-linked
+postman-upload-getting-started-linked:
+	@echo "📤 Uploading Getting Started linked collection (placeholders)..."
+	@GETTING_STARTED_FILE="$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-linked-collection.json"; \
 	if [ ! -f "$$GETTING_STARTED_FILE" ]; then \
-		echo "⚠️  Getting Started with examples collection not found. Run postman-generate-getting-started-with-examples first."; \
+		echo "⚠️  Getting Started linked collection not found. Run postman-generate-getting-started-all first."; \
 		exit 1; \
 	fi; \
 	COLLECTION_UID=$$(jq -c '{collection: .}' "$$GETTING_STARTED_FILE" | \
@@ -1563,16 +1552,41 @@ postman-upload-getting-started-with-examples:
 			$(POSTMAN_CURL_HEADERS_XC) \
 			--data-binary @- | jq -r '.collection.uid'); \
 	if [ "$$COLLECTION_UID" = "null" ] || [ -z "$$COLLECTION_UID" ]; then \
-		echo "❌ Failed to upload Getting Started with examples collection"; exit 1; \
+		echo "❌ Failed to upload Getting Started linked collection"; exit 1; \
 	else \
-		echo "✅ Getting Started with examples collection uploaded with UID: $$COLLECTION_UID"; \
-		echo $$COLLECTION_UID > $(POSTMAN_GENERATED_DIR)/getting-started-with-examples-collection-uid.txt; \
+		echo "✅ Getting Started linked collection uploaded with UID: $$COLLECTION_UID"; \
+		echo $$COLLECTION_UID > $(POSTMAN_GENERATED_DIR)/getting-started-linked-collection-uid.txt; \
 	fi
 
-# Upload Getting Started collection (examples only)
+# Upload Getting Started test collection (examples)
+.PHONY: postman-upload-getting-started-test
+postman-upload-getting-started-test:
+	@echo "📤 Uploading Getting Started test collection (examples)..."
+	@GETTING_STARTED_FILE="$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-test-collection.json"; \
+	if [ ! -f "$$GETTING_STARTED_FILE" ]; then \
+		echo "⚠️  Getting Started test collection not found. Run postman-generate-getting-started-all first."; \
+		exit 1; \
+	fi; \
+	COLLECTION_UID=$$(jq -c '{collection: .}' "$$GETTING_STARTED_FILE" | \
+		curl --silent --location --request POST "$(POSTMAN_COLLECTIONS_URL)?workspace=$(POSTMAN_WS)" \
+			$(POSTMAN_CURL_HEADERS_XC) \
+			--data-binary @- | jq -r '.collection.uid'); \
+	if [ "$$COLLECTION_UID" = "null" ] || [ -z "$$COLLECTION_UID" ]; then \
+		echo "❌ Failed to upload Getting Started test collection"; exit 1; \
+	else \
+		echo "✅ Getting Started test collection uploaded with UID: $$COLLECTION_UID"; \
+		echo $$COLLECTION_UID > $(POSTMAN_GENERATED_DIR)/getting-started-test-collection-uid.txt; \
+	fi
+
+# Upload both Getting Started collections
 .PHONY: postman-upload-getting-started-all
-postman-upload-getting-started-all: postman-upload-getting-started-with-examples
-	@echo "✅ Getting Started collection uploaded successfully (with examples)"
+postman-upload-getting-started-all: postman-upload-getting-started-linked postman-upload-getting-started-test
+	@echo "✅ Both Getting Started collections uploaded successfully"
+
+# Backward compatibility alias
+.PHONY: postman-upload-getting-started-with-examples
+postman-upload-getting-started-with-examples: postman-upload-getting-started-all
+	@echo "✅ Getting Started collections uploaded (both versions)"
 
 # Upload all enhanced collections (enhanced test, use case, and getting started)
 .PHONY: postman-upload-all-enhanced-collections
@@ -1607,9 +1621,8 @@ postman-inject-docs-link-all:
 		"$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-test-collection-flat.json" \
 		"$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-test-collection-enhanced.json" \
 		"$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-real-world-use-cases-collection.json" \
-		"$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-curated-collection.json" \
-		"$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-collection.json" \
-		"$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-with-examples-collection.json"; do \
+		"$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-linked-collection.json" \
+		"$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-test-collection.json"; do \
 		if [ -f "$$collection" ]; then \
 			node scripts/active/inject_documentation_link.js "$$collection" "$(REDOC_DOCS_URL)" || true; \
 		fi; \
@@ -2807,3 +2820,4 @@ artifacts-status: ## Check status of artifacts repo
 # ========================================================================
 # END OF MAKEFILE
 # ========================================================================
+# Getting Started Collection Upload Targets

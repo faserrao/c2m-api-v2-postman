@@ -1,0 +1,276 @@
+# Getting Started Template - Extracted from Bootstrap Collection
+# Source: REST API V2.postman_collection.json
+# Generated: 2026-03-08 22:31:33
+#
+# This file defines the complete structure for C2M API v2 Getting Started collections.
+# Edit this file to customize folder structure, endpoint selections, and field choices.
+#
+# Schema References (defined in template):
+# - OpenAPI Spec: openapi/c2mapiv2-openapi-spec-base.yaml
+#   Provides: Field types, oneOf variants, validation rules
+# - Linked Collection: postman/generated/c2mapiv2-linked-collection-flat.json
+#   Provides: Canonical request structures with all possible fields
+#
+# Two collections will be generated from this template:
+# 1. Linked Collection (placeholders like <String>) - for documentation
+# 2. Test Collection (realistic values) - for actual testing
+
+
+collection:
+  name: C2M API v2 - Getting Started
+  description: Educational collection showing common usage patterns for the C2M API
+    v2. Organized by frequency of use.
+  version: 1.0.0
+schema_references:
+  openapi_spec: openapi/c2mapiv2-openapi-spec-base.yaml
+  linked_collection: postman/generated/c2mapiv2-linked-collection-flat.json
+  note: OpenAPI spec provides types, oneOf variants, and validation. Linked collection
+    provides canonical request structures.
+groups:
+- logical_name: most-frequently-used
+  display_name: Most Frequently Used
+  order: 1
+  description: The most common API usage patterns
+- logical_name: bulk
+  display_name: Bulk
+  order: 2
+  description: Processing multiple documents or recipients efficiently
+- logical_name: less-frequently-used
+  display_name: Less frequently used
+  order: 3
+  description: Specialized use cases and advanced features
+examples:
+- name: /jobs/submit//single/doc - single recipient
+  method: POST
+  path: /jobs/submit/single/doc
+  group: most-frequently-used
+  tags: []
+  description: /jobs/submit//single/doc - single recipient
+  select:
+    docSourceAll: requestId
+    recipientAddressSource: singleAddress
+  values:
+    jobTemplate: <String>
+- name: /jobs/submit/single/doc - mail merge
+  method: POST
+  path: /jobs/submit/single/doc
+  group: most-frequently-used
+  tags: []
+  description: /jobs/submit/single/doc - mail merge
+  select:
+    recipientAddressSource: addressList
+  values:
+    jobTemplate: <String>
+- name: /jobs/submit/single/pdf/addressCapture
+  method: POST
+  path: /jobs/submit/single/pdf/addressCapture
+  group: most-frequently-used
+  tags: []
+  description: /jobs/submit/single/pdf/addressCapture
+  select:
+    docSourceAll: requestId
+  values:
+    jobTemplate: <String>
+- name: /jobs/submit/single/pdf/split/addressCapture
+  method: POST
+  path: /jobs/submit/single/pdf/split/addressCapture
+  group: bulk
+  tags: []
+  description: /jobs/submit/single/pdf/split/addressCapture
+  select:
+    docSourceAll: requestId
+  values:
+    jobTemplate: <String>
+- name: /jobs/submit/multiple/zip/addressCapture - using zip file
+  method: POST
+  path: /jobs/submit/multi/zip/addressCapture
+  group: bulk
+  tags: []
+  description: /jobs/submit/multiple/zip/addressCapture - using zip file
+  select:
+    docSourceAll: requestId
+  values:
+    jobTemplate: <String>
+- name: /jobs/submit/single/pdf/split
+  method: POST
+  path: /jobs/submit/single/pdf/split
+  group: bulk
+  tags: []
+  description: /jobs/submit/single/pdf/split
+  select:
+    docSourceAll: requestId
+    recipientAddressSource: singleAddress
+  values:
+    jobTemplate: <String>
+    jobs:
+    - pages:
+        startPage: <Integer>
+        endPage: <Integer>
+    - pages:
+        startPage: <Integer>
+        endPage: <Integer>
+    - pages:
+        startPage: <Integer>
+        endPage: <Integer>
+- name: /jobs/submit/multiple/doc/merge
+  method: POST
+  path: /jobs/submit/multi/doc/merge
+  group: less-frequently-used
+  tags: []
+  description: /jobs/submit/multiple/doc/merge
+  select:
+    recipientAddressSource: singleAddress
+  values:
+    jobTemplate: <String>
+    documentsToMerge:
+    - requestId: <Integer>
+    - documentId: <Integer>
+    - documentId: <Integer>
+- name: /jobs/submit/single/doc - using options
+  method: POST
+  path: /jobs/submit/single/doc
+  group: less-frequently-used
+  tags: []
+  description: /jobs/submit/single/doc - using options
+  select:
+    docSourceAll: requestId
+    recipientAddressSource: singleAddress
+  values:
+    jobOptions:
+      documentClass: <String>
+      layout: <String>
+      productionTime: <String>
+      envelope: <String>
+      color: <String>
+      paperType: <String>
+      printOption: <String>
+      mailClass: <String>
+- name: /jobs/submit/single/doc - using URL
+  method: POST
+  path: /jobs/submit/single/doc
+  group: less-frequently-used
+  tags: []
+  description: /jobs/submit/single/doc - using URL
+  select:
+    docSourceAll: url
+    recipientAddressSource: singleAddress
+  values:
+    jobTemplate: <String>
+- name: /jobs/submit/single/doc - setting tags
+  method: POST
+  path: /jobs/submit/single/doc
+  group: less-frequently-used
+  tags: []
+  description: /jobs/submit/single/doc - setting tags
+  select:
+    docSourceAll: requestId
+    recipientAddressSource: singleAddress
+  values:
+    jobTemplate: <String>
+    tags:
+    - <String>
+    - <String>
+    - <String>
+- name: /jobs/submit/single/doc - naming addressList
+  method: POST
+  path: /jobs/submit/single/doc
+  group: less-frequently-used
+  tags: []
+  description: /jobs/submit/single/doc - naming addressList
+  select:
+    recipientAddressSource: addressList
+  values:
+    jobTemplate: <String>
+    addressListName: <String>
+    mappingId: <Integer>
+- name: /jobs/submit//single/doc - payment option
+  method: POST
+  path: /jobs/submit/single/doc
+  group: less-frequently-used
+  tags: []
+  description: /jobs/submit//single/doc - payment option
+  select:
+    docSourceAll: requestId
+    recipientAddressSource: singleAddress
+    paymentDetails: creditCard
+  values:
+    jobTemplate: <String>
+- name: /jobs/submit/multiple/zip - using zip file
+  method: POST
+  path: /jobs/submit/multi/zip
+  group: less-frequently-used
+  tags: []
+  description: /jobs/submit/multiple/zip - using zip file
+  select:
+    docSourceAll: requestId
+    recipientAddressSource: singleAddress
+  values:
+    jobTemplate: <String>
+    jobs:
+    - filename: <String>
+    - filename: <String>
+    - filename: <String>
+- name: /jobs/submit/multiple/zip - using documentId
+  method: POST
+  path: /jobs/submit/multi/zip
+  group: less-frequently-used
+  tags: []
+  description: /jobs/submit/multiple/zip - using documentId
+  select:
+    docSourceAll: documentId
+    recipientAddressSource: singleAddress
+  values:
+    jobTemplate: <String>
+    jobs:
+    - filename: <String>
+- name: /jobs/submit/multiple/doc - using requestID
+  method: POST
+  path: /jobs/submit/multi/doc
+  group: less-frequently-used
+  tags: []
+  description: /jobs/submit/multiple/doc - using requestID
+  select:
+    docSourceAll: requestId
+    recipientAddressSource: singleAddress
+  values:
+    jobTemplate: <String>
+    jobs:
+    - filename: <String>
+    - filename: <String>
+    - filename: <String>
+- name: /jobs/submit/multiple/doc - using documentID
+  method: POST
+  path: /jobs/submit/multi/doc
+  group: less-frequently-used
+  tags: []
+  description: /jobs/submit/multiple/doc - using documentID
+  select:
+    docSourceAll: documentId
+    recipientAddressSource: singleAddress
+  values:
+    jobTemplate: <String>
+    jobs:
+    - mappingId: <Integer>
+    - mappingId: <Integer>
+- name: /jobs/submit/single/doc - using documentID
+  method: POST
+  path: /jobs/submit/single/doc
+  group: less-frequently-used
+  tags: []
+  description: /jobs/submit/single/doc - using documentID
+  select:
+    docSourceAll: documentId
+    recipientAddressSource: singleAddress
+  values:
+    jobTemplate: <String>
+- name: /jobs/submit/single/doc - using addressListId
+  method: POST
+  path: /jobs/submit/single/doc
+  group: less-frequently-used
+  tags: []
+  description: /jobs/submit/single/doc - using addressListId
+  select:
+    docSourceAll: requestId
+    recipientAddressSource: addressListId
+  values:
+    jobTemplate: <String>
