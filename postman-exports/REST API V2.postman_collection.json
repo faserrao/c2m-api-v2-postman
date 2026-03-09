@@ -1,0 +1,643 @@
+{
+  "info": {
+    "_postman_id": "c515e7fc-130d-4bfa-b543-dae6d118a4a4",
+    "name": "REST API V2",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "46321051"
+  },
+  "item": [
+    {
+      "name": "Most Frequently Used",
+      "item": [
+        {
+          "name": "/jobs/submit//single/doc - single recipient",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobTemplate\": \"<String>\",\n  \"documentSource\": {\n    \"requestId\": \"<Integer>\"\n  },\n  \"recipientAddressSource\": {\n    \"singleAddress\": {\n      \"firstName\": \"<String>\",\n      \"lastName\": \"<String>\",\n      \"address1\": \"<String>\",\n      \"address2\": \"<String>\",\n      \"address3\": \"<String>\",\n      \"city\": \"<String>\",\n      \"state\": \"<String>\",\n      \"zip\": \"<String>\",\n      \"country\": \"<String>\"\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{subdomain}}.click2mail.com/molpro/v2/jobs/submit/single/doc",
+              "protocol": "https",
+              "host": [
+                "{{subdomain}}",
+                "click2mail",
+                "com"
+              ],
+              "path": [
+                "molpro",
+                "v2",
+                "jobs",
+                "submit",
+                "single",
+                "doc"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/jobs/submit/single/doc - mail merge",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobTemplate\": \"<String>\",\n  \"recipientAddressSource\": {\n    \"addressList\": [\n      {\n        \"firstName\": \"<String>\",\n        \"lastName\": \"<String>\",\n        \"address1\": \"<String>\",\n        \"address2\": \"<String>\",\n        \"address3\": \"<String>\",\n        \"city\": \"<String>\",\n        \"state\": \"<String>\",\n        \"zip\": \"<String>\",\n        \"country\": \"<String>\",\n        \"foo1\": \"<String>\",\n        \"foo2\": \"<String>\"\n      },\n      {\n        \"firstName\": \"<String>\",\n        \"lastName\": \"<String>\",\n        \"address1\": \"<String>\",\n        \"address2\": \"<String>\",\n        \"address3\": \"<String>\",\n        \"city\": \"<String>\",\n        \"state\": \"<String>\",\n        \"zip\": \"<String>\",\n        \"country\": \"<String>\",\n        \"foo1\": \"<String>\",\n        \"foo2\": \"<String>\"\n      },\n      {\n        \"firstName\": \"<String>\",\n        \"lastName\": \"<String>\",\n        \"address1\": \"<String>\",\n        \"address2\": \"<String>\",\n        \"address3\": \"<String>\",\n        \"city\": \"<String>\",\n        \"state\": \"<String>\",\n        \"zip\": \"<String>\",\n        \"country\": \"<String>\",\n        \"foo1\": \"<String>\",\n        \"foo2\": \"<String>\"\n      }\n    ]\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{subdomain}}.click2mail.com/molpro/v2/jobs/submit/single/doc",
+              "protocol": "https",
+              "host": [
+                "{{subdomain}}",
+                "click2mail",
+                "com"
+              ],
+              "path": [
+                "molpro",
+                "v2",
+                "jobs",
+                "submit",
+                "single",
+                "doc"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/jobs/submit/single/pdf/addressCapture",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobTemplate\": \"<String>\",\n  \"documentSource\": {\n    \"requestId\": \"<Integer>\"\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{subdomain}}.click2mail.com/molpro/v2/jobs/submit/single/pdf/addressCapture",
+              "protocol": "https",
+              "host": [
+                "{{subdomain}}",
+                "click2mail",
+                "com"
+              ],
+              "path": [
+                "molpro",
+                "v2",
+                "jobs",
+                "submit",
+                "single",
+                "pdf",
+                "addressCapture"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Bulk",
+      "item": [
+        {
+          "name": "/jobs/submit/single/pdf/split/addressCapture",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobTemplate\": \"<String>\",\n  \"documentSource\": {\n    \"requestId\": \"<Integer>\"\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{subdomain}}.click2mail.com/molpro/v2/jobs/submit/single/pdf/split/addressCapture",
+              "protocol": "https",
+              "host": [
+                "{{subdomain}}",
+                "click2mail",
+                "com"
+              ],
+              "path": [
+                "molpro",
+                "v2",
+                "jobs",
+                "submit",
+                "single",
+                "pdf",
+                "split",
+                "addressCapture"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/jobs/submit/multiple/zip/addressCapture - using zip file",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobTemplate\": \"<String>\",\n  \"documentSource\": {\n    \"requestId\": \"<Integer>\"\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{subdomain}}.click2mail.com/molpro/v2/jobs/submit/multiple/zip/addressCapture",
+              "protocol": "https",
+              "host": [
+                "{{subdomain}}",
+                "click2mail",
+                "com"
+              ],
+              "path": [
+                "molpro",
+                "v2",
+                "jobs",
+                "submit",
+                "multiple",
+                "zip",
+                "addressCapture"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/jobs/submit/single/pdf/split",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobTemplate\": \"<String>\",\n  \"documentSource\": {\n    \"requestId\": \"<Integer>\"\n  },\n  \"jobs\": [\n    {\n      \"pages\": {\n        \"startPage\": \"<Integer>\",\n        \"endPage\": \"<Integer>\"\n      },\n      \"recipientAddressSource\": {\n          \"firstName\": \"<String>\",\n          \"lastName\": \"<String>\",\n          \"address1\": \"<String>\",\n          \"address2\": \"<String>\",\n          \"address3\": \"<String>\",\n          \"city\": \"<String>\",\n          \"state\": \"<String>\",\n          \"zip\": \"<String>\",\n          \"country\": \"<String>\"\n        }\n      },\n    {\n      \"pages\": {\n        \"startPage\": \"<Integer>\",\n        \"endPage\": \"<Integer>\"\n      },\n      \"recipientAddressSource\": {\n        \"singleAddress\": {\n          \"firstName\": \"<String>\",\n          \"lastName\": \"<String>\",\n          \"address1\": \"<String>\",\n          \"address2\": \"<String>\",\n          \"address3\": \"<String>\",\n          \"city\": \"<String>\",\n          \"state\": \"<String>\",\n          \"zip\": \"<String>\",\n          \"country\": \"<String>\"\n        }\n      }\n    },\n    {\n      \"pages\": {\n        \"startPage\": \"<Integer>\",\n        \"endPage\": \"<Integer>\"\n      },\n      \"recipientAddressSource\": {\n        \"singleAddress\": {\n          \"firstName\": \"<String>\",\n          \"lastName\": \"<String>\",\n          \"address1\": \"<String>\",\n          \"address2\": \"<String>\",\n          \"address3\": \"<String>\",\n          \"city\": \"<String>\",\n          \"state\": \"<String>\",\n          \"zip\": \"<String>\",\n          \"country\": \"<String>\"\n        }\n      }\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{subdomain}}.click2mail.com/molpro/v2/jobs/submit/single/pdf/split",
+              "protocol": "https",
+              "host": [
+                "{{subdomain}}",
+                "click2mail",
+                "com"
+              ],
+              "path": [
+                "molpro",
+                "v2",
+                "jobs",
+                "submit",
+                "single",
+                "pdf",
+                "split"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Less frequently used",
+      "item": [
+        {
+          "name": "/jobs/submit/multiple/doc/merge",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobTemplate\": \"<String>\",\n  \"documentSource\": {\n    \"documentsToMerge\": [\n      {\n        \"requestId\": \"<Integer>\"\n      },\n      {\n        \"documentId\": \"<Integer>\"\n      },\n      {\n        \"documentId\": \"<Integer>\"\n      }\n    ]\n  },\n  \"recipientAddressSource\": {\n    \"singleAddress\": {\n      \"firstName\": \"<String>\",\n      \"lastName\": \"<String>\",\n      \"address1\": \"<String>\",\n      \"address2\": \"<String>\",\n      \"address3\": \"<String>\",\n      \"city\": \"<String>\",\n      \"state\": \"<String>\",\n      \"zip\": \"<String>\",\n      \"country\": \"<String>\"\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{subdomain}}.click2mail.com/molpro/v2/jobs/submit/multiple/doc/merge",
+              "protocol": "https",
+              "host": [
+                "{{subdomain}}",
+                "click2mail",
+                "com"
+              ],
+              "path": [
+                "molpro",
+                "v2",
+                "jobs",
+                "submit",
+                "multiple",
+                "doc",
+                "merge"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/jobs/submit/single/doc - using options",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobOptions\": {\n    \"documentClass\": \"<String>\",\n    \"layout\": \"<String>\",\n    \"productionTime\": \"<String>\",\n    \"envelope\": \"<String>\",\n    \"color\": \"<String>\",\n    \"paperType\": \"<String>\",\n    \"printOption\": \"<String>\",\n    \"mailClass\": \"<String>\"\n  },\n  \"documentSource\": {\n    \"requestId\": \"<Integer>\"\n  },\n  \"recipientAddressSource\": {\n    \"singleAddress\": {\n      \"firstName\": \"<String>\",\n      \"lastName\": \"<String>\",\n      \"address1\": \"<String>\",\n      \"address2\": \"<String>\",\n      \"address3\": \"<String>\",\n      \"city\": \"<String>\",\n      \"state\": \"<String>\",\n      \"zip\": \"<String>\",\n      \"country\": \"<String>\"\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{subdomain}}.click2mail.com/molpro/v2/jobs/submit/single/doc",
+              "protocol": "https",
+              "host": [
+                "{{subdomain}}",
+                "click2mail",
+                "com"
+              ],
+              "path": [
+                "molpro",
+                "v2",
+                "jobs",
+                "submit",
+                "single",
+                "doc"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/jobs/submit/single/doc - using URL",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobTemplate\": \"<String>\",\n  \"documentSource\": {\n    \"url\": \"<String>\"\n  },\n  \"recipientAddressSource\": {\n    \"singleAddress\": {\n      \"firstName\": \"<String>\",\n      \"lastName\": \"<String>\",\n      \"address1\": \"<String>\",\n      \"address2\": \"<String>\",\n      \"address3\": \"<String>\",\n      \"city\": \"<String>\",\n      \"state\": \"<String>\",\n      \"zip\": \"<String>\",\n      \"country\": \"<String>\"\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{subdomain}}.click2mail.com/molpro/v2/jobs/submit/single/doc",
+              "protocol": "https",
+              "host": [
+                "{{subdomain}}",
+                "click2mail",
+                "com"
+              ],
+              "path": [
+                "molpro",
+                "v2",
+                "jobs",
+                "submit",
+                "single",
+                "doc"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/jobs/submit/single/doc - setting tags",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobTemplate\": \"<String>\",\n  \"documentSource\": {\n    \"requestId\": \"<Integer>\"\n  },\n  \"recipientAddressSource\": {\n    \"singleAddress\": {\n      \"firstName\": \"<String>\",\n      \"lastName\": \"<String>\",\n      \"address1\": \"<String>\",\n      \"address2\": \"<String>\",\n      \"address3\": \"<String>\",\n      \"city\": \"<String>\",\n      \"state\": \"<String>\",\n      \"zip\": \"<String>\",\n      \"country\": \"<String>\"\n    }\n  },\n  \"tags\": [\n    \"<String>\",\n    \"<String>\",\n    \"<String>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{subdomain}}.click2mail.com/molpro/v2/jobs/submit/single/doc",
+              "protocol": "https",
+              "host": [
+                "{{subdomain}}",
+                "click2mail",
+                "com"
+              ],
+              "path": [
+                "molpro",
+                "v2",
+                "jobs",
+                "submit",
+                "single",
+                "doc"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/jobs/submit/single/doc - naming addressList",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobTemplate\": \"<String>\",\n  \"recipientAddressSource\": {\n    \"addressListName\": \"<String>\",\n    \"mappingId\": \"<Integer>\",\n    \"addressList\": [\n      {\n        \"firstName\": \"<String>\",\n        \"lastName\": \"<String>\",\n        \"address1\": \"<String>\",\n        \"address2\": \"<String>\",\n        \"address3\": \"<String>\",\n        \"city\": \"<String>\",\n        \"state\": \"<String>\",\n        \"zip\": \"<String>\",\n        \"country\": \"<String>\",\n        \"foo1\": \"<String>\",\n        \"foo2\": \"<String>\"\n      },\n      {\n        \"firstName\": \"<String>\",\n        \"lastName\": \"<String>\",\n        \"address1\": \"<String>\",\n        \"address2\": \"<String>\",\n        \"address3\": \"<String>\",\n        \"city\": \"<String>\",\n        \"state\": \"<String>\",\n        \"zip\": \"<String>\",\n        \"country\": \"<String>\",\n        \"foo1\": \"<String>\",\n        \"foo2\": \"<String>\"\n      },\n      {\n        \"firstName\": \"<String>\",\n        \"lastName\": \"<String>\",\n        \"address1\": \"<String>\",\n        \"address2\": \"<String>\",\n        \"address3\": \"<String>\",\n        \"city\": \"<String>\",\n        \"state\": \"<String>\",\n        \"zip\": \"<String>\",\n        \"country\": \"<String>\",\n        \"foo1\": \"<String>\",\n        \"foo2\": \"<String>\"\n      }\n    ]\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{subdomain}}.click2mail.com/molpro/v2/jobs/submit/single/doc",
+              "protocol": "https",
+              "host": [
+                "{{subdomain}}",
+                "click2mail",
+                "com"
+              ],
+              "path": [
+                "molpro",
+                "v2",
+                "jobs",
+                "submit",
+                "single",
+                "doc"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/jobs/submit//single/doc - payment option",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobTemplate\": \"<String>\",\n  \"documentSource\": {\n    \"requestId\": \"<Integer>\"\n  },\n  \"recipientAddressSource\": {\n    \"singleAddress\": {\n      \"firstName\": \"<String>\",\n      \"lastName\": \"<String>\",\n      \"address1\": \"<String>\",\n      \"address2\": \"<String>\",\n      \"address3\": \"<String>\",\n      \"city\": \"<String>\",\n      \"state\": \"<String>\",\n      \"zip\": \"<String>\",\n      \"country\": \"<String>\"\n    }\n  },\n  \"paymentDetails\": {\n    \"paymentType\": \"<String>\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{subdomain}}.click2mail.com/molpro/v2/jobs/submit/single/doc",
+              "protocol": "https",
+              "host": [
+                "{{subdomain}}",
+                "click2mail",
+                "com"
+              ],
+              "path": [
+                "molpro",
+                "v2",
+                "jobs",
+                "submit",
+                "single",
+                "doc"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/jobs/submit/multiple/zip - using zip file",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobTemplate\": \"<String>\",\n  \"documentSource\": {\n    \"requestId\": \"<Integer>\"\n  },\n  \"jobs\": [\n    {\n      \"filename\": \"<String>\",\n      \"recipientAddressSource\": {\n        \"singleAddress\": {\n          \"firstName\": \"<String>\",\n          \"lastName\": \"<String>\",\n          \"address1\": \"<String>\",\n          \"address2\": \"<String>\",\n          \"address3\": \"<String>\",\n          \"city\": \"<String>\",\n          \"state\": \"<String>\",\n          \"zip\": \"<String>\",\n          \"country\": \"<String>\"\n        }\n      }\n    },\n    {\n      \"filename\": \"<String>\",\n      \"recipientAddressSource\": {\n        \"singleAddress\": {\n          \"firstName\": \"<String>\",\n          \"lastName\": \"<String>\",\n          \"address1\": \"<String>\",\n          \"address2\": \"<String>\",\n          \"address3\": \"<String>\",\n          \"city\": \"<String>\",\n          \"state\": \"<String>\",\n          \"zip\": \"<String>\",\n          \"country\": \"<String>\"\n        }\n      }\n    },\n    {\n      \"filename\": \"<String>\",\n      \"recipientAddressSource\": {\n        \"singleAddress\": {\n          \"firstName\": \"<String>\",\n          \"lastName\": \"<String>\",\n          \"address1\": \"<String>\",\n          \"address2\": \"<String>\",\n          \"address3\": \"<String>\",\n          \"city\": \"<String>\",\n          \"state\": \"<String>\",\n          \"zip\": \"<String>\",\n          \"country\": \"<String>\"\n        }\n      }\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{subdomain}}.click2mail.com/molpro/v2/jobs/submit/multiple/zip",
+              "protocol": "https",
+              "host": [
+                "{{subdomain}}",
+                "click2mail",
+                "com"
+              ],
+              "path": [
+                "molpro",
+                "v2",
+                "jobs",
+                "submit",
+                "multiple",
+                "zip"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/jobs/submit/multiple/zip - using documentId",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobTemplate\": \"<String>\",\n  \"documentSource\": {\n    \"documentId\": \"<Integer>\"\n  },\n  \"jobs\": [\n    {\n      \"filename\": \"<String>\",\n      \"recipientAddressSource\": {\n        \"singleAddress\": {\n          \"firstName\": \"<String>\",\n          \"lastName\": \"<String>\",\n          \"address1\": \"<String>\",\n          \"address2\": \"<String>\",\n          \"address3\": \"<String>\",\n          \"city\": \"<String>\",\n          \"state\": \"<String>\",\n          \"zip\": \"<String>\",\n          \"country\": \"<String>\"\n        }\n      }\n    },\n    {\n      \"filename\": \"<String>\",\n      \"recipientAddressSource\": {\n        \"singleAddress\": {\n          \"firstName\": \"<String>\",\n          \"lastName\": \"<String>\",\n          \"address1\": \"<String>\",\n          \"address2\": \"<String>\",\n          \"address3\": \"<String>\",\n          \"city\": \"<String>\",\n          \"state\": \"<String>\",\n          \"zip\": \"<String>\",\n          \"country\": \"<String>\"\n        }\n      }\n    },\n    {\n      \"filename\": \"<String>\",\n      \"recipientAddressSource\": {\n        \"singleAddress\": {\n          \"firstName\": \"<String>\",\n          \"lastName\": \"<String>\",\n          \"address1\": \"<String>\",\n          \"address2\": \"<String>\",\n          \"address3\": \"<String>\",\n          \"city\": \"<String>\",\n          \"state\": \"<String>\",\n          \"zip\": \"<String>\",\n          \"country\": \"<String>\"\n        },\n      }\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{subdomain}}.click2mail.com/molpro/v2/jobs/submit/multiple/zip",
+              "protocol": "https",
+              "host": [
+                "{{subdomain}}",
+                "click2mail",
+                "com"
+              ],
+              "path": [
+                "molpro",
+                "v2",
+                "jobs",
+                "submit",
+                "multiple",
+                "zip"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/jobs/submit/multiple/doc - using requestID",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobTemplate\": \"<String>\",\n  \"documentSource\": {\n    \"requestId\": \"<Integer>\"\n  },\n  \"jobs\": [\n    {\n      \"filename\": \"<String>\",\n      \"recipientAddressSource\": {\n        \"singleAddress\": {\n          \"firstName\": \"<String>\",\n          \"lastName\": \"<String>\",\n          \"address1\": \"<String>\",\n          \"address2\": \"<String>\",\n          \"address3\": \"<String>\",\n          \"city\": \"<String>\",\n          \"state\": \"<String>\",\n          \"zip\": \"<String>\",\n          \"country\": \"<String>\"\n        }\n      }\n    },\n    {\n      \"filename\": \"<String>\",\n      \"recipientAddressSource\": {\n        \"singleAddress\": {\n          \"firstName\": \"<String>\",\n          \"lastName\": \"<String>\",\n          \"address1\": \"<String>\",\n          \"address2\": \"<String>\",\n          \"address3\": \"<String>\",\n          \"city\": \"<String>\",\n          \"state\": \"<String>\",\n          \"zip\": \"<String>\",\n          \"country\": \"<String>\"\n        }\n      }\n    },\n    {\n      \"filename\": \"<String>\",\n      \"recipientAddressSource\": {\n        \"singleAddress\": {\n          \"firstName\": \"<String>\",\n          \"lastName\": \"<String>\",\n          \"address1\": \"<String>\",\n          \"address2\": \"<String>\",\n          \"address3\": \"<String>\",\n          \"city\": \"<String>\",\n          \"state\": \"<String>\",\n          \"zip\": \"<String>\",\n          \"country\": \"<String>\"\n        }\n      }\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{subdomain}}.click2mail.com/molpro/v2/jobs/submit/multiple/doc",
+              "protocol": "https",
+              "host": [
+                "{{subdomain}}",
+                "click2mail",
+                "com"
+              ],
+              "path": [
+                "molpro",
+                "v2",
+                "jobs",
+                "submit",
+                "multiple",
+                "doc"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/jobs/submit/multiple/doc - using documentID",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobTemplate\": \"<String>\",\n  \"jobs\": [\n    {\n      \"documentSource\": {\n        \"documentId\": \"<Integer>\"\n      },\n      \"recipientAddressSource\": {\n        \"mappingId\": \"<Integer>\",\n        \"singleAddress\": {\n          \"firstName\": \"<String>\",\n          \"lastName\": \"<String>\",\n          \"address1\": \"<String>\",\n          \"address2\": \"<String>\",\n          \"address3\": \"<String>\",\n          \"city\": \"<String>\",\n          \"state\": \"<String>\",\n          \"zip\": \"<String>\",\n          \"country\": \"<String>\"\n        }\n      }\n    },\n    {\n      \"documentSource\": {\n        \"documentId\": \"<Integer>\"\n      },\n      \"recipientAddressSource\": {\n        \"mappingId\": \"<Integer>\",\n        \"singleAddress\": {\n          \"firstName\": \"<String>\",\n          \"lastName\": \"<String>\",\n          \"address1\": \"<String>\",\n          \"address2\": \"<String>\",\n          \"address3\": \"<String>\",\n          \"city\": \"<String>\",\n          \"state\": \"<String>\",\n          \"zip\": \"<String>\",\n          \"country\": \"<String>\"\n        }\n      }\n    },\n    {\n      \"documentSource\": {\n        \"documentId\": \"<Integer>\"\n      },\n      \"recipientAddressSource\": {\n        \"singleAddress\": {\n          \"firstName\": \"<String>\",\n          \"lastName\": \"<String>\",\n          \"address1\": \"<String>\",\n          \"address2\": \"<String>\",\n          \"address3\": \"<String>\",\n          \"city\": \"<String>\",\n          \"state\": \"<String>\",\n          \"zip\": \"<String>\",\n          \"country\": \"<String>\"\n        }\n      }\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{subdomain}}.click2mail.com/molpro/v2/jobs/submit/multiple/doc",
+              "protocol": "https",
+              "host": [
+                "{{subdomain}}",
+                "click2mail",
+                "com"
+              ],
+              "path": [
+                "molpro",
+                "v2",
+                "jobs",
+                "submit",
+                "multiple",
+                "doc"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/jobs/submit/single/doc - using documentID",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobTemplate\": \"<String>\",\n  \"documentSource\": {\n    \"documentId\": \"<Integer>\"\n  },\n  \"recipientAddressSource\": {\n    \"singleAddress\": {\n      \"firstName\": \"<String>\",\n      \"lastName\": \"<String>\",\n      \"address1\": \"<String>\",\n      \"address2\": \"<String>\",\n      \"address3\": \"<String>\",\n      \"city\": \"<String>\",\n      \"state\": \"<String>\",\n      \"zip\": \"<String>\",\n      \"country\": \"<String>\"\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{subdomain}}.click2mail.com/molpro/v2/jobs/submit/single/doc",
+              "protocol": "https",
+              "host": [
+                "{{subdomain}}",
+                "click2mail",
+                "com"
+              ],
+              "path": [
+                "molpro",
+                "v2",
+                "jobs",
+                "submit",
+                "single",
+                "doc"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/jobs/submit/single/doc - using addressListId",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobTemplate\": \"<String>\",\n  \"documentSource\": {\n    \"requestId\": \"<Integer>\"\n  },\n  \"recipientAddressSource\": {\n    \"addressListId\": \"<Integer>\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{subdomain}}.click2mail.com/molpro/v2/jobs/submit/single/doc",
+              "protocol": "https",
+              "host": [
+                "{{subdomain}}",
+                "click2mail",
+                "com"
+              ],
+              "path": [
+                "molpro",
+                "v2",
+                "jobs",
+                "submit",
+                "single",
+                "doc"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

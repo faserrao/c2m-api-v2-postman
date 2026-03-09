@@ -1,0 +1,4455 @@
+{
+  "info": {
+    "_postman_id": "4934b52d-4631-437a-a8d5-8e788bfbb749",
+    "name": "C2mApiCollectionLinked",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "46321051"
+  },
+  "item": [
+    {
+      "name": "POST /jobs/submit/single/doc",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"docSourceAll\": \"<oneOf>\",\n  \"recipientAddressSource\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"priority\": \"overnight\",\n  \"color\": \"<string>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+          "options": {
+            "raw": {
+              "headerFamily": "json",
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/jobs/submit/single/doc",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "jobs",
+            "submit",
+            "single",
+            "doc"
+          ]
+        },
+        "description": "Submits a mailing job (single doc). The request body contains job parameters including document source, recipient address information, and payment details."
+      },
+      "response": [
+        {
+          "name": "Success",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"docSourceAll\": \"<oneOf>\",\n  \"recipientAddressSource\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"priority\": \"overnight\",\n  \"color\": \"<string>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/single/doc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "single",
+                "doc"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"status\": \"<string>\",\n  \"message\": \"<string>\",\n  \"requestId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Bad Request - Invalid request parameters",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"docSourceAll\": \"<oneOf>\",\n  \"recipientAddressSource\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"priority\": \"overnight\",\n  \"color\": \"<string>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/single/doc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "single",
+                "doc"
+              ]
+            }
+          },
+          "status": "Bad Request",
+          "code": 400,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Unauthorized - Missing or invalid authentication",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"docSourceAll\": \"<oneOf>\",\n  \"recipientAddressSource\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"priority\": \"overnight\",\n  \"color\": \"<string>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/single/doc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "single",
+                "doc"
+              ]
+            }
+          },
+          "status": "Unauthorized",
+          "code": 401,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Forbidden - Insufficient permissions",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"docSourceAll\": \"<oneOf>\",\n  \"recipientAddressSource\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"priority\": \"overnight\",\n  \"color\": \"<string>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/single/doc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "single",
+                "doc"
+              ]
+            }
+          },
+          "status": "Forbidden",
+          "code": 403,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Not Found - Resource not found",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"docSourceAll\": \"<oneOf>\",\n  \"recipientAddressSource\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"priority\": \"overnight\",\n  \"color\": \"<string>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/single/doc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "single",
+                "doc"
+              ]
+            }
+          },
+          "status": "Not Found",
+          "code": 404,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Unprocessable Entity - Validation failed",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"docSourceAll\": \"<oneOf>\",\n  \"recipientAddressSource\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"priority\": \"overnight\",\n  \"color\": \"<string>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/single/doc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "single",
+                "doc"
+              ]
+            }
+          },
+          "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+          "code": 422,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Internal Server Error - Server encountered an error",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"docSourceAll\": \"<oneOf>\",\n  \"recipientAddressSource\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"priority\": \"overnight\",\n  \"color\": \"<string>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/single/doc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "single",
+                "doc"
+              ]
+            }
+          },
+          "status": "Internal Server Error",
+          "code": 500,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "POST /jobs/submit/single/pdf/addressCapture",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"docSourceStandard\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+          "options": {
+            "raw": {
+              "headerFamily": "json",
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/jobs/submit/single/pdf/addressCapture",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "jobs",
+            "submit",
+            "single",
+            "pdf",
+            "addressCapture"
+          ]
+        },
+        "description": "Submits a mailing job (single pdf addressCapture). The request body contains job parameters including document source, recipient address information, and payment details."
+      },
+      "response": [
+        {
+          "name": "Success",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"docSourceStandard\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/single/pdf/addressCapture",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "single",
+                "pdf",
+                "addressCapture"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"status\": \"<string>\",\n  \"message\": \"<string>\",\n  \"requestId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Bad Request - Invalid request parameters",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"docSourceStandard\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/single/pdf/addressCapture",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "single",
+                "pdf",
+                "addressCapture"
+              ]
+            }
+          },
+          "status": "Bad Request",
+          "code": 400,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Unauthorized - Missing or invalid authentication",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"docSourceStandard\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/single/pdf/addressCapture",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "single",
+                "pdf",
+                "addressCapture"
+              ]
+            }
+          },
+          "status": "Unauthorized",
+          "code": 401,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Forbidden - Insufficient permissions",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"docSourceStandard\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/single/pdf/addressCapture",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "single",
+                "pdf",
+                "addressCapture"
+              ]
+            }
+          },
+          "status": "Forbidden",
+          "code": 403,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Not Found - Resource not found",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"docSourceStandard\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/single/pdf/addressCapture",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "single",
+                "pdf",
+                "addressCapture"
+              ]
+            }
+          },
+          "status": "Not Found",
+          "code": 404,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Unprocessable Entity - Validation failed",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"docSourceStandard\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/single/pdf/addressCapture",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "single",
+                "pdf",
+                "addressCapture"
+              ]
+            }
+          },
+          "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+          "code": 422,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Internal Server Error - Server encountered an error",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"docSourceStandard\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/single/pdf/addressCapture",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "single",
+                "pdf",
+                "addressCapture"
+              ]
+            }
+          },
+          "status": "Internal Server Error",
+          "code": 500,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "POST /jobs/submit/single/pdf/split",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"docSourceStandard\": \"<oneOf>\",\n  \"pdfSplitJobsWithAddress\": [\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"recipientAddressSource\": \"<oneOf>\"\n    },\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"recipientAddressSource\": \"<oneOf>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+          "options": {
+            "raw": {
+              "headerFamily": "json",
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/jobs/submit/single/pdf/split",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "jobs",
+            "submit",
+            "single",
+            "pdf",
+            "split"
+          ]
+        },
+        "description": "Submits a mailing job (single pdf split). The request body contains job parameters including document source, recipient address information, and payment details."
+      },
+      "response": [
+        {
+          "name": "Success",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"docSourceStandard\": \"<oneOf>\",\n  \"pdfSplitJobsWithAddress\": [\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"recipientAddressSource\": \"<oneOf>\"\n    },\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"recipientAddressSource\": \"<oneOf>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/single/pdf/split",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "single",
+                "pdf",
+                "split"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"status\": \"<string>\",\n  \"message\": \"<string>\",\n  \"requestId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Bad Request - Invalid request parameters",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"docSourceStandard\": \"<oneOf>\",\n  \"pdfSplitJobsWithAddress\": [\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"recipientAddressSource\": \"<oneOf>\"\n    },\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"recipientAddressSource\": \"<oneOf>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/single/pdf/split",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "single",
+                "pdf",
+                "split"
+              ]
+            }
+          },
+          "status": "Bad Request",
+          "code": 400,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Unauthorized - Missing or invalid authentication",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"docSourceStandard\": \"<oneOf>\",\n  \"pdfSplitJobsWithAddress\": [\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"recipientAddressSource\": \"<oneOf>\"\n    },\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"recipientAddressSource\": \"<oneOf>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/single/pdf/split",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "single",
+                "pdf",
+                "split"
+              ]
+            }
+          },
+          "status": "Unauthorized",
+          "code": 401,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Forbidden - Insufficient permissions",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"docSourceStandard\": \"<oneOf>\",\n  \"pdfSplitJobsWithAddress\": [\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"recipientAddressSource\": \"<oneOf>\"\n    },\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"recipientAddressSource\": \"<oneOf>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/single/pdf/split",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "single",
+                "pdf",
+                "split"
+              ]
+            }
+          },
+          "status": "Forbidden",
+          "code": 403,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Not Found - Resource not found",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"docSourceStandard\": \"<oneOf>\",\n  \"pdfSplitJobsWithAddress\": [\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"recipientAddressSource\": \"<oneOf>\"\n    },\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"recipientAddressSource\": \"<oneOf>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/single/pdf/split",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "single",
+                "pdf",
+                "split"
+              ]
+            }
+          },
+          "status": "Not Found",
+          "code": 404,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Unprocessable Entity - Validation failed",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"docSourceStandard\": \"<oneOf>\",\n  \"pdfSplitJobsWithAddress\": [\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"recipientAddressSource\": \"<oneOf>\"\n    },\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"recipientAddressSource\": \"<oneOf>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/single/pdf/split",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "single",
+                "pdf",
+                "split"
+              ]
+            }
+          },
+          "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+          "code": 422,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Internal Server Error - Server encountered an error",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"docSourceStandard\": \"<oneOf>\",\n  \"pdfSplitJobsWithAddress\": [\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"recipientAddressSource\": \"<oneOf>\"\n    },\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\",\n      \"recipientAddressSource\": \"<oneOf>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/single/pdf/split",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "single",
+                "pdf",
+                "split"
+              ]
+            }
+          },
+          "status": "Internal Server Error",
+          "code": 500,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "POST /jobs/submit/single/pdf/split/addressCapture",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"docSourceStandard\": \"<oneOf>\",\n  \"pdfSplitJobsNoAddress\": [\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\"\n    },\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+          "options": {
+            "raw": {
+              "headerFamily": "json",
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/jobs/submit/single/pdf/split/addressCapture",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "jobs",
+            "submit",
+            "single",
+            "pdf",
+            "split",
+            "addressCapture"
+          ]
+        },
+        "description": "Submits a mailing job (single pdf split addressCapture). The request body contains job parameters including document source, recipient address information, and payment details."
+      },
+      "response": [
+        {
+          "name": "Success",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"docSourceStandard\": \"<oneOf>\",\n  \"pdfSplitJobsNoAddress\": [\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\"\n    },\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/single/pdf/split/addressCapture",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "single",
+                "pdf",
+                "split",
+                "addressCapture"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"status\": \"<string>\",\n  \"message\": \"<string>\",\n  \"requestId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Bad Request - Invalid request parameters",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"docSourceStandard\": \"<oneOf>\",\n  \"pdfSplitJobsNoAddress\": [\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\"\n    },\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/single/pdf/split/addressCapture",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "single",
+                "pdf",
+                "split",
+                "addressCapture"
+              ]
+            }
+          },
+          "status": "Bad Request",
+          "code": 400,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Unauthorized - Missing or invalid authentication",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"docSourceStandard\": \"<oneOf>\",\n  \"pdfSplitJobsNoAddress\": [\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\"\n    },\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/single/pdf/split/addressCapture",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "single",
+                "pdf",
+                "split",
+                "addressCapture"
+              ]
+            }
+          },
+          "status": "Unauthorized",
+          "code": 401,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Forbidden - Insufficient permissions",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"docSourceStandard\": \"<oneOf>\",\n  \"pdfSplitJobsNoAddress\": [\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\"\n    },\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/single/pdf/split/addressCapture",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "single",
+                "pdf",
+                "split",
+                "addressCapture"
+              ]
+            }
+          },
+          "status": "Forbidden",
+          "code": 403,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Not Found - Resource not found",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"docSourceStandard\": \"<oneOf>\",\n  \"pdfSplitJobsNoAddress\": [\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\"\n    },\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/single/pdf/split/addressCapture",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "single",
+                "pdf",
+                "split",
+                "addressCapture"
+              ]
+            }
+          },
+          "status": "Not Found",
+          "code": 404,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Unprocessable Entity - Validation failed",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"docSourceStandard\": \"<oneOf>\",\n  \"pdfSplitJobsNoAddress\": [\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\"\n    },\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/single/pdf/split/addressCapture",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "single",
+                "pdf",
+                "split",
+                "addressCapture"
+              ]
+            }
+          },
+          "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+          "code": 422,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Internal Server Error - Server encountered an error",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"docSourceStandard\": \"<oneOf>\",\n  \"pdfSplitJobsNoAddress\": [\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\"\n    },\n    {\n      \"startPage\": \"<integer>\",\n      \"endPage\": \"<integer>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/single/pdf/split/addressCapture",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "single",
+                "pdf",
+                "split",
+                "addressCapture"
+              ]
+            }
+          },
+          "status": "Internal Server Error",
+          "code": 500,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "POST /jobs/submit/multi/doc",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"multiDocJobs\": [\n    {\n      \"docSourceAll\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    },\n    {\n      \"docSourceAll\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+          "options": {
+            "raw": {
+              "headerFamily": "json",
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/jobs/submit/multi/doc",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "jobs",
+            "submit",
+            "multi",
+            "doc"
+          ]
+        },
+        "description": "Submits a mailing job (multi doc). The request body contains job parameters including document source, recipient address information, and payment details."
+      },
+      "response": [
+        {
+          "name": "Success",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"multiDocJobs\": [\n    {\n      \"docSourceAll\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    },\n    {\n      \"docSourceAll\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/multi/doc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "multi",
+                "doc"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"status\": \"<string>\",\n  \"message\": \"<string>\",\n  \"requestId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Bad Request - Invalid request parameters",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"multiDocJobs\": [\n    {\n      \"docSourceAll\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    },\n    {\n      \"docSourceAll\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/multi/doc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "multi",
+                "doc"
+              ]
+            }
+          },
+          "status": "Bad Request",
+          "code": 400,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Unauthorized - Missing or invalid authentication",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"multiDocJobs\": [\n    {\n      \"docSourceAll\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    },\n    {\n      \"docSourceAll\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/multi/doc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "multi",
+                "doc"
+              ]
+            }
+          },
+          "status": "Unauthorized",
+          "code": 401,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Forbidden - Insufficient permissions",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"multiDocJobs\": [\n    {\n      \"docSourceAll\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    },\n    {\n      \"docSourceAll\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/multi/doc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "multi",
+                "doc"
+              ]
+            }
+          },
+          "status": "Forbidden",
+          "code": 403,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Not Found - Resource not found",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"multiDocJobs\": [\n    {\n      \"docSourceAll\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    },\n    {\n      \"docSourceAll\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/multi/doc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "multi",
+                "doc"
+              ]
+            }
+          },
+          "status": "Not Found",
+          "code": 404,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Unprocessable Entity - Validation failed",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"multiDocJobs\": [\n    {\n      \"docSourceAll\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    },\n    {\n      \"docSourceAll\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/multi/doc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "multi",
+                "doc"
+              ]
+            }
+          },
+          "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+          "code": 422,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Internal Server Error - Server encountered an error",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"multiDocJobs\": [\n    {\n      \"docSourceAll\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    },\n    {\n      \"docSourceAll\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/multi/doc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "multi",
+                "doc"
+              ]
+            }
+          },
+          "status": "Internal Server Error",
+          "code": 500,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "POST /jobs/submit/multi/doc/merge",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"mergeDocumentSource\": [\n    \"<integer>\",\n    \"<integer>\"\n  ],\n  \"recipientAddressSource\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+          "options": {
+            "raw": {
+              "headerFamily": "json",
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/jobs/submit/multi/doc/merge",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "jobs",
+            "submit",
+            "multi",
+            "doc",
+            "merge"
+          ]
+        },
+        "description": "Submits a mailing job (multi doc merge). The request body contains job parameters including document source, recipient address information, and payment details."
+      },
+      "response": [
+        {
+          "name": "Success",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mergeDocumentSource\": [\n    \"<integer>\",\n    \"<integer>\"\n  ],\n  \"recipientAddressSource\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/multi/doc/merge",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "multi",
+                "doc",
+                "merge"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"status\": \"<string>\",\n  \"message\": \"<string>\",\n  \"requestId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Bad Request - Invalid request parameters",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mergeDocumentSource\": [\n    \"<integer>\",\n    \"<integer>\"\n  ],\n  \"recipientAddressSource\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/multi/doc/merge",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "multi",
+                "doc",
+                "merge"
+              ]
+            }
+          },
+          "status": "Bad Request",
+          "code": 400,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Unauthorized - Missing or invalid authentication",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mergeDocumentSource\": [\n    \"<integer>\",\n    \"<integer>\"\n  ],\n  \"recipientAddressSource\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/multi/doc/merge",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "multi",
+                "doc",
+                "merge"
+              ]
+            }
+          },
+          "status": "Unauthorized",
+          "code": 401,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Forbidden - Insufficient permissions",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mergeDocumentSource\": [\n    \"<integer>\",\n    \"<integer>\"\n  ],\n  \"recipientAddressSource\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/multi/doc/merge",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "multi",
+                "doc",
+                "merge"
+              ]
+            }
+          },
+          "status": "Forbidden",
+          "code": 403,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Not Found - Resource not found",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mergeDocumentSource\": [\n    \"<integer>\",\n    \"<integer>\"\n  ],\n  \"recipientAddressSource\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/multi/doc/merge",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "multi",
+                "doc",
+                "merge"
+              ]
+            }
+          },
+          "status": "Not Found",
+          "code": 404,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Unprocessable Entity - Validation failed",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mergeDocumentSource\": [\n    \"<integer>\",\n    \"<integer>\"\n  ],\n  \"recipientAddressSource\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/multi/doc/merge",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "multi",
+                "doc",
+                "merge"
+              ]
+            }
+          },
+          "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+          "code": 422,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Internal Server Error - Server encountered an error",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mergeDocumentSource\": [\n    \"<integer>\",\n    \"<integer>\"\n  ],\n  \"recipientAddressSource\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/multi/doc/merge",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "multi",
+                "doc",
+                "merge"
+              ]
+            }
+          },
+          "status": "Internal Server Error",
+          "code": 500,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "POST /jobs/submit/multi/zip",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"multiZipJobs\": [\n    {\n      \"docSourceZipFile\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    },\n    {\n      \"docSourceZipFile\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+          "options": {
+            "raw": {
+              "headerFamily": "json",
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/jobs/submit/multi/zip",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "jobs",
+            "submit",
+            "multi",
+            "zip"
+          ]
+        },
+        "description": "Submits a mailing job (multi zip). The request body contains job parameters including document source, recipient address information, and payment details."
+      },
+      "response": [
+        {
+          "name": "Success",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"multiZipJobs\": [\n    {\n      \"docSourceZipFile\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    },\n    {\n      \"docSourceZipFile\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/multi/zip",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "multi",
+                "zip"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"status\": \"<string>\",\n  \"message\": \"<string>\",\n  \"requestId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Bad Request - Invalid request parameters",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"multiZipJobs\": [\n    {\n      \"docSourceZipFile\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    },\n    {\n      \"docSourceZipFile\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/multi/zip",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "multi",
+                "zip"
+              ]
+            }
+          },
+          "status": "Bad Request",
+          "code": 400,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Unauthorized - Missing or invalid authentication",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"multiZipJobs\": [\n    {\n      \"docSourceZipFile\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    },\n    {\n      \"docSourceZipFile\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/multi/zip",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "multi",
+                "zip"
+              ]
+            }
+          },
+          "status": "Unauthorized",
+          "code": 401,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Forbidden - Insufficient permissions",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"multiZipJobs\": [\n    {\n      \"docSourceZipFile\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    },\n    {\n      \"docSourceZipFile\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/multi/zip",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "multi",
+                "zip"
+              ]
+            }
+          },
+          "status": "Forbidden",
+          "code": 403,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Not Found - Resource not found",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"multiZipJobs\": [\n    {\n      \"docSourceZipFile\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    },\n    {\n      \"docSourceZipFile\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/multi/zip",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "multi",
+                "zip"
+              ]
+            }
+          },
+          "status": "Not Found",
+          "code": 404,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Unprocessable Entity - Validation failed",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"multiZipJobs\": [\n    {\n      \"docSourceZipFile\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    },\n    {\n      \"docSourceZipFile\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/multi/zip",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "multi",
+                "zip"
+              ]
+            }
+          },
+          "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+          "code": 422,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Internal Server Error - Server encountered an error",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"multiZipJobs\": [\n    {\n      \"docSourceZipFile\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    },\n    {\n      \"docSourceZipFile\": \"<oneOf>\",\n      \"recipientAddressSource\": \"<oneOf>\",\n      \"jobTemplate\": \"<string>\"\n    }\n  ],\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/multi/zip",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "multi",
+                "zip"
+              ]
+            }
+          },
+          "status": "Internal Server Error",
+          "code": 500,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "POST /jobs/submit/multi/zip/addressCapture",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"zipDocumentSource\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+          "options": {
+            "raw": {
+              "headerFamily": "json",
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/jobs/submit/multi/zip/addressCapture",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "jobs",
+            "submit",
+            "multi",
+            "zip",
+            "addressCapture"
+          ]
+        },
+        "description": "Submits a mailing job (multi zip addressCapture). The request body contains job parameters including document source, recipient address information, and payment details."
+      },
+      "response": [
+        {
+          "name": "Success",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"zipDocumentSource\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/multi/zip/addressCapture",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "multi",
+                "zip",
+                "addressCapture"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"status\": \"<string>\",\n  \"message\": \"<string>\",\n  \"requestId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Bad Request - Invalid request parameters",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"zipDocumentSource\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/multi/zip/addressCapture",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "multi",
+                "zip",
+                "addressCapture"
+              ]
+            }
+          },
+          "status": "Bad Request",
+          "code": 400,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Unauthorized - Missing or invalid authentication",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"zipDocumentSource\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/multi/zip/addressCapture",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "multi",
+                "zip",
+                "addressCapture"
+              ]
+            }
+          },
+          "status": "Unauthorized",
+          "code": 401,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Forbidden - Insufficient permissions",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"zipDocumentSource\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/multi/zip/addressCapture",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "multi",
+                "zip",
+                "addressCapture"
+              ]
+            }
+          },
+          "status": "Forbidden",
+          "code": 403,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Not Found - Resource not found",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"zipDocumentSource\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/multi/zip/addressCapture",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "multi",
+                "zip",
+                "addressCapture"
+              ]
+            }
+          },
+          "status": "Not Found",
+          "code": 404,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Unprocessable Entity - Validation failed",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"zipDocumentSource\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/multi/zip/addressCapture",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "multi",
+                "zip",
+                "addressCapture"
+              ]
+            }
+          },
+          "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
+          "code": 422,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        },
+        {
+          "name": "Internal Server Error - Server encountered an error",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: bearer",
+                "key": "Authorization",
+                "value": "Bearer <token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"zipDocumentSource\": \"<oneOf>\",\n  \"jobTemplate\": \"<string>\",\n  \"paymentDetails\": \"<oneOf>\",\n  \"returnAddress\": {\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"address1\": \"<string>\",\n    \"city\": \"<string>\",\n    \"state\": \"<string>\",\n    \"zip\": \"<string>\",\n    \"country\": \"<string>\",\n    \"company\": \"<string>\",\n    \"address2\": \"<string>\",\n    \"address3\": \"<string>\"\n  },\n  \"jobOptions\": {\n    \"documentClass\": \"<string>\",\n    \"layout\": \"<string>\",\n    \"productionTime\": \"<string>\",\n    \"envelope\": \"<string>\",\n    \"color\": \"<string>\",\n    \"paperType\": \"<string>\",\n    \"printOption\": \"<string>\",\n    \"mailClass\": \"<string>\"\n  },\n  \"tags\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/jobs/submit/multi/zip/addressCapture",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "submit",
+                "multi",
+                "zip",
+                "addressCapture"
+              ]
+            }
+          },
+          "status": "Internal Server Error",
+          "code": 500,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"errorType\": \"ResourceNotFoundError\",\n  \"errorMessage\": \"<string>\",\n  \"errorCode\": \"EXPIRED_TOKEN\",\n  \"errorDetails\": \"<string>\",\n  \"errorTrackingId\": \"<string>\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "POST /auth/tokens/short",
+      "request": {
+        "auth": {
+          "type": "oauth2",
+          "oauth2": [
+            {
+              "key": "scope",
+              "value": "tokens:write tokens:revoke",
+              "type": "string"
+            },
+            {
+              "key": "accessTokenUrl",
+              "value": "/auth/tokens/long",
+              "type": "string"
+            },
+            {
+              "key": "grant_type",
+              "value": "client_credentials",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"scopes\": [\n    \"jobs:submit\",\n    \"jobs:read\",\n    \"templates:read\"\n  ]\n}",
+          "options": {
+            "raw": {
+              "headerFamily": "json",
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/tokens/short",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "tokens",
+            "short"
+          ]
+        },
+        "description": "Exchange a valid long-term token for a short-lived JWT (e.g., 15 minutes).\nThe long-term token must be sent in the Authorization header as `Bearer <long_token>`.\n"
+      },
+      "response": [
+        {
+          "name": "Short-term token issued",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: oauth2",
+                "key": "Authorization",
+                "value": "<token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"long_token\": \"<string>\",\n  \"scopes\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/tokens/short",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "tokens",
+                "short"
+              ]
+            }
+          },
+          "status": "Created",
+          "code": 201,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"token_type\": \"Bearer\",\n  \"access_token\": \"<string>\",\n  \"expires_in\": \"<integer>\",\n  \"expires_at\": \"<dateTime>\",\n  \"scopes\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"token_id\": \"<string>\"\n}"
+        },
+        {
+          "name": "Bad request",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: oauth2",
+                "key": "Authorization",
+                "value": "<token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"long_token\": \"<string>\",\n  \"scopes\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/tokens/short",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "tokens",
+                "short"
+              ]
+            }
+          },
+          "status": "Bad Request",
+          "code": 400,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\",\n  \"details\": {}\n}"
+        },
+        {
+          "name": "Unauthorized",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: oauth2",
+                "key": "Authorization",
+                "value": "<token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"long_token\": \"<string>\",\n  \"scopes\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/tokens/short",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "tokens",
+                "short"
+              ]
+            }
+          },
+          "status": "Unauthorized",
+          "code": 401,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\",\n  \"details\": {}\n}"
+        },
+        {
+          "name": "Too Many Requests",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: oauth2",
+                "key": "Authorization",
+                "value": "<token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"long_token\": \"<string>\",\n  \"scopes\": [\n    \"<string>\",\n    \"<string>\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/tokens/short",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "tokens",
+                "short"
+              ]
+            }
+          },
+          "status": "Too Many Requests",
+          "code": 429,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\",\n  \"details\": {}\n}"
+        }
+      ]
+    },
+    {
+      "name": "POST /auth/tokens/long",
+      "request": {
+        "auth": {
+          "type": "oauth2",
+          "oauth2": [
+            {
+              "key": "scope",
+              "value": "tokens:write tokens:revoke",
+              "type": "string"
+            },
+            {
+              "key": "accessTokenUrl",
+              "value": "/auth/tokens/short",
+              "type": "string"
+            },
+            {
+              "key": "grant_type",
+              "value": "client_credentials",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"grant_type\": \"client_credentials\",\n  \"client_id\": \"{{clientId}}\",\n  \"client_secret\": \"{{clientSecret}}\",\n  \"scopes\": [\n    \"jobs:submit\",\n    \"jobs:read\",\n    \"jobs:update\",\n    \"templates:read\",\n    \"account:read\"\n  ],\n  \"ttl_seconds\": 7776000\n}",
+          "options": {
+            "raw": {
+              "headerFamily": "json",
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/tokens/long",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "tokens",
+            "long"
+          ]
+        },
+        "description": "Issues a long-term token (e.g., 30-90 days) for automation or server-to-server use.\nRequires step-up authentication. Choose one of the supported grant types:\n\n- `client_credentials` + `client_secret`\n- `client_credentials` + one-time `otp_code`\n- `assertion` (e.g., signed JWT by your private key)\n- Or an existing short-term token with the `tokens:write` scope\n\nOnly one mechanism is required per call.\n"
+      },
+      "response": [
+        {
+          "name": "Long-term token issued",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: oauth2",
+                "key": "Authorization",
+                "value": "<token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"grant_type\": \"assertion\",\n  \"client_id\": \"<string>\",\n  \"client_secret\": \"<string>\",\n  \"otp_code\": \"<string>\",\n  \"assertion_type\": \"<string>\",\n  \"assertion\": \"<string>\",\n  \"scopes\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"ttl_seconds\": \"<integer>\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/tokens/long",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "tokens",
+                "long"
+              ]
+            }
+          },
+          "status": "Created",
+          "code": 201,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "disabled": false,
+              "description": {
+                "content": "Server-generated identifier for revocation and audit",
+                "type": "text/plain"
+              },
+              "key": "X-Token-Id",
+              "value": "<string>"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"token_type\": \"Bearer\",\n  \"access_token\": \"<string>\",\n  \"expires_in\": \"<integer>\",\n  \"expires_at\": \"<dateTime>\",\n  \"scopes\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"token_id\": \"<string>\"\n}"
+        },
+        {
+          "name": "Bad request",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: oauth2",
+                "key": "Authorization",
+                "value": "<token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"grant_type\": \"assertion\",\n  \"client_id\": \"<string>\",\n  \"client_secret\": \"<string>\",\n  \"otp_code\": \"<string>\",\n  \"assertion_type\": \"<string>\",\n  \"assertion\": \"<string>\",\n  \"scopes\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"ttl_seconds\": \"<integer>\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/tokens/long",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "tokens",
+                "long"
+              ]
+            }
+          },
+          "status": "Bad Request",
+          "code": 400,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\",\n  \"details\": {}\n}"
+        },
+        {
+          "name": "Unauthorized",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: oauth2",
+                "key": "Authorization",
+                "value": "<token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"grant_type\": \"assertion\",\n  \"client_id\": \"<string>\",\n  \"client_secret\": \"<string>\",\n  \"otp_code\": \"<string>\",\n  \"assertion_type\": \"<string>\",\n  \"assertion\": \"<string>\",\n  \"scopes\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"ttl_seconds\": \"<integer>\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/tokens/long",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "tokens",
+                "long"
+              ]
+            }
+          },
+          "status": "Unauthorized",
+          "code": 401,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\",\n  \"details\": {}\n}"
+        },
+        {
+          "name": "Forbidden",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: oauth2",
+                "key": "Authorization",
+                "value": "<token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"grant_type\": \"assertion\",\n  \"client_id\": \"<string>\",\n  \"client_secret\": \"<string>\",\n  \"otp_code\": \"<string>\",\n  \"assertion_type\": \"<string>\",\n  \"assertion\": \"<string>\",\n  \"scopes\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"ttl_seconds\": \"<integer>\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/tokens/long",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "tokens",
+                "long"
+              ]
+            }
+          },
+          "status": "Forbidden",
+          "code": 403,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\",\n  \"details\": {}\n}"
+        },
+        {
+          "name": "Too Many Requests",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: oauth2",
+                "key": "Authorization",
+                "value": "<token>"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"grant_type\": \"assertion\",\n  \"client_id\": \"<string>\",\n  \"client_secret\": \"<string>\",\n  \"otp_code\": \"<string>\",\n  \"assertion_type\": \"<string>\",\n  \"assertion\": \"<string>\",\n  \"scopes\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"ttl_seconds\": \"<integer>\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/tokens/long",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "tokens",
+                "long"
+              ]
+            }
+          },
+          "status": "Too Many Requests",
+          "code": 429,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\",\n  \"details\": {}\n}"
+        }
+      ]
+    },
+    {
+      "name": "POST /auth/tokens/:tokenId/revoke",
+      "request": {
+        "auth": {
+          "type": "oauth2",
+          "oauth2": [
+            {
+              "key": "scope",
+              "value": "tokens:write tokens:revoke",
+              "type": "string"
+            },
+            {
+              "key": "accessTokenUrl",
+              "value": "/auth/tokens/short",
+              "type": "string"
+            },
+            {
+              "key": "grant_type",
+              "value": "client_credentials",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"reason\": \"Compromised key\",\n  \"revoke_all_related\": false\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/tokens/:tokenId/revoke",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "tokens",
+            ":tokenId",
+            "revoke"
+          ],
+          "variable": [
+            {
+              "key": "tokenId",
+              "value": "<string>",
+              "description": "(Required) The token ID to revoke"
+            }
+          ]
+        },
+        "description": "Revokes a short- or long-term token by its `tokenId`. Idempotent."
+      },
+      "response": [
+        {
+          "name": "Revoked (idempotent)",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "description": "Added as a part of security scheme: oauth2",
+                "key": "Authorization",
+                "value": "<token>"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/tokens/:tokenId/revoke",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "tokens",
+                ":tokenId",
+                "revoke"
+              ],
+              "variable": [
+                {
+                  "key": "tokenId",
+                  "value": "<string>",
+                  "description": "(Required) The token ID to revoke"
+                }
+              ]
+            }
+          },
+          "status": "No Content",
+          "code": 204,
+          "_postman_previewlanguage": "text",
+          "header": [],
+          "cookie": [],
+          "body": null
+        },
+        {
+          "name": "Unauthorized",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: oauth2",
+                "key": "Authorization",
+                "value": "<token>"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/tokens/:tokenId/revoke",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "tokens",
+                ":tokenId",
+                "revoke"
+              ],
+              "variable": [
+                {
+                  "key": "tokenId",
+                  "value": "<string>",
+                  "description": "(Required) The token ID to revoke"
+                }
+              ]
+            }
+          },
+          "status": "Unauthorized",
+          "code": 401,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\",\n  \"details\": {}\n}"
+        },
+        {
+          "name": "Not found",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "description": "Added as a part of security scheme: oauth2",
+                "key": "Authorization",
+                "value": "<token>"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/tokens/:tokenId/revoke",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "tokens",
+                ":tokenId",
+                "revoke"
+              ],
+              "variable": [
+                {
+                  "key": "tokenId",
+                  "value": "<string>",
+                  "description": "(Required) The token ID to revoke"
+                }
+              ]
+            }
+          },
+          "status": "Not Found",
+          "code": 404,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"code\": \"<string>\",\n  \"message\": \"<string>\",\n  \"details\": {}\n}"
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Postman Pre-request Script for JWT Authentication",
+          "// This script automatically manages token refresh for C2M API requests",
+          "",
+          "// Configuration - Set these in your Postman environment",
+          "const config = {",
+          "    // Use authUrl for authentication endpoints, fallback to baseUrl for compatibility",
+          "    authUrl: pm.environment.get('authUrl') || pm.environment.get('baseUrl') || 'http://localhost:4010',",
+          "    baseUrl: pm.environment.get('baseUrl') || 'http://localhost:4010',",
+          "    clientId: pm.environment.get('clientId'),",
+          "    clientSecret: pm.environment.get('clientSecret'),",
+          "    longTokenVar: 'longTermToken',",
+          "    shortTokenVar: 'shortTermToken',",
+          "    tokenExpiryVar: 'tokenExpiry',",
+          "    tokenIdVar: 'currentTokenId'",
+          "};",
+          "",
+          "// Helper function to check if token is expired",
+          "function isTokenExpired(expiryTime) {",
+          "    if (!expiryTime) return true;",
+          "    const now = new Date().getTime();",
+          "    const expiry = new Date(expiryTime).getTime();",
+          "    const bufferTime = 60 * 1000; // 1 minute buffer",
+          "    return (expiry - now) <= bufferTime;",
+          "}",
+          "",
+          "// Helper function to get long-term token",
+          "async function getLongTermToken() {",
+          "    console.log('Obtaining new long-term token...');",
+          "    ",
+          "    const request = {",
+          "        url: `${config.authUrl}/auth/tokens/long`,",
+          "        method: 'POST',",
+          "        header: {",
+          "            'Content-Type': 'application/json',",
+          "            'X-Client-Id': config.clientId",
+          "        },",
+          "        body: {",
+          "            mode: 'raw',",
+          "            raw: JSON.stringify({",
+          "                grant_type: 'client_credentials',",
+          "                client_id: config.clientId,",
+          "                client_secret: config.clientSecret,",
+          "                scopes: ['jobs:submit', 'templates:read', 'tokens:revoke'],",
+          "                ttl_seconds: 2592000 // 30 days",
+          "            })",
+          "        }",
+          "    };",
+          "    ",
+          "    return new Promise((resolve, reject) => {",
+          "        pm.sendRequest(request, (err, response) => {",
+          "            if (err) {",
+          "                console.error('Failed to get long-term token:', err);",
+          "                reject(err);",
+          "                return;",
+          "            }",
+          "            ",
+          "            if (response.code === 200 || response.code === 201) {",
+          "                const data = response.json();",
+          "                pm.environment.set(config.longTokenVar, data.access_token);",
+          "                pm.environment.set('longTokenId', data.token_id);",
+          "                pm.environment.set('longTokenExpiry', data.expires_at);",
+          "                console.log(`Long-term token obtained: ${data.token_id}`);",
+          "                resolve(data.access_token);",
+          "            } else {",
+          "                console.error('Failed to get long-term token:', response.text());",
+          "                reject(new Error(`HTTP ${response.code}: ${response.text()}`));",
+          "            }",
+          "        });",
+          "    });",
+          "}",
+          "",
+          "// Helper function to get short-term token",
+          "async function getShortTermToken(longTermToken) {",
+          "    console.log('Exchanging for short-term token...');",
+          "    ",
+          "    const request = {",
+          "        url: `${config.authUrl}/auth/tokens/short`,",
+          "        method: 'POST',",
+          "        header: {",
+          "            'Authorization': `Bearer ${longTermToken}`,",
+          "            'Content-Type': 'application/json'",
+          "        },",
+          "        body: {",
+          "            mode: 'raw',",
+          "            raw: JSON.stringify({",
+          "                scopes: ['jobs:submit'] // Narrow scope for actual API calls",
+          "            })",
+          "        }",
+          "    };",
+          "    ",
+          "    return new Promise((resolve, reject) => {",
+          "        pm.sendRequest(request, (err, response) => {",
+          "            if (err) {",
+          "                console.error('Failed to get short-term token:', err);",
+          "                reject(err);",
+          "                return;",
+          "            }",
+          "            ",
+          "            if (response.code === 200 || response.code === 201) {",
+          "                const data = response.json();",
+          "                pm.environment.set(config.shortTokenVar, data.access_token);",
+          "                pm.environment.set(config.tokenExpiryVar, data.expires_at);",
+          "                pm.environment.set(config.tokenIdVar, data.token_id);",
+          "                console.log(`Short-term token obtained: ${data.token_id}, expires: ${data.expires_at}`);",
+          "                resolve(data.access_token);",
+          "            } else {",
+          "                console.error('Failed to get short-term token:', response.text());",
+          "                reject(new Error(`HTTP ${response.code}: ${response.text()}`));",
+          "            }",
+          "        });",
+          "    });",
+          "}",
+          "",
+          "// Main authentication flow",
+          "async function authenticate() {",
+          "    try {",
+          "        // Skip auth for token endpoints",
+          "        const currentPath = pm.request.url.getPath();",
+          "        if (currentPath.includes('/auth/tokens/')) {",
+          "            console.log('Skipping auth for token endpoint');",
+          "            return;",
+          "        }",
+          "        ",
+          "        // Check if we need client credentials",
+          "        if (!config.clientId || !config.clientSecret) {",
+          "            console.warn('Client credentials not configured. Set clientId and clientSecret in environment.');",
+          "            return;",
+          "        }",
+          "        ",
+          "        // Get current tokens from environment",
+          "        let longTermToken = pm.environment.get(config.longTokenVar);",
+          "        const shortTermToken = pm.environment.get(config.shortTokenVar);",
+          "        const tokenExpiry = pm.environment.get(config.tokenExpiryVar);",
+          "        ",
+          "        // Check if we need to refresh tokens",
+          "        if (!longTermToken) {",
+          "            // No long-term token, get one",
+          "            longTermToken = await getLongTermToken();",
+          "        }",
+          "        ",
+          "        if (!shortTermToken || isTokenExpired(tokenExpiry)) {",
+          "            // No short-term token or it's expired, get a new one",
+          "            await getShortTermToken(longTermToken);",
+          "        } else {",
+          "            console.log('Using existing valid short-term token');",
+          "        }",
+          "        ",
+          "        // Set the Authorization header with the short-term token",
+          "        const currentShortToken = pm.environment.get(config.shortTokenVar);",
+          "",
+          "        // FIX: Check URL host (resolved) OR baseUrl variable (for templates)",
+          "        const requestUrl = pm.request.url.toString();",
+          "        const urlHost = Array.isArray(pm.request.url.host) ? pm.request.url.host.join('.') : (pm.request.url.host || '');",
+          "        const baseUrlVar = pm.environment.get('baseUrl') || '';",
+          "",
+          "        // Check both the resolved host AND the baseUrl variable",
+          "        const isMockServer = urlHost.includes('mock.pstmn.io') ||",
+          "                           urlHost.includes('localhost') ||",
+          "                           baseUrlVar.includes('mock.pstmn.io') ||",
+          "                           baseUrlVar.includes('localhost:4010') ||",
+          "                           pm.environment.get('isMockServer') === 'true';",
+          "",
+          "        // Enhanced logging for debugging",
+          "        console.log('=== JWT AUTH DEBUG ===');",
+          "        console.log('Request URL:', requestUrl);",
+          "        console.log('URL Host (resolved):', urlHost);",
+          "        console.log('BaseUrl variable:', baseUrlVar);",
+          "        console.log('Is mock server:', isMockServer);",
+          "        console.log('Short-term token (last 20 chars):', currentShortToken ? '...' + currentShortToken.slice(-20) : 'NONE');",
+          "",
+          "        if (!isMockServer) {",
+          "            pm.request.headers.add({",
+          "                key: 'Authorization',",
+          "                value: `Bearer ${currentShortToken}`",
+          "            });",
+          "            console.log('✅ Authorization header ADDED (real API detected)');",
+          "        } else {",
+          "            console.log('⏭️  Authorization header SKIPPED (mock server detected)');",
+          "        }",
+          "        console.log('=== END DEBUG ===');",
+          "        ",
+          "    } catch (error) {",
+          "        console.error('Authentication failed:', error);",
+          "        throw error;",
+          "    }",
+          "}",
+          "",
+          "// Execute authentication",
+          "authenticate().catch(error => {",
+          "    // Set an error variable that tests can check",
+          "    pm.environment.set('authError', error.toString());",
+          "    console.error('Pre-request script failed:', error);",
+          "});",
+          "",
+          "// Utility functions for manual token management (can be called from Tests tab)",
+          "pm.globals.set('revokeCurrentToken', async function() {",
+          "    const tokenId = pm.environment.get(config.tokenIdVar);",
+          "    const token = pm.environment.get(config.shortTokenVar);",
+          "    ",
+          "    if (!tokenId || !token) {",
+          "        console.log('No token to revoke');",
+          "        return;",
+          "    }",
+          "    ",
+          "    const request = {",
+          "        url: `${config.authUrl}/auth/tokens/${tokenId}/revoke`,",
+          "        method: 'POST',",
+          "        header: {",
+          "            'Authorization': `Bearer ${token}`",
+          "        }",
+          "    };",
+          "    ",
+          "    pm.sendRequest(request, (err, response) => {",
+          "        if (err) {",
+          "            console.error('Failed to revoke token:', err);",
+          "        } else if (response.code === 200 || response.code === 204) {",
+          "            console.log(`Token ${tokenId} revoked successfully`);",
+          "            pm.environment.unset(config.shortTokenVar);",
+          "            pm.environment.unset(config.tokenExpiryVar);",
+          "            pm.environment.unset(config.tokenIdVar);",
+          "        } else {",
+          "            console.error('Failed to revoke token:', response.text());",
+          "        }",
+          "    });",
+          "});",
+          "",
+          "pm.globals.set('refreshTokens', async function() {",
+          "    try {",
+          "        const longTermToken = pm.environment.get(config.longTokenVar) || await getLongTermToken();",
+          "        await getShortTermToken(longTermToken);",
+          "        console.log('Tokens refreshed successfully');",
+          "    } catch (error) {",
+          "        console.error('Failed to refresh tokens:', error);",
+          "    }",
+          "});"
+        ]
+      }
+    }
+  ]
+}

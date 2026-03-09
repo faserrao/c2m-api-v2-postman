@@ -1,0 +1,420 @@
+# Getting Started - Curated Examples Catalog (Extracted from Postman Collection)
+# Pattern: Read structure from Postman, write to YAML catalog
+# Source: REST API V2.postman_collection (3).json
+
+groups:
+- logical_name: most-frequently-used
+  display_name: Most Frequently Used
+  order: 1
+  description: The most common API usage patterns
+- logical_name: bulk
+  display_name: Bulk
+  order: 2
+  description: Processing multiple documents or recipients efficiently
+- logical_name: less-frequently-used
+  display_name: Less frequently used
+  order: 3
+  description: Specialized use cases and advanced features
+examples:
+- name: /jobs/submit//single/doc - single recipient
+  method: POST
+  path: /jobs/submit/single/doc
+  group: most-frequently-used
+  tags: []
+  description: ' - single - doc - single recipient'
+  select:
+    documentSource: requestId
+    recipientAddressSource: singleAddress
+  values: {}
+- name: /jobs/submit/single/doc - mail merge
+  method: POST
+  path: /jobs/submit/single/doc
+  group: most-frequently-used
+  tags: []
+  description: single - doc - mail merge
+  select:
+    recipientAddressSource: addressList
+  values:
+    addressList:
+    - firstName: <String>
+      lastName: <String>
+      address1: <String>
+      address2: <String>
+      address3: <String>
+      city: <String>
+      state: <String>
+      zip: <String>
+      country: <String>
+      foo1: <String>
+      foo2: <String>
+    - firstName: <String>
+      lastName: <String>
+      address1: <String>
+      address2: <String>
+      address3: <String>
+      city: <String>
+      state: <String>
+      zip: <String>
+      country: <String>
+      foo1: <String>
+      foo2: <String>
+    - firstName: <String>
+      lastName: <String>
+      address1: <String>
+      address2: <String>
+      address3: <String>
+      city: <String>
+      state: <String>
+      zip: <String>
+      country: <String>
+      foo1: <String>
+      foo2: <String>
+- name: /jobs/submit/single/pdf/addressCapture
+  method: POST
+  path: /jobs/submit/single/pdf/addressCapture
+  group: most-frequently-used
+  tags: []
+  description: single - pdf - addressCapture
+  select:
+    documentSource: requestId
+  values: {}
+- name: /jobs/submit/single/pdf/split/addressCapture
+  method: POST
+  path: /jobs/submit/single/pdf/split/addressCapture
+  group: bulk
+  tags: []
+  description: single - pdf - split - addressCapture
+  select:
+    documentSource: requestId
+  values: {}
+- name: /jobs/submit/multiple/zip/addressCapture - using zip file
+  method: POST
+  path: /jobs/submit/multiple/zip/addressCapture
+  group: bulk
+  tags: []
+  description: multiple - zip - addressCapture - using zip file
+  select:
+    documentSource: requestId
+  values: {}
+- name: /jobs/submit/single/pdf/split
+  method: POST
+  path: /jobs/submit/single/pdf/split
+  group: bulk
+  tags: []
+  description: single - pdf - split
+  select:
+    documentSource: requestId
+  values:
+    jobs:
+    - pages:
+        startPage: <Integer>
+        endPage: <Integer>
+      recipientAddressSource:
+        firstName: <String>
+        lastName: <String>
+        address1: <String>
+        address2: <String>
+        address3: <String>
+        city: <String>
+        state: <String>
+        zip: <String>
+        country: <String>
+    - pages:
+        startPage: <Integer>
+        endPage: <Integer>
+      recipientAddressSource:
+        singleAddress:
+          firstName: <String>
+          lastName: <String>
+          address1: <String>
+          address2: <String>
+          address3: <String>
+          city: <String>
+          state: <String>
+          zip: <String>
+          country: <String>
+    - pages:
+        startPage: <Integer>
+        endPage: <Integer>
+      recipientAddressSource:
+        singleAddress:
+          firstName: <String>
+          lastName: <String>
+          address1: <String>
+          address2: <String>
+          address3: <String>
+          city: <String>
+          state: <String>
+          zip: <String>
+          country: <String>
+- name: /jobs/submit/multiple/doc/merge
+  method: POST
+  path: /jobs/submit/multiple/doc/merge
+  group: less-frequently-used
+  tags: []
+  description: multiple - doc - merge
+  select:
+    documentSource: documentsToMerge
+    recipientAddressSource: singleAddress
+  values:
+    documentsToMerge:
+    - requestId: <Integer>
+    - documentId: <Integer>
+    - documentId: <Integer>
+- name: /jobs/submit/single/doc - using options
+  method: POST
+  path: /jobs/submit/single/doc
+  group: less-frequently-used
+  tags: []
+  description: single - doc - using options
+  select:
+    documentSource: requestId
+    recipientAddressSource: singleAddress
+  values: {}
+- name: /jobs/submit/single/doc - using URL
+  method: POST
+  path: /jobs/submit/single/doc
+  group: less-frequently-used
+  tags: []
+  description: single - doc - using URL
+  select:
+    documentSource: url
+    recipientAddressSource: singleAddress
+  values: {}
+- name: /jobs/submit/single/doc - setting tags
+  method: POST
+  path: /jobs/submit/single/doc
+  group: less-frequently-used
+  tags: []
+  description: single - doc - setting tags
+  select:
+    documentSource: requestId
+    recipientAddressSource: singleAddress
+  values:
+    tags:
+    - <String>
+    - <String>
+    - <String>
+- name: /jobs/submit/single/doc - naming addressList
+  method: POST
+  path: /jobs/submit/single/doc
+  group: less-frequently-used
+  tags: []
+  description: single - doc - naming addressList
+  select:
+    recipientAddressSource: addressList
+  values:
+    addressList:
+    - firstName: <String>
+      lastName: <String>
+      address1: <String>
+      address2: <String>
+      address3: <String>
+      city: <String>
+      state: <String>
+      zip: <String>
+      country: <String>
+      foo1: <String>
+      foo2: <String>
+    - firstName: <String>
+      lastName: <String>
+      address1: <String>
+      address2: <String>
+      address3: <String>
+      city: <String>
+      state: <String>
+      zip: <String>
+      country: <String>
+      foo1: <String>
+      foo2: <String>
+    - firstName: <String>
+      lastName: <String>
+      address1: <String>
+      address2: <String>
+      address3: <String>
+      city: <String>
+      state: <String>
+      zip: <String>
+      country: <String>
+      foo1: <String>
+      foo2: <String>
+- name: /jobs/submit//single/doc - payment option
+  method: POST
+  path: /jobs/submit/single/doc
+  group: less-frequently-used
+  tags: []
+  description: ' - single - doc - payment option'
+  select:
+    documentSource: requestId
+    recipientAddressSource: singleAddress
+  values: {}
+- name: /jobs/submit/multiple/zip - using zip file
+  method: POST
+  path: /jobs/submit/multiple/zip
+  group: less-frequently-used
+  tags: []
+  description: multiple - zip - using zip file
+  select:
+    documentSource: requestId
+  values:
+    jobs:
+    - filename: <String>
+      recipientAddressSource:
+        singleAddress:
+          firstName: <String>
+          lastName: <String>
+          address1: <String>
+          address2: <String>
+          address3: <String>
+          city: <String>
+          state: <String>
+          zip: <String>
+          country: <String>
+    - filename: <String>
+      recipientAddressSource:
+        singleAddress:
+          firstName: <String>
+          lastName: <String>
+          address1: <String>
+          address2: <String>
+          address3: <String>
+          city: <String>
+          state: <String>
+          zip: <String>
+          country: <String>
+    - filename: <String>
+      recipientAddressSource:
+        singleAddress:
+          firstName: <String>
+          lastName: <String>
+          address1: <String>
+          address2: <String>
+          address3: <String>
+          city: <String>
+          state: <String>
+          zip: <String>
+          country: <String>
+- name: /jobs/submit/multiple/zip - using documentId
+  method: POST
+  path: /jobs/submit/multiple/zip
+  group: less-frequently-used
+  tags: []
+  description: multiple - zip - using documentId
+  select: {}
+  values: {}
+- name: /jobs/submit/multiple/doc - using requestID
+  method: POST
+  path: /jobs/submit/multiple/doc
+  group: less-frequently-used
+  tags: []
+  description: multiple - doc - using requestID
+  select:
+    documentSource: requestId
+  values:
+    jobs:
+    - filename: <String>
+      recipientAddressSource:
+        singleAddress:
+          firstName: <String>
+          lastName: <String>
+          address1: <String>
+          address2: <String>
+          address3: <String>
+          city: <String>
+          state: <String>
+          zip: <String>
+          country: <String>
+    - filename: <String>
+      recipientAddressSource:
+        singleAddress:
+          firstName: <String>
+          lastName: <String>
+          address1: <String>
+          address2: <String>
+          address3: <String>
+          city: <String>
+          state: <String>
+          zip: <String>
+          country: <String>
+    - filename: <String>
+      recipientAddressSource:
+        singleAddress:
+          firstName: <String>
+          lastName: <String>
+          address1: <String>
+          address2: <String>
+          address3: <String>
+          city: <String>
+          state: <String>
+          zip: <String>
+          country: <String>
+- name: /jobs/submit/multiple/doc - using documentID
+  method: POST
+  path: /jobs/submit/multiple/doc
+  group: less-frequently-used
+  tags: []
+  description: multiple - doc - using documentID
+  select: {}
+  values:
+    jobs:
+    - documentSource:
+        documentId: <Integer>
+      recipientAddressSource:
+        mappingId: <Integer>
+        singleAddress:
+          firstName: <String>
+          lastName: <String>
+          address1: <String>
+          address2: <String>
+          address3: <String>
+          city: <String>
+          state: <String>
+          zip: <String>
+          country: <String>
+    - documentSource:
+        documentId: <Integer>
+      recipientAddressSource:
+        mappingId: <Integer>
+        singleAddress:
+          firstName: <String>
+          lastName: <String>
+          address1: <String>
+          address2: <String>
+          address3: <String>
+          city: <String>
+          state: <String>
+          zip: <String>
+          country: <String>
+    - documentSource:
+        documentId: <Integer>
+      recipientAddressSource:
+        singleAddress:
+          firstName: <String>
+          lastName: <String>
+          address1: <String>
+          address2: <String>
+          address3: <String>
+          city: <String>
+          state: <String>
+          zip: <String>
+          country: <String>
+- name: /jobs/submit/single/doc - using documentID
+  method: POST
+  path: /jobs/submit/single/doc
+  group: less-frequently-used
+  tags: []
+  description: single - doc - using documentID
+  select:
+    documentSource: documentId
+    recipientAddressSource: singleAddress
+  values: {}
+- name: /jobs/submit/single/doc - using addressListId
+  method: POST
+  path: /jobs/submit/single/doc
+  group: less-frequently-used
+  tags: []
+  description: single - doc - using addressListId
+  select:
+    documentSource: requestId
+    recipientAddressSource: addressListId
+  values: {}
