@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>C2M API v2 Documentation - Stoplight Elements</title>
+    <meta name="description" content="Click2Mail API v2 interactive documentation powered by Stoplight Elements">
+
+    <!-- Stoplight Elements styles -->
+    <link rel="stylesheet" href="https://unpkg.com/@stoplight/elements/styles.min.css">
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      }
+
+      /* Custom styling for Elements */
+      elements-api {
+        height: 100vh;
+      }
+
+      /* Header banner */
+      .custom-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+
+      .custom-header h1 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+      }
+
+      .custom-header .links {
+        display: flex;
+        gap: 1rem;
+      }
+
+      .custom-header a {
+        color: white;
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.2);
+        transition: background 0.2s;
+      }
+
+      .custom-header a:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      /* Mock server banner */
+      .mock-server-banner {
+        background: #f0f4f8;
+        border-left: 4px solid #4299e1;
+        padding: 1rem 2rem;
+        margin-bottom: 0;
+      }
+
+      .mock-server-banner p {
+        margin: 0;
+        color: #2d3748;
+      }
+
+      .mock-server-banner strong {
+        color: #1a365d;
+      }
+
+      .mock-server-banner code {
+        background: #e2e8f0;
+        padding: 0.2rem 0.5rem;
+        border-radius: 3px;
+        font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+        font-size: 0.9em;
+      }
+
+      /* Container for Elements */
+      .elements-container {
+        height: calc(100vh - 120px);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Custom Header -->
+    <div class="custom-header">
+      <h1>C2M API v2 Documentation</h1>
+      <div class="links">
+        <a href="index.html">Redoc</a>
+        <a href="swagger.html">Swagger UI</a>
+        <a href="elements.html">Elements</a>
+        <a href="https://github.com/click2mail/c2m-api-v2-postman" target="_blank">GitHub</a>
+      </div>
+    </div>
+
+    <!-- Mock Server Banner -->
+    <div class="mock-server-banner">
+      <p>
+        <strong>🚀 Try it live:</strong> This documentation is connected to our mock server at
+        <code>https://d5af3934-ca42-44ba-a999-50d31efcb698.mock.pstmn.io</code>.
+        You can test API calls directly from this page!
+      </p>
+    </div>
+
+    <!-- Stoplight Elements API Component -->
+    <div class="elements-container">
+      <elements-api
+        apiDescriptionUrl="swagger.yaml"
+        router="hash"
+        layout="sidebar"
+        tryItCredentialsPolicy="include"
+      />
+    </div>
+
+    <!-- Stoplight Elements script -->
+    <script src="https://unpkg.com/@stoplight/elements/web-components.min.js"></script>
+  </body>
+</html>

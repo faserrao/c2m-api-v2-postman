@@ -1912,6 +1912,14 @@ docs-build:
 	sed "s|__MOCK_SERVER_URL__|$$MOCK_URL|g" $(DOCS_DIR)/swagger-initializer.js.template > $(DOCS_DIR)/swagger-initializer.js; \
 	echo "Swagger UI mock server URL: $$MOCK_URL"
 	@cp $(OPENAPI_BUNDLED_FILE) $(DOCS_DIR)/swagger.yaml
+	@echo "🔧 Building Stoplight Elements documentation..."
+	@MOCK_URL=$$(cat $(POSTMAN_MOCK_URL_FILE) 2>/dev/null || echo ""); \
+	sed "s|__MOCK_SERVER_URL__|$$MOCK_URL|g" $(DOCS_DIR)/elements.html.template > $(DOCS_DIR)/elements.html; \
+	echo "Stoplight Elements mock server URL: $$MOCK_URL"
+	@echo "✅ Documentation built successfully!"
+	@echo "   📄 Redoc: $(DOCS_DIR)/index.html"
+	@echo "   📄 Swagger UI: $(DOCS_DIR)/swagger.html"
+	@echo "   📄 Stoplight Elements: $(DOCS_DIR)/elements.html"
 
 # Serve documentation in background
 .PHONY: docs-serve-bg

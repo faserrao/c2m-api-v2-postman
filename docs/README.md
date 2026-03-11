@@ -18,13 +18,15 @@ Look for the **"Start with Template Endpoints!"** banner at the top of the docum
 docs/
 ├── index.html                      # Main documentation landing page
 ├── redoc.html                      # Redocly ReDoc documentation
+├── elements.html                   # Stoplight Elements documentation
 ├── swagger.html                    # Swagger UI documentation
 ├── api.md                          # Markdown API reference
 ├── swagger-initializer.js          # Swagger UI configuration
 ├── swagger.yaml                    # Local copy of OpenAPI spec
 ├── templates/                      # Documentation templates
 │   ├── swagger-initializer.js.template
-│   └── swagger.html.template
+│   ├── swagger.html.template
+│   └── elements.html.template
 ├── custom-redoc-template.hbs       # Custom Redoc template
 ├── template-endpoints-banner.html  # Banner for template endpoints
 ├── template-endpoints-quickstart.html # Quick start guide
@@ -39,7 +41,9 @@ docs/
 
 ## Documentation Tools
 
-### 1. Redocly ReDoc (`redoc.html`)
+We provide **three interactive documentation formats**, each with unique strengths:
+
+### 1. Redocly ReDoc (`index.html`)
 
 Interactive API documentation with a clean, responsive design.
 
@@ -48,18 +52,49 @@ Interactive API documentation with a clean, responsive design.
 - Code samples in multiple languages
 - Search functionality
 - Nested schema visualization
-- Try-it-out functionality (configurable)
+- Template endpoints banner
+- Clean, professional design
 
-**Access:** http://localhost:8080/redoc.html
+**Access:** http://localhost:8080/index.html (or http://localhost:8080/)
+
+**Best for:** Reading documentation, understanding API structure
 
 **Generation:**
 ```bash
 make docs-build
 ```
 
-### 2. Swagger UI (`swagger.html`)
+### 2. Stoplight Elements (`elements.html`)
 
-Interactive API explorer with built-in testing capabilities.
+Modern, component-based API documentation with excellent UX.
+
+**Features:**
+- Sidebar navigation with endpoint grouping
+- Try-it-out console with live testing
+- Mock server integration
+- Request maker with authentication
+- Clean, modern UI
+- Automatic request/response validation
+- Schema explorer
+
+**Access:** http://localhost:8080/elements.html
+
+**Best for:** Interactive testing, API exploration, modern user experience
+
+**Benefits:**
+- Best-in-class "Try It" functionality
+- Excellent for developers testing endpoints
+- Beautiful, intuitive interface
+- Built-in mock server support
+
+**Generation:**
+```bash
+make docs-build  # Automatically included
+```
+
+### 3. Swagger UI (`swagger.html`)
+
+Classic interactive API explorer with comprehensive testing capabilities.
 
 **Features:**
 - Try-it-out functionality
@@ -67,12 +102,15 @@ Interactive API explorer with built-in testing capabilities.
 - Authentication support
 - Schema visualization
 - Multiple server support
+- Industry-standard interface
 
 **Access:** http://localhost:8080/swagger.html
 
+**Best for:** Traditional API testing, familiar interface
+
 **Configuration:** Edit `swagger-initializer.js` to customize behavior
 
-### 3. Markdown Documentation (`api.md`)
+### 4. Markdown Documentation (`api.md`)
 
 Plain text API reference for offline viewing or integration with other tools.
 
