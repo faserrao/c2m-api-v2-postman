@@ -47,9 +47,9 @@ Latest build: See [GitHub Actions](https://github.com/faserrao/c2m-api-v2-postma
 ### Accessing Documentation
 
 **GitHub Pages (Live):**
-- **Redocly ReDoc**: https://faserrao.github.io/c2m-api-v2-postman/index.html
-- **Stoplight Elements**: https://faserrao.github.io/c2m-api-v2-postman/elements.html
-- **Swagger UI**: https://faserrao.github.io/c2m-api-v2-postman/swagger.html
+- **Redocly ReDoc**: https://click2mail.github.io/c2m-api-v2-postman-artifacts/index.html
+- **Stoplight Elements**: https://click2mail.github.io/c2m-api-v2-postman-artifacts/elements.html
+- **Swagger UI**: https://click2mail.github.io/c2m-api-v2-postman-artifacts/swagger.html
 
 **Local:**
 Clone the repository and open any of the HTML files in `docs/`
