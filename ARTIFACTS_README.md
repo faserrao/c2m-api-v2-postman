@@ -1,12 +1,12 @@
 # C2M API Artifacts
 
-This repository contains automatically generated artifacts from the [c2m-api-v2-postman](https://github.com/faserrao/c2m-api-v2-postman).
+This repository contains automatically generated artifacts from the [c2m-api-v2-postman](https://github.com/click2mail/c2m-api-v2-postman).
 
 ## ⚠️ Do Not Edit These Files
 
 All files in this repository are automatically generated. Any manual changes will be overwritten by the next build.
 
-To make changes, please edit the source files in [c2m-api-v2-postman](https://github.com/faserrao/c2m-api-v2-postman).
+To make changes, please edit the source files in [c2m-api-v2-postman](https://github.com/click2mail/c2m-api-v2-postman).
 
 ## Repository Structure
 
@@ -17,7 +17,7 @@ To make changes, please edit the source files in [c2m-api-v2-postman](https://gi
 
 ## Build Status
 
-Latest build: See [GitHub Actions](https://github.com/faserrao/c2m-api-v2-postman/actions)
+Latest build: See [GitHub Actions](https://github.com/click2mail/c2m-api-v2-postman/actions)
 
 ## Generated Files
 
@@ -60,12 +60,12 @@ Each SDK directory contains its own README with installation and usage instructi
 ### Getting OpenAPI Spec
 ```bash
 # Latest spec (from artifacts repo)
-curl https://raw.githubusercontent.com/faserrao/c2m-api-v2-postman-artifacts/main/openapi/c2mapiv2-openapi-spec-final.yaml
+curl https://raw.githubusercontent.com/click2mail/c2m-api-v2-postman-artifacts/main/openapi/c2mapiv2-openapi-spec-final.yaml
 
 # Or from main repo
-curl https://raw.githubusercontent.com/faserrao/c2m-api-v2-postman/main/openapi/c2mapiv2-openapi-spec-final.yaml
+curl https://raw.githubusercontent.com/click2mail/c2m-api-v2-postman/main/openapi/c2mapiv2-openapi-spec-final.yaml
 ```
 
 ## License
 
-See [c2m-api-v2-postman](https://github.com/faserrao/c2m-api-v2-postman) for license information.
+See [c2m-api-v2-postman](https://github.com/click2mail/c2m-api-v2-postman) for license information.
