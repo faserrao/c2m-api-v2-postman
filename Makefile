@@ -1916,7 +1916,7 @@ docs-build:
 	if [ -n "$$MOCK_URL" ]; then \
 		awk -v url="$$MOCK_URL" '/^servers:/ {print; print "  - url: " url; print "    description: Postman Mock Server"; next} 1' \
 			$(OPENAPI_BUNDLED_FILE) > $(DOCS_DIR)/swagger.yaml; \
-		echo "Added mock server to swagger.yaml"; \
+		echo "Added Postman mock server to swagger.yaml: $$MOCK_URL"; \
 	else \
 		cp $(OPENAPI_BUNDLED_FILE) $(DOCS_DIR)/swagger.yaml; \
 		echo "No mock server URL found, using production server only"; \
