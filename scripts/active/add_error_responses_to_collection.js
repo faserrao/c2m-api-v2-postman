@@ -12,6 +12,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const yaml = require('js-yaml');
 
 // HTTP status text mapping (required by Postman mock server for x-mock-response-code matching)
 const HTTP_STATUS_TEXT = {
@@ -30,127 +31,186 @@ function generateUUID() {
   });
 }
 
-// Error response templates (realistic data, not placeholders)
-// NOTE: status field (HTTP status text) is required for Postman mock x-mock-response-code matching
-const ERROR_RESPONSES = {
-  '400': [
-    {
-      id: generateUUID(),
-      name: 'Missing required field',
-      status: HTTP_STATUS_TEXT[400],
-      code: 400,
-      _postman_previewlanguage: 'json',
-      header: [{ key: 'Content-Type', value: 'application/json' }],
-      body: JSON.stringify({
-        errorType: 'ValidationError',
-        errorMessage: 'Required field is missing from request body',
-        errorCode: 'MISSING_REQUIRED_FIELD',
-        errorDetails: '{"field": "documentId", "location": "requestBody"}',
-        errorTrackingId: 'TRK-20260216-ABC123'
-      }, null, 2)
-    },
-    {
-      id: generateUUID(),
-      name: 'Invalid field format',
-      status: HTTP_STATUS_TEXT[400],
-      code: 400,
-      _postman_previewlanguage: 'json',
-      header: [{ key: 'Content-Type', value: 'application/json' }],
-      body: JSON.stringify({
-        errorType: 'ValidationError',
-        errorMessage: 'Field contains invalid format or value',
-        errorCode: 'INVALID_FORMAT',
-        errorDetails: '{"field": "postalCode", "provided": "1234", "expected": "5 or 9 digits"}',
-        errorTrackingId: 'TRK-20260216-DEF456'
-      }, null, 2)
-    }
-  ],
-  '401': [
-    {
-      id: generateUUID(),
-      name: 'Missing authentication',
-      status: HTTP_STATUS_TEXT[401],
-      code: 401,
-      _postman_previewlanguage: 'json',
-      header: [{ key: 'Content-Type', value: 'application/json' }],
-      body: JSON.stringify({
-        errorType: 'AuthenticationError',
-        errorMessage: 'Authorization header is missing or invalid',
-        errorCode: 'MISSING_AUTH_HEADER',
-        errorDetails: '{"expected": "Bearer <token>", "received": "none"}',
-        errorTrackingId: 'TRK-20260216-GHI789'
-      }, null, 2)
-    }
-  ],
-  '403': [
-    {
-      id: generateUUID(),
-      name: 'Insufficient permissions',
-      status: HTTP_STATUS_TEXT[403],
-      code: 403,
-      _postman_previewlanguage: 'json',
-      header: [{ key: 'Content-Type', value: 'application/json' }],
-      body: JSON.stringify({
-        errorType: 'AuthorizationError',
-        errorMessage: 'User does not have required permissions for this operation',
-        errorCode: 'INSUFFICIENT_PERMISSIONS',
-        errorDetails: '{"required": "jobs:write", "user": "read-only-user"}',
-        errorTrackingId: 'TRK-20260216-JKL012'
-      }, null, 2)
-    }
-  ],
-  '404': [
-    {
-      id: generateUUID(),
-      name: 'Resource not found',
-      status: HTTP_STATUS_TEXT[404],
-      code: 404,
-      _postman_previewlanguage: 'json',
-      header: [{ key: 'Content-Type', value: 'application/json' }],
-      body: JSON.stringify({
-        errorType: 'ResourceNotFoundError',
-        errorMessage: 'Requested resource does not exist',
-        errorCode: 'RESOURCE_NOT_FOUND',
-        errorDetails: '{"resourceType": "document", "resourceId": "DOC-12345"}',
-        errorTrackingId: 'TRK-20260216-MNO345'
-      }, null, 2)
-    }
-  ],
-  '422': [
-    {
-      id: generateUUID(),
-      name: 'Validation failed',
-      status: HTTP_STATUS_TEXT[422],
-      code: 422,
-      _postman_previewlanguage: 'json',
-      header: [{ key: 'Content-Type', value: 'application/json' }],
-      body: JSON.stringify({
-        errorType: 'ValidationError',
-        errorMessage: 'Request validation failed for multiple fields',
-        errorCode: 'INVALID_FORMAT',
-        errorDetails: '{"errors": [{"field": "documentId", "issue": "not found"}, {"field": "recipientAddress.postalCode", "issue": "invalid format"}]}',
-        errorTrackingId: 'TRK-20260216-PQR678'
-      }, null, 2)
-    }
-  ],
-  '500': [
-    {
-      id: generateUUID(),
-      name: 'Internal server error',
-      status: HTTP_STATUS_TEXT[500],
-      code: 500,
-      _postman_previewlanguage: 'json',
-      header: [{ key: 'Content-Type', value: 'application/json' }],
-      body: JSON.stringify({
-        errorType: 'ServerError',
-        errorMessage: 'An unexpected error occurred while processing the request',
-        errorCode: 'SERVER_ERROR',
-        errorDetails: '{"timestamp": "2026-02-16T18:30:45Z", "requestId": "req-abc123"}',
-        errorTrackingId: 'TRK-20260216-STU901'
-      }, null, 2)
-    }
-  ]
+// Error code metadata: maps error code to HTTP status, error type, and message template
+const ERROR_CODE_METADATA = {
+  'MISSING_REQUIRED_FIELD': {
+    status: 400,
+    errorType: 'ValidationError',
+    name: 'Missing required field',
+    message: 'Required field is missing from request body',
+    details: '{"field": "documentId", "location": "requestBody"}'
+  },
+  'INVALID_ONEOF': {
+    status: 400,
+    errorType: 'ValidationError',
+    name: 'Invalid oneOf selection',
+    message: 'Request must match exactly one of the defined schemas',
+    details: '{"field": "document", "issue": "matches multiple schemas or no schema"}'
+  },
+  'INVALID_JSON': {
+    status: 400,
+    errorType: 'ValidationError',
+    name: 'Invalid JSON',
+    message: 'Request body contains malformed JSON',
+    details: '{"error": "Unexpected token at position 42", "line": 3}'
+  },
+  'MISSING_AUTH_HEADER': {
+    status: 401,
+    errorType: 'AuthenticationError',
+    name: 'Missing authentication',
+    message: 'Authorization header is missing or invalid',
+    details: '{"expected": "Bearer <token>", "received": "none"}'
+  },
+  'INVALID_TOKEN': {
+    status: 401,
+    errorType: 'AuthenticationError',
+    name: 'Invalid token',
+    message: 'Authentication token is invalid or malformed',
+    details: '{"reason": "invalid signature", "token": "<redacted>"}'
+  },
+  'EXPIRED_TOKEN': {
+    status: 401,
+    errorType: 'AuthenticationError',
+    name: 'Expired token',
+    message: 'Authentication token has expired',
+    details: '{"expired": "2026-03-10T15:30:00Z", "current": "2026-03-11T10:00:00Z"}'
+  },
+  'INSUFFICIENT_PERMISSIONS': {
+    status: 403,
+    errorType: 'AuthorizationError',
+    name: 'Insufficient permissions',
+    message: 'User does not have required permissions for this operation',
+    details: '{"required": "jobs:write", "user": "read-only-user"}'
+  },
+  'ACCOUNT_SUSPENDED': {
+    status: 403,
+    errorType: 'AuthorizationError',
+    name: 'Account suspended',
+    message: 'User account has been suspended',
+    details: '{"reason": "payment overdue", "contact": "support@click2mail.com"}'
+  },
+  'JOB_NOT_FOUND': {
+    status: 404,
+    errorType: 'ResourceNotFoundError',
+    name: 'Job not found',
+    message: 'The specified job does not exist',
+    details: '{"resourceType": "job", "jobId": "JOB-12345"}'
+  },
+  'RESOURCE_NOT_FOUND': {
+    status: 404,
+    errorType: 'ResourceNotFoundError',
+    name: 'Resource not found',
+    message: 'Requested resource does not exist',
+    details: '{"resourceType": "document", "resourceId": "DOC-12345"}'
+  },
+  'INVALID_ENUM_VALUE': {
+    status: 422,
+    errorType: 'ValidationError',
+    name: 'Invalid enum value',
+    message: 'Field contains a value not allowed by the enumeration',
+    details: '{"field": "mailClass", "provided": "express", "allowed": ["First", "Standard"]}'
+  },
+  'MUTUAL_EXCLUSION_VIOLATION': {
+    status: 422,
+    errorType: 'ValidationError',
+    name: 'Mutually exclusive fields',
+    message: 'Request contains mutually exclusive fields',
+    details: '{"conflict": "documentId and documentUrl cannot both be specified"}'
+  },
+  'INVALID_FORMAT': {
+    status: 422,
+    errorType: 'ValidationError',
+    name: 'Invalid field format',
+    message: 'Field contains invalid format or value',
+    details: '{"field": "postalCode", "provided": "1234", "expected": "5 or 9 digits"}'
+  },
+  'SERVER_ERROR': {
+    status: 500,
+    errorType: 'ServerError',
+    name: 'Internal server error',
+    message: 'An unexpected error occurred while processing the request',
+    details: '{"timestamp": "2026-03-11T18:30:45Z", "requestId": "req-abc123"}'
+  },
+  'DATABASE_ERROR': {
+    status: 500,
+    errorType: 'ServerError',
+    name: 'Database error',
+    message: 'Database operation failed',
+    details: '{"operation": "insert", "table": "jobs", "error": "connection timeout"}'
+  },
+  'EXTERNAL_SERVICE_ERROR': {
+    status: 500,
+    errorType: 'ServerError',
+    name: 'External service error',
+    message: 'External service call failed',
+    details: '{"service": "address-validation", "error": "timeout after 30s"}'
+  }
 };
+
+/**
+ * Load error codes from OpenAPI spec and generate ERROR_RESPONSES object
+ */
+function loadErrorResponsesFromSpec(openapiSpecPath) {
+  console.log(`Loading error codes from OpenAPI spec: ${openapiSpecPath}`);
+
+  // Read and parse OpenAPI spec
+  const specContent = fs.readFileSync(openapiSpecPath, 'utf8');
+  const spec = yaml.load(specContent);
+
+  // Extract error codes from errorCode enum in components/schemas
+  let errorCodes = [];
+  if (spec.components && spec.components.schemas && spec.components.schemas.errorCode) {
+    errorCodes = spec.components.schemas.errorCode.enum || [];
+  }
+
+  if (errorCodes.length === 0) {
+    console.warn('⚠️  No error codes found in OpenAPI spec, using hardcoded metadata');
+    errorCodes = Object.keys(ERROR_CODE_METADATA);
+  }
+
+  console.log(`Found ${errorCodes.length} error codes in OpenAPI spec`);
+
+  // Group error codes by HTTP status
+  const errorResponsesByStatus = {};
+
+  errorCodes.forEach(errorCode => {
+    const metadata = ERROR_CODE_METADATA[errorCode];
+    if (!metadata) {
+      console.warn(`⚠️  No metadata for error code: ${errorCode}, skipping`);
+      return;
+    }
+
+    const statusCode = metadata.status.toString();
+    if (!errorResponsesByStatus[statusCode]) {
+      errorResponsesByStatus[statusCode] = [];
+    }
+
+    // Generate tracking ID
+    const trackingId = `TRK-${new Date().toISOString().split('T')[0].replace(/-/g, '')}-${generateUUID().split('-')[0].toUpperCase()}`;
+
+    // Create error response object
+    errorResponsesByStatus[statusCode].push({
+      id: generateUUID(),
+      name: metadata.name,
+      status: HTTP_STATUS_TEXT[metadata.status],
+      code: metadata.status,
+      _postman_previewlanguage: 'json',
+      header: [{ key: 'Content-Type', value: 'application/json' }],
+      body: JSON.stringify({
+        errorType: metadata.errorType,
+        errorMessage: metadata.message,
+        errorCode: errorCode,
+        errorDetails: metadata.details,
+        errorTrackingId: trackingId
+      }, null, 2)
+    });
+  });
+
+  return errorResponsesByStatus;
+}
+
+// Global ERROR_RESPONSES object (will be populated from OpenAPI spec)
+let ERROR_RESPONSES = {};
 
 /**
  * Recursively process collection items to add error responses
@@ -218,6 +278,13 @@ function main() {
   }
 
   const [inputFile, outputFile] = args;
+
+  // Determine OpenAPI spec path (relative to script location)
+  const scriptDir = path.dirname(__filename);
+  const openapiSpecPath = path.resolve(scriptDir, '../../openapi/c2mapiv2-openapi-spec-final.yaml');
+
+  // Load error responses from OpenAPI spec
+  ERROR_RESPONSES = loadErrorResponsesFromSpec(openapiSpecPath);
 
   // Read input collection
   console.log(`Reading collection from: ${inputFile}`);
