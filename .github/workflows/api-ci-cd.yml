@@ -317,6 +317,9 @@ jobs:
             echo "  ⚠️  SDK directory not found (generation may have failed)"
           fi
 
+          echo "📝 Copying artifacts README..."
+          cp -v ARTIFACTS_README.md artifacts-repo/README.md 2>/dev/null || echo "  ⚠️  No ARTIFACTS_README.md to copy"
+
           echo "✅ All artifacts copied successfully"
 
       # ---------- Commit and push to artifacts repo ----------
