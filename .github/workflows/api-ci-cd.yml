@@ -317,8 +317,9 @@ jobs:
             echo "  ⚠️  SDK directory not found (generation may have failed)"
           fi
 
-          echo "📝 Copying artifacts README..."
-          cp -v ARTIFACTS_README.md artifacts-repo/README.md 2>/dev/null || echo "  ⚠️  No ARTIFACTS_README.md to copy"
+          echo "📝 Generating artifacts README with organization..."
+          sed "s|__GITHUB_ORG__|${{ github.repository_owner }}|g" ARTIFACTS_README.md.template > artifacts-repo/README.md
+          echo "  ✅ README generated for organization: ${{ github.repository_owner }}"
 
           echo "✅ All artifacts copied successfully"
 
