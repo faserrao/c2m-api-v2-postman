@@ -1911,7 +1911,16 @@ docs-build:
 	@MOCK_URL=$$(cat $(POSTMAN_MOCK_URL_FILE) 2>/dev/null || echo ""); \
 	sed "s|__MOCK_SERVER_URL__|$$MOCK_URL|g" $(DOCS_DIR)/swagger-initializer.js.template > $(DOCS_DIR)/swagger-initializer.js; \
 	echo "Swagger UI mock server URL: $$MOCK_URL"
-	@cp $(OPENAPI_BUNDLED_FILE) $(DOCS_DIR)/swagger.yaml
+	@echo "🔧 Adding mock server to OpenAPI spec for interactive docs..."
+	@MOCK_URL=$$(cat $(POSTMAN_MOCK_URL_FILE) 2>/dev/null || echo ""); \
+	if [ -n "$$MOCK_URL" ]; then \
+		awk -v url="$$MOCK_URL" '/^servers:/ {print; print "  - url: " url; print "    description: Postman Mock Server"; next} 1' \
+			$(OPENAPI_BUNDLED_FILE) > $(DOCS_DIR)/swagger.yaml; \
+		echo "Added mock server to swagger.yaml"; \
+	else \
+		cp $(OPENAPI_BUNDLED_FILE) $(DOCS_DIR)/swagger.yaml; \
+		echo "No mock server URL found, using production server only"; \
+	fi
 	@echo "🔧 Building Stoplight Elements documentation..."
 	@MOCK_URL=$$(cat $(POSTMAN_MOCK_URL_FILE) 2>/dev/null || echo ""); \
 	sed "s|__MOCK_SERVER_URL__|$$MOCK_URL|g" $(DOCS_DIR)/elements.html.template > $(DOCS_DIR)/elements.html; \
