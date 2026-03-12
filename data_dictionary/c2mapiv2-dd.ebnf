@@ -428,8 +428,7 @@ submitSinglePdfSplitAddressCaptureParams =
 *)
 
 submitMultiDocParams =
-      [ jobTemplate ]
-    + multiDocJobs
+    multiDocJobs
     + [ paymentDetails ]
     + [ tags ] ;
 

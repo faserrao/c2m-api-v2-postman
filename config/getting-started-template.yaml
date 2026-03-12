@@ -233,11 +233,49 @@ examples:
     docSourceAll: requestId
     recipientAddressSource: singleAddress
   values:
-    jobTemplate: <String>
     jobs:
-    - filename: <String>
-    - filename: <String>
-    - filename: <String>
+    - jobTemplate: <String>
+      docSourceAll:
+        requestId: <Integer>
+      recipientAddressSource:
+        singleAddress:
+          firstName: <String>
+          lastName: <String>
+          address1: <String>
+          address2: <String>
+          address3: <String>
+          city: <String>
+          state: <String>
+          zip: <String>
+          country: <String>
+    - jobTemplate: <String>
+      docSourceAll:
+        requestId: <Integer>
+      recipientAddressSource:
+        singleAddress:
+          firstName: <String>
+          lastName: <String>
+          address1: <String>
+          address2: <String>
+          address3: <String>
+          city: <String>
+          state: <String>
+          zip: <String>
+          country: <String>
+    - jobTemplate: <String>
+      docSourceAll:
+        requestId: <Integer>
+      recipientAddressSource:
+        singleAddress:
+          firstName: <String>
+          lastName: <String>
+          address1: <String>
+          address2: <String>
+          address3: <String>
+          city: <String>
+          state: <String>
+          zip: <String>
+          country: <String>
 - name: /jobs/submit/multiple/doc - using documentID
   method: POST
   path: /jobs/submit/multi/doc
@@ -248,10 +286,35 @@ examples:
     docSourceAll: documentId
     recipientAddressSource: singleAddress
   values:
-    jobTemplate: <String>
     jobs:
-    - mappingId: <Integer>
-    - mappingId: <Integer>
+    - jobTemplate: <String>
+      docSourceAll:
+        documentId: <Integer>
+      recipientAddressSource:
+        singleAddress:
+          firstName: <String>
+          lastName: <String>
+          address1: <String>
+          address2: <String>
+          address3: <String>
+          city: <String>
+          state: <String>
+          zip: <String>
+          country: <String>
+    - jobTemplate: <String>
+      docSourceAll:
+        documentId: <Integer>
+      recipientAddressSource:
+        singleAddress:
+          firstName: <String>
+          lastName: <String>
+          address1: <String>
+          address2: <String>
+          address3: <String>
+          city: <String>
+          state: <String>
+          zip: <String>
+          country: <String>
 - name: /jobs/submit/single/doc - using documentID
   method: POST
   path: /jobs/submit/single/doc

@@ -633,20 +633,35 @@ examples:
       - multi-docs
     description: Send multiple different documents (not merged, each goes separately)
     select:
-      docSourceAll: documentIds
-      recipientAddressSource: addressListId
+      docSourceAll: documentId
+      recipientAddressSource: singleAddress
       paymentDetails: creditCard
     values:
-      documentIds:
-        - 3009
-        - 3010
-      addressListId: "MULTI-DOC-LIST-001"
-      jobTemplate: standard_letter
-      cardType: visa
-      cardNumber: "4111111111111111"
-      expirationMonth: 5
-      expirationYear: 2027
-      cvv: 666
+      jobs:
+        - jobTemplate: standard_letter
+          docSourceAll:
+            documentId: 3009
+          recipientAddressSource:
+            singleAddress:
+              firstName: David
+              lastName: Martinez
+              address1: 246 Cedar Lane
+              city: Denver
+              state: CO
+              zip: "80201"
+              country: USA
+        - jobTemplate: standard_letter
+          docSourceAll:
+            documentId: 3010
+          recipientAddressSource:
+            singleAddress:
+              firstName: Emma
+              lastName: Garcia
+              address1: 357 Maple Drive
+              city: Phoenix
+              state: AZ
+              zip: "85001"
+              country: USA
       tags:
         - advanced
         - multiple-docs
