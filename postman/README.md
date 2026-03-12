@@ -102,8 +102,8 @@ When you fork the Getting Started Collection in Postman, follow these steps to e
 You should fork the environment(s) you plan to use. There are two environments available:
 
 **Available Environments:**
-- **C2M API - Mock Server** - For testing without a real backend (fast, no side effects)
-- **C2M API - AWS Dev** - For testing against the development backend (requires valid credentials)
+- **C2M API - Mock Server** - For endpoint testing (API structure, request/response formats)
+- **C2M API - AWS Dev** - For testing the authentication process directly
 
 **Fork the Mock Server Environment:**
 1. Click the three dots (...) next to "C2M API - Mock Server" environment
@@ -117,7 +117,7 @@ You should fork the environment(s) you plan to use. There are two environments a
 3. Choose a label for your fork
 4. Click "Fork Environment"
 
-**Recommendation**: Start by forking the Mock Server environment for learning and testing. Fork the AWS Dev environment only when you need to test against the actual backend.
+**Recommendation**: Use the Mock Server environment for endpoint testing (validating request/response structure). Use the AWS Dev environment when you need to test the authentication flow.
 
 ### Step 3: Verify Environment Variables
 
@@ -126,9 +126,9 @@ You should fork the environment(s) you plan to use. There are two environments a
 Open your forked environment to verify the automatically copied variables:
 
 **Configuration Variables (Pre-populated):**
-- `baseUrl`: Base URL for API (mock or live) - **automatically copied from original**
-  - Mock Server example: `https://6913ca39-ba3a-427c-80b8-2b4352a561d3.mock.pstmn.io`
-  - AWS Dev example: `https://api-dev.click2mail.com`
+- `baseUrl`: Base URL for API - **automatically copied from original**
+  - Mock Server: `https://d5af3934-ca42-44ba-a999-50d31efcb698.mock.pstmn.io` (endpoint testing)
+  - AWS Dev: `https://j0dos52r5e.execute-api.us-east-1.amazonaws.com/dev` (authentication testing)
   - **Note**: Mock server URLs are preserved across builds (won't change)
 - `authUrl`: Authentication service endpoint - automatically copied
 - `clientId`: Your client credentials ID - automatically copied
@@ -146,11 +146,11 @@ These are automatically populated by authentication scripts during API calls:
 ### Step 4: Select Your Forked Environment
 1. Use the environment dropdown (top right in Postman)
 2. Select your newly forked environment:
-   - **C2M API - Mock Server (fork)** - for mock testing
-   - **C2M API - AWS Dev (fork)** - for AWS backend testing
+   - **C2M API - Mock Server (fork)** - for endpoint testing (API structure/responses)
+   - **C2M API - AWS Dev (fork)** - for authentication testing (JWT flow)
 3. Verify `baseUrl` resolves correctly (hover over `{{baseUrl}}` in a request to see the value)
 
-**Tip**: You can switch between your forked environments at any time to test against different backends without modifying the collection.
+**Tip**: You can switch between your forked environments at any time to test different aspects (endpoints vs. authentication) without modifying the collection.
 
 ### Common Issues
 - **Error: `getaddrinfo ENOTFOUND {{baseUrl}}`**
