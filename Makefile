@@ -15,7 +15,8 @@
 # Usage:
 #   make help                          # Show all available targets
 #   make postman-instance-build-with-tests  # Run complete pipeline
-#   make postman-cleanup-all           # Clean all Postman resources
+#   make postman-cleanup-all           # Clean all Postman resources (including mocks)
+#   make postman-cleanup-except-mocks  # Clean all except mock servers (preserves forked URLs)
 #
 # Load environment variables from .env file if it exists
 -include .env
@@ -614,6 +615,28 @@ postman-cleanup-all:
 	fi
 	@echo "✅ Postman cleanup complete for workspace $(POSTMAN_WS)."
 
+# Clean all resources EXCEPT mock servers (preserves mock server URLs for forked environments)
+.PHONY: postman-cleanup-except-mocks
+postman-cleanup-except-mocks:
+	@echo "🧹 Starting cleanup of Postman resources (preserving mock servers) for workspace $(POSTMAN_WS)..."
+	@echo "ℹ️  Note: Mock servers will NOT be deleted to preserve URLs for forked environments"
+	$(MAKE) postman-delete-collections
+	$(MAKE) postman-delete-environments
+	$(MAKE) postman-api-clean-trash
+	$(MAKE) postman-delete-specs
+	@echo "🔍 Verifying cleanup..."
+	@REMAINING_APIS=$$(curl --silent --location \
+		--request GET "$(POSTMAN_APIS_URL)$(POSTMAN_Q_ID)" \
+		--header "X-Api-Key: $(POSTMAN_API_KEY)" | jq -r '.apis | length' || echo 0); \
+	if [ "$$REMAINING_APIS" -gt 0 ]; then \
+		echo "ℹ️  Note: $$REMAINING_APIS API(s) exist in workspace (not deleted - API resources no longer used)"; \
+	fi
+	@REMAINING_MOCKS=$$(curl --silent --location \
+		--request GET "$(POSTMAN_MOCKS_URL)$(POSTMAN_Q_ID)" \
+		--header "X-Api-Key: $(POSTMAN_API_KEY)" | jq -r '.mocks | length' || echo 0); \
+	echo "ℹ️  Preserved mock servers: $$REMAINING_MOCKS (not deleted to preserve forked environment URLs)"
+	@echo "✅ Postman cleanup complete (mock servers preserved) for workspace $(POSTMAN_WS)."
+
 # Rebuild everything without deleting existing resources
 .PHONY: rebuild-all-no-delete
 rebuild-all-no-delete:
@@ -637,6 +660,12 @@ rebuild-all-no-delete-ci:
 .PHONY: rebuild-all-with-delete-ci
 rebuild-all-with-delete-ci:
 	$(MAKE) postman-cleanup-all
+	$(MAKE) rebuild-all-no-delete-ci
+
+# Delete existing resources EXCEPT mock servers and rebuild (for CI/CD to preserve forked URLs)
+.PHONY: rebuild-all-with-delete-except-mocks-ci
+rebuild-all-with-delete-except-mocks-ci:
+	$(MAKE) postman-cleanup-except-mocks
 	$(MAKE) rebuild-all-no-delete-ci
 
 # ========================================================================

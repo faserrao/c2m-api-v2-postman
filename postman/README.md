@@ -87,6 +87,74 @@ Pre-request script for JWT authentication.
 - **`postman_mock_url.txt`** - Cloud mock server base URL
 - **`prism_mock_url.txt`** - Local Prism mock server URL
 
+## Forking the Getting Started Collection
+
+When you fork the Getting Started Collection in Postman, follow these steps to ensure it works correctly:
+
+### Step 1: Fork the Collection
+1. In Postman, click the three dots (...) next to "C2M API v2 - Getting Started"
+2. Select "Create a fork"
+3. Choose a label for your fork
+4. Click "Fork Collection"
+
+### Step 2: Fork the Environment(s)
+
+You should fork the environment(s) you plan to use. There are two environments available:
+
+**Available Environments:**
+- **C2M API - Mock Server** - For testing without a real backend (fast, no side effects)
+- **C2M API - AWS Dev** - For testing against the development backend (requires valid credentials)
+
+**Fork the Mock Server Environment:**
+1. Click the three dots (...) next to "C2M API - Mock Server" environment
+2. Select "Create a fork"
+3. Choose a label for your fork
+4. Click "Fork Environment"
+
+**Fork the AWS Dev Environment (if needed):**
+1. Click the three dots (...) next to "C2M API - AWS Dev" environment
+2. Select "Create a fork"
+3. Choose a label for your fork
+4. Click "Fork Environment"
+
+**Recommendation**: Start by forking the Mock Server environment for learning and testing. Fork the AWS Dev environment only when you need to test against the actual backend.
+
+### Step 3: Set Environment Variables
+After forking, you must configure your forked environment with the same values as the original:
+
+**Required Variables:**
+- `baseUrl`: Set to the same mock server URL as the original environment
+  - Example: `https://6913ca39-ba3a-427c-80b8-2b4352a561d3.mock.pstmn.io`
+  - This ensures your forked collection connects to the working mock server
+- `authUrl`: Authentication service endpoint
+- `clientId`: Your client credentials ID
+- `clientSecret`: Your client secret (mark as secret type)
+
+**Token Variables (initially empty):**
+- `longTermToken`: Will be populated after authentication
+- `shortTermToken`: Will be populated after authentication
+- `tokenExpiry`: Token expiration timestamp
+- `currentTokenId`: Current token identifier
+- `longTokenId`: Long-term token identifier
+- `longTokenExpiry`: Long-term token expiration
+
+### Step 4: Select Your Forked Environment
+1. Use the environment dropdown (top right in Postman)
+2. Select your newly forked environment:
+   - **C2M API - Mock Server (fork)** - for mock testing
+   - **C2M API - AWS Dev (fork)** - for AWS backend testing
+3. Verify `baseUrl` resolves correctly (hover over `{{baseUrl}}` in a request to see the value)
+
+**Tip**: You can switch between your forked environments at any time to test against different backends without modifying the collection.
+
+### Common Issues
+- **Error: `getaddrinfo ENOTFOUND {{baseUrl}}`**
+  - Cause: Environment not selected or `baseUrl` variable not set
+  - Fix: Select your forked environment and set `baseUrl` to the mock server URL
+- **Authentication errors**
+  - Cause: Client credentials not configured
+  - Fix: Set `clientId` and `clientSecret` in your environment
+
 ## Workflows
 
 ### 1. Basic Collection Generation

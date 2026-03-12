@@ -237,8 +237,8 @@ jobs:
             export BUILD_TYPE=github
             make workspace-info
             echo ""
-            make postman-cleanup-all
-            make postman-instance-build-without-tests
+            echo "🔄 Using rebuild-all-with-delete-except-mocks-ci to preserve mock server URLs for forked environments"
+            make rebuild-all-with-delete-except-mocks-ci
           fi
 
       # ---------- Post-Build Validation ----------
