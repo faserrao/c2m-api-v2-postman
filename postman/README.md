@@ -119,20 +119,25 @@ You should fork the environment(s) you plan to use. There are two environments a
 
 **Recommendation**: Start by forking the Mock Server environment for learning and testing. Fork the AWS Dev environment only when you need to test against the actual backend.
 
-### Step 3: Set Environment Variables
-After forking, you must configure your forked environment with the same values as the original:
+### Step 3: Verify Environment Variables
 
-**Required Variables:**
-- `baseUrl`: Set to the same mock server URL as the original environment
-  - Example: `https://6913ca39-ba3a-427c-80b8-2b4352a561d3.mock.pstmn.io`
-  - This ensures your forked collection connects to the working mock server
-- `authUrl`: Authentication service endpoint
-- `clientId`: Your client credentials ID
-- `clientSecret`: Your client secret (mark as secret type)
+**Good News**: When you fork an environment in Postman, all variable values are automatically copied to your forked environment!
 
-**Token Variables (initially empty):**
-- `longTermToken`: Will be populated after authentication
-- `shortTermToken`: Will be populated after authentication
+Open your forked environment to verify the automatically copied variables:
+
+**Configuration Variables (Pre-populated):**
+- `baseUrl`: Base URL for API (mock or live) - **automatically copied from original**
+  - Mock Server example: `https://6913ca39-ba3a-427c-80b8-2b4352a561d3.mock.pstmn.io`
+  - AWS Dev example: `https://api-dev.click2mail.com`
+  - **Note**: Mock server URLs are preserved across builds (won't change)
+- `authUrl`: Authentication service endpoint - automatically copied
+- `clientId`: Your client credentials ID - automatically copied
+- `clientSecret`: Your client secret - automatically copied
+
+**Token Variables (Initially Empty):**
+These are automatically populated by authentication scripts during API calls:
+- `longTermToken`: Populated after authentication
+- `shortTermToken`: Populated after authentication
 - `tokenExpiry`: Token expiration timestamp
 - `currentTokenId`: Current token identifier
 - `longTokenId`: Long-term token identifier
@@ -149,11 +154,14 @@ After forking, you must configure your forked environment with the same values a
 
 ### Common Issues
 - **Error: `getaddrinfo ENOTFOUND {{baseUrl}}`**
-  - Cause: Environment not selected or `baseUrl` variable not set
-  - Fix: Select your forked environment and set `baseUrl` to the mock server URL
+  - **Cause**: Forked environment is not selected (variables aren't being resolved)
+  - **Fix**:
+    1. Use environment dropdown (top-right) to select your forked environment
+    2. Verify: Hover over `{{baseUrl}}` in a request - should show actual URL, not `{{baseUrl}}`
+  - **Note**: The `baseUrl` variable should already be set (copied during fork) - you just need to select the environment
 - **Authentication errors**
-  - Cause: Client credentials not configured
-  - Fix: Set `clientId` and `clientSecret` in your environment
+  - **Cause**: Using AWS Dev environment without proper credentials
+  - **Fix**: Use Mock Server environment for testing (no credentials needed), or configure valid AWS Dev credentials in your forked environment
 
 ## Workflows
 
