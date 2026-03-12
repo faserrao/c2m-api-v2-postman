@@ -229,9 +229,6 @@ examples:
   group: less-frequently-used
   tags: []
   description: /jobs/submit/multiple/doc - using requestID
-  select:
-    docSourceAll: requestId
-    recipientAddressSource: singleAddress
   values:
     jobs:
     - jobTemplate: <String>
@@ -282,9 +279,6 @@ examples:
   group: less-frequently-used
   tags: []
   description: /jobs/submit/multiple/doc - using documentID
-  select:
-    docSourceAll: documentId
-    recipientAddressSource: singleAddress
   values:
     jobs:
     - jobTemplate: <String>
