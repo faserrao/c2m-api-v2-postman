@@ -215,14 +215,36 @@ examples:
       - real-world
       - reseller
       - batch-processing
-    description: Mail service bureau processes multiple ZIP files with embedded addresses
+    description: Mail service bureau processes multiple documents from a single ZIP file
     select:
-      docSourceAll: zipDocumentIds
+      docSourceZipFileRef: requestId
       paymentDetails: ach
     values:
-      zipDocumentIds:
-        - 77777
-        - 88888
+      docSourceZipFileRef:
+        requestId: 77777
+      multiZipJobs:
+        - jobTemplate: standard_letter
+          filename: invoice_001.pdf
+          recipientAddressSource:
+            singleAddress:
+              firstName: John
+              lastName: Smith
+              address1: 100 Main St
+              city: Seattle
+              state: WA
+              zip: "98101"
+              country: USA
+        - jobTemplate: standard_letter
+          filename: invoice_002.pdf
+          recipientAddressSource:
+            singleAddress:
+              firstName: Jane
+              lastName: Doe
+              address1: 200 Oak Ave
+              city: Portland
+              state: OR
+              zip: "97201"
+              country: USA
       accountType: business
       routingNumber: "987654321"
       accountNumber: "1234567890"
@@ -611,13 +633,34 @@ examples:
       - zip-with-addresses
     description: Process ZIP with multiple documents and provide addresses separately
     select:
-      docSourceAll: zipDocumentId
-      recipientAddressSource: addressListId
+      docSourceZipFileRef: documentId
       paymentDetails: invoice
     values:
-      zipDocumentId: 3008
-      filename: multi_docs.zip
-      addressListId: "ZIP-ADDRESS-LIST-001"
+      docSourceZipFileRef:
+        documentId: 3008
+      multiZipJobs:
+        - jobTemplate: standard_letter
+          filename: letter_001.pdf
+          recipientAddressSource:
+            singleAddress:
+              firstName: Alice
+              lastName: Johnson
+              address1: 500 Pine St
+              city: San Francisco
+              state: CA
+              zip: "94102"
+              country: USA
+        - jobTemplate: standard_letter
+          filename: letter_002.pdf
+          recipientAddressSource:
+            singleAddress:
+              firstName: Bob
+              lastName: Williams
+              address1: 600 Elm St
+              city: Los Angeles
+              state: CA
+              zip: "90001"
+              country: USA
       customerAccountId: "ZIP-ACCT-001"
       tags:
         - advanced

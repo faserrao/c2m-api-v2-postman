@@ -333,8 +333,7 @@ submitSinglePdfAddressCaptureParams =
 *)
 
 submitSinglePdfSplitParams =
-      [ jobTemplate ]
-    + docSourceStandard   (* choose, see below *)
+      docSourceStandard   (* choose, see below *)
     + pdfSplitJobsWithAddress
     + [ paymentDetails ]
     + [ returnAddress ]
@@ -483,11 +482,12 @@ submitMultiDocMergeParams =
 (* ------------------------------------------------------------------------- *)
 
 (* English meaning:
-   - Submits multiple jobs, intended to be ZIP-ONLY (each job references a file within a zip document source).
-   - Body MAY include jobTemplate.
-   - Body MUST include `multiZipJobs` (list of zip-sourced job items).
+   - Submits multiple jobs from a single ZIP file.
+   - Body MUST include docSourceZipFileRef (specifies which zip file - requestId or documentId only, no filename).
+   - Body MUST include `multiZipJobs` (list of job items).
    - Each `multiZipJobs[]` item is a `multiZipJobItem` containing:
-       [ jobTemplate ] + docSourceZipFile + recipientAddressSource
+       [ jobTemplate ] + filename + recipientAddressSource
+   - Each job can have its own jobTemplate, specifies which file within the zip, and recipient address.
    - Body MAY include paymentDetails and tags.
 *)
 
@@ -503,11 +503,16 @@ submitMultiDocMergeParams =
 
    Zip policy:
      This endpoint is modeled as ZIP-ONLY in the grammar via:
-       multiZipJobItem = [ jobTemplate ] + docSourceZipFile + recipientAddressSource ;
+       submitMultiZipParams requires docSourceZipFileRef (zip file reference at top-level)
+       multiZipJobItem = [ jobTemplate ] + filename + recipientAddressSource ;
 
-     Therefore, each multiZipJobs[i] can only reference:
-       - zipDocumentIdSource, OR
-       - zipRequestIdSource
+     The zip file is specified once at top-level via docSourceZipFileRef:
+       - zipDocumentIdOnly (documentId only, no filename), OR
+       - zipRequestIdOnly (requestId only, no filename)
+     Each job item then specifies:
+       - Optional jobTemplate (or inherits default if not specified)
+       - filename (which file within the zip)
+       - recipientAddressSource (who receives it)
 
      Implementation should still validate:
        IF multiZipJobs[i] uses zipRequestIdSource:
@@ -520,7 +525,7 @@ submitMultiDocMergeParams =
 *)
 
 submitMultiZipParams =
-      [ jobTemplate ]
+      docSourceZipFileRef
     + multiZipJobs
     + [ paymentDetails ]
     + [ tags ] ;
@@ -685,6 +690,10 @@ zipDocumentId = id ;
 zipRequestIdSource = requestId + zipFilename + filename ;
 zipFilename = string ;
 
+(* Zip file reference without filename - for multi/zip top-level *)
+zipDocumentIdOnly = zipDocumentId ;
+zipRequestIdOnly = requestId ;
+
 zipDocumentSource =
       zipDocumentIdSource
     | zipRequestIdSource ;
@@ -698,6 +707,7 @@ zipDocumentSource =
 
 docSourceStandard = documentIdSource | requestIdSource | urlSource ;
 docSourceZipFile  = zipDocumentIdSource | zipRequestIdSource ;
+docSourceZipFileRef = zipDocumentIdOnly | zipRequestIdOnly ;  (* For multi/zip top-level - zip reference without filename *)
 docSourceAll      = docSourceStandard | docSourceZipFile ;
 
 (***********************************)
@@ -728,7 +738,7 @@ multiDocJobItem =
 pdfSplitJobsWithAddress = { pdfSplitJobItemWithAddress } ;
 pdfSplitJobsNoAddress   = { pdfSplitJobItemNoAddress } ;
 
-pdfSplitJobItemWithAddress = startPage + endPage + recipientAddressSource ;
+pdfSplitJobItemWithAddress = [ jobTemplate ] + startPage + endPage + recipientAddressSource ;
 pdfSplitJobItemNoAddress   = startPage + endPage ;
 
 startPage = integer ;
@@ -736,10 +746,12 @@ endPage   = integer ;
 
 (* Zip-only jobs list:
    - Used by POST /jobs/submit/multi/zip.
-   - Each item uses docSourceZipFile, so non-zip document modes are impossible in this endpoint's schema.
+   - Zip file specified at top-level (docSourceZipFileRef in submitMultiZipParams).
+   - Each item specifies optional jobTemplate, filename (which file within zip), and recipient.
+   - Each job is independent with its own template and recipient.
 *)
 multiZipJobs = { multiZipJobItem } ;
-multiZipJobItem = [ jobTemplate ] + docSourceZipFile + recipientAddressSource ;
+multiZipJobItem = [ jobTemplate ] + filename + recipientAddressSource ;
 
 (***********************************)
 (*           PRIMITIVE ALIASES      *)
