@@ -7,6 +7,7 @@ on:
     paths:
       # Source files that require regeneration
       - 'data_dictionary/**'           # EBNF data dictionary (source of truth)
+      - 'config/**'                     # Configuration files (templates, catalogs)
       - 'Makefile'                      # Build configuration
       - 'scripts/active/**'             # Generation scripts
       - 'scripts/validation/**'         # Validation scripts
@@ -17,6 +18,7 @@ on:
     paths:
       # Source files that require regeneration
       - 'data_dictionary/**'           # EBNF data dictionary (source of truth)
+      - 'config/**'                     # Configuration files (templates, catalogs)
       - 'Makefile'                      # Build configuration
       - 'scripts/active/**'             # Generation scripts
       - 'scripts/validation/**'         # Validation scripts
