@@ -104,11 +104,11 @@ def get_oneof_structure(field_name: str, variant: str) -> Any:
     """
     oneof_fixtures = {
         "docSourceAll": {
-            "requestId": {"requestId": 67890, "filename": "document.pdf"},
-            "documentId": 12345,
-            "url": "https://example.com/documents/sample.pdf",
-            "zipRequestId": {"requestId": 98765, "zipFilename": "documents.zip", "filename": "document.pdf"},
-            "zipDocumentId": {"zipDocumentId": 54321, "filename": "document.pdf"}
+            "requestId": {"requestId": 67890},
+            "documentId": {"documentId": 12345},
+            "url": {"url": "https://example.com/documents/sample.pdf"},
+            "zipRequestId": {"zipRequestId": 98765, "zipFilename": "documents.zip"},
+            "zipDocumentId": {"zipDocumentId": 54321, "zipFilename": "documents.zip"}
         },
         "recipientAddressSource": {
             "singleAddress": {
@@ -155,15 +155,7 @@ def get_oneof_structure(field_name: str, variant: str) -> Any:
     }
 
     if field_name in oneof_fixtures and variant in oneof_fixtures[field_name]:
-        content = oneof_fixtures[field_name][variant]
-
-        # Some oneOf fields need variant name wrapper, others don't
-        # - recipientAddressSource, paymentDetails: Need wrapper (e.g., {"singleAddress": {...}})
-        # - docSourceAll: No wrapper needed (content already has correct structure)
-        if field_name in ["recipientAddressSource", "paymentDetails"]:
-            return {variant: content}
-        else:
-            return content
+        return oneof_fixtures[field_name][variant]
 
     return None
 
