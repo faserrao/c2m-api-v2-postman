@@ -96,68 +96,152 @@ def find_endpoint_in_linked(linked_collection: Dict, method: str, path: str) -> 
     items = linked_collection.get("item", [])
     return search_items(items)
 
-def get_oneof_structure(field_name: str, variant: str) -> Any:
+def get_schema_from_openapi(openapi_spec: Dict, schema_ref: str) -> Optional[Dict]:
     """
-    Get the structure for a specific oneOf variant.
+    Resolve a $ref to get the actual schema from OpenAPI spec.
 
-    Returns the appropriate nested object or value for the selected variant.
+    Args:
+        openapi_spec: Loaded OpenAPI spec
+        schema_ref: Reference like '#/components/schemas/requestIdSource'
+
+    Returns:
+        Schema definition dict or None
     """
-    oneof_fixtures = {
-        "docSourceAll": {
-            "requestId": {"requestId": 67890},
-            "documentId": {"documentId": 12345},
-            "url": {"url": "https://example.com/documents/sample.pdf"},
-            "zipRequestId": {"zipRequestId": 98765, "zipFilename": "documents.zip"},
-            "zipDocumentId": {"zipDocumentId": 54321, "zipFilename": "documents.zip"}
-        },
-        "recipientAddressSource": {
-            "singleAddress": {
-                "firstName": "Alice",
-                "lastName": "Johnson",
-                "address1": "123 Main Street",
-                "address2": "Suite 100",
-                "address3": "",
-                "city": "Boston",
-                "state": "MA",
-                "zip": "02101",
-                "country": "USA"
-            },
-            "addressList": [
-                {
-                    "firstName": "Alice",
-                    "lastName": "Johnson",
-                    "address1": "123 Main Street",
-                    "city": "Boston",
-                    "state": "MA",
-                    "zip": "02101",
-                    "country": "USA",
-                    "foo1": "Custom Field 1",
-                    "foo2": "Custom Field 2"
-                }
-            ],
-            "addressListId": {"addressListId": 1001}
-        },
-        "paymentDetails": {
-            "creditCard": {
-                "cardType": "visa",
-                "cardNumber": "4111111111111111",
-                "expirationMonth": 12,
-                "expirationYear": 2026,
-                "cvv": 123
-            },
-            "ach": {
-                "accountType": "checking",
-                "routingNumber": "111000025",
-                "accountNumber": "1234567890"
-            },
-            "invoice": {"paymentType": "invoice"}
-        }
-    }
+    if not schema_ref.startswith('#/components/schemas/'):
+        return None
 
-    if field_name in oneof_fixtures and variant in oneof_fixtures[field_name]:
-        return oneof_fixtures[field_name][variant]
+    schema_name = schema_ref.replace('#/components/schemas/', '')
+    return openapi_spec.get('components', {}).get('schemas', {}).get(schema_name)
+
+def build_structure_from_schema(schema: Dict, openapi_spec: Dict) -> Any:
+    """
+    Recursively build JSON structure from OpenAPI schema with placeholders.
+
+    This function focuses on building the correct structure (nesting, types, arrays)
+    with placeholder values. Use replace_placeholders_recursive() to generate
+    realistic values based on field names.
+
+    Args:
+        schema: OpenAPI schema definition
+        openapi_spec: Full OpenAPI spec (for resolving refs)
+
+    Returns:
+        JSON structure matching the schema with placeholder values
+    """
+    # Handle $ref
+    if '$ref' in schema:
+        ref_schema = get_schema_from_openapi(openapi_spec, schema['$ref'])
+        if ref_schema:
+            return build_structure_from_schema(ref_schema, openapi_spec)
+        return None
+
+    schema_type = schema.get('type')
+
+    # Handle objects
+    if schema_type == 'object':
+        result = {}
+        properties = schema.get('properties', {})
+
+        for prop_name, prop_schema in properties.items():
+            # Include all fields (required + optional) for Getting Started examples
+            result[prop_name] = build_structure_from_schema(prop_schema, openapi_spec)
+
+        return result
+
+    # Handle arrays
+    elif schema_type == 'array':
+        item_schema = schema.get('items', {})
+        # Return array with one example item
+        item = build_structure_from_schema(item_schema, openapi_spec)
+        return [item] if item is not None else []
+
+    # Handle primitives - always return placeholders
+    elif schema_type == 'string':
+        return "<String>"
+
+    elif schema_type == 'integer':
+        return "<Integer>"
+
+    elif schema_type == 'number':
+        return "<Number>"
+
+    elif schema_type == 'boolean':
+        return "<Boolean>"
+
+    # Handle enums
+    elif 'enum' in schema:
+        return f"<{' | '.join(schema['enum'])}>"
 
     return None
+
+def get_oneof_structure_from_openapi(openapi_spec: Dict, field_name: str, variant: str) -> Any:
+    """
+    Get oneOf variant structure from OpenAPI spec with placeholder values.
+
+    This replaces hardcoded fixtures by reading structure from OpenAPI spec (which came from EBNF).
+    Returns structure with placeholders - use replace_placeholders_recursive() for realistic values.
+
+    Handles nested oneOf structures (e.g., docSourceAll → docSourceStandard → requestIdSource).
+
+    Args:
+        openapi_spec: Loaded OpenAPI specification
+        field_name: oneOf field name (e.g., "docSourceAll", "recipientAddressSource")
+        variant: Selected variant (e.g., "requestId", "singleAddress")
+
+    Returns:
+        JSON structure for the selected variant with placeholders, or None if not found
+    """
+    # Get the oneOf field schema
+    field_schema = openapi_spec.get('components', {}).get('schemas', {}).get(field_name)
+    if not field_schema or 'oneOf' not in field_schema:
+        return None
+
+    # Map variant names to schema names
+    # Template uses simplified names, OpenAPI uses full schema names
+    variant_mappings = {
+        # docSourceAll variants
+        'requestId': 'requestIdSource',
+        'documentId': 'documentIdSource',
+        'url': 'urlSource',
+        'zipRequestId': 'zipRequestIdSource',
+        'zipDocumentId': 'zipDocumentIdSource',
+        # recipientAddressSource variants
+        'singleAddress': 'recipientAddressBySingle',
+        'addressList': 'recipientAddressByList',
+        'addressListId': 'recipientAddressByListId',
+        'addressId': 'recipientAddressByAddressId',
+        # paymentDetails variants
+        'creditCard': 'creditCardPayment',
+        'ach': 'achPayment',
+        'invoice': 'invoicePayment',
+        'userCredit': 'userCreditPayment'
+    }
+
+    schema_name = variant_mappings.get(variant, variant)
+
+    def find_variant_recursive(oneof_options):
+        """Recursively search through nested oneOf structures."""
+        for oneof_option in oneof_options:
+            if '$ref' in oneof_option:
+                ref_name = oneof_option['$ref'].split('/')[-1]
+
+                # Direct match - found it!
+                if ref_name == schema_name:
+                    variant_schema = get_schema_from_openapi(openapi_spec, oneof_option['$ref'])
+                    if variant_schema:
+                        return build_structure_from_schema(variant_schema, openapi_spec)
+
+                # Not a match - check if this schema has nested oneOf
+                variant_schema = get_schema_from_openapi(openapi_spec, oneof_option['$ref'])
+                if variant_schema and 'oneOf' in variant_schema:
+                    # Recursively search nested oneOf
+                    result = find_variant_recursive(variant_schema['oneOf'])
+                    if result is not None:
+                        return result
+
+        return None
+
+    return find_variant_recursive(field_schema['oneOf'])
 
 def generate_realistic_value(field_name: str, field_type: str, oneof_selection: Optional[str] = None) -> Any:
     """
@@ -318,13 +402,14 @@ def replace_placeholders_recursive(obj: Any, parent_key: str = "") -> Any:
         return obj
 
 
-def apply_template_to_request(template_example: Dict, linked_request: Dict, use_realistic_values: bool = False) -> Dict:
+def apply_template_to_request(template_example: Dict, linked_request: Dict, openapi_spec: Dict, use_realistic_values: bool = False) -> Dict:
     """
     Apply template selections and values to a linked collection request.
 
     Args:
         template_example: Example from template with select/values
         linked_request: Canonical request from linked collection
+        openapi_spec: OpenAPI specification (source of truth for structure)
         use_realistic_values: If True, use realistic values; if False, keep placeholders
 
     Returns:
@@ -347,58 +432,32 @@ def apply_template_to_request(template_example: Dict, linked_request: Dict, use_
     # Apply values from template
     values = template_example.get("values", {})
 
-    if use_realistic_values:
-        # For test collection: Build ONLY fields from template with realistic data
-        new_body = {}
+    # Build body with ONLY fields from template
+    new_body = {}
 
-        # Apply selections (oneOf variants) with realistic data
-        for field, variant in selections.items():
-            structure = get_oneof_structure(field, variant)
-            if structure is not None:
+    # Apply selections (oneOf variants) - get structure from OpenAPI
+    for field, variant in selections.items():
+        # Get structure with placeholders from OpenAPI spec (source of truth)
+        structure = get_oneof_structure_from_openapi(openapi_spec, field, variant)
+        if structure is not None:
+            if use_realistic_values:
+                # For test collection: Replace placeholders with realistic values
+                new_body[field] = replace_placeholders_recursive(structure, field)
+            else:
+                # For linked collection: Keep placeholders
                 new_body[field] = structure
 
-        # Apply values from template with realistic data
-        for field, value in values.items():
-            if field in selections:
-                # This is a oneOf field - skip (handled above)
-                continue
+    # Apply values from template
+    for field, value in values.items():
+        if field in selections:
+            # This is a oneOf field - skip (handled above)
+            continue
 
-            # Recursively replace placeholders in the value with realistic data
+        if use_realistic_values:
+            # For test collection: Replace placeholders with realistic data
             new_body[field] = replace_placeholders_recursive(value, field)
-    else:
-        # For linked collection: Build ONLY fields from template (subset)
-        new_body = {}
-
-        # Apply selections (oneOf variants) with placeholders
-        for field, variant in selections.items():
-            # Build structure with placeholders based on variant
-            structure = get_oneof_structure(field, variant)
-            if structure is not None:
-                # Replace values with placeholders
-                def placeholderize(obj):
-                    if isinstance(obj, dict):
-                        return {k: placeholderize(v) for k, v in obj.items()}
-                    elif isinstance(obj, list):
-                        return [placeholderize(item) for item in obj]
-                    elif isinstance(obj, str):
-                        return "<String>"
-                    elif isinstance(obj, int):
-                        return "<Integer>"
-                    elif isinstance(obj, float):
-                        return "<Number>"
-                    elif isinstance(obj, bool):
-                        return "<Boolean>"
-                    return obj
-
-                new_body[field] = placeholderize(structure)
-
-        # Apply values from template (keep placeholders)
-        for field, value in values.items():
-            if field in selections:
-                # This is a oneOf field - skip (handled above)
-                continue
-
-            # Use placeholder value from template
+        else:
+            # For linked collection: Keep placeholders from template
             new_body[field] = value
 
     # Update request body
@@ -414,13 +473,14 @@ def apply_template_to_request(template_example: Dict, linked_request: Dict, use_
 
     return request
 
-def generate_collection(template: Dict, linked_collection: Dict, use_realistic_values: bool = False) -> Dict:
+def generate_collection(template: Dict, linked_collection: Dict, openapi_spec: Dict, use_realistic_values: bool = False) -> Dict:
     """
     Generate a Postman collection from template.
 
     Args:
         template: Template YAML with collection metadata, groups, examples
         linked_collection: Canonical linked collection (structure source)
+        openapi_spec: OpenAPI specification (structure definitions from EBNF)
         use_realistic_values: If True, generate test collection; if False, linked collection
 
     Returns:
@@ -474,7 +534,7 @@ def generate_collection(template: Dict, linked_collection: Dict, use_realistic_v
 
         # Apply template to request
         linked_request = linked_item.get("request", {})
-        modified_request = apply_template_to_request(example, linked_request, use_realistic_values)
+        modified_request = apply_template_to_request(example, linked_request, openapi_spec, use_realistic_values)
 
         # Create new item
         new_item = {
@@ -578,13 +638,17 @@ def main():
     print(f"Loading linked collection from {linked_path}...", file=sys.stderr)
     linked_collection = load_json(linked_path)
 
+    # Load OpenAPI spec
+    print(f"Loading OpenAPI spec from {openapi_path}...", file=sys.stderr)
+    openapi_spec = load_yaml(openapi_path)
+
     # Generate linked collection (placeholders)
     print("Generating linked collection (placeholders)...", file=sys.stderr)
-    linked_output = generate_collection(template, linked_collection, use_realistic_values=False)
+    linked_output = generate_collection(template, linked_collection, openapi_spec, use_realistic_values=False)
 
     # Generate test collection (realistic values)
     print("Generating test collection (realistic values)...", file=sys.stderr)
-    test_output = generate_collection(template, linked_collection, use_realistic_values=True)
+    test_output = generate_collection(template, linked_collection, openapi_spec, use_realistic_values=True)
 
     # Save outputs
     print(f"Writing linked collection to {args.output_linked}...", file=sys.stderr)
