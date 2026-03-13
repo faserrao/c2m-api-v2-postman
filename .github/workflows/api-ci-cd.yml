@@ -237,8 +237,8 @@ jobs:
             export BUILD_TYPE=github
             make workspace-info
             echo ""
-            echo "🔄 Using rebuild-all-with-delete-except-mocks-ci to preserve mock server URLs for forked environments"
-            make rebuild-all-with-delete-except-mocks-ci
+            echo "🔄 Full cleanup and rebuild (deletes all Postman resources including mocks and environments)"
+            make rebuild-all-with-delete-ci
           fi
 
       # ---------- Post-Build Validation ----------
