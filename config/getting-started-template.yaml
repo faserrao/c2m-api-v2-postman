@@ -99,19 +99,53 @@ examples:
   description: /jobs/submit/single/pdf/split
   select:
     docSourceAll: requestId
-    recipientAddressSource: singleAddress
   values:
-    jobTemplate: <String>
     jobs:
-    - pages:
+    - jobTemplate: <String>
+      pages:
         startPage: <Integer>
         endPage: <Integer>
-    - pages:
+      recipientAddressSource:
+        singleAddress:
+          firstName: <String>
+          lastName: <String>
+          address1: <String>
+          address2: <String>
+          address3: <String>
+          city: <String>
+          state: <String>
+          zip: <String>
+          country: <String>
+    - jobTemplate: <String>
+      pages:
         startPage: <Integer>
         endPage: <Integer>
-    - pages:
+      recipientAddressSource:
+        singleAddress:
+          firstName: <String>
+          lastName: <String>
+          address1: <String>
+          address2: <String>
+          address3: <String>
+          city: <String>
+          state: <String>
+          zip: <String>
+          country: <String>
+    - jobTemplate: <String>
+      pages:
         startPage: <Integer>
         endPage: <Integer>
+      recipientAddressSource:
+        singleAddress:
+          firstName: <String>
+          lastName: <String>
+          address1: <String>
+          address2: <String>
+          address3: <String>
+          city: <String>
+          state: <String>
+          zip: <String>
+          country: <String>
 - name: /jobs/submit/multiple/doc/merge
   method: POST
   path: /jobs/submit/multi/doc/merge
@@ -195,34 +229,104 @@ examples:
     paymentDetails: creditCard
   values:
     jobTemplate: <String>
-- name: /jobs/submit/multiple/zip - using zip file
+- name: /jobs/submit/multiple/zip - using requestId
   method: POST
   path: /jobs/submit/multi/zip
   group: less-frequently-used
   tags: []
-  description: /jobs/submit/multiple/zip - using zip file
-  select:
-    docSourceAll: requestId
-    recipientAddressSource: singleAddress
+  description: /jobs/submit/multiple/zip - using requestId
   values:
-    jobTemplate: <String>
-    jobs:
-    - filename: <String>
-    - filename: <String>
-    - filename: <String>
+    docSourceZipFileRef:
+      requestId: <Integer>
+    multiZipJobs:
+    - jobTemplate: <String>
+      filename: <String>
+      recipientAddressSource:
+        singleAddress:
+          firstName: <String>
+          lastName: <String>
+          address1: <String>
+          address2: <String>
+          address3: <String>
+          city: <String>
+          state: <String>
+          zip: <String>
+          country: <String>
+    - jobTemplate: <String>
+      filename: <String>
+      recipientAddressSource:
+        singleAddress:
+          firstName: <String>
+          lastName: <String>
+          address1: <String>
+          address2: <String>
+          address3: <String>
+          city: <String>
+          state: <String>
+          zip: <String>
+          country: <String>
+    - jobTemplate: <String>
+      filename: <String>
+      recipientAddressSource:
+        singleAddress:
+          firstName: <String>
+          lastName: <String>
+          address1: <String>
+          address2: <String>
+          address3: <String>
+          city: <String>
+          state: <String>
+          zip: <String>
+          country: <String>
 - name: /jobs/submit/multiple/zip - using documentId
   method: POST
   path: /jobs/submit/multi/zip
   group: less-frequently-used
   tags: []
   description: /jobs/submit/multiple/zip - using documentId
-  select:
-    docSourceAll: documentId
-    recipientAddressSource: singleAddress
   values:
-    jobTemplate: <String>
-    jobs:
-    - filename: <String>
+    docSourceZipFileRef:
+      documentId: <Integer>
+    multiZipJobs:
+    - jobTemplate: <String>
+      filename: <String>
+      recipientAddressSource:
+        singleAddress:
+          firstName: <String>
+          lastName: <String>
+          address1: <String>
+          address2: <String>
+          address3: <String>
+          city: <String>
+          state: <String>
+          zip: <String>
+          country: <String>
+    - jobTemplate: <String>
+      filename: <String>
+      recipientAddressSource:
+        singleAddress:
+          firstName: <String>
+          lastName: <String>
+          address1: <String>
+          address2: <String>
+          address3: <String>
+          city: <String>
+          state: <String>
+          zip: <String>
+          country: <String>
+    - jobTemplate: <String>
+      filename: <String>
+      recipientAddressSource:
+        singleAddress:
+          firstName: <String>
+          lastName: <String>
+          address1: <String>
+          address2: <String>
+          address3: <String>
+          city: <String>
+          state: <String>
+          zip: <String>
+          country: <String>
 - name: /jobs/submit/multiple/doc - using requestID
   method: POST
   path: /jobs/submit/multi/doc
@@ -331,3 +435,24 @@ examples:
     recipientAddressSource: addressListId
   values:
     jobTemplate: <String>
+- name: /jobs/submit/single/doc - return address
+  method: POST
+  path: /jobs/submit/single/doc
+  group: less-frequently-used
+  tags: []
+  description: /jobs/submit/single/doc - return address
+  select:
+    docSourceAll: requestId
+    recipientAddressSource: singleAddress
+  values:
+    jobTemplate: <String>
+    returnAddress:
+      firstName: <String>
+      lastName: <String>
+      address1: <String>
+      address2: <String>
+      address3: <String>
+      city: <String>
+      state: <String>
+      zip: <String>
+      country: <String>

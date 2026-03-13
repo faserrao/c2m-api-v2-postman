@@ -35,6 +35,10 @@ import copy
 import subprocess
 from pathlib import Path
 from typing import Dict, List, Any, Optional
+from faker import Faker
+
+# Initialize Faker for generating unique random test data
+fake = Faker()
 
 # Import realistic value generators (reuse existing code)
 sys.path.insert(0, str(Path(__file__).parent.parent / "active"))
@@ -159,75 +163,122 @@ def generate_realistic_value(field_name: str, field_type: str, oneof_selection: 
     """
     Generate realistic value for a field based on its name and type.
 
-    Reuses patterns from existing codebase for consistency.
+    Uses Faker to generate unique random values for each field occurrence.
+
+    TODO: Refactor to avoid hardcoding field names
+    Instead of hardcoding field names like "firstName", "address1", etc., explore generating
+    example data directly from the getting-started-template.yaml structure. This would make
+    the generator more maintainable and allow template changes to automatically flow through
+    to generated examples without code changes.
+    Potential approach: Parse template YAML to extract field patterns, use Faker based on
+    field name patterns (e.g., any field with "name" gets fake.name(), "address" gets
+    fake.address(), etc.) rather than exact string matches.
     """
-    # Realistic values based on field name
-    realistic_values = {
-        # Document sources
-        "documentId": 12345,
-        "requestId": 67890,
-        "zipDocumentId": 54321,
-        "zipRequestId": 98765,
-        "url": "https://example.com/documents/sample.pdf",
+    # Generate unique random values based on field name
+    field_lower = field_name.lower()
 
-        # Address fields
-        "firstName": "Alice",
-        "lastName": "Johnson",
-        "address1": "123 Main Street",
-        "address2": "Suite 100",
-        "address3": "",
-        "city": "Boston",
-        "state": "MA",
-        "zip": "02101",
-        "country": "USA",
+    # Document sources
+    if field_name == "documentId":
+        return fake.random_int(min=10000, max=99999)
+    elif field_name == "requestId":
+        return fake.random_int(min=10000, max=99999)
+    elif field_name == "zipDocumentId":
+        return fake.random_int(min=10000, max=99999)
+    elif field_name == "zipRequestId":
+        return fake.random_int(min=10000, max=99999)
+    elif field_name == "url":
+        return "https://example.com/documents/sample.pdf"
 
-        # Job configuration
-        "jobTemplate": "standard_letter",
+    # Address fields (generate unique values each time)
+    elif field_name == "firstName":
+        return fake.first_name()
+    elif field_name == "lastName":
+        return fake.last_name()
+    elif field_name == "address1":
+        return fake.street_address()
+    elif field_name == "address2":
+        return f"Suite {fake.random_int(min=100, max=999)}"
+    elif field_name == "address3":
+        return ""
+    elif field_name == "city":
+        return fake.city()
+    elif field_name == "state":
+        return fake.state_abbr()
+    elif field_name == "zip":
+        return fake.zipcode()
+    elif field_name == "country":
+        return "USA"
+    elif field_name == "company":
+        return fake.company()
 
-        # Options
-        "documentClass": "letter",
-        "layout": "address_on_top",
-        "productionTime": "next_day",
-        "envelope": "standard",
-        "color": "full_color",
-        "paperType": "white",
-        "printOption": "double_sided",
-        "mailClass": "first_class",
+    # Job configuration - static realistic values
+    elif field_name == "jobTemplate":
+        return "standard_letter"
 
-        # Payment
-        "cardType": "visa",
-        "cardNumber": "4111111111111111",
-        "expirationMonth": 12,
-        "expirationYear": 2026,
-        "cvv": 123,
-        "accountType": "checking",
-        "routingNumber": "111000025",
-        "accountNumber": "1234567890",
+    # Job Options - static realistic values
+    elif field_name == "documentClass":
+        return "letter"
+    elif field_name == "layout":
+        return "address_on_top"
+    elif field_name == "productionTime":
+        return "next_day"
+    elif field_name == "envelope":
+        return "standard"
+    elif field_name == "color":
+        return "full_color"
+    elif field_name == "paperType":
+        return "white"
+    elif field_name == "printOption":
+        return "double_sided"
+    elif field_name == "mailClass":
+        return "first_class"
 
-        # Lists
-        "addressListId": 1001,
-        "addressListName": "Marketing Campaign Q1",
-        "mappingId": 5001,
+    # Payment - static realistic values
+    elif field_name == "cardType":
+        return "visa"
+    elif field_name == "cardNumber":
+        return "4111111111111111"
+    elif field_name == "expirationMonth":
+        return 12
+    elif field_name == "expirationYear":
+        return 2026
+    elif field_name == "cvv":
+        return 123
+    elif field_name == "accountType":
+        return "checking"
+    elif field_name == "routingNumber":
+        return "111000025"
+    elif field_name == "accountNumber":
+        return "1234567890"
 
-        # Other
-        "filename": "document.pdf",
-        "paymentType": "credit_card",
+    # Lists - static realistic values
+    elif field_name == "addressListId":
+        return 1001
+    elif field_name == "addressListName":
+        return "Marketing Campaign Q1"
+    elif field_name == "mappingId":
+        return 5001
 
-        # Merge fields (custom data)
-        "foo1": "Custom Field 1",
-        "foo2": "Custom Field 2",
+    # Other fields
+    elif field_name == "filename":
+        return "document.pdf"
+    elif field_name == "paymentType":
+        return "credit_card"
 
-        # Pages
-        "startPage": 1,
-        "endPage": 5,
-    }
+    # Merge fields (custom data)
+    elif field_name == "foo1":
+        return "Custom Field 1"
+    elif field_name == "foo2":
+        return "Custom Field 2"
 
-    # Return realistic value if we have one
-    if field_name in realistic_values:
-        return realistic_values[field_name]
+    # Pages
+    elif field_name == "startPage":
+        return 1
+    elif field_name == "endPage":
+        return 5
 
-    # Otherwise generate based on type
-    if field_type == "string":
+    # Otherwise generate based on type (fallback)
+    elif field_type == "string":
         return f"example_{field_name}"
     elif field_type == "integer":
         return 123
@@ -235,8 +286,8 @@ def generate_realistic_value(field_name: str, field_type: str, oneof_selection: 
         return 123.45
     elif field_type == "boolean":
         return True
-
-    return None
+    else:
+        return None
 
 def replace_placeholders_recursive(obj: Any, parent_key: str = "") -> Any:
     """

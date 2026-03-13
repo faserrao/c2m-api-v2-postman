@@ -514,14 +514,9 @@ function generateRandomValue(key, existingValue) {
     } else if (keyLower.includes('account')) {
         return faker.finance.accountNumber();
     } else if (keyLower.includes('status')) {
-        return faker.helpers.arrayElement(['active', 'pending', 'completed', 'processing', 'success']);
+        return 'accepted';
     } else if (keyLower.includes('message')) {
-        return faker.helpers.arrayElement([
-            'Operation completed successfully',
-            'Request processed',
-            'Job created successfully',
-            'Processing your request'
-        ]);
+        return 'Your request has been queued';
     } else if (keyLower === 'jobid' || (keyLower.includes('job') && keyLower.includes('id'))) {
         return `job_${Date.now()}_${faker.string.alphanumeric(6)}`;
     } else {

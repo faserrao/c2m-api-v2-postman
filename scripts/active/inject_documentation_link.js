@@ -48,9 +48,11 @@ const documentationSection = `
 
 ## Documentation
 
-**Redoc API Documentation:** ${docsUrl}
+Detailed API documentation can be found at the following location:
 
-Complete interactive API documentation with request/response examples, schemas, and authentication details.
+**${docsUrl}**
+
+The link below provides the same documentation in Postman's native format for viewing within the Postman environment.
 
 ---
 `;

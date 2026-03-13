@@ -524,14 +524,35 @@ postman-instance-build-with-tests:
 	$(MAKE) postman-import-openapi-spec
 	# Create standalone spec in Specs tab
 	$(MAKE) postman-spec-create-standalone
-	# Generate and link standard collection
-	$(MAKE) postman-create-linked-collection
-	# Generate and upload use case and getting started collections
-	# NOTE: Test collection created as dependency of postman-generate-getting-started-all
+	# Generate all collections (but don't upload yet)
+	$(MAKE) postman-api-linked-collection-generate
+	$(MAKE) postman-linked-collection-flatten
 	$(MAKE) postman-generate-use-case-collection
 	$(MAKE) postman-generate-getting-started-all
+	# Generate test collection (full pipeline but don't upload yet)
+	$(MAKE) postman-test-collection-generate
+	$(MAKE) postman-test-collection-add-examples || echo "⚠️  Skipping examples (optional step)."
+	$(MAKE) postman-test-collection-add-error-responses || echo "⚠️  Skipping error responses (optional step)."
+	$(MAKE) postman-test-collection-merge-overrides
+	$(MAKE) postman-test-collection-add-tests || echo "⚠️  Skipping adding tests (optional step)."
+	$(MAKE) postman-auth-setup || echo "⚠️  Skipping auth setup (provider not available)."
+	$(MAKE) postman-test-collection-diff-tests
+	$(MAKE) postman-test-collection-auto-fix
+	$(MAKE) postman-test-collection-fix-v2
+	$(MAKE) postman-test-collection-validate
+	$(MAKE) verify-urls
+	$(MAKE) fix-urls
+	$(MAKE) postman-test-collection-validate
+	$(MAKE) postman-test-collection-flatten-rename
+	$(MAKE) postman-test-collection-add-auth-examples || echo "⚠️  Skipping auth examples (optional step)."
+	# Inject documentation links into all collections
+	$(MAKE) postman-inject-docs-link-all
+	# Upload all collections with documentation links
+	$(MAKE) postman-linked-collection-upload
+	$(MAKE) postman-test-collection-upload
 	$(MAKE) postman-upload-use-case-collection
 	$(MAKE) postman-upload-getting-started-all
+	# Create mock server and environments
 	$(MAKE) postman-create-mock-and-env
 	# Start local mock and run tests
 	$(MAKE) prism-start
@@ -551,19 +572,36 @@ postman-instance-build-without-tests:
 	$(MAKE) postman-import-openapi-spec
 	# Create standalone spec in Specs tab
 	$(MAKE) postman-spec-create-standalone
-	# Generate and link standard collection
-	$(MAKE) postman-create-linked-collection
-	# Generate and upload use case and getting started collections
-	# NOTE: Test collection generated as dependency of postman-generate-getting-started-all
+	# Generate all collections (but don't upload yet)
+	# NOTE: postman-create-linked-collection includes upload, so we need to split it
+	$(MAKE) postman-api-linked-collection-generate
+	$(MAKE) postman-linked-collection-flatten
 	$(MAKE) postman-generate-use-case-collection
 	$(MAKE) postman-generate-getting-started-all
+	# Generate test collection (full pipeline but don't upload yet)
+	$(MAKE) postman-test-collection-generate
+	$(MAKE) postman-test-collection-add-examples || echo "⚠️  Skipping examples (optional step)."
+	$(MAKE) postman-test-collection-add-error-responses || echo "⚠️  Skipping error responses (optional step)."
+	$(MAKE) postman-test-collection-merge-overrides
+	$(MAKE) postman-test-collection-add-tests || echo "⚠️  Skipping adding tests (optional step)."
+	$(MAKE) postman-auth-setup || echo "⚠️  Skipping auth setup (provider not available)."
+	$(MAKE) postman-test-collection-diff-tests
+	$(MAKE) postman-test-collection-auto-fix
+	$(MAKE) postman-test-collection-fix-v2
+	$(MAKE) postman-test-collection-validate
+	$(MAKE) verify-urls
+	$(MAKE) fix-urls
+	$(MAKE) postman-test-collection-validate
+	$(MAKE) postman-test-collection-flatten-rename
+	$(MAKE) postman-test-collection-add-auth-examples || echo "⚠️  Skipping auth examples (optional step)."
 	# Inject documentation links into all collections
 	$(MAKE) postman-inject-docs-link-all
-	# Upload collections with documentation links
+	# Upload all collections with documentation links
+	$(MAKE) postman-linked-collection-upload
+	$(MAKE) postman-test-collection-upload
 	$(MAKE) postman-upload-use-case-collection
 	$(MAKE) postman-upload-getting-started-all
-	# Upload test collection (required for mock server creation)
-	$(MAKE) postman-create-test-collection
+	# Create mock server and environments
 	$(MAKE) postman-create-mock-and-env
 	# Build documentation
 	$(MAKE) docs-build
@@ -615,13 +653,12 @@ postman-cleanup-all:
 	fi
 	@echo "✅ Postman cleanup complete for workspace $(POSTMAN_WS)."
 
-# Clean all resources EXCEPT mock servers (preserves mock server URLs for forked environments)
-.PHONY: postman-cleanup-except-mocks
-postman-cleanup-except-mocks:
-	@echo "🧹 Starting cleanup of Postman resources (preserving mock servers) for workspace $(POSTMAN_WS)..."
-	@echo "ℹ️  Note: Mock servers will NOT be deleted to preserve URLs for forked environments"
+# Clean all resources EXCEPT mock servers and environments (preserves mock server URLs for forked environments)
+.PHONY: postman-cleanup-except-mocks-and-envs
+postman-cleanup-except-mocks-and-envs:
+	@echo "🧹 Starting cleanup of Postman resources (preserving mock servers and environments) for workspace $(POSTMAN_WS)..."
+	@echo "ℹ️  Note: Mock servers and environments will NOT be deleted to preserve URLs for forked environments"
 	$(MAKE) postman-delete-collections
-	$(MAKE) postman-delete-environments
 	$(MAKE) postman-api-clean-trash
 	$(MAKE) postman-delete-specs
 	@echo "🔍 Verifying cleanup..."

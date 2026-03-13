@@ -182,8 +182,8 @@ def add_response_examples(spec):
         # Add examples to StandardResponse
         if 'StandardResponse' in schemas:
             schemas['StandardResponse']['example'] = {
-                'status': 'success',
-                'message': 'Job created successfully',
+                'status': 'accepted',
+                'message': 'Your request has been queued',
                 'requestId': 'job_20241227_123456'
             }
         
@@ -211,19 +211,11 @@ def add_response_examples(spec):
                                         # Only add 'examples' (not 'example') to avoid validation issues
                                         json_response['examples'] = {
                                             'success': {
-                                                'summary': 'Successful job creation',
+                                                'summary': 'Request accepted and queued',
                                                 'value': {
-                                                    'status': 'success',
-                                                    'message': f'{endpoint_name} job created successfully',
+                                                    'status': 'accepted',
+                                                    'message': 'Your request has been queued',
                                                     'requestId': f'{endpoint_name}_job_123456'
-                                                }
-                                            },
-                                            'queued': {
-                                                'summary': 'Job queued for processing',
-                                                'value': {
-                                                    'status': 'queued',
-                                                    'message': f'{endpoint_name} job queued for processing',
-                                                    'requestId': f'{endpoint_name}_job_789012'
                                                 }
                                             }
                                         }
