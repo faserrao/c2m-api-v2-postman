@@ -120,7 +120,7 @@ echo ""
 echo "This will:"
 echo "  1. Stage data_dictionary/ and openapi/ files"
 echo "  2. Commit with your message"
-echo "  3. Push to origin main"
+echo "  3. Push to the remote for the current context (.git-context: $(git ctx-show))"
 echo "  4. Trigger GitHub Actions workflow automatically"
 echo ""
 echo -e "${YELLOW}Proceed? (y/n)${NC}"
@@ -146,9 +146,11 @@ git add data_dictionary/ openapi/
 git commit -m "$COMMIT_MSG"
 echo -e "${GREEN}✓ Changes committed${NC}"
 
-# Push
-git push origin main
-echo -e "${GREEN}✓ Pushed to GitHub${NC}"
+# Push (context-aware: personal -> faserrao, click2mail -> click2mail)
+CONTEXT=$(git ctx-show)
+echo -e "${BLUE}Pushing to the '${CONTEXT}' remote via git ctx-push...${NC}"
+git ctx-push main
+echo -e "${GREEN}✓ Pushed to GitHub (${CONTEXT})${NC}"
 
 # STEP 8: Success message
 echo ""
@@ -166,7 +168,11 @@ echo "  4. Deploy documentation"
 echo "  5. Generate SDKs"
 echo ""
 echo "Monitor workflow progress:"
-echo -e "${CYAN}https://github.com/click2mail/c2m-api-v2-postman/actions${NC}"
+if [ "$(git ctx-show)" = "personal" ]; then
+    echo -e "${CYAN}https://github.com/faserrao/c2m-api-v2-postman/actions${NC}"
+else
+    echo -e "${CYAN}https://github.com/click2mail/c2m-api-v2-postman/actions${NC}"
+fi
 echo ""
 echo "Expected completion time: ~3-4 minutes"
 echo ""

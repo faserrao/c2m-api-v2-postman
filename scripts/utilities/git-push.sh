@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 #
-# git-save.sh
-# Usage: ./git-save.sh "Your commit message"
+# git-push.sh
+# Usage: ./git-push.sh "Your commit message"
 #
-# Adds, commits, and pushes onto origin/main.
+# Adds, commits, and pushes the current branch to the remote selected by
+# .git-context (personal -> faserrao, click2mail -> click2mail) using the
+# 'git ctx-push' alias. This keeps pushes consistent with the Postman
+# workspace/API-key context the build uses.
 
 set -e  # exit on any error
 
@@ -23,5 +26,10 @@ git add .
 echo "📝  Running: git commit -m \"$COMMIT_MSG\""
 git commit -m "$COMMIT_MSG"
 
-echo "✅  Done! Local branch is now up-to-date wit
+# ---- 4. Push (context-aware) ------------------------------------------------
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+CONTEXT=$(git ctx-show)
+echo "🚀  Running: git ctx-push \"$BRANCH\"  (context: $CONTEXT)"
+git ctx-push "$BRANCH"
 
+echo "✅  Done! Pushed $BRANCH to the '$CONTEXT' remote (triggers its GitHub Actions workflow)."
