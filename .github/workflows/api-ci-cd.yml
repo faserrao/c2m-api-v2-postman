@@ -270,6 +270,7 @@ jobs:
           ./scripts/validation/ci_verify.sh "$WORKSPACE"
 
       - name: Upload Validation Reports
+        continue-on-error: true  # A storage-quota hit here must NOT skip the artifacts-repo push below
         if: |
           always() &&
           github.ref == 'refs/heads/main' &&
@@ -355,6 +356,7 @@ jobs:
 
       # ---------- Upload artifacts ----------
       - name: Upload build artifacts
+        continue-on-error: true  # Non-essential; a storage-quota hit must NOT fail the run or block Pages
         uses: actions/upload-artifact@v4
         with:
           name: api-artifacts
