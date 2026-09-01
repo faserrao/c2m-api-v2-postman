@@ -200,6 +200,9 @@ def main(argv=None):
     ap.add_argument("--after", required=True)
     ap.add_argument("--path-prefix", default="/jobs/submit")
     ap.add_argument("--json", action="store_true")
+    ap.add_argument("--require-coverage", action="store_true",
+                    help="CUSTOMER REQUIREMENT guard: exit non-zero if the AFTER "
+                         "collection drops any endpoint present in BEFORE")
     args = ap.parse_args(argv)
 
     bpath = args.before if os.path.isabs(args.before) else os.path.join(V.REPO, args.before)
@@ -210,15 +213,32 @@ def main(argv=None):
     rows = endpoint_rollup(before, after)
     matched, only_b, only_a = request_level(before, after)
 
+    # Customer requirement: the AFTER collection must retain every endpoint the
+    # BEFORE collection covers. An endpoint is DROPPED if it had before-examples
+    # but has zero after-examples.
+    dropped_endpoints = sorted(r["path"] for r in rows if r["before_names"] and not r["after_names"])
+
     if args.json:
         print(json.dumps({
             "before": args.before, "after": args.after,
             "endpoint_rollup": rows,
             "request_level": {"matched_with_changes": matched,
                               "before_only": only_b, "after_only": only_a},
+            "dropped_endpoints": dropped_endpoints,
+            "coverage_ok": not dropped_endpoints,
         }, indent=2))
     else:
         print_human(args.before, args.after, rows, matched, only_b, only_a)
+        print("\n## ENDPOINT COVERAGE (customer requirement: retain all current endpoints)")
+        if dropped_endpoints:
+            print(f"   ❌ VIOLATED — {len(dropped_endpoints)} endpoint(s) dropped by AFTER:")
+            for e in dropped_endpoints:
+                print(f"        - {e}")
+        else:
+            print("   ✅ SATISFIED — no endpoint dropped.")
+
+    if args.require_coverage and dropped_endpoints:
+        return 1
     return 0
 
 
