@@ -2741,6 +2741,19 @@ postman-publish-both: ## [Removed] Cross-publishing not allowed with strict 1:1 
 	@echo "  2. Push to click2mail repo (triggers corporate Postman via GitHub Actions)"
 	@exit 1
 
+# ========================================================================
+# COLLECTION CONFORMANCE VALIDATION (spec-driven, non-hardcoded)
+# ========================================================================
+# Path variables are injected via env so they are NOT duplicated in the Python
+# script (single source of truth). See scripts/validation/SPEC_DRIVEN_VALIDATOR.md
+.PHONY: validate-collections-conformance
+validate-collections-conformance: ## Validate generated collections conform to the OpenAPI spec
+	@C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" POSTMAN_GENERATED_DIR="$(POSTMAN_GENERATED_DIR)" C2MAPIV2_POSTMAN_API_NAME_KC="$(C2MAPIV2_POSTMAN_API_NAME_KC)" $(VENV_PYTHON) scripts/validation/validate_collections_against_spec.py $(VALIDATE_ARGS)
+
+.PHONY: validate-collections-conformance-test
+validate-collections-conformance-test: ## Run the collection validator's golden test suite
+	@C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" POSTMAN_GENERATED_DIR="$(POSTMAN_GENERATED_DIR)" C2MAPIV2_POSTMAN_API_NAME_KC="$(C2MAPIV2_POSTMAN_API_NAME_KC)" $(VENV_PYTHON) scripts/validation/tests/test_validate_collections.py
+
 # Show all available targets with descriptions
 .PHONY: help
 help:## Show help

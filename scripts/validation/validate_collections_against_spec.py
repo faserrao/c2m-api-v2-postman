@@ -46,17 +46,35 @@ import sys
 REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 PLACEHOLDER = re.compile(r"<[^>]+>")
 
-# Use the FINAL spec (the source-of-truth contract; identical to base for job
+# Path defaults are sourced from the SAME variables the Makefile defines
+# (passed through the environment), so paths are not duplicated between the
+# Makefile and this script. Run via `make validate-collections-conformance` and
+# the Makefile injects C2MAPIV2_OPENAPI_SPEC / POSTMAN_GENERATED_DIR /
+# C2MAPIV2_POSTMAN_API_NAME_KC. Run standalone and these fall back to the
+# standard relative locations. Env values may be absolute or repo-relative.
+#
+# Spec: the FINAL spec (source-of-truth contract; identical to -base for the job
 # endpoints). NOT bundled.yaml — bundling flattens single-alias oneOf chains
-# (documentIdSource->documentId->id collapses to a bare `id`), which is a
-# derived-artifact distortion, not what generates the Postman collections.
-DEFAULT_SPEC = os.path.join(REPO, "openapi/c2mapiv2-openapi-spec-final.yaml")
-DEFAULT_COLLECTIONS = [
-    "postman/generated/c2mapiv2-linked-collection-flat.json",
-    "postman/generated/c2mapiv2-test-collection-flat.json",
-    "postman/generated/c2mapiv2-getting-started-linked-collection.json",
-    "postman/generated/c2mapiv2-getting-started-test-collection.json",
+# (documentIdSource->documentId->id collapses to a bare `id`), a derived-artifact
+# distortion that is not what generates the Postman collections.
+_SPEC_REL    = os.environ.get("C2MAPIV2_OPENAPI_SPEC", "openapi/c2mapiv2-openapi-spec-final.yaml")
+_GEN_DIR_REL = os.environ.get("POSTMAN_GENERATED_DIR", "postman/generated")
+_API_NAME    = os.environ.get("C2MAPIV2_POSTMAN_API_NAME_KC", "c2mapiv2")
+
+
+def _abs(p):
+    return p if os.path.isabs(p) else os.path.join(REPO, p)
+
+
+DEFAULT_SPEC = _abs(_SPEC_REL)
+GEN_DIR_ABS = _abs(_GEN_DIR_REL)
+_COLLECTION_BASENAMES = [
+    f"{_API_NAME}-linked-collection-flat.json",
+    f"{_API_NAME}-test-collection-flat.json",
+    f"{_API_NAME}-getting-started-linked-collection.json",
+    f"{_API_NAME}-getting-started-test-collection.json",
 ]
+DEFAULT_COLLECTIONS = [os.path.join(GEN_DIR_ABS, b) for b in _COLLECTION_BASENAMES]
 
 
 # --------------------------------------------------------------------------- #

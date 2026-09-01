@@ -36,7 +36,7 @@ sys.path.insert(0, VDIR)
 import validate_collections_against_spec as V  # noqa: E402
 import json  # noqa: E402
 
-SPEC = V.load_spec(os.path.join(V.REPO, "openapi/c2mapiv2-openapi-spec-final.yaml"))
+SPEC = V.load_spec(V.DEFAULT_SPEC)  # env-aware (Makefile-sourced) spec path
 PREFIX = "/jobs/submit"
 
 _failures = []
@@ -50,7 +50,7 @@ def check(cond, msg):
 
 
 def load_collection(rel):
-    with open(os.path.join(V.REPO, "postman/generated", rel)) as f:
+    with open(os.path.join(V.GEN_DIR_ABS, rel)) as f:  # env-aware generated dir
         return json.load(f)
 
 
