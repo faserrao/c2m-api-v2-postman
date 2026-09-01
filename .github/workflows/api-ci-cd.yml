@@ -30,15 +30,11 @@ on:
         description: 'Publish to Postman'
         type: boolean
         default: true
-      deploy_gh_pages:
-        description: 'Deploy to GitHub Pages'
-        type: boolean
-        default: true
 
+# Pages is served from the artifacts repo, so this pipeline needs only
+# contents:write (auto-commit generated files). No pages:/id-token: here.
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 env:
   # Environment configuration
@@ -51,7 +47,6 @@ env:
   
   # Feature toggles
   PUBLISH_TO_POSTMAN: ${{ github.event.inputs.publish_to_postman || 'true' }}
-  DEPLOY_GH_PAGES: ${{ github.event.inputs.deploy_gh_pages || 'true' }}
   
   # Postman configuration
   POSTMAN_API_BASE: https://api.postman.com
@@ -368,54 +363,16 @@ jobs:
             ${{ env.DOCS_DIR }}/**
             sdk/**
 
-      # ---------- Prepare GitHub Pages ----------
-      - name: Setup Pages
-        continue-on-error: true  # Don't fail workflow if Pages not enabled (requires admin)
-        if: |
-          github.ref == 'refs/heads/main' &&
-          ((github.event_name == 'push' && env.DEPLOY_GH_PAGES == 'true') ||
-           (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_gh_pages == 'true'))
-        uses: actions/configure-pages@v4
-
-      - name: Upload GitHub Pages artifact
-        continue-on-error: true  # Don't fail if Setup Pages failed
-        if: |
-          github.ref == 'refs/heads/main' &&
-          ((github.event_name == 'push' && env.DEPLOY_GH_PAGES == 'true') ||
-           (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_gh_pages == 'true'))
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: docs
-
-  # ---------- Deploy to GitHub Pages ----------
-  deploy-pages:
-    name: Deploy to GitHub Pages
-    # Disabled until GitHub Pages is enabled (requires admin access)
-    # Change 'false' to 'true' after enabling Pages in repository settings
-    if: |
-      false &&
-      github.ref == 'refs/heads/main' &&
-      needs.build.result == 'success' &&
-      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      # NOTE: GitHub Pages is intentionally NOT deployed from this pipeline repo.
+      # The generated docs are force-pushed to the artifacts repo
+      # (c2m-api-v2-postman-artifacts), which is the ONLY repo where Pages is
+      # enabled and served (see the "Copy/Commit and push artifacts" steps above).
 
   # ---------- Summary ----------
   summary:
     name: Workflow Summary
     if: always()
-    needs: [build, deploy-pages]
+    needs: [build]
     runs-on: ubuntu-latest
     
     steps:
@@ -433,17 +390,9 @@ jobs:
           fi
           echo "" >> $GITHUB_STEP_SUMMARY
           
-          # Deployment status
-          if [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            echo "### Deployments" >> $GITHUB_STEP_SUMMARY
-            if [ "${{ needs.deploy-pages.result }}" == "success" ]; then
-              echo "✅ GitHub Pages deployment successful" >> $GITHUB_STEP_SUMMARY
-            elif [ "${{ needs.deploy-pages.result }}" == "skipped" ]; then
-              echo "⏭️  GitHub Pages deployment skipped" >> $GITHUB_STEP_SUMMARY
-            else
-              echo "❌ GitHub Pages deployment failed" >> $GITHUB_STEP_SUMMARY
-            fi
-          fi
+          # Docs are published from the artifacts repo (Pages is NOT deployed here)
+          echo "### Docs" >> $GITHUB_STEP_SUMMARY
+          echo "📄 Docs force-pushed to the artifacts repo, which serves GitHub Pages" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
           # Links
