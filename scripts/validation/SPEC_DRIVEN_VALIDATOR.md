@@ -9,6 +9,33 @@ regenerating the spec automatically changes what the validator enforces.
 ## Files
 - `validate_collections_against_spec.py` — the validator (Phase 1: structural).
 - `tests/test_validate_collections.py` — the golden test suite that proves it.
+- `diff_collections.py` — before/after structural diff (companion acceptance check).
+
+## Two acceptance checks for a merge / regeneration
+The validator and the diff answer different questions; use both:
+
+| Check | Question it answers | Covers |
+|---|---|---|
+| `validate_collections_against_spec.py` | Do the request bodies conform to the spec? | Top-level required/field-name (NOT oneOf interiors) |
+| `diff_collections.py` | What *changed* between two collections? | EVERY structural change incl. oneOf interiors + flattening |
+
+`diff_collections.py` is **structural, not value-level**: it compares the set of
+field paths + kinds (array indices normalized, scalar values ignored), so random
+example data creates no noise — identical structure diffs to nothing. It surfaces
+`jobs`->`multiDocJobs`, wrapper add/removal, object-vs-array flips, and
+nesting/flattening. Two views: an endpoint rollup (name-independent, works even
+when example names differ across the two template systems) and a request-level
+diff (matched by method+path+name, lists unmatched requests).
+
+```bash
+# During the dual-template merge dry-run: current vs regenerated
+$VENV scripts/validation/diff_collections.py \
+    --before postman/generated/c2mapiv2-getting-started-test-collection.json \
+    --after  <regenerated-collection>.json
+```
+Report-only (exit 0). Read it and decide — this is the check that makes the
+merge's interior/flattening changes and example-preservation VISIBLE before
+anything is published, closing the validator's Phase-1 coverage gap.
 
 ## Run
 
