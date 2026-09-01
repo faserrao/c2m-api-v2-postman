@@ -327,15 +327,24 @@ jobs:
           github.ref == 'refs/heads/main' &&
           (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         working-directory: artifacts-repo
+        env:
+          # Pass untrusted commit text via env (NOT inline ${{ }}) to prevent
+          # shell injection: a commit message containing quotes/backticks/$()
+          # would otherwise break out of the double-quoted string. This is what
+          # caused exit 127 on the "stop deploying GitHub Pages" commit, whose
+          # body contained the quoted phrase "Get Pages site failed".
+          SRC_COMMIT_MSG: ${{ github.event.head_commit.message }}
         run: |
           git config user.name "c2m-api-bot"
           git config user.email "c2m-api-bot@users.noreply.github.com"
-          
+
           # Add all changes
           git add .
-          
-          # Create commit message with build info
-          COMMIT_MSG="Build #${{ github.run_number }}: Update from ${{ github.event.head_commit.message }}"
+
+          # Build info commit message. Use only the SUBJECT line, and reference
+          # the env var as a shell variable (safe — not re-parsed by the shell).
+          SRC_SUBJECT=$(printf '%s' "$SRC_COMMIT_MSG" | head -n1)
+          COMMIT_MSG="Build #${{ github.run_number }}: Update from ${SRC_SUBJECT}"
           
           # Commit (don't fail if no changes)
           git commit -m "$COMMIT_MSG" \
