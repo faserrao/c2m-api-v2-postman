@@ -89,7 +89,7 @@ POSTMAN_API_NAME                 := $(C2MAPIV2_POSTMAN_API_NAME_PC)
 # All paths are relative to the Makefile location
 POSTMAN_DIR                      := postman
 POSTMAN_ENV_FILE                 := $(POSTMAN_DIR)/mock-env.json
-POSTMAN_BASE_URL                 := https://api.getpostman.com
+POSTMAN_BASE_URL                 := https://api.postman.com
 LOCALHOST_URL                    := http://127.0.0.1
 
 #--- Directories ---
