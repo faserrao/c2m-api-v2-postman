@@ -2754,6 +2754,27 @@ validate-collections-conformance: ## Validate generated collections conform to t
 validate-collections-conformance-test: ## Run the collection validator's golden test suite
 	@C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" POSTMAN_GENERATED_DIR="$(POSTMAN_GENERATED_DIR)" C2MAPIV2_POSTMAN_API_NAME_KC="$(C2MAPIV2_POSTMAN_API_NAME_KC)" $(VENV_PYTHON) scripts/validation/tests/test_validate_collections.py
 
+# CI GATE: regenerate the must-be-correct collection FRESH from the current spec
+# and fail the build if it drifts. Regenerates into a throwaway temp dir so the
+# working tree (and the PR drift-check) is never touched. Gates on the Linked
+# collection — canonical, all 11 endpoints (8 job + 3 auth); the Test collection
+# shares the same request bodies. Run AFTER `make openapi-build` (needs the fresh
+# spec + the venv it creates). Validates job AND auth endpoints (--path-prefix /).
+.PHONY: validate-collections-conformance-gate
+validate-collections-conformance-gate: ## CI gate: fail if the freshly-built Linked collection drifts from the OpenAPI spec
+	@set -e; \
+	GATE_DIR="$$(mktemp -d)"; \
+	trap 'rm -rf "$$GATE_DIR"' EXIT; \
+	echo "🧪 Regenerating Linked collection fresh into $$GATE_DIR ..."; \
+	$(MAKE) --no-print-directory POSTMAN_GENERATED_DIR="$$GATE_DIR" postman-collection-build >/dev/null; \
+	echo "🔎 Validating fresh collection against fresh spec ($(C2MAPIV2_OPENAPI_SPEC), job + auth)..."; \
+	C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" \
+	POSTMAN_GENERATED_DIR="$$GATE_DIR" \
+	C2MAPIV2_POSTMAN_API_NAME_KC="$(C2MAPIV2_POSTMAN_API_NAME_KC)" \
+	$(VENV_PYTHON) scripts/validation/validate_collections_against_spec.py \
+		--path-prefix "/" --exit-status \
+		--collections "$$GATE_DIR/$(C2MAPIV2_POSTMAN_API_NAME_KC)-linked-collection-flat.json"
+
 # Show all available targets with descriptions
 .PHONY: help
 help:## Show help

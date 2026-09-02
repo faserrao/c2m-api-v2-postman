@@ -141,6 +141,16 @@ jobs:
           echo "📋 Building OpenAPI spec from EBNF data dictionary..."
           make openapi-build
 
+      # ---------- Conformance Gate (all events, before publish) ----------
+      # Regenerates the must-be-correct (Linked) collection FRESH from the spec
+      # just built above and fails the build if it drifts. Fresh-vs-fresh, so it
+      # never trips on stale committed artifacts. Regenerates into a temp dir, so
+      # it does not touch the tree or the drift-check below. Covers job + auth.
+      - name: Gate — Collections conform to spec
+        run: |
+          echo "🚦 Conformance gate: Linked collection must match the freshly-built spec."
+          make validate-collections-conformance-gate
+
       - name: Lint OpenAPI Spec
         continue-on-error: true
         run: |
