@@ -112,7 +112,7 @@ examples:
       - document-merging
     description: Medical office merges patient test results with consultation letters
     select:
-      documentsToMerge: documentIds
+      mergeDocumentSource: documentIds
       recipientAddressSource: singleAddress
       paymentDetails: ach
     values:
@@ -170,7 +170,7 @@ examples:
       - address-capture
     description: E-commerce company sends catalogs using addresses embedded in PDF
     select:
-      docSourceAll: documentId
+      docSourceStandard: documentId
       paymentDetails: creditCard
     values:
       documentId: 33333
@@ -193,7 +193,7 @@ examples:
       - multi-document
     description: Marketing agency sends personalized multi-page campaign materials
     select:
-      documentsToMerge: documentIds
+      mergeDocumentSource: documentIds
       recipientAddressSource: addressListId
       paymentDetails: invoice
     values:
