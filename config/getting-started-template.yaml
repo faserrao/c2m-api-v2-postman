@@ -57,6 +57,7 @@ examples:
   tags: []
   description: /jobs/submit/single/doc - mail merge
   select:
+    docSourceAll: requestId
     recipientAddressSource: addressList
   values:
     jobTemplate: <String>
@@ -67,7 +68,7 @@ examples:
   tags: []
   description: /jobs/submit/single/pdf/addressCapture
   select:
-    docSourceAll: requestId
+    docSourceStandard: requestId
   values:
     jobTemplate: <String>
 - name: /jobs/submit/single/pdf/split/addressCapture
@@ -77,19 +78,24 @@ examples:
   tags: []
   description: /jobs/submit/single/pdf/split/addressCapture
   select:
-    docSourceAll: requestId
+    docSourceStandard: requestId
   values:
     jobTemplate: <String>
+    pdfSplitJobsNoAddress:
+    - startPage: <Integer>
+      endPage: <Integer>
+    - startPage: <Integer>
+      endPage: <Integer>
 - name: /jobs/submit/multiple/zip/addressCapture - using zip file
   method: POST
   path: /jobs/submit/multi/zip/addressCapture
   group: bulk
   tags: []
   description: /jobs/submit/multiple/zip/addressCapture - using zip file
-  select:
-    docSourceAll: requestId
   values:
     jobTemplate: <String>
+    zipDocumentSource:
+      requestId: <Integer>
 - name: /jobs/submit/single/pdf/split
   method: POST
   path: /jobs/submit/single/pdf/split
@@ -97,13 +103,12 @@ examples:
   tags: []
   description: /jobs/submit/single/pdf/split
   select:
-    docSourceAll: requestId
+    docSourceStandard: requestId
   values:
-    jobs:
+    pdfSplitJobsWithAddress:
     - jobTemplate: <String>
-      pages:
-        startPage: <Integer>
-        endPage: <Integer>
+      startPage: <Integer>
+      endPage: <Integer>
       recipientAddressSource:
         singleAddress:
           firstName: <String>
@@ -116,9 +121,8 @@ examples:
           zip: <String>
           country: <String>
     - jobTemplate: <String>
-      pages:
-        startPage: <Integer>
-        endPage: <Integer>
+      startPage: <Integer>
+      endPage: <Integer>
       recipientAddressSource:
         singleAddress:
           firstName: <String>
@@ -131,9 +135,8 @@ examples:
           zip: <String>
           country: <String>
     - jobTemplate: <String>
-      pages:
-        startPage: <Integer>
-        endPage: <Integer>
+      startPage: <Integer>
+      endPage: <Integer>
       recipientAddressSource:
         singleAddress:
           firstName: <String>
@@ -155,7 +158,7 @@ examples:
     recipientAddressSource: singleAddress
   values:
     jobTemplate: <String>
-    documentsToMerge:
+    mergeDocumentSource:
     - requestId: <Integer>
     - documentId: <Integer>
     - documentId: <Integer>
@@ -211,11 +214,20 @@ examples:
   tags: []
   description: /jobs/submit/single/doc - naming addressList
   select:
-    recipientAddressSource: addressList
+    docSourceAll: requestId
   values:
     jobTemplate: <String>
-    addressListName: <String>
-    mappingId: <Integer>
+    recipientAddressSource:
+      mappingId: <Integer>
+      addressList:
+      - firstName: <String>
+        lastName: <String>
+        address1: <String>
+        city: <String>
+        state: <String>
+        zip: <String>
+        country: <String>
+      addressListName: <String>
 - name: /jobs/submit//single/doc - payment option
   method: POST
   path: /jobs/submit/single/doc
@@ -333,7 +345,7 @@ examples:
   tags: []
   description: /jobs/submit/multiple/doc - using requestID
   values:
-    jobs:
+    multiDocJobs:
     - jobTemplate: <String>
       docSourceAll:
         requestId: <Integer>
@@ -383,7 +395,7 @@ examples:
   tags: []
   description: /jobs/submit/multiple/doc - using documentID
   values:
-    jobs:
+    multiDocJobs:
     - jobTemplate: <String>
       docSourceAll:
         documentId: <Integer>
