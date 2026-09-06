@@ -948,6 +948,16 @@ sortingCode = string ;
 (* token is Encrypted payment token from Google Pay *)
 
 (* ================================================================
+   SUCCESS RESPONSE SCHEMAS
+   ================================================================ *)
+
+(* Standard Success Response - returned for all successful job submissions *)
+standardResponse = status , message , requestId ;
+
+status = string ;    (* e.g. "accepted" *)
+message = string ;   (* Human-readable confirmation, e.g. "Your request has been queued" *)
+
+(* ================================================================
    ERROR RESPONSE SCHEMAS
    ================================================================ *)
 
