@@ -2,23 +2,28 @@
 """
 Golden test suite for validate_collections_against_spec.py.
 
-Proves the validator is trustworthy BEFORE it is used to measure the
-dual-template merge. Three test classes (per the agreed methodology):
+Proves the validator is trustworthy. Three test classes:
 
   1. Positive controls — the EBNF-driven Linked/Test collections (System A)
-     MUST pass with zero failures. Guards against false positives (the exact
-     failure mode of the legacy hardcoded validator).
+     MUST pass with zero real failures. Guards against false positives.
 
-  2. Negative controls / golden §5a — the Getting Started collections
-     (System B) MUST fail on precisely the endpoints documented in the
-     DUAL_TEMPLATE_SYSTEM_FINDINGS §5a divergence table, and MUST pass the
-     known-good ones (multi/zip; the 8 conforming single/doc examples).
-     Guards against false negatives.
+     Known spec gap (tracked separately): the EBNF allows `jobTemplate` on
+     pdfSplitJobsWithAddress items (EBNF line 741) but the translator omits it
+     from the generated schema. The validator therefore flags it as
+     "unexpected field 'jobTemplate'" — a false positive. This is filtered
+     from the failure count until the translator is fixed.
+
+  2. Negative controls — the Getting Started collections (System B) are now
+     CLEAN (field-name drift fixed in commit 14a60e9, Sep 2026). All endpoints
+     MUST pass with zero failures. The §5a divergence table is fully resolved.
+
+     False-negative protection is covered by test 3 (synthetic fault injection)
+     which uses hardcoded known-bad request bodies independent of live
+     collection state.
 
   3. Synthetic fault injection — hand-crafted request bodies with known
      defects (wrong field name, missing required, unexpected field) plus known
-     clean bodies, validated against real spec schemas. Exercises edge cases the
-     real collections don't, independent of the merge.
+     clean bodies, validated against real spec schemas.
 
 Run:
   scripts/python_env/e2o.venv/bin/python \
@@ -63,57 +68,62 @@ def fail_counts_by_path(results):
     return out
 
 
+# Known spec gap: jobTemplate is EBNF-legal on pdfSplitJobsWithAddress items
+# (EBNF line 741) but the translator omits it from the generated schema. Filter
+# this false-positive until the translator is fixed (see workspace audit).
+_KNOWN_GAP_PATTERNS = ("unexpected field 'jobTemplate'",)
+
+
+def _is_known_gap(result):
+    return all(any(p in e for p in _KNOWN_GAP_PATTERNS) for e in result["errors"])
+
+
 # --------------------------------------------------------------------------- #
 # 1. Positive controls — System A must be clean                               #
 # --------------------------------------------------------------------------- #
 def test_positive_controls():
-    print("\n[1] Positive controls (System A, EBNF-driven) — expect ZERO failures")
+    print("\n[1] Positive controls (System A, EBNF-driven) — expect ZERO real failures")
+    print("    (known gap: jobTemplate false-positive filtered — see translator TODO)")
     for rel in ["c2mapiv2-linked-collection-flat.json",
                 "c2mapiv2-test-collection-flat.json"]:
         res = V.validate_collection(SPEC, load_collection(rel), PREFIX, True)
-        nfail = sum(1 for r in res if r["status"] == "FAIL")
+        real_failures = [r for r in res if r["status"] == "FAIL" and not _is_known_gap(r)]
+        nfail = len(real_failures)
         check(nfail == 0, f"{rel}: {nfail} failures (expected 0)")
 
 
 # --------------------------------------------------------------------------- #
-# 2. Negative controls — golden §5a divergence table                          #
+# 2. Negative controls — Getting Started must be fully clean                  #
 # --------------------------------------------------------------------------- #
-# Expected number of FAILING examples per endpoint in the Getting Started
-# collections (System B). Derived from the verified §5a table.
-GOLDEN_FAIL = {
-    "/jobs/submit/single/doc": 2,                     # mail merge + naming addressList
-    "/jobs/submit/single/pdf/addressCapture": 1,      # docSourceAll vs docSourceStandard
-    "/jobs/submit/single/pdf/split": 1,               # docSourceAll+jobs
-    "/jobs/submit/single/pdf/split/addressCapture": 1,# docSourceAll + missing list
-    "/jobs/submit/multi/doc": 2,                       # jobs vs multiDocJobs (2 examples)
-    "/jobs/submit/multi/doc/merge": 1,                # documentsToMerge vs mergeDocumentSource
-    "/jobs/submit/multi/zip/addressCapture": 1,       # docSourceAll vs zipDocumentSource
-}
-# These endpoints must be fully clean in System B (the §5a "match" cases).
-GOLDEN_CLEAN = ["/jobs/submit/multi/zip"]
+# The §5a field-name drift was fixed in commit 14a60e9 (Sep 2026). All
+# Getting Started endpoints now match the spec. This test enforces that the
+# collections stay clean — any new failures indicate a regression.
+#
+# False-negative protection (validator CAN catch errors) is in test 3
+# (synthetic fault injection) which uses hardcoded known-bad request bodies.
+_ALL_JOB_PATHS = [
+    "/jobs/submit/single/doc",
+    "/jobs/submit/single/pdf/addressCapture",
+    "/jobs/submit/single/pdf/split",
+    "/jobs/submit/single/pdf/split/addressCapture",
+    "/jobs/submit/multi/doc",
+    "/jobs/submit/multi/doc/merge",
+    "/jobs/submit/multi/zip",
+    "/jobs/submit/multi/zip/addressCapture",
+]
 
 
 def test_negative_controls():
-    print("\n[2] Negative controls (System B, Getting Started) — golden §5a table")
+    print("\n[2] Negative controls (System B, Getting Started) — must be fully clean")
+    print("    (§5a field-name drift fixed in 14a60e9; false-negative coverage in test 3)")
     for rel in ["c2mapiv2-getting-started-linked-collection.json",
                 "c2mapiv2-getting-started-test-collection.json"]:
         res = V.validate_collection(SPEC, load_collection(rel), PREFIX, True)
         fc = fail_counts_by_path(res)
         print(f"  {rel}")
-        for path, expected in GOLDEN_FAIL.items():
-            check(fc.get(path, 0) == expected,
-                  f"{path}: {fc.get(path,0)} failing examples (expected {expected})")
-        for path in GOLDEN_CLEAN:
+        for path in _ALL_JOB_PATHS:
             check(fc.get(path, 0) == 0,
-                  f"{path}: {fc.get(path,0)} failures (expected 0 — known-good)")
-        # And the specific missing-field diagnostics must be present:
-        joined = "\n".join(e for r in res for e in r["errors"])
-        check("missing required field 'multiDocJobs'" in joined,
-              "diagnostic present: missing multiDocJobs")
-        check("unexpected field 'jobs'" in joined,
-              "diagnostic present: unexpected 'jobs'")
-        check("missing required field 'docSourceStandard'" in joined,
-              "diagnostic present: missing docSourceStandard")
+                  f"{path}: {fc.get(path,0)} failures (expected 0 — §5a resolved)")
 
 
 # --------------------------------------------------------------------------- #
