@@ -341,16 +341,6 @@ class EBNFToOpenAPITranslator:
             # Add the schema
             schemas[name] = schema
 
-        # Add a standard response schema
-        schemas["StandardResponse"] = {
-            "type": "object",
-            "properties": {
-                "status": {"type": "string"},
-                "message": {"type": "string"},
-                "requestId": {"type": "string"}
-            }
-        }
-        
         # Add any generated named schemas from concatenation structures
         schemas.update(self.generated_schemas)
         
@@ -401,7 +391,7 @@ class EBNFToOpenAPITranslator:
                         "description": "Success",
                         "content": {
                             "application/json": {
-                                "schema": {"$ref": "#/components/schemas/StandardResponse"}
+                                "schema": {"$ref": "#/components/schemas/standardResponse"}
                             }
                         }
                     }),
