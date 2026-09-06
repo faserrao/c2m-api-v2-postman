@@ -34,6 +34,9 @@ import sys
 import copy
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from utilities.oneof_resolver import find_variant_by_discriminator_key, build_variant_placeholder_structure
+
 
 def load_yaml_catalog(catalog_path):
     """Load YAML catalog with examples and groups."""
@@ -161,61 +164,19 @@ def resolve_schema_deep(spec, schema, depth=0, max_depth=10):
     return result
 
 
-# Mapping from YAML selection values to OpenAPI schema names
-VARIANT_SCHEMA_MAPPING = {
-    # paymentDetails variants
-    'creditCard': 'creditCardPayment',
-    'invoice': 'invoicePayment',
-    'ach': 'achPayment',
-    'userCredit': 'userCreditPayment',
-
-    # docSourceAll variants (via docSourceStandard)
-    'documentId': 'documentIdSource',
-    'requestId': 'requestIdSource',
-    'url': 'urlSource',
-
-    # docSourceZipFile variants
-    'zipDocumentId': 'zipDocumentIdSource',
-    'zipRequestId': 'zipRequestIdSource',
-
-    # recipientAddressSource variants
-    'singleAddress': 'recipientAddressBySingle',
-    'addressList': 'recipientAddressByList',
-    'addressListId': 'recipientAddressByListId',
-}
-
 
 def get_variant_structure_from_spec(spec, field_name, variant_name):
     """
     Get deep structure for a oneOf variant from OpenAPI spec.
 
-    Args:
-        spec: OpenAPI specification
-        field_name: Field containing oneOf (e.g., 'paymentDetails')
-        variant_name: Selected variant (e.g., 'creditCard')
-
-    Returns:
-        Dictionary with {variant_name: deep_structure} or None if not found
+    Dynamically resolves the variant by searching for variant_name as a
+    property key within the oneOf candidates of field_name — no hardcoded
+    name mapping required.
     """
-    # Map YAML selection to OpenAPI schema name
-    schema_name = VARIANT_SCHEMA_MAPPING.get(variant_name)
+    schema_name, _ = find_variant_by_discriminator_key(spec, field_name, variant_name)
     if not schema_name:
         return None
-
-    # Get the schema from components
-    if 'components' not in spec or 'schemas' not in spec['components']:
-        return None
-
-    schemas = spec['components']['schemas']
-    if schema_name not in schemas:
-        return None
-
-    # Resolve the schema completely (handle all $ref)
-    schema = schemas[schema_name]
-    resolved_schema = resolve_schema_deep(spec, schema)
-
-    # Convert OpenAPI schema to example structure with placeholders
-    return schema_to_example(resolved_schema)
+    return build_variant_placeholder_structure(spec, schema_name)
 
 
 def schema_to_example(schema):
