@@ -151,6 +151,11 @@ jobs:
           echo "🚦 Conformance gate: Linked collection must match the freshly-built spec."
           make validate-collections-conformance-gate
 
+      - name: Golden test suite
+        run: |
+          echo "🧪 Running golden test suite (validator + resolver unit tests)..."
+          make validate-collections-conformance-test
+
       - name: Lint OpenAPI Spec
         continue-on-error: true
         run: |
