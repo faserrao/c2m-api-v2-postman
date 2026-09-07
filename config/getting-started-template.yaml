@@ -25,6 +25,59 @@ schema_references:
   linked_collection: postman/generated/c2mapiv2-linked-collection-flat.json
   note: OpenAPI spec provides types, oneOf variants, and validation. Linked collection
     provides canonical request structures.
+faker_hints:
+  # Document source fields
+  documentId:       {type: random_int, min: 10000, max: 99999}
+  requestId:        {type: random_int, min: 10000, max: 99999}
+  zipDocumentId:    {type: random_int, min: 10000, max: 99999}
+  zipRequestId:     {type: random_int, min: 10000, max: 99999}
+  url:              {type: static, value: "https://example.com/documents/sample.pdf"}
+
+  # Address fields
+  firstName:        {type: faker, method: first_name}
+  lastName:         {type: faker, method: last_name}
+  address1:         {type: faker, method: street_address}
+  address2:         {type: static, value: "Suite 100"}
+  address3:         {type: static, value: ""}
+  city:             {type: faker, method: city}
+  state:            {type: faker, method: state_abbr}
+  zip:              {type: faker, method: zipcode}
+  country:          {type: static, value: "USA"}
+  company:          {type: faker, method: company}
+
+  # Job configuration
+  jobTemplate:      {type: static, value: "standard_letter"}
+  documentClass:    {type: static, value: "letter"}
+  layout:           {type: static, value: "address_on_top"}
+  productionTime:   {type: static, value: "next_day"}
+  envelope:         {type: static, value: "standard"}
+  color:            {type: static, value: "full_color"}
+  paperType:        {type: static, value: "white"}
+  printOption:      {type: static, value: "double_sided"}
+  mailClass:        {type: static, value: "first_class"}
+
+  # Payment fields
+  cardType:         {type: static, value: "visa"}
+  cardNumber:       {type: static, value: "4111111111111111"}
+  expirationMonth:  {type: static, value: 12}
+  expirationYear:   {type: static, value: 2027}
+  cvv:              {type: static, value: 123}
+  accountType:      {type: static, value: "checking"}
+  routingNumber:    {type: static, value: "111000025"}
+  accountNumber:    {type: static, value: "1234567890"}
+
+  # Address list fields
+  addressListId:    {type: static, value: 1001}
+  addressListName:  {type: static, value: "Marketing Campaign Q1"}
+  mappingId:        {type: static, value: 5001}
+
+  # Other
+  filename:         {type: static, value: "document.pdf"}
+  paymentType:      {type: static, value: "credit_card"}
+  foo1:             {type: static, value: "Custom Field 1"}
+  foo2:             {type: static, value: "Custom Field 2"}
+  startPage:        {type: static, value: 1}
+  endPage:          {type: static, value: 5}
 groups:
 - logical_name: most-frequently-used
   display_name: Most Frequently Used
