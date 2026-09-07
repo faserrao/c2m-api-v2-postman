@@ -601,53 +601,61 @@ class EBNFToOpenAPITranslator:
 
         return []
 
+    def _collect_symbols_from_expression(self, expr: Any, result: List[str]) -> None:
+        """Recursively collect all symbol names from an EBNF expression tree."""
+        if not isinstance(expr, dict):
+            return
+        t = expr.get('type')
+        if t == 'symbol':
+            name = expr.get('name')
+            if name:
+                result.append(name)
+        elif t == 'concatenation':
+            for item in expr.get('items', []):
+                self._collect_symbols_from_expression(item, result)
+        elif t == 'alternation':
+            for choice in expr.get('choices', []):
+                self._collect_symbols_from_expression(choice, result)
+        elif t in ('optional', 'repeat'):
+            self._collect_symbols_from_expression(expr.get('expression'), result)
+
     def _extract_endpoint_field_names(self, endpoint: Endpoint) -> Dict[str, str]:
-        """Extract relevant field names from endpoint's request body schema"""
-        # Try to get the production for this endpoint
+        """Extract relevant field names from endpoint's request body schema using EBNF graph traversal."""
         if not endpoint.production_name or endpoint.production_name not in self.productions:
             return {'field': 'unknownField', 'field1': 'unknownField1'}
 
         production = self.productions[endpoint.production_name]
 
-        # Look for common field names in the schema
+        # Walk the full EBNF expression tree to collect all referenced symbol names.
+        all_symbols: List[str] = []
+        self._collect_symbols_from_expression(production.expression, all_symbols)
+
         field_names = {}
 
-        # Check for document source variants
-        doc_fields = ['docSourceAll', 'docSourceStandard', 'docSourceZipFile', 'documentSource']
-        for field in doc_fields:
-            if self._has_field_in_production(production, field):
-                field_names['documentField'] = field
+        # Find document field: match by keyword, most-specific first so the
+        # best match wins (e.g. 'docSource*' beats 'document*').
+        doc_keywords = ['docSource', 'documentSource', 'document']
+        for kw in doc_keywords:
+            match = next((s for s in all_symbols if kw.lower() in s.lower()), None)
+            if match:
+                field_names['documentField'] = match
                 break
 
-        # Check for address fields
-        addr_fields = ['recipientAddressSource', 'recipientAddress', 'addressListId']
-        for field in addr_fields:
-            if self._has_field_in_production(production, field):
-                field_names['addressField'] = field
+        # Find address field similarly.
+        addr_keywords = ['addressSource', 'recipientAddress', 'addressList', 'address']
+        for kw in addr_keywords:
+            match = next((s for s in all_symbols if kw.lower() in s.lower()), None)
+            if match:
+                field_names['addressField'] = match
                 break
 
-        # Default field names if not found
+        # Defaults if graph traversal found no matching symbols.
         if 'documentField' not in field_names:
             field_names['documentField'] = 'documentId'
         if 'addressField' not in field_names:
             field_names['addressField'] = 'recipientAddress'
 
         return field_names
-
-    def _has_field_in_production(self, production: EBNFProduction, field_name: str) -> bool:
-        """Check if a field exists in a production"""
-        expr = production.expression
-        if isinstance(expr, dict) and expr.get('type') == 'concatenation':
-            for item in expr.get('items', []):
-                if isinstance(item, dict):
-                    if item.get('type') == 'symbol' and item.get('name') == field_name:
-                        return True
-                    if item.get('type') == 'optional':
-                        opt_expr = item.get('expression')
-                        if isinstance(opt_expr, dict) and opt_expr.get('type') == 'symbol':
-                            if opt_expr.get('name') == field_name:
-                                return True
-        return False
 
     def _generate_error_details(self, status_code: str, error_code: str, field_names: Dict[str, str]) -> str:
         """Generate contextual error details based on error type"""
