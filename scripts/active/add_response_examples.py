@@ -33,9 +33,29 @@ def extract_error_code_enum(spec):
         pass
     return []
 
+def extract_error_type_enum(spec):
+    """
+    Extract valid errorType enum values from OpenAPI spec.
+
+    The OpenAPI spec is generated from EBNF data dictionary, which is the
+    single source of truth for errorType values.
+
+    Returns:
+        list: Valid errorType enum values, or empty list if not found
+    """
+    try:
+        if 'components' in spec and 'schemas' in spec['components']:
+            if 'errorType' in spec['components']['schemas']:
+                error_type_schema = spec['components']['schemas']['errorType']
+                if 'enum' in error_type_schema:
+                    return error_type_schema['enum']
+    except (KeyError, TypeError):
+        pass
+    return []
+
 def validate_error_examples(spec, error_examples):
     """
-    Validate that all errorCode values in ERROR_EXAMPLES match the EBNF enum.
+    Validate that all errorCode and errorType values in ERROR_EXAMPLES match the EBNF enums.
 
     This ensures the script stays synchronized with the EBNF data dictionary.
     If validation fails, the script will exit with a clear error message.
@@ -45,22 +65,29 @@ def validate_error_examples(spec, error_examples):
         error_examples: ERROR_EXAMPLES dictionary to validate
 
     Returns:
-        bool: True if all errorCode values are valid
+        bool: True if all values are valid
 
     Raises:
-        SystemExit: If any errorCode values don't match EBNF enum
+        SystemExit: If any errorCode or errorType values don't match EBNF enums
     """
     valid_codes = extract_error_code_enum(spec)
+    valid_types = extract_error_type_enum(spec)
 
     if not valid_codes:
         print("⚠️  WARNING: Could not extract errorCode enum from OpenAPI spec")
         print("    Skipping validation - ensure EBNF errorCode definition exists")
         return False
 
-    print(f"✓ Found {len(valid_codes)} valid errorCode values in EBNF enum")
+    if not valid_types:
+        print("⚠️  WARNING: Could not extract errorType enum from OpenAPI spec")
+        print("    Skipping validation - ensure EBNF errorType definition exists")
+        return False
 
-    # Collect all errorCode values used in examples
+    print(f"✓ Found {len(valid_codes)} valid errorCode values in EBNF enum")
+    print(f"✓ Found {len(valid_types)} valid errorType values in EBNF enum")
+
     invalid_codes = []
+    invalid_types = []
     for http_code, examples in error_examples.items():
         for example_name, example_data in examples.items():
             error_code = example_data['value'].get('errorCode')
@@ -70,6 +97,15 @@ def validate_error_examples(spec, error_examples):
                     'example': example_name,
                     'invalid_value': error_code
                 })
+            error_type = example_data['value'].get('errorType')
+            if error_type and error_type not in valid_types:
+                invalid_types.append({
+                    'http_code': http_code,
+                    'example': example_name,
+                    'invalid_value': error_type
+                })
+
+    failed = False
 
     if invalid_codes:
         print("\n❌ ERROR: Found errorCode values that don't match EBNF enum:")
@@ -79,14 +115,28 @@ def validate_error_examples(spec, error_examples):
         for code in valid_codes:
             print(f"   - {code}")
         print("\nFix: Update ERROR_EXAMPLES dictionary to use valid EBNF errorCode values")
+        failed = True
+
+    if invalid_types:
+        print("\n❌ ERROR: Found errorType values that don't match EBNF enum:")
+        for item in invalid_types:
+            print(f"   - HTTP {item['http_code']} ({item['example']}): '{item['invalid_value']}'")
+        print(f"\nValid errorType values from EBNF:")
+        for t in valid_types:
+            print(f"   - {t}")
+        print("\nFix: Update ERROR_EXAMPLES dictionary to use valid EBNF errorType values")
+        failed = True
+
+    if failed:
         sys.exit(1)
 
     print(f"✓ All errorCode values in ERROR_EXAMPLES are valid")
+    print(f"✓ All errorType values in ERROR_EXAMPLES are valid")
     return True
 
 # Error example templates (realistic data, not placeholders)
-# NOTE: errorCode values MUST match the enum defined in EBNF data dictionary
-# Validation runs automatically on every execution to ensure synchronization
+# NOTE: errorCode AND errorType values MUST match the enums defined in EBNF data dictionary.
+# Validation runs automatically on every execution to ensure synchronization.
 ERROR_EXAMPLES = {
     '400': {
         'missing_field': {
@@ -270,8 +320,8 @@ def main():
     with open(input_file, 'r') as f:
         spec = yaml.safe_load(f)
 
-    # Validate errorCode values against EBNF enum (via OpenAPI spec)
-    print("\n🔍 Validating errorCode values against EBNF data dictionary...")
+    # Validate errorCode and errorType values against EBNF enums (via OpenAPI spec)
+    print("\n🔍 Validating errorCode and errorType values against EBNF data dictionary...")
     validate_error_examples(spec, ERROR_EXAMPLES)
 
     # Add examples
