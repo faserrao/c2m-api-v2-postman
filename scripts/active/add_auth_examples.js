@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const yaml = require('js-yaml');
 
 // Parse command line arguments
 const args = process.argv.slice(2);
@@ -13,37 +14,52 @@ if (!inputFile) {
   process.exit(1);
 }
 
-// Auth examples - supporting both original names and flattened names
-const authExamples = {
-  'Issue a short-term access token': {
-    scopes: ["jobs:submit", "jobs:read", "templates:read"]
-  },
-  'POST /auth/tokens/short': {
-    scopes: ["jobs:submit", "jobs:read", "templates:read"]
-  },
-  'Issue or rotate a long-term token': {
-    grant_type: "client_credentials",
-    client_id: "{{clientId}}",
-    client_secret: "{{clientSecret}}",
-    scopes: ["jobs:submit", "jobs:read", "jobs:update", "templates:read", "account:read"],
-    ttl_seconds: 7776000
-  },
-  'POST /auth/tokens/long': {
-    grant_type: "client_credentials",
-    client_id: "{{clientId}}",
-    client_secret: "{{clientSecret}}",
-    scopes: ["jobs:submit", "jobs:read", "jobs:update", "templates:read", "account:read"],
-    ttl_seconds: 7776000
-  },
-  'Revoke a token': {
-    reason: "Compromised key",
-    revoke_all_related: false
-  },
-  'POST /auth/tokens/:tokenId/revoke': {
-    reason: "Compromised key",
-    revoke_all_related: false
+/**
+ * Load auth request body examples from the OpenAPI auth overlay.
+ *
+ * For each path in the overlay that has a POST with a requestBody, reads the
+ * first example value and registers it under two keys so it matches both the
+ * original Postman request name (from operation.summary) and the flattened
+ * path name used in generated collections (e.g. "POST /auth/tokens/short").
+ *
+ * Endpoints with no requestBody (e.g. revoke) are skipped — no body injected.
+ */
+function loadAuthExamplesFromOverlay(overlayPath) {
+  const content = fs.readFileSync(overlayPath, 'utf8');
+  const overlay = yaml.load(content);
+  const examples = {};
+
+  for (const [pathKey, pathItem] of Object.entries(overlay.paths || {})) {
+    const operation = pathItem.post;
+    if (!operation || !operation.requestBody) continue;
+
+    const jsonContent = operation.requestBody.content &&
+                        operation.requestBody.content['application/json'];
+    if (!jsonContent || !jsonContent.examples) continue;
+
+    const firstExample = Object.values(jsonContent.examples)[0];
+    if (!firstExample || !firstExample.value) continue;
+
+    const exampleValue = firstExample.value;
+
+    // Register under the operation summary (used as Postman item name)
+    if (operation.summary) {
+      examples[operation.summary] = exampleValue;
+    }
+
+    // Register under the flattened path name used in generated collections
+    // ("{tokenId}" → ":tokenId" to match the Postman URL parameter convention)
+    const flatPath = pathKey.replace(/\{(\w+)\}/g, ':$1');
+    examples[`POST ${flatPath}`] = exampleValue;
   }
-};
+
+  console.log(`Loaded auth examples for: ${Object.keys(examples).join(', ')}`);
+  return examples;
+}
+
+// Load auth examples from the overlay (single source of truth)
+const overlayPath = path.resolve(__dirname, '../../openapi/overlays/auth.tokens.yaml');
+const authExamples = loadAuthExamplesFromOverlay(overlayPath);
 
 // Read the collection
 const collection = JSON.parse(fs.readFileSync(inputFile, 'utf8'));
