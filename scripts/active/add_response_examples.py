@@ -172,24 +172,49 @@ ERROR_EXAMPLES = {
     }
 }
 
+def discover_job_response_schema_name(spec):
+    """
+    Discover the job response schema name dynamically from the spec.
+
+    Finds the first /jobs/ POST endpoint with a 200 response whose
+    application/json schema is a $ref, and returns the referenced schema name.
+    Returns None if not found.
+    """
+    for path, methods in spec.get('paths', {}).items():
+        if '/jobs/' not in path:
+            continue
+        operation = methods.get('post', {})
+        if not operation:
+            continue
+        content = (operation.get('responses', {})
+                             .get('200', {})
+                             .get('content', {})
+                             .get('application/json', {}))
+        ref = content.get('schema', {}).get('$ref', '')
+        if ref.startswith('#/components/schemas/'):
+            return ref.split('/')[-1]
+    return None
+
+
 def add_response_examples(spec):
-    """Add example values to StandardResponse and response schemas"""
-    
-    # Add examples to StandardResponse schema
+    """Add example values to the job response schema and all job endpoints."""
+
+    response_schema_name = discover_job_response_schema_name(spec)
+
+    # Add examples to the job response schema
     if 'components' in spec and 'schemas' in spec['components']:
         schemas = spec['components']['schemas']
-        
-        # Add examples to StandardResponse
-        if 'StandardResponse' in schemas:
-            schemas['StandardResponse']['example'] = {
+
+        if response_schema_name and response_schema_name in schemas:
+            schemas[response_schema_name]['example'] = {
                 'status': 'accepted',
                 'message': 'Your request has been queued',
                 'requestId': 'job_20241227_123456'
             }
-        
+
         # Don't add 'examples' to schema level - only 'example' is valid
         # Multiple examples should be added at the media type level, not schema level
-    
+
     # Add examples to all job endpoints
     if 'paths' in spec:
         for path, methods in spec['paths'].items():
@@ -201,10 +226,10 @@ def add_response_examples(spec):
                             response = operation['responses']['200']
                             if 'content' in response and 'application/json' in response['content']:
                                 json_response = response['content']['application/json']
-                                
-                                # Add example if it references StandardResponse
+
+                                # Add example if it references the discovered response schema
                                 if 'schema' in json_response and '$ref' in json_response['schema']:
-                                    if 'StandardResponse' in json_response['schema']['$ref']:
+                                    if response_schema_name and response_schema_name in json_response['schema']['$ref']:
                                         # Create endpoint-specific example
                                         endpoint_name = path.split('/')[-1].replace('-', '_')
                                         
