@@ -2675,6 +2675,20 @@ postman-collection-build: ## Generate and flatten the primary collection [CI ali
 	$(MAKE) postman-api-linked-collection-generate
 	$(MAKE) postman-linked-collection-flatten
 
+.PHONY: postman-build-golden-test-fixtures
+postman-build-golden-test-fixtures: ## Build all collection files needed by the golden test suite (local only, no API keys required)
+	$(MAKE) postman-api-linked-collection-generate
+	$(MAKE) postman-linked-collection-flatten
+	$(MAKE) postman-generate-getting-started-all
+	$(MAKE) postman-test-collection-generate
+	$(MAKE) postman-test-collection-add-examples || echo "⚠️  Skipping examples (optional)"
+	$(MAKE) postman-test-collection-add-error-responses || echo "⚠️  Skipping error responses (optional)"
+	$(MAKE) postman-test-collection-merge-overrides
+	$(MAKE) postman-test-collection-add-tests || echo "⚠️  Skipping adding tests (optional)"
+	$(MAKE) postman-test-collection-auto-fix
+	$(MAKE) postman-test-collection-fix-v2
+	$(MAKE) postman-test-collection-flatten-rename
+
 .PHONY: docs
 docs: docs-build ## Build API documentation [CI alias]
 
