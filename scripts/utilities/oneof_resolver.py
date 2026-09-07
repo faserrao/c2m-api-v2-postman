@@ -71,6 +71,23 @@ def _search_oneof(
         if discriminator_key in candidate_schema.get('properties', {}):
             return candidate_name, candidate_schema
 
+        # Property-prefix match: any property name starts with discriminator_key.
+        # Catches renamed properties (e.g. creditCard -> creditCardDetails).
+        props = candidate_schema.get('properties', {})
+        if props and any(p.lower().startswith(discriminator_key.lower()) for p in props):
+            return candidate_name, candidate_schema
+
+        # $ref-alias match: candidate is a pure $ref with no properties/oneOf.
+        # Check if the immediate $ref target name equals discriminator_key.
+        # Catches single-value aliases: documentIdSource($ref:documentId),
+        # urlSource($ref:url), recipientAddressByListId($ref:addressListId).
+        if ('$ref' in candidate_schema
+                and not candidate_schema.get('properties')
+                and not candidate_schema.get('oneOf')):
+            ref_target = candidate_schema['$ref'].split('/')[-1]
+            if ref_target.lower() == discriminator_key.lower():
+                return candidate_name, candidate_schema
+
         # Nested oneOf: recurse into this candidate's oneOf options
         if 'oneOf' in candidate_schema:
             result_name, result_schema = _search_oneof(
