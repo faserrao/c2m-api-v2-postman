@@ -209,7 +209,7 @@ def add_response_examples(spec):
             schemas[response_schema_name]['example'] = {
                 'status': 'accepted',
                 'message': 'Your request has been queued',
-                'requestId': 'job_20241227_123456'
+                'requestId': 123456
             }
 
         # Don't add 'examples' to schema level - only 'example' is valid
@@ -240,7 +240,7 @@ def add_response_examples(spec):
                                                 'value': {
                                                     'status': 'accepted',
                                                     'message': 'Your request has been queued',
-                                                    'requestId': f'{endpoint_name}_job_123456'
+                                                    'requestId': 123456
                                                 }
                                             }
                                         }
