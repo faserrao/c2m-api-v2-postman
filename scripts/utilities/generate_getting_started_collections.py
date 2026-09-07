@@ -423,12 +423,23 @@ def add_jwt_auth(collection_path: str, jwt_script_path: str = "postman/scripts/j
         return False
 
 def extract_all_spec_field_names(spec: Dict) -> set:
-    """Recursively collect all property names from spec component schemas."""
+    """Recursively collect all property names from spec component schemas, following $refs."""
     names = set()
+    schemas = spec.get('components', {}).get('schemas', {})
+    visited_refs = set()  # Track visited $ref targets to prevent cycles
 
     def _collect(schema):
         if not isinstance(schema, dict):
             return
+        # Follow $ref pointers — needed when top-level schemas delegate via $ref
+        if '$ref' in schema:
+            ref = schema['$ref']
+            if ref.startswith('#/components/schemas/') and ref not in visited_refs:
+                visited_refs.add(ref)
+                ref_name = ref.split('/')[-1]
+                if ref_name in schemas:
+                    _collect(schemas[ref_name])
+            return  # $ref and sibling keys are mutually exclusive in valid OAS
         for prop_name, prop_schema in schema.get('properties', {}).items():
             names.add(prop_name)
             _collect(prop_schema)
@@ -437,8 +448,11 @@ def extract_all_spec_field_names(spec: Dict) -> set:
         if 'items' in schema:
             _collect(schema['items'])
 
-    for schema in spec.get('components', {}).get('schemas', {}).values():
-        _collect(schema)
+    for schema_name, schema in schemas.items():
+        ref_key = f'#/components/schemas/{schema_name}'
+        if ref_key not in visited_refs:
+            visited_refs.add(ref_key)
+            _collect(schema)
 
     return names
 
