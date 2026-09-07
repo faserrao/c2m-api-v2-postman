@@ -536,12 +536,14 @@ def validate_field_patchability(template_body, values_dict, selections):
     # Get all field names in canonical structure (after oneOf selection)
     canonical_fields = get_all_field_names(template_with_selections)
 
+    # Check against the full schema before oneOf selection —
+    # fields like jobTemplate appear at the top level but not in all oneOf branches.
+    all_schema_fields = get_all_field_names(template_body)
+
     # Check each value in YAML
     for field_name in values_dict.keys():
         if field_name not in canonical_fields and not field_name.startswith('_'):
-            # Special fields (tags, jobTemplate, etc.) are always valid
-            special_fields = {'tags', 'jobTemplate', 'jobOptions'}
-            if field_name not in special_fields:
+            if field_name not in all_schema_fields:
                 warnings.append(f"Field '{field_name}' not found in canonical structure (may be unused)")
 
     return True, warnings
