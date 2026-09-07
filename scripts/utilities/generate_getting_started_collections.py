@@ -422,6 +422,66 @@ def add_jwt_auth(collection_path: str, jwt_script_path: str = "postman/scripts/j
         print(f"ERROR: Failed to add JWT auth: {str(e)}", file=sys.stderr)
         return False
 
+def extract_all_spec_field_names(spec: Dict) -> set:
+    """Recursively collect all property names from spec component schemas."""
+    names = set()
+
+    def _collect(schema):
+        if not isinstance(schema, dict):
+            return
+        for prop_name, prop_schema in schema.get('properties', {}).items():
+            names.add(prop_name)
+            _collect(prop_schema)
+        for sub in schema.get('allOf', []) + schema.get('oneOf', []) + schema.get('anyOf', []):
+            _collect(sub)
+        if 'items' in schema:
+            _collect(schema['items'])
+
+    for schema in spec.get('components', {}).get('schemas', {}).values():
+        _collect(schema)
+
+    return names
+
+
+def validate_faker_hints_keys(faker_hints: dict, spec: Dict) -> None:
+    """
+    Validate that faker_hints keys match known field names in the OpenAPI spec.
+
+    Warns (does not fail) about unknown keys — some keys like foo1/foo2 are
+    intentional extras not in the spec. Unknown keys fall back to type-based
+    placeholder generation, so there is no build failure, only a potential
+    silent quality gap if a field was renamed in the EBNF.
+
+    If any key was renamed in the EBNF, it will appear here as unknown.
+    Fix: update the faker_hints key in config/getting-started-template.yaml
+    to match the new field name.
+    """
+    if not faker_hints:
+        return
+
+    spec_fields = extract_all_spec_field_names(spec)
+
+    if not spec_fields:
+        print("⚠️  WARNING: Could not extract field names from OpenAPI spec — skipping faker_hints validation",
+              file=sys.stderr)
+        return
+
+    print(f"\n🔍 Validating faker_hints keys against OpenAPI spec ({len(spec_fields)} known fields)...",
+          file=sys.stderr)
+
+    unknown_keys = [k for k in faker_hints if k not in spec_fields]
+    if unknown_keys:
+        print(f"⚠️  faker_hints has {len(unknown_keys)} key(s) not found in the OpenAPI spec:", file=sys.stderr)
+        for key in sorted(unknown_keys):
+            hint = faker_hints[key]
+            detail = hint.get('value', hint.get('method', '?'))
+            print(f"   - {key}  (type={hint.get('type','?')}, value={detail})", file=sys.stderr)
+        print("   These may be intentional extras (e.g. foo1/foo2) or renamed EBNF fields.", file=sys.stderr)
+        print("   If a field was renamed, update faker_hints to match the new name.", file=sys.stderr)
+    else:
+        print(f"✓ All {len(faker_hints)} faker_hints keys are valid spec field names", file=sys.stderr)
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Generate Getting Started collections from template"
@@ -460,6 +520,9 @@ def main():
     # Load OpenAPI spec
     print(f"Loading OpenAPI spec from {openapi_path}...", file=sys.stderr)
     openapi_spec = load_yaml(openapi_path)
+
+    # Validate faker_hints keys against spec field names
+    validate_faker_hints_keys(template.get('faker_hints', {}), openapi_spec)
 
     # Generate linked collection (placeholders)
     print("Generating linked collection (placeholders)...", file=sys.stderr)
