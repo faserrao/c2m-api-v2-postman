@@ -42,6 +42,8 @@ fake = Faker()
 
 # Import realistic value generators (reuse existing code)
 sys.path.insert(0, str(Path(__file__).parent.parent / "active"))
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from utilities.oneof_resolver import find_variant_by_discriminator_key, build_variant_placeholder_structure
 
 def load_yaml(filepath: str) -> Dict:
     """Load YAML file."""
@@ -177,71 +179,12 @@ def build_structure_from_schema(schema: Dict, openapi_spec: Dict) -> Any:
 def get_oneof_structure_from_openapi(openapi_spec: Dict, field_name: str, variant: str) -> Any:
     """
     Get oneOf variant structure from OpenAPI spec with placeholder values.
-
-    This replaces hardcoded fixtures by reading structure from OpenAPI spec (which came from EBNF).
-    Returns structure with placeholders - use replace_placeholders_recursive() for realistic values.
-
-    Handles nested oneOf structures (e.g., docSourceAll → docSourceStandard → requestIdSource).
-
-    Args:
-        openapi_spec: Loaded OpenAPI specification
-        field_name: oneOf field name (e.g., "docSourceAll", "recipientAddressSource")
-        variant: Selected variant (e.g., "requestId", "singleAddress")
-
-    Returns:
-        JSON structure for the selected variant with placeholders, or None if not found
+    Replaces hardcoded variant_mappings with dynamic spec-driven lookup.
     """
-    # Get the oneOf field schema
-    field_schema = openapi_spec.get('components', {}).get('schemas', {}).get(field_name)
-    if not field_schema or 'oneOf' not in field_schema:
+    schema_name, _ = find_variant_by_discriminator_key(openapi_spec, field_name, variant)
+    if schema_name is None:
         return None
-
-    # Map variant names to schema names
-    # Template uses simplified names, OpenAPI uses full schema names
-    variant_mappings = {
-        # docSourceAll variants
-        'requestId': 'requestIdSource',
-        'documentId': 'documentIdSource',
-        'url': 'urlSource',
-        'zipRequestId': 'zipRequestIdSource',
-        'zipDocumentId': 'zipDocumentIdSource',
-        # recipientAddressSource variants
-        'singleAddress': 'recipientAddressBySingle',
-        'addressList': 'recipientAddressByList',
-        'addressListId': 'recipientAddressByListId',
-        'addressId': 'recipientAddressByAddressId',
-        # paymentDetails variants
-        'creditCard': 'creditCardPayment',
-        'ach': 'achPayment',
-        'invoice': 'invoicePayment',
-        'userCredit': 'userCreditPayment'
-    }
-
-    schema_name = variant_mappings.get(variant, variant)
-
-    def find_variant_recursive(oneof_options):
-        """Recursively search through nested oneOf structures."""
-        for oneof_option in oneof_options:
-            if '$ref' in oneof_option:
-                ref_name = oneof_option['$ref'].split('/')[-1]
-
-                # Direct match - found it!
-                if ref_name == schema_name:
-                    variant_schema = get_schema_from_openapi(openapi_spec, oneof_option['$ref'])
-                    if variant_schema:
-                        return build_structure_from_schema(variant_schema, openapi_spec)
-
-                # Not a match - check if this schema has nested oneOf
-                variant_schema = get_schema_from_openapi(openapi_spec, oneof_option['$ref'])
-                if variant_schema and 'oneOf' in variant_schema:
-                    # Recursively search nested oneOf
-                    result = find_variant_recursive(variant_schema['oneOf'])
-                    if result is not None:
-                        return result
-
-        return None
-
-    return find_variant_recursive(field_schema['oneOf'])
+    return build_variant_placeholder_structure(openapi_spec, schema_name)
 
 def generate_realistic_value(field_name: str, field_type: str, oneof_selection: Optional[str] = None) -> Any:
     """
