@@ -152,6 +152,7 @@ class EBNFToOpenAPITranslator:
         self.type_cache: Dict[str, TypeInfo] = {}
         self.generated_schemas: Dict[str, Dict[str, Any]] = {}  # Store generated named schemas
         self.schema_counter = 0  # Counter for unique schema names
+        self.http_error_map: Dict[str, Any] = {}  # Parsed from @http_error_map block in EBNF
         
         # OpenAPI type mappings for primitives
         self.primitive_types = {
@@ -182,6 +183,9 @@ class EBNFToOpenAPITranslator:
         """Parse EBNF content and extract productions"""
         lines = content.split('\n')
         
+        # Parse HTTP error map from @http_error_map annotation block
+        self.http_error_map = self._parse_http_error_map(content)
+
         # First extract endpoints from comments
         self._extract_endpoints(lines)
         
@@ -206,6 +210,25 @@ class EBNFToOpenAPITranslator:
                 message=f"Failed to parse EBNF: {str(e)}"
             ))
     
+    def _parse_http_error_map(self, content: str) -> Dict[str, Any]:
+        """Parse @http_error_map annotation block from EBNF content.
+
+        Returns dict keyed by HTTP status string: {'400': {'errorType': '...', 'errorCodes': [...]}}
+        Returns empty dict if the block is absent (non-fatal; caller should guard).
+        """
+        match = re.search(r'@http_error_map\s*\n(.*?)@end_http_error_map', content, re.DOTALL)
+        if not match:
+            return {}
+        result: Dict[str, Any] = {}
+        for line in match.group(1).splitlines():
+            m = re.match(r'\s*(\d+):\s*errorType=(\w+);\s*errorCodes=([\w,]+)', line)
+            if m:
+                status = m.group(1)
+                error_type = m.group(2)
+                codes = [c.strip() for c in m.group(3).split(',')]
+                result[status] = {'errorType': error_type, 'errorCodes': codes}
+        return result
+
     def _extract_endpoints(self, lines: List[str]) -> None:
         """Extract endpoint definitions from comments and their associated productions"""
         endpoint_pattern = r'Endpoint:\s*(GET|POST|PUT|DELETE|PATCH)\s+(/[\w/\-{}]+)'
@@ -278,7 +301,8 @@ class EBNFToOpenAPITranslator:
             ("info", OrderedDict([
                 ("title", "C2M API v2"),
                 ("version", "2.0.0"),
-                ("description", "API for submitting mailing jobs with various document routing options")
+                ("description", "API for submitting mailing jobs with various document routing options"),
+                ("x-http-error-map", self.http_error_map)
             ])),
             ("servers", [
                 {
@@ -493,56 +517,15 @@ class EBNFToOpenAPITranslator:
     def _generate_error_examples(self, status_code: str, endpoint: Endpoint) -> Dict[str, Any]:
         """Generate error response examples for a given HTTP status code.
 
-        Uses static mappings (status_to_type, status_to_codes) for the semantic
-        relationship between HTTP status codes and error enum values — that mapping
-        cannot be derived from the EBNF alone. Both mappings are validated at
-        runtime against the errorType and errorCode enums read from the EBNF;
-        if the EBNF enums change, this method raises with the specific mismatched values.
+        errorType and errorCodes are read from the @http_error_map block in the EBNF
+        (parsed into self.http_error_map). Edit that block in the data dictionary to
+        change which error variants are produced — no Python changes needed.
         """
-        # Extract error codes and types from EBNF for runtime validation below
-        error_codes = self._get_enum_values('errorCode')
-        error_types = self._get_enum_values('errorType')
-
-        # Map HTTP status codes to appropriate errorType.
-        # Values must exist in the EBNF errorType enum — validated below.
-        status_to_type = {
-            '400': 'ValidationError',
-            '401': 'AuthenticationError',
-            '403': 'AuthorizationError',
-            '404': 'ResourceNotFoundError',
-            '422': 'ValidationError',
-            '500': 'ServerError'
-        }
-
-        # Map HTTP status codes to appropriate errorCode values (multiple per status).
-        # Values must exist in the EBNF errorCode enum — validated below.
-        status_to_codes = {
-            '400': ['MISSING_REQUIRED_FIELD', 'INVALID_ONEOF', 'INVALID_JSON'],
-            '401': ['MISSING_AUTH_HEADER', 'INVALID_TOKEN', 'EXPIRED_TOKEN'],
-            '403': ['INSUFFICIENT_PERMISSIONS', 'ACCOUNT_SUSPENDED'],
-            '404': ['JOB_NOT_FOUND', 'RESOURCE_NOT_FOUND'],
-            '422': ['INVALID_ENUM_VALUE', 'MUTUAL_EXCLUSION_VIOLATION', 'INVALID_FORMAT'],
-            '500': ['SERVER_ERROR', 'DATABASE_ERROR', 'EXTERNAL_SERVICE_ERROR']
-        }
-
-        # Validate mapping values against EBNF enums — fail fast if the spec drifts
-        if error_types:
-            invalid_types = set(status_to_type.values()) - set(error_types)
-            if invalid_types:
-                raise RuntimeError(
-                    f"status_to_type contains errorType values not in EBNF enum: {sorted(invalid_types)}\n"
-                    f"Valid errorType values from EBNF: {error_types}\n"
-                    f"Fix: update status_to_type in _generate_error_examples()"
-                )
-        if error_codes:
-            all_mapped_codes = {code for codes in status_to_codes.values() for code in codes}
-            invalid_codes = all_mapped_codes - set(error_codes)
-            if invalid_codes:
-                raise RuntimeError(
-                    f"status_to_codes contains errorCode values not in EBNF enum: {sorted(invalid_codes)}\n"
-                    f"Valid errorCode values from EBNF: {error_codes}\n"
-                    f"Fix: update status_to_codes in _generate_error_examples()"
-                )
+        if not self.http_error_map:
+            raise RuntimeError(
+                "@http_error_map block not found in EBNF data dictionary.\n"
+                "Add it after the HTTP status aliases in data_dictionary/c2mapiv2-dd.ebnf."
+            )
 
         # Map HTTP status codes to descriptive messages
         status_to_messages = {
@@ -581,8 +564,9 @@ class EBNFToOpenAPITranslator:
 
         # Generate examples for this status code
         examples = {}
-        error_type = status_to_type.get(status_code, 'ServerError')
-        codes = status_to_codes.get(status_code, ['SERVER_ERROR'])
+        map_entry = self.http_error_map.get(status_code, {})
+        error_type = map_entry.get('errorType', 'ServerError')
+        codes = map_entry.get('errorCodes', ['SERVER_ERROR'])
         messages = status_to_messages.get(status_code, ['An error occurred'])
 
         # Create one example per error code for this status

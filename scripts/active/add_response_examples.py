@@ -12,6 +12,17 @@ import random
 import string
 from datetime import datetime, timezone
 
+def extract_http_error_map(spec):
+    """Read the x-http-error-map extension from the OpenAPI spec info block.
+
+    This extension is injected by ebnf_to_openapi_dynamic_v3.py, which parses it
+    from the @http_error_map annotation block in the EBNF data dictionary.
+    Returns dict keyed by HTTP status string: {'400': {'errorType': '...', 'errorCodes': [...]}}.
+    """
+    raw = spec.get('info', {}).get('x-http-error-map', {})
+    return {str(k): v for k, v in raw.items()}
+
+
 def extract_error_code_enum(spec):
     """
     Extract valid errorCode enum values from OpenAPI spec.
@@ -54,40 +65,25 @@ def extract_error_type_enum(spec):
     return []
 
 def validate_error_examples(spec, error_examples):
-    """
-    Validate that all errorCode and errorType values in ERROR_EXAMPLES match the EBNF enums.
+    """Validate that errorCode values in ERROR_EXAMPLES match the EBNF enum.
 
-    This ensures the script stays synchronized with the EBNF data dictionary.
-    If validation fails, the script will exit with a clear error message.
-
-    Args:
-        spec: OpenAPI specification dictionary
-        error_examples: ERROR_EXAMPLES dictionary to validate
-
-    Returns:
-        bool: True if all values are valid
+    errorType is no longer validated here — it is derived from x-http-error-map
+    (injected into the spec by ebnf_to_openapi_dynamic_v3.py from the EBNF
+    @http_error_map block) and is never stored in ERROR_EXAMPLES.
 
     Raises:
-        SystemExit: If any errorCode or errorType values don't match EBNF enums
+        SystemExit: If any errorCode value doesn't match the EBNF enum.
     """
     valid_codes = extract_error_code_enum(spec)
-    valid_types = extract_error_type_enum(spec)
 
     if not valid_codes:
         print("⚠️  WARNING: Could not extract errorCode enum from OpenAPI spec")
         print("    Skipping validation - ensure EBNF errorCode definition exists")
         return False
 
-    if not valid_types:
-        print("⚠️  WARNING: Could not extract errorType enum from OpenAPI spec")
-        print("    Skipping validation - ensure EBNF errorType definition exists")
-        return False
-
     print(f"✓ Found {len(valid_codes)} valid errorCode values in EBNF enum")
-    print(f"✓ Found {len(valid_types)} valid errorType values in EBNF enum")
 
     invalid_codes = []
-    invalid_types = []
     for http_code, examples in error_examples.items():
         for example_name, example_data in examples.items():
             error_code = example_data['value'].get('errorCode')
@@ -97,15 +93,6 @@ def validate_error_examples(spec, error_examples):
                     'example': example_name,
                     'invalid_value': error_code
                 })
-            error_type = example_data['value'].get('errorType')
-            if error_type and error_type not in valid_types:
-                invalid_types.append({
-                    'http_code': http_code,
-                    'example': example_name,
-                    'invalid_value': error_type
-                })
-
-    failed = False
 
     if invalid_codes:
         print("\n❌ ERROR: Found errorCode values that don't match EBNF enum:")
@@ -115,34 +102,22 @@ def validate_error_examples(spec, error_examples):
         for code in valid_codes:
             print(f"   - {code}")
         print("\nFix: Update ERROR_EXAMPLES dictionary to use valid EBNF errorCode values")
-        failed = True
-
-    if invalid_types:
-        print("\n❌ ERROR: Found errorType values that don't match EBNF enum:")
-        for item in invalid_types:
-            print(f"   - HTTP {item['http_code']} ({item['example']}): '{item['invalid_value']}'")
-        print(f"\nValid errorType values from EBNF:")
-        for t in valid_types:
-            print(f"   - {t}")
-        print("\nFix: Update ERROR_EXAMPLES dictionary to use valid EBNF errorType values")
-        failed = True
-
-    if failed:
         sys.exit(1)
 
     print(f"✓ All errorCode values in ERROR_EXAMPLES are valid")
-    print(f"✓ All errorType values in ERROR_EXAMPLES are valid")
     return True
 
 # Error example templates (realistic data, not placeholders)
-# NOTE: errorCode AND errorType values MUST match the enums defined in EBNF data dictionary.
-# Validation runs automatically on every execution to ensure synchronization.
+# errorCode values MUST match the EBNF data dictionary errorCode enum.
+# errorType is NOT stored here — it is read from x-http-error-map in the spec
+# (injected by ebnf_to_openapi_dynamic_v3.py from the EBNF @http_error_map block)
+# and merged in at injection time. Edit data_dictionary/c2mapiv2-dd.ebnf to change
+# the errorType assignment per status.
 ERROR_EXAMPLES = {
     '400': {
         'missing_field': {
             'summary': 'Missing required field',
             'value': {
-                'errorType': 'ValidationError',
                 'errorMessage': 'Required field is missing from request body',
                 'errorCode': 'MISSING_REQUIRED_FIELD',
                 'errorDetails': '{"field": "documentId", "location": "requestBody"}',
@@ -152,7 +127,6 @@ ERROR_EXAMPLES = {
         'invalid_format': {
             'summary': 'Invalid field format',
             'value': {
-                'errorType': 'ValidationError',
                 'errorMessage': 'Field contains invalid format or value',
                 'errorCode': 'INVALID_FORMAT',
                 'errorDetails': '{"field": "postalCode", "provided": "1234", "expected": "5 or 9 digits"}',
@@ -164,7 +138,6 @@ ERROR_EXAMPLES = {
         'missing_token': {
             'summary': 'Missing authentication',
             'value': {
-                'errorType': 'AuthenticationError',
                 'errorMessage': 'Authorization header is missing or invalid',
                 'errorCode': 'MISSING_AUTH_HEADER',
                 'errorDetails': '{"expected": "Bearer <token>", "received": "none"}',
@@ -176,7 +149,6 @@ ERROR_EXAMPLES = {
         'insufficient_permissions': {
             'summary': 'Insufficient permissions',
             'value': {
-                'errorType': 'AuthorizationError',
                 'errorMessage': 'User does not have required permissions for this operation',
                 'errorCode': 'INSUFFICIENT_PERMISSIONS',
                 'errorDetails': '{"required": "jobs:write", "user": "read-only-user"}',
@@ -188,7 +160,6 @@ ERROR_EXAMPLES = {
         'resource_not_found': {
             'summary': 'Resource not found',
             'value': {
-                'errorType': 'ResourceNotFoundError',
                 'errorMessage': 'Requested resource does not exist',
                 'errorCode': 'RESOURCE_NOT_FOUND',
                 'errorDetails': '{"resourceType": "document", "resourceId": "DOC-12345"}',
@@ -200,7 +171,6 @@ ERROR_EXAMPLES = {
         'validation_failed': {
             'summary': 'Validation failed',
             'value': {
-                'errorType': 'ValidationError',
                 'errorMessage': 'Request validation failed for multiple fields',
                 'errorCode': 'INVALID_FORMAT',
                 'errorDetails': '{"errors": [{"field": "documentId", "issue": "not found"}, {"field": "recipientAddress.postalCode", "issue": "invalid format"}]}',
@@ -212,7 +182,6 @@ ERROR_EXAMPLES = {
         'server_error': {
             'summary': 'Internal server error',
             'value': {
-                'errorType': 'ServerError',
                 'errorMessage': 'An unexpected error occurred while processing the request',
                 'errorCode': 'SERVER_ERROR',
                 'errorDetails': '{"timestamp": "2026-02-16T18:30:45Z", "requestId": "req-abc123"}',
@@ -248,6 +217,10 @@ def discover_job_response_schema_name(spec):
 
 def add_response_examples(spec):
     """Add example values to the job response schema and all job endpoints."""
+
+    http_error_map = extract_http_error_map(spec)
+    if not http_error_map:
+        print("⚠️  WARNING: x-http-error-map not found in spec info — errorType will be omitted from error examples")
 
     response_schema_name = discover_job_response_schema_name(spec)
 
@@ -302,9 +275,16 @@ def add_response_examples(spec):
                                                 if 'content' in error_response and 'application/json' in error_response['content']:
                                                     error_json = error_response['content']['application/json']
 
-                                                    # Add error examples from ERROR_EXAMPLES dictionary
+                                                    # Merge errorType from EBNF map into each example at injection time
                                                     if error_code in ERROR_EXAMPLES:
-                                                        error_json['examples'] = ERROR_EXAMPLES[error_code]
+                                                        error_type = http_error_map.get(error_code, {}).get('errorType')
+                                                        examples = {}
+                                                        for ex_name, ex_data in ERROR_EXAMPLES[error_code].items():
+                                                            merged_value = ex_data['value']
+                                                            if error_type:
+                                                                merged_value = {'errorType': error_type, **merged_value}
+                                                            examples[ex_name] = {**ex_data, 'value': merged_value}
+                                                        error_json['examples'] = examples
 
     return spec
 

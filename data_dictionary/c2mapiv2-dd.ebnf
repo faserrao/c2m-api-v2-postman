@@ -1005,3 +1005,20 @@ HTTP_403_FORBIDDEN = errorResponse ;
 HTTP_404_NOT_FOUND = errorResponse ;
 HTTP_422_UNPROCESSABLE_ENTITY = errorResponse ;
 HTTP_500_INTERNAL_SERVER_ERROR = errorResponse ;
+
+(* ----------------------------------------------------------------
+   HTTP STATUS → ERROR MAPPING
+   Declares which errorType and errorCodes apply for each HTTP status.
+   Edit this block (not the Python scripts) to change which error
+   variants are produced in the OpenAPI spec and Postman collections.
+   Both ebnf_to_openapi_dynamic_v3.py and add_response_examples.py
+   read this block at build time via the x-http-error-map spec extension.
+   ----------------------------------------------------------------
+   @http_error_map
+   400: errorType=ValidationError; errorCodes=MISSING_REQUIRED_FIELD,INVALID_ONEOF,INVALID_JSON
+   401: errorType=AuthenticationError; errorCodes=MISSING_AUTH_HEADER,INVALID_TOKEN,EXPIRED_TOKEN
+   403: errorType=AuthorizationError; errorCodes=INSUFFICIENT_PERMISSIONS,ACCOUNT_SUSPENDED
+   404: errorType=ResourceNotFoundError; errorCodes=JOB_NOT_FOUND,RESOURCE_NOT_FOUND
+   422: errorType=ValidationError; errorCodes=INVALID_ENUM_VALUE,MUTUAL_EXCLUSION_VIOLATION,INVALID_FORMAT
+   500: errorType=ServerError; errorCodes=SERVER_ERROR,DATABASE_ERROR,EXTERNAL_SERVICE_ERROR
+   @end_http_error_map *)
