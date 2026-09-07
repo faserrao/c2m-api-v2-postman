@@ -186,177 +186,56 @@ def get_oneof_structure_from_openapi(openapi_spec: Dict, field_name: str, varian
         return None
     return build_variant_placeholder_structure(openapi_spec, schema_name)
 
-def generate_realistic_value(field_name: str, field_type: str, oneof_selection: Optional[str] = None) -> Any:
+def generate_realistic_value(field_name: str, field_type: str,
+                              faker_hints: dict = None) -> Any:
     """
-    Generate realistic value for a field based on its name and type.
-
-    Uses Faker to generate unique random values for each field occurrence.
-
-    TODO: Refactor to avoid hardcoding field names
-    Instead of hardcoding field names like "firstName", "address1", etc., explore generating
-    example data directly from the getting-started-template.yaml structure. This would make
-    the generator more maintainable and allow template changes to automatically flow through
-    to generated examples without code changes.
-    Potential approach: Parse template YAML to extract field patterns, use Faker based on
-    field name patterns (e.g., any field with "name" gets fake.name(), "address" gets
-    fake.address(), etc.) rather than exact string matches.
+    Generate a realistic value for a field using hints from the template YAML.
+    Falls back to generic type-based values if no hint is present.
     """
-    # Generate unique random values based on field name
-    field_lower = field_name.lower()
-
-    # Document sources
-    if field_name == "documentId":
-        return fake.random_int(min=10000, max=99999)
-    elif field_name == "requestId":
-        return fake.random_int(min=10000, max=99999)
-    elif field_name == "zipDocumentId":
-        return fake.random_int(min=10000, max=99999)
-    elif field_name == "zipRequestId":
-        return fake.random_int(min=10000, max=99999)
-    elif field_name == "url":
-        return "https://example.com/documents/sample.pdf"
-
-    # Address fields (generate unique values each time)
-    elif field_name == "firstName":
-        return fake.first_name()
-    elif field_name == "lastName":
-        return fake.last_name()
-    elif field_name == "address1":
-        return fake.street_address()
-    elif field_name == "address2":
-        return f"Suite {fake.random_int(min=100, max=999)}"
-    elif field_name == "address3":
-        return ""
-    elif field_name == "city":
-        return fake.city()
-    elif field_name == "state":
-        return fake.state_abbr()
-    elif field_name == "zip":
-        return fake.zipcode()
-    elif field_name == "country":
-        return "USA"
-    elif field_name == "company":
-        return fake.company()
-
-    # Job configuration - static realistic values
-    elif field_name == "jobTemplate":
-        return "standard_letter"
-
-    # Job Options - static realistic values
-    elif field_name == "documentClass":
-        return "letter"
-    elif field_name == "layout":
-        return "address_on_top"
-    elif field_name == "productionTime":
-        return "next_day"
-    elif field_name == "envelope":
-        return "standard"
-    elif field_name == "color":
-        return "full_color"
-    elif field_name == "paperType":
-        return "white"
-    elif field_name == "printOption":
-        return "double_sided"
-    elif field_name == "mailClass":
-        return "first_class"
-
-    # Payment - static realistic values
-    elif field_name == "cardType":
-        return "visa"
-    elif field_name == "cardNumber":
-        return "4111111111111111"
-    elif field_name == "expirationMonth":
-        return 12
-    elif field_name == "expirationYear":
-        return 2026
-    elif field_name == "cvv":
+    if faker_hints and field_name in faker_hints:
+        hint = faker_hints[field_name]
+        hint_type = hint.get('type')
+        if hint_type == 'static':
+            return hint['value']
+        elif hint_type == 'faker':
+            return getattr(fake, hint['method'])()
+        elif hint_type == 'random_int':
+            return fake.random_int(
+                min=hint.get('min', 0),
+                max=hint.get('max', 9999)
+            )
+    # Generic fallback — degraded but not broken
+    if field_type == 'integer':
         return 123
-    elif field_name == "accountType":
-        return "checking"
-    elif field_name == "routingNumber":
-        return "111000025"
-    elif field_name == "accountNumber":
-        return "1234567890"
-
-    # Lists - static realistic values
-    elif field_name == "addressListId":
-        return 1001
-    elif field_name == "addressListName":
-        return "Marketing Campaign Q1"
-    elif field_name == "mappingId":
-        return 5001
-
-    # Other fields
-    elif field_name == "filename":
-        return "document.pdf"
-    elif field_name == "paymentType":
-        return "credit_card"
-
-    # Merge fields (custom data)
-    elif field_name == "foo1":
-        return "Custom Field 1"
-    elif field_name == "foo2":
-        return "Custom Field 2"
-
-    # Pages
-    elif field_name == "startPage":
-        return 1
-    elif field_name == "endPage":
-        return 5
-
-    # Otherwise generate based on type (fallback)
-    elif field_type == "string":
-        return f"example_{field_name}"
-    elif field_type == "integer":
-        return 123
-    elif field_type == "number":
+    elif field_type == 'number':
         return 123.45
-    elif field_type == "boolean":
+    elif field_type == 'boolean':
         return True
-    else:
-        return None
+    return f"example_{field_name}"
 
-def replace_placeholders_recursive(obj: Any, parent_key: str = "") -> Any:
+def replace_placeholders_recursive(obj: Any, parent_key: str = "",
+                                    faker_hints: dict = None) -> Any:
     """
     Recursively replace all placeholders in an object with realistic values.
-
-    Args:
-        obj: The object to process (can be dict, list, string, etc.)
-        parent_key: The parent key name (for nested objects)
-
-    Returns:
-        Object with all placeholders replaced
     """
     if isinstance(obj, dict):
         result = {}
         for key, value in obj.items():
-            result[key] = replace_placeholders_recursive(value, key)
+            result[key] = replace_placeholders_recursive(value, key, faker_hints)
         return result
     elif isinstance(obj, list):
-        return [replace_placeholders_recursive(item, parent_key) for item in obj]
-    elif isinstance(obj, str):
-        if obj.startswith("<"):
-            # Placeholder - generate realistic value
-            field_type = "string" if "String" in obj or "oneOf" in obj else "integer"
-            return generate_realistic_value(parent_key, field_type)
-        return obj
-    else:
-        # Return other types as-is
-        return obj
+        return [replace_placeholders_recursive(item, parent_key, faker_hints)
+                for item in obj]
+    elif isinstance(obj, str) and obj.startswith("<"):
+        field_type = "string" if "String" in obj or "oneOf" in obj else "integer"
+        return generate_realistic_value(parent_key, field_type, faker_hints)
+    return obj
 
 
-def apply_template_to_request(template_example: Dict, linked_request: Dict, openapi_spec: Dict, use_realistic_values: bool = False) -> Dict:
+def apply_template_to_request(template_example: Dict, linked_request: Dict, openapi_spec: Dict,
+                               use_realistic_values: bool = False, faker_hints: dict = None) -> Dict:
     """
     Apply template selections and values to a linked collection request.
-
-    Args:
-        template_example: Example from template with select/values
-        linked_request: Canonical request from linked collection
-        openapi_spec: OpenAPI specification (source of truth for structure)
-        use_realistic_values: If True, use realistic values; if False, keep placeholders
-
-    Returns:
-        Modified request with template applied
     """
     request = copy.deepcopy(linked_request)
 
@@ -384,23 +263,18 @@ def apply_template_to_request(template_example: Dict, linked_request: Dict, open
         structure = get_oneof_structure_from_openapi(openapi_spec, field, variant)
         if structure is not None:
             if use_realistic_values:
-                # For test collection: Replace placeholders with realistic values
-                new_body[field] = replace_placeholders_recursive(structure, field)
+                new_body[field] = replace_placeholders_recursive(structure, field, faker_hints)
             else:
-                # For linked collection: Keep placeholders
                 new_body[field] = structure
 
     # Apply values from template
     for field, value in values.items():
         if field in selections:
-            # This is a oneOf field - skip (handled above)
             continue
 
         if use_realistic_values:
-            # For test collection: Replace placeholders with realistic data
-            new_body[field] = replace_placeholders_recursive(value, field)
+            new_body[field] = replace_placeholders_recursive(value, field, faker_hints)
         else:
-            # For linked collection: Keep placeholders from template
             new_body[field] = value
 
     # Update request body
@@ -429,6 +303,8 @@ def generate_collection(template: Dict, linked_collection: Dict, openapi_spec: D
     Returns:
         Complete Postman collection
     """
+    faker_hints = template.get('faker_hints', {})
+
     # Collection metadata
     collection_info = template.get("collection", {})
     collection_name = collection_info.get("name", "C2M API v2 - Getting Started")
@@ -477,7 +353,7 @@ def generate_collection(template: Dict, linked_collection: Dict, openapi_spec: D
 
         # Apply template to request
         linked_request = linked_item.get("request", {})
-        modified_request = apply_template_to_request(example, linked_request, openapi_spec, use_realistic_values)
+        modified_request = apply_template_to_request(example, linked_request, openapi_spec, use_realistic_values, faker_hints)
 
         # Create new item
         new_item = {
