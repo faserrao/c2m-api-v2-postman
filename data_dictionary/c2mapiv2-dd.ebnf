@@ -333,8 +333,7 @@ submitSinglePdfAddressCaptureParams =
 *)
 
 submitSinglePdfSplitParams =
-      [ jobTemplate ]
-    + docSourceStandard   (* choose, see below *)
+      docSourceStandard   (* choose, see below *)
     + pdfSplitJobsWithAddress
     + [ paymentDetails ]
     + [ returnAddress ]
