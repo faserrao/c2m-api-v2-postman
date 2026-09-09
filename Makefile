@@ -281,7 +281,7 @@ endef
 # SCRIPT PATHS
 # ========================================================================
 #--- SCRIPTS ---
-ADD_EXAMPLES_TO_OPENAPI_SPEC     := $(SCRIPTS_DIR)/active/add_examples_to_spec_v3.py
+ADD_EXAMPLES_TO_OPENAPI_SPEC     := $(SCRIPTS_DIR)/test_data_genertor_for_openapi_specs/add_examples_to_spec.py $(C2MAPIV2_OPENAPI_SPEC)
 ADD_TESTS_SCRIPT                 := $(SCRIPTS_DIR)/active/add_tests.js
 EBNF_TO_OPENAPI_SCRIPT           := $(SCRIPTS_DIR)/active/ebnf_to_openapi_dynamic_v3.py
 FIX_COLLECTION_URLS              := $(SCRIPTS_DIR)/active/fix_collection_urls_v2.py
@@ -801,18 +801,6 @@ openapi-merge-overlays: $(C2MAPIV2_OPENAPI_SPEC_BASE) $(OPENAPI_AUTH_OVERLAY)
 		$(C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC)
 	@echo "✅ Response examples added"
 
-
-# Add oneOf schema placeholder examples to the final OpenAPI spec.
-# Complements openapi-merge-overlays (which adds success/error response examples).
-# Run manually after openapi-build when you need per-variant oneOf examples in
-# the spec (e.g. to verify Prism serves the correct example for each variant).
-# In-place: reads and overwrites $(C2MAPIV2_OPENAPI_SPEC).
-.PHONY: openapi-add-spec-examples
-openapi-add-spec-examples: ## Add oneOf schema examples to the final OpenAPI spec (in-place)
-	@echo "📝 Adding oneOf schema examples to $(C2MAPIV2_OPENAPI_SPEC)..."
-	@$(VENV_PYTHON) $(ADD_EXAMPLES_TO_OPENAPI_SPEC) \
-		$(C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC)
-	@echo "✅ OneOf schema examples added"
 
 # ========================================================================
 # OPENAPI VALIDATION AND LINTING
