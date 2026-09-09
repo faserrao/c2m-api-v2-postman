@@ -331,8 +331,10 @@ jobs:
 
           echo "📊 Copying test reports..."
           mkdir -p artifacts-repo/reports
-          cp -v reports/*.md artifacts-repo/reports/ 2>/dev/null || echo "  ⚠️  No markdown reports to copy"
-          cp -v reports/*.txt artifacts-repo/reports/ 2>/dev/null || echo "  ⚠️  No txt reports to copy"
+          cp -v reports/*.md  artifacts-repo/reports/ 2>/dev/null || echo "  ⚠️  No markdown reports to copy"
+          cp -v reports/*.json artifacts-repo/reports/ 2>/dev/null || echo "  ⚠️  No JSON reports to copy"
+          cp -v reports/*.html artifacts-repo/reports/ 2>/dev/null || echo "  ⚠️  No HTML reports to copy"
+          cp -v reports/*.txt  artifacts-repo/reports/ 2>/dev/null || echo "  ⚠️  No txt reports to copy"
 
           echo "📝 Generating artifacts README with organization..."
           sed "s|__GITHUB_ORG__|${{ github.repository_owner }}|g" ARTIFACTS_README.md.template > artifacts-repo/README.md
