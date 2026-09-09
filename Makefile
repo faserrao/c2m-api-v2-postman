@@ -2788,7 +2788,8 @@ validate-collections-conformance-gate: ## CI gate: fail if the freshly-built Lin
 	C2MAPIV2_POSTMAN_API_NAME_KC="$(C2MAPIV2_POSTMAN_API_NAME_KC)" \
 	$(VENV_PYTHON) scripts/validation/validate_collections_against_spec.py \
 		--path-prefix "/" --exit-status \
-		--collections "$$GATE_DIR/$(C2MAPIV2_POSTMAN_API_NAME_KC)-linked-collection-flat.json"
+		--collections "$$GATE_DIR/$(C2MAPIV2_POSTMAN_API_NAME_KC)-linked-collection-flat.json" \
+		$(CONFORMANCE_GATE_REPORT)
 
 # Show all available targets with descriptions
 .PHONY: help

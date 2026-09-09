@@ -149,14 +149,18 @@ jobs:
       - name: Gate — Collections conform to spec
         run: |
           echo "🚦 Conformance gate: Linked collection must match the freshly-built spec."
-          make validate-collections-conformance-gate
+          mkdir -p reports
+          make validate-collections-conformance-gate \
+            CONFORMANCE_GATE_REPORT="--report reports/conformance-gate.md"
 
       - name: Golden test suite
         run: |
+          set -o pipefail
           echo "🧪 Building collection fixtures (local-only, no API keys)..."
           make postman-build-golden-test-fixtures
           echo "🧪 Running golden test suite (validator + resolver unit tests)..."
-          make validate-collections-conformance-test
+          mkdir -p reports
+          make validate-collections-conformance-test 2>&1 | tee reports/golden-tests.txt
 
       - name: Lint OpenAPI Spec
         continue-on-error: true
@@ -283,19 +287,12 @@ jobs:
 
       - name: Upload Validation Reports
         continue-on-error: true  # A storage-quota hit here must NOT skip the artifacts-repo push below
-        if: |
-          always() &&
-          github.ref == 'refs/heads/main' &&
-          ((github.event_name == 'push' && env.PUBLISH_TO_POSTMAN == 'true') ||
-           (github.event_name == 'workflow_dispatch' && github.event.inputs.publish_to_postman == 'true'))
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: validation-reports
-          path: |
-            reports/validation-*.md
-            reports/validation-*.json
-            reports/newman-*.html
-            reports/newman-*.json
+          path: reports/**
+          if-no-files-found: ignore
           retention-days: 30
 
       # ---------- Copy artifacts to artifacts repo ----------
@@ -331,6 +328,11 @@ jobs:
           else
             echo "  ⚠️  SDK directory not found (generation may have failed)"
           fi
+
+          echo "📊 Copying test reports..."
+          mkdir -p artifacts-repo/reports
+          cp -v reports/*.md artifacts-repo/reports/ 2>/dev/null || echo "  ⚠️  No markdown reports to copy"
+          cp -v reports/*.txt artifacts-repo/reports/ 2>/dev/null || echo "  ⚠️  No txt reports to copy"
 
           echo "📝 Generating artifacts README with organization..."
           sed "s|__GITHUB_ORG__|${{ github.repository_owner }}|g" ARTIFACTS_README.md.template > artifacts-repo/README.md
@@ -388,6 +390,7 @@ jobs:
             ${{ env.POSTMAN_DIR }}/*.json
             ${{ env.DOCS_DIR }}/**
             sdk/**
+            reports/**
 
       # NOTE: GitHub Pages is intentionally NOT deployed from this pipeline repo.
       # The generated docs are force-pushed to the artifacts repo
