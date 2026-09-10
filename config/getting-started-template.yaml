@@ -92,44 +92,44 @@ groups:
   order: 3
   description: Specialized use cases and advanced features
 examples:
-- name: /jobs/submit//single/doc - single recipient
+- name: /static - single recipient
   method: POST
-  path: /jobs/submit/single/doc
+  path: /static
   group: most-frequently-used
   tags: []
-  description: /jobs/submit//single/doc - single recipient
+  description: /static - single recipient
   select:
     docSourceAll: requestId
     recipientAddressSource: singleAddress
   values:
     jobTemplate: <String>
-- name: /jobs/submit/single/doc - mail merge
+- name: /static - mail merge
   method: POST
-  path: /jobs/submit/single/doc
+  path: /static
   group: most-frequently-used
   tags: []
-  description: /jobs/submit/single/doc - mail merge
+  description: /static - mail merge
   select:
     docSourceAll: requestId
     recipientAddressSource: addressList
   values:
     jobTemplate: <String>
-- name: /jobs/submit/single/pdf/addressCapture
+- name: /static/address-capture
   method: POST
-  path: /jobs/submit/single/pdf/addressCapture
+  path: /static/address-capture
   group: most-frequently-used
   tags: []
-  description: /jobs/submit/single/pdf/addressCapture
+  description: /static/address-capture
   select:
     docSourceStandard: requestId
   values:
     jobTemplate: <String>
-- name: /jobs/submit/single/pdf/split/addressCapture
+- name: /batch/split/address-capture
   method: POST
-  path: /jobs/submit/single/pdf/split/addressCapture
+  path: /batch/split/address-capture
   group: bulk
   tags: []
-  description: /jobs/submit/single/pdf/split/addressCapture
+  description: /batch/split/address-capture
   select:
     docSourceStandard: requestId
   values:
@@ -139,22 +139,22 @@ examples:
       endPage: <Integer>
     - startPage: <Integer>
       endPage: <Integer>
-- name: /jobs/submit/multiple/zip/addressCapture - using zip file
+- name: /batch/zip/address-capture - using zip file
   method: POST
-  path: /jobs/submit/multi/zip/addressCapture
+  path: /batch/zip/address-capture
   group: bulk
   tags: []
-  description: /jobs/submit/multiple/zip/addressCapture - using zip file
+  description: /batch/zip/address-capture - using zip file
   values:
     jobTemplate: <String>
     zipDocumentSource:
       requestId: <Integer>
-- name: /jobs/submit/single/pdf/split
+- name: /batch/split
   method: POST
-  path: /jobs/submit/single/pdf/split
+  path: /batch/split
   group: bulk
   tags: []
-  description: /jobs/submit/single/pdf/split
+  description: /batch/split
   select:
     docSourceStandard: requestId
   values:
@@ -201,12 +201,12 @@ examples:
           state: <String>
           zip: <String>
           country: <String>
-- name: /jobs/submit/multiple/doc/merge
+- name: /mail-merge
   method: POST
-  path: /jobs/submit/multi/doc/merge
+  path: /mail-merge
   group: less-frequently-used
   tags: []
-  description: /jobs/submit/multiple/doc/merge
+  description: /mail-merge
   select:
     recipientAddressSource: singleAddress
   values:
@@ -215,12 +215,12 @@ examples:
     - requestId: <Integer>
     - documentId: <Integer>
     - documentId: <Integer>
-- name: /jobs/submit/single/doc - using options
+- name: /static - using options
   method: POST
-  path: /jobs/submit/single/doc
+  path: /static
   group: less-frequently-used
   tags: []
-  description: /jobs/submit/single/doc - using options
+  description: /static - using options
   select:
     docSourceAll: requestId
     recipientAddressSource: singleAddress
@@ -234,23 +234,23 @@ examples:
       paperType: <String>
       printOption: <String>
       mailClass: <String>
-- name: /jobs/submit/single/doc - using URL
+- name: /static - using URL
   method: POST
-  path: /jobs/submit/single/doc
+  path: /static
   group: less-frequently-used
   tags: []
-  description: /jobs/submit/single/doc - using URL
+  description: /static - using URL
   select:
     docSourceAll: url
     recipientAddressSource: singleAddress
   values:
     jobTemplate: <String>
-- name: /jobs/submit/single/doc - setting tags
+- name: /static - setting tags
   method: POST
-  path: /jobs/submit/single/doc
+  path: /static
   group: less-frequently-used
   tags: []
-  description: /jobs/submit/single/doc - setting tags
+  description: /static - setting tags
   select:
     docSourceAll: requestId
     recipientAddressSource: singleAddress
@@ -260,12 +260,12 @@ examples:
     - <String>
     - <String>
     - <String>
-- name: /jobs/submit/single/doc - naming addressList
+- name: /static - naming addressList
   method: POST
-  path: /jobs/submit/single/doc
+  path: /static
   group: less-frequently-used
   tags: []
-  description: /jobs/submit/single/doc - naming addressList
+  description: /static - naming addressList
   select:
     docSourceAll: requestId
   values:
@@ -281,24 +281,24 @@ examples:
         zip: <String>
         country: <String>
       addressListName: <String>
-- name: /jobs/submit//single/doc - payment option
+- name: /static - payment option
   method: POST
-  path: /jobs/submit/single/doc
+  path: /static
   group: less-frequently-used
   tags: []
-  description: /jobs/submit//single/doc - payment option
+  description: /static - payment option
   select:
     docSourceAll: requestId
     recipientAddressSource: singleAddress
     paymentDetails: creditCard
   values:
     jobTemplate: <String>
-- name: /jobs/submit/multiple/zip - using requestId
+- name: /batch/zip - using requestId
   method: POST
-  path: /jobs/submit/multi/zip
+  path: /batch/zip
   group: less-frequently-used
   tags: []
-  description: /jobs/submit/multiple/zip - using requestId
+  description: /batch/zip - using requestId
   values:
     docSourceZipFileRef:
       requestId: <Integer>
@@ -342,12 +342,12 @@ examples:
           state: <String>
           zip: <String>
           country: <String>
-- name: /jobs/submit/multiple/zip - using documentId
+- name: /batch/zip - using documentId
   method: POST
-  path: /jobs/submit/multi/zip
+  path: /batch/zip
   group: less-frequently-used
   tags: []
-  description: /jobs/submit/multiple/zip - using documentId
+  description: /batch/zip - using documentId
   values:
     docSourceZipFileRef:
       documentId: <Integer>
@@ -391,12 +391,12 @@ examples:
           state: <String>
           zip: <String>
           country: <String>
-- name: /jobs/submit/multiple/doc - using requestID
+- name: /static/multi - using requestID
   method: POST
-  path: /jobs/submit/multi/doc
+  path: /static/multi
   group: less-frequently-used
   tags: []
-  description: /jobs/submit/multiple/doc - using requestID
+  description: /static/multi - using requestID
   values:
     multiDocJobs:
     - jobTemplate: <String>
@@ -441,12 +441,12 @@ examples:
           state: <String>
           zip: <String>
           country: <String>
-- name: /jobs/submit/multiple/doc - using documentID
+- name: /static/multi - using documentID
   method: POST
-  path: /jobs/submit/multi/doc
+  path: /static/multi
   group: less-frequently-used
   tags: []
-  description: /jobs/submit/multiple/doc - using documentID
+  description: /static/multi - using documentID
   values:
     multiDocJobs:
     - jobTemplate: <String>
@@ -477,34 +477,34 @@ examples:
           state: <String>
           zip: <String>
           country: <String>
-- name: /jobs/submit/single/doc - using documentID
+- name: /static - using documentID
   method: POST
-  path: /jobs/submit/single/doc
+  path: /static
   group: less-frequently-used
   tags: []
-  description: /jobs/submit/single/doc - using documentID
+  description: /static - using documentID
   select:
     docSourceAll: documentId
     recipientAddressSource: singleAddress
   values:
     jobTemplate: <String>
-- name: /jobs/submit/single/doc - using addressListId
+- name: /static - using addressListId
   method: POST
-  path: /jobs/submit/single/doc
+  path: /static
   group: less-frequently-used
   tags: []
-  description: /jobs/submit/single/doc - using addressListId
+  description: /static - using addressListId
   select:
     docSourceAll: requestId
     recipientAddressSource: addressListId
   values:
     jobTemplate: <String>
-- name: /jobs/submit/single/doc - return address
+- name: /static - return address
   method: POST
-  path: /jobs/submit/single/doc
+  path: /static
   group: less-frequently-used
   tags: []
-  description: /jobs/submit/single/doc - return address
+  description: /static - return address
   select:
     docSourceAll: requestId
     recipientAddressSource: singleAddress

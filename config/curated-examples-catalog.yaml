@@ -46,7 +46,7 @@ examples:
 
   - name: Legal Firm - Court Notices
     method: POST
-    path: /jobs/submit/single/doc
+    path: /static
     tags:
       - real-world
       - legal
@@ -83,7 +83,7 @@ examples:
 
   - name: Real Estate Agent - Property Marketing
     method: POST
-    path: /jobs/submit/single/doc
+    path: /static
     tags:
       - real-world
       - real-estate
@@ -105,7 +105,7 @@ examples:
 
   - name: Medical Agency - Patient Reminders
     method: POST
-    path: /jobs/submit/multi/doc/merge
+    path: /mail-merge
     tags:
       - real-world
       - medical
@@ -137,7 +137,7 @@ examples:
 
   - name: Monthly Newsletters - Bulk Distribution
     method: POST
-    path: /jobs/submit/single/doc
+    path: /static
     tags:
       - real-world
       - newsletter
@@ -163,7 +163,7 @@ examples:
 
   - name: E-commerce Company - Product Catalog
     method: POST
-    path: /jobs/submit/single/pdf/addressCapture
+    path: /static/address-capture
     tags:
       - real-world
       - e-commerce
@@ -186,7 +186,7 @@ examples:
 
   - name: Marketing Agency - Multi-Document Campaign
     method: POST
-    path: /jobs/submit/multi/doc/merge
+    path: /mail-merge
     tags:
       - real-world
       - marketing
@@ -210,7 +210,7 @@ examples:
 
   - name: Reseller - Multi-ZIP Batch Processing
     method: POST
-    path: /jobs/submit/multi/zip
+    path: /batch/zip
     tags:
       - real-world
       - reseller
@@ -255,7 +255,7 @@ examples:
 
   - name: Non-Profit - Fundraising Appeal
     method: POST
-    path: /jobs/submit/single/doc
+    path: /static
     tags:
       - real-world
       - non-profit
@@ -290,7 +290,7 @@ examples:
 
   - name: Single Document to Single Recipient
     method: POST
-    path: /jobs/submit/single/doc
+    path: /static
     group: most-frequently-used
     tags:
       - getting-started
@@ -322,7 +322,7 @@ examples:
 
   - name: Mail Merge to Address List
     method: POST
-    path: /jobs/submit/single/doc
+    path: /static
     group: most-frequently-used
     tags:
       - getting-started
@@ -346,7 +346,7 @@ examples:
 
   - name: Embedded Address Capture
     method: POST
-    path: /jobs/submit/single/pdf/addressCapture
+    path: /static/address-capture
     group: most-frequently-used
     tags:
       - getting-started
@@ -369,7 +369,7 @@ examples:
 
   - name: Split PDF with Address Capture
     method: POST
-    path: /jobs/submit/single/pdf/split/addressCapture
+    path: /batch/split/address-capture
     group: bulk-operations
     tags:
       - getting-started
@@ -392,7 +392,7 @@ examples:
 
   - name: Split PDF with Specified Addresses
     method: POST
-    path: /jobs/submit/single/pdf/split
+    path: /batch/split
     group: bulk-operations
     tags:
       - getting-started
@@ -415,7 +415,7 @@ examples:
 
   - name: Multiple Documents from ZIP with Address Capture
     method: POST
-    path: /jobs/submit/multi/zip/addressCapture
+    path: /batch/zip/address-capture
     group: bulk-operations
     tags:
       - getting-started
@@ -439,7 +439,7 @@ examples:
 
   - name: Merge Multiple Documents
     method: POST
-    path: /jobs/submit/multi/doc/merge
+    path: /mail-merge
     group: advanced-patterns
     tags:
       - getting-started
@@ -473,7 +473,7 @@ examples:
 
   - name: Using jobOptions Instead of Template
     method: POST
-    path: /jobs/submit/single/doc
+    path: /static
     group: advanced-patterns
     tags:
       - getting-started
@@ -508,7 +508,7 @@ examples:
 
   - name: Using Document URL Instead of Upload
     method: POST
-    path: /jobs/submit/single/doc
+    path: /static
     group: advanced-patterns
     tags:
       - getting-started
@@ -532,7 +532,7 @@ examples:
 
   - name: Adding Tags for Organization
     method: POST
-    path: /jobs/submit/single/doc
+    path: /static
     group: advanced-patterns
     tags:
       - getting-started
@@ -561,7 +561,7 @@ examples:
 
   - name: Naming an Address List for Reuse
     method: POST
-    path: /jobs/submit/single/doc
+    path: /static
     group: advanced-patterns
     tags:
       - getting-started
@@ -595,7 +595,7 @@ examples:
 
   - name: Specifying Payment Method
     method: POST
-    path: /jobs/submit/single/doc
+    path: /static
     group: advanced-patterns
     tags:
       - getting-started
@@ -625,7 +625,7 @@ examples:
 
   - name: Multiple Documents from ZIP - Specify Addresses
     method: POST
-    path: /jobs/submit/multi/zip
+    path: /batch/zip
     group: advanced-patterns
     tags:
       - getting-started
@@ -668,7 +668,7 @@ examples:
 
   - name: Multiple Separate Documents
     method: POST
-    path: /jobs/submit/multi/doc
+    path: /static/multi
     group: advanced-patterns
     tags:
       - getting-started
@@ -711,7 +711,7 @@ examples:
 
   - name: Using Stored documentId
     method: POST
-    path: /jobs/submit/single/doc
+    path: /static
     group: advanced-patterns
     tags:
       - getting-started
@@ -743,7 +743,7 @@ examples:
 
   - name: Using Saved addressListId
     method: POST
-    path: /jobs/submit/single/doc
+    path: /static
     group: advanced-patterns
     tags:
       - getting-started
