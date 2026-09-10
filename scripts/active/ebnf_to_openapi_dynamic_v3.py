@@ -485,34 +485,67 @@ class EBNFToOpenAPITranslator:
         # Use the production name as the operation ID
         return endpoint.production_name
 
+    # Human-readable metadata keyed by endpoint path.
+    # Update this table whenever endpoint paths change in the EBNF.
+    _ENDPOINT_META = {
+        '/static': (
+            "Submit single document",
+            "Submits a mailing job for a single document to one or more recipients. "
+            "The request body must include a document source, recipient address information, "
+            "and payment details."
+        ),
+        '/static/address-capture': (
+            "Submit single document — address capture",
+            "Submits a mailing job for a single PDF where recipient addresses are captured "
+            "from the document via OCR. No inline recipient address is required."
+        ),
+        '/static/multi': (
+            "Submit multiple documents",
+            "Submits a batch of independent mailing jobs in a single request. Each job "
+            "specifies its own document source and recipient address."
+        ),
+        '/batch/split': (
+            "Submit PDF split",
+            "Splits a single PDF into page ranges and mails each range to a different "
+            "recipient. Each job item specifies page range and recipient address."
+        ),
+        '/batch/split/address-capture': (
+            "Submit PDF split — address capture",
+            "Splits a single PDF into page ranges where recipient addresses are captured "
+            "from the PDF. No inline recipient addresses are required."
+        ),
+        '/mail-merge': (
+            "Submit mail merge",
+            "Merges multiple documents into a single mailing sent to one recipient. "
+            "Useful for creating document packets or multi-page letters."
+        ),
+        '/batch/zip': (
+            "Submit ZIP batch",
+            "Submits multiple mailing jobs sourced from files inside a single ZIP archive. "
+            "Each job item specifies which file within the ZIP and the recipient address."
+        ),
+        '/batch/zip/address-capture': (
+            "Submit ZIP batch — address capture",
+            "Submits a ZIP-based mailing batch where recipient addresses are captured "
+            "externally. No inline recipient addresses are required."
+        ),
+    }
+
     def _generate_summary(self, endpoint: Endpoint) -> str:
-        """Generate a brief summary from endpoint path"""
-        # Extract meaningful parts from path
-        # Example: /jobs/submit/single/doc -> "Submit a single document job"
-        path_parts = [p for p in endpoint.path.strip('/').split('/') if p]
-
-        # Build summary based on path pattern
-        if len(path_parts) >= 3 and path_parts[0] == 'jobs' and path_parts[1] == 'submit':
-            variant = ' '.join(path_parts[2:])
-            return f"Submit a {variant} job"
-
-        # Fallback: use production name as readable text
-        return endpoint.production_name.replace('_', ' ').title()
+        """Generate a brief summary from endpoint path."""
+        meta = self._ENDPOINT_META.get(endpoint.path)
+        if meta:
+            return meta[0]
+        # Fallback: preserve camelCase production name (never call .title() on camelCase)
+        return endpoint.production_name
 
     def _generate_description(self, endpoint: Endpoint) -> str:
-        """Generate a detailed description from endpoint"""
-        # Extract path components
-        path_parts = [p for p in endpoint.path.strip('/').split('/') if p]
-
-        # Generate description based on path pattern
-        if len(path_parts) >= 3 and path_parts[0] == 'jobs' and path_parts[1] == 'submit':
-            variant = ' '.join(path_parts[2:])
-            return (f"Submits a mailing job ({variant}). "
-                    f"The request body contains job parameters including document source, "
-                    f"recipient address information, and payment details.")
-
+        """Generate a detailed description from endpoint."""
+        meta = self._ENDPOINT_META.get(endpoint.path)
+        if meta:
+            return meta[1]
         # Fallback description
-        return f"API endpoint for {endpoint.production_name.replace('_', ' ')}"
+        return f"API endpoint for {endpoint.production_name}"
 
     def _generate_error_examples(self, status_code: str, endpoint: Endpoint) -> Dict[str, Any]:
         """Generate error response examples for a given HTTP status code.
