@@ -56,3 +56,11 @@ rules:
   # ----- Turn OFF things you don’t care about in early dev -----
   oas3-valid-schema-example: off
   info-description: off   # allow empty description until later
+
+  # EBNF leaf-node schemas (firstName, lastName, jobTemplate, cardType, etc.) are
+  # defined in components/schemas as a schema library for documentation completeness.
+  # Composite schemas inline their properties rather than $ref-ing each leaf, so
+  # Spectral flags them as unused. HTTP error schemas and reusable parameters are
+  # similarly defined for reference but not yet $ref’d from operations.
+  # Suppressed until the generator/overlay is updated to wire these up via $ref.
+  oas3-unused-component: off
