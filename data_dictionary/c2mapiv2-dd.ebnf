@@ -3,9 +3,16 @@
    ============================================================================
 
    This file is an EBNF “data dictionary” that describes the JSON request bodies
-   for the simplified C2M Jobs submission endpoints under:
+   for the C2M Jobs submission endpoints:
 
-     POST /jobs/submit/...
+     POST /static
+     POST /static/multi
+     POST /static/address-capture
+     POST /mail-merge
+     POST /batch/split
+     POST /batch/split/address-capture
+     POST /batch/zip
+     POST /batch/zip/address-capture
 
    If you have never seen EBNF before, think of it as a compact way to describe
    “what fields can appear” and “how those fields can be combined”.
@@ -153,7 +160,7 @@
 
 
 (* C2M Jobs Submission API - Data Dictionary (EBNF)
-   Source: Data lead proposal (Dec 02 2025) for simplified /jobs/submit/... endpoints.
+   Source: Data lead proposal (Dec 02 2025) for C2M Jobs submission endpoints.
    Purpose: EBNF is the source of truth; EBNF -> OpenAPI (YAML) is generated in CI/CD.
 
    This file is intentionally written to match the EBNF style used in c2mapiv2-dd.ebnf (old endpoints):
@@ -176,7 +183,7 @@
 (***********************************)
 
 (* ------------------------------------------------------------------------- *)
-(* Endpoint: POST /jobs/submit/single/doc                                              *)
+(* Endpoint: POST /static                                                              *)
 (* ------------------------------------------------------------------------- *)
 
 (* English meaning:
@@ -255,7 +262,7 @@ submitSingleDocParams =
     + [ tags ] ;
 
 (* ------------------------------------------------------------------------- *)
-(* Endpoint: POST /jobs/submit/single/pdf/addressCapture                               *)
+(* Endpoint: POST /static/address-capture                                              *)
 (* ------------------------------------------------------------------------- *)
 
 (* English meaning:
@@ -273,17 +280,17 @@ submitSingleDocParams =
        THEN reject (this endpoint relies on address capture workflow, not inline addresses).
 
    Document source:
-     Apply the same docSourceStandard resolution rules as /jobs/submit/single/doc.
+     Apply the same docSourceStandard resolution rules as /static.
 
    Job list constraint:
      IF request body includes jobs
        THEN reject (this endpoint is not a split/bulk endpoint).
 
    jobTemplate vs jobOptions:
-     Apply the same mutual-exclusion/default policy as /jobs/submit/single/doc.
+     Apply the same mutual-exclusion/default policy as /static.
 
    Payment:
-     Same paymentDetails rules as /jobs/submit/single/doc (Apple/Google excluded).
+     Same paymentDetails rules as /static (Apple/Google excluded).
 *)
 
 submitSinglePdfAddressCaptureParams =
@@ -296,7 +303,7 @@ submitSinglePdfAddressCaptureParams =
 
 
 (* ------------------------------------------------------------------------- *)
-(* Endpoint: POST /jobs/submit/single/pdf/split                                         *)
+(* Endpoint: POST /batch/split                                                          *)
 (* ------------------------------------------------------------------------- *)
 
 (* English meaning:
@@ -329,7 +336,7 @@ submitSinglePdfAddressCaptureParams =
        IF startPage > endPage
          THEN reject.
        IF recipientAddressSource missing
-         THEN reject (required for /single/pdf/split).
+         THEN reject (required for /batch/split).
 *)
 
 submitSinglePdfSplitParams =
@@ -343,7 +350,7 @@ submitSinglePdfSplitParams =
 
 
 (* ------------------------------------------------------------------------- *)
-(* Endpoint: POST /jobs/submit/single/pdf/split/addressCapture                          *)
+(* Endpoint: POST /batch/split/address-capture                                          *)
 (* ------------------------------------------------------------------------- *)
 
 (* English meaning:
@@ -374,7 +381,7 @@ submitSinglePdfSplitParams =
      FOR EACH pdfSplitJobsNoAddress[i]:
        IF pdfSplitJobsNoAddress[i] is not a pdfSplitJobItemNoAddress shape
          THEN reject.
-       Validate startPage/endPage same as /single/pdf/split.
+       Validate startPage/endPage same as /batch/split.
        IF recipientAddressSource is present
          THEN reject (addresses must be captured externally for this endpoint).
 *)
@@ -390,7 +397,7 @@ submitSinglePdfSplitAddressCaptureParams =
 
 
 (* ------------------------------------------------------------------------- *)
-(* Endpoint: POST /jobs/submit/multi/doc                                                *)
+(* Endpoint: POST /static/multi                                                         *)
 (* ------------------------------------------------------------------------- *)
 
 (* English meaning:
@@ -423,8 +430,8 @@ submitSinglePdfSplitAddressCaptureParams =
 
    Document and recipient rules:
      FOR EACH multiDocJobs[i]:
-       Resolve multiDocJobs[i].docSourceAll using the same rules as /single/doc.
-       Resolve multiDocJobs[i].recipientAddressSource using the same rules as /single/doc.
+       Resolve multiDocJobs[i].docSourceAll using the same rules as /static.
+       Resolve multiDocJobs[i].recipientAddressSource using the same rules as /static.
 *)
 
 submitMultiDocParams =
@@ -434,7 +441,7 @@ submitMultiDocParams =
 
 
 (* ------------------------------------------------------------------------- *)
-(* Endpoint: POST /jobs/submit/multi/doc/merge                                          *)
+(* Endpoint: POST /mail-merge                                                           *)
 (* ------------------------------------------------------------------------- *)
 
 (* English meaning:
@@ -479,7 +486,7 @@ submitMultiDocMergeParams =
 
 
 (* ------------------------------------------------------------------------- *)
-(* Endpoint: POST /jobs/submit/multi/zip                                                *)
+(* Endpoint: POST /batch/zip                                                            *)
 (* ------------------------------------------------------------------------- *)
 
 (* English meaning:
@@ -522,7 +529,7 @@ submitMultiDocMergeParams =
          THEN filename MUST exist inside the referenced zipDocumentId.
 
    jobTemplate scoping:
-     Same as /jobs/submit/multi/doc.
+     Same as /static/multi.
 *)
 
 submitMultiZipParams =
@@ -533,7 +540,7 @@ submitMultiZipParams =
 
 
 (* ------------------------------------------------------------------------- *)
-(* Endpoint: POST /jobs/submit/multi/zip/addressCapture                                 *)
+(* Endpoint: POST /batch/zip/address-capture                                            *)
 (* ------------------------------------------------------------------------- *)
 
 (* English meaning:
@@ -571,7 +578,7 @@ submitMultiZipParams =
        THEN reject.
 
    jobTemplate vs jobOptions:
-     Apply the same mutual-exclusion/default policy as /single/doc.
+     Apply the same mutual-exclusion/default policy as /static.
 *)
 
 submitMultiZipAddressCaptureParams =
@@ -702,8 +709,8 @@ zipDocumentSource =
 (* Translator note:
    - docSourceStandard/docSourceZipFile/docSourceAll are specialized document source variants used to keep
      endpoint schemas tight (only accepting the source types each endpoint supports).
-   - zipDocumentSource is used only by /jobs/submit/multi/zip/addressCapture and is intentionally zip-only.
-   - Zip-only behavior for /jobs/submit/multi/zip is enforced indirectly via multiZipJobItem using docSourceZipFile.
+   - zipDocumentSource is used only by /batch/zip/address-capture and is intentionally zip-only.
+   - Zip-only behavior for /batch/zip is enforced indirectly via multiZipJobItem using docSourceZipFile.
 *)
 
 docSourceStandard = documentIdSource | requestIdSource | urlSource ;
@@ -746,7 +753,7 @@ startPage = integer ;
 endPage   = integer ;
 
 (* Zip-only jobs list:
-   - Used by POST /jobs/submit/multi/zip.
+   - Used by POST /batch/zip.
    - Zip file specified at top-level (docSourceZipFileRef in submitMultiZipParams).
    - Each item specifies optional jobTemplate, filename (which file within zip), and recipient.
    - Each job is independent with its own template and recipient.
