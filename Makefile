@@ -281,7 +281,6 @@ endef
 # SCRIPT PATHS
 # ========================================================================
 #--- SCRIPTS ---
-ADD_EXAMPLES_TO_OPENAPI_SPEC     := $(SCRIPTS_DIR)/test_data_genertor_for_openapi_specs/add_examples_to_spec.py $(C2MAPIV2_OPENAPI_SPEC)
 ADD_TESTS_SCRIPT                 := $(SCRIPTS_DIR)/active/add_tests.js
 EBNF_TO_OPENAPI_SCRIPT           := $(SCRIPTS_DIR)/active/ebnf_to_openapi_dynamic_v3.py
 FIX_COLLECTION_URLS              := $(SCRIPTS_DIR)/active/fix_collection_urls_v2.py
@@ -702,7 +701,7 @@ rebuild-all-with-delete-ci:
 # Delete existing resources EXCEPT mock servers and rebuild (for CI/CD to preserve forked URLs)
 .PHONY: rebuild-all-with-delete-except-mocks-ci
 rebuild-all-with-delete-except-mocks-ci:
-	$(MAKE) postman-cleanup-except-mocks
+	$(MAKE) postman-cleanup-except-mocks-and-envs
 	$(MAKE) rebuild-all-no-delete-ci
 
 # ========================================================================
