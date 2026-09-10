@@ -435,7 +435,7 @@ postman-create-linked-collection-legacy:
 	$(MAKE) postman-api-linked-collection-generate
 	$(MAKE) postman-linked-collection-flatten
 	$(MAKE) postman-linked-collection-upload
-	$(MAKE) postman-linked-collection-link
+	#$(MAKE) postman-linked-collection-link  # disabled 2026-02-19
 
 # Generate, Add Tests, Validate, Fix, and Upload the Test Collection
 # Using post-process flattening
@@ -1009,8 +1009,13 @@ postman-import-openapi-spec:
 # ========================================================================
 
 # Create or update spec (shows under Specs tab, not APIs tab)
+# NOTE: Requires postman-import-openapi-as-api (disabled 2026-02-19 — API resources
+# removed to avoid 3-API limit; collections work independently without API linkage).
 .PHONY: postman-spec-create
 postman-spec-create:
+	@if [ ! -f $(POSTMAN_API_UID_FILE) ]; then \
+		echo "❌ Missing API UID file: $(POSTMAN_API_UID_FILE). Requires postman-import-openapi-as-api (disabled 2026-02-19)."; exit 1; \
+	fi
 	@echo "📄 Creating/updating OpenAPI spec under Specs tab..."
 	@CONTENT=$$(cat "$(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES)"); \
 	jq -n \
@@ -1190,28 +1195,28 @@ postman-linked-collection-upload:
 # ========================================================================
 # POSTMAN COLLECTION LINKING
 # ========================================================================
-# Link uploaded collection to API definition
-.PHONY: postman-linked-collection-link
-postman-linked-collection-link:
-	@echo "🔗 Linking collection to API $(POSTMAN_API_NAME)..."
-	@if [ ! -f $(POSTMAN_API_UID_FILE) ]; then \
-		echo "❌ Missing API UID file: $(POSTMAN_API_UID_FILE). Run postman-import-openapi-spec first."; exit 1; \
-	fi
-	@if [ ! -f $(POSTMAN_LINKED_COLLECTION_UID_FILE) ]; then \
-		echo "❌ Missing collection UID file: $(POSTMAN_LINKED_COLLECTION_UID_FILE). Run postman-collection-upload first."; exit 1; \
-	fi
-	@API_ID=$$(cat $(POSTMAN_API_UID_FILE)); \
-	COLLECTION_UID=$$(cat $(POSTMAN_LINKED_COLLECTION_UID_FILE)); \
-	echo "🔗 Copying and linking collection $$COLLECTION_UID to API $$API_ID..."; \
-	jq -n --arg coll "$$COLLECTION_UID" '{operationType: "COPY_COLLECTION", data: {collectionId: $$coll}}' > $(POSTMAN_LINK_PAYLOAD); \
-	curl --silent --location --request POST "$(POSTMAN_APIS_URL)/$$API_ID/collections" \
-		$(POSTMAN_CURL_HEADERS_XC) \
-		$(POSTMAN_CURL_HEADERS_AA) \
-		--data-binary "@$(POSTMAN_LINK_PAYLOAD)" | tee $(POSTMAN_LINK_DEBUG)
-	@echo " "
-	@echo " "
-	@echo " "
-	@echo " "
+# Disabled 2026-02-19: API resources removed to avoid 3-API limit.
+# Collections work independently without API linkage.
+# Uncomment to restore if API linkage is re-enabled.
+#
+# .PHONY: postman-linked-collection-link
+# postman-linked-collection-link:
+# 	@echo "🔗 Linking collection to API $(POSTMAN_API_NAME)..."
+# 	@if [ ! -f $(POSTMAN_API_UID_FILE) ]; then \
+# 		echo "❌ Missing API UID file: $(POSTMAN_API_UID_FILE). Run postman-import-openapi-spec first."; exit 1; \
+# 	fi
+# 	@if [ ! -f $(POSTMAN_LINKED_COLLECTION_UID_FILE) ]; then \
+# 		echo "❌ Missing collection UID file: $(POSTMAN_LINKED_COLLECTION_UID_FILE). Run postman-collection-upload first."; exit 1; \
+# 	fi
+# 	@API_ID=$$(cat $(POSTMAN_API_UID_FILE)); \
+# 	COLLECTION_UID=$$(cat $(POSTMAN_LINKED_COLLECTION_UID_FILE)); \
+# 	echo "🔗 Copying and linking collection $$COLLECTION_UID to API $$API_ID..."; \
+# 	jq -n --arg coll "$$COLLECTION_UID" '{operationType: "COPY_COLLECTION", data: {collectionId: $$coll}}' > $(POSTMAN_LINK_PAYLOAD); \
+# 	curl --silent --location --request POST "$(POSTMAN_APIS_URL)/$$API_ID/collections" \
+# 		$(POSTMAN_CURL_HEADERS_XC) \
+# 		$(POSTMAN_CURL_HEADERS_AA) \
+# 		--data-binary "@$(POSTMAN_LINK_PAYLOAD)" | tee $(POSTMAN_LINK_DEBUG)
+# 	@echo " "
 
 # ========================================================================
 # TEST COLLECTION GENERATION
@@ -2715,7 +2720,7 @@ postman-publish: ## Push API + collection to workspace based on current context
 	# Build now creates 9 resources instead of 10 (removed: 1 API organizational container)
 	#@$(MAKE) postman-import-openapi-as-api
 	@$(MAKE) postman-linked-collection-upload
-	@$(MAKE) postman-linked-collection-link
+	#@$(MAKE) postman-linked-collection-link  # disabled 2026-02-19
 
 .PHONY: postman-publish-personal
 postman-publish-personal: ## [Deprecated] Use 'make context-set-personal' then 'make postman-publish'
