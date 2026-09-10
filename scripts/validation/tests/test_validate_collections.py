@@ -42,7 +42,7 @@ import validate_collections_against_spec as V  # noqa: E402
 import json  # noqa: E402
 
 SPEC = V.load_spec(V.DEFAULT_SPEC)  # env-aware (Makefile-sourced) spec path
-PREFIX = "/jobs/submit"
+PREFIX = None  # no prefix filter — new paths span /static, /batch, /mail-merge
 
 _failures = []
 
@@ -102,20 +102,20 @@ def test_positive_controls():
 # False-negative protection (validator CAN catch errors) is in test 3
 # (synthetic fault injection) which uses hardcoded known-bad request bodies.
 _ALL_JOB_PATHS = [
-    "/jobs/submit/single/doc",
-    "/jobs/submit/single/pdf/addressCapture",
-    "/jobs/submit/single/pdf/split",
-    "/jobs/submit/single/pdf/split/addressCapture",
-    "/jobs/submit/multi/doc",
-    "/jobs/submit/multi/doc/merge",
-    "/jobs/submit/multi/zip",
-    "/jobs/submit/multi/zip/addressCapture",
+    "/static",
+    "/static/address-capture",
+    "/batch/split",
+    "/batch/split/address-capture",
+    "/static/multi",
+    "/mail-merge",
+    "/batch/zip",
+    "/batch/zip/address-capture",
 ]
 
 
 def test_negative_controls():
     print("\n[2] Negative controls (System B, Getting Started) — must be fully clean")
-    print("    (§5a field-name drift fixed in 14a60e9; false-negative coverage in test 3)")
+    print("    (false-negative coverage provided by test 3 synthetic fault injection)")
     for rel in ["c2mapiv2-getting-started-linked-collection.json",
                 "c2mapiv2-getting-started-test-collection.json"]:
         res = V.validate_collection(SPEC, load_collection(rel), PREFIX, True)
@@ -123,7 +123,7 @@ def test_negative_controls():
         print(f"  {rel}")
         for path in _ALL_JOB_PATHS:
             check(fc.get(path, 0) == 0,
-                  f"{path}: {fc.get(path,0)} failures (expected 0 — §5a resolved)")
+                  f"{path}: {fc.get(path,0)} failures (expected 0)")
 
 
 # --------------------------------------------------------------------------- #
@@ -138,54 +138,54 @@ def errs_for(path, body):
 def test_synthetic_faults():
     print("\n[3] Synthetic fault injection")
 
-    # 3a. Clean multi/doc body -> no errors
+    # 3a. Clean /static/multi body -> no errors
     clean_multidoc = {"multiDocJobs": [
         {"docSourceAll": {"documentId": 1},
          "recipientAddressSource": {"singleAddress": {"firstName": "A", "lastName": "B",
             "address1": "1 St", "city": "X", "state": "NY", "zip": "10001", "country": "USA"}}}]}
-    check(errs_for("/jobs/submit/multi/doc", clean_multidoc) == [],
-          "clean multi/doc body -> no errors")
+    check(errs_for("/static/multi", clean_multidoc) == [],
+          "clean /static/multi body -> no errors")
 
     # 3b. Wrong wrapper key (jobs instead of multiDocJobs) -> 2 defects
-    e = errs_for("/jobs/submit/multi/doc", {"jobs": []})
+    e = errs_for("/static/multi", {"jobs": []})
     check(any("missing required field 'multiDocJobs'" in x for x in e),
-          "wrong-wrapper multi/doc -> flags missing multiDocJobs")
+          "wrong-wrapper /static/multi -> flags missing multiDocJobs")
     check(any("unexpected field 'jobs'" in x for x in e),
-          "wrong-wrapper multi/doc -> flags unexpected 'jobs'")
+          "wrong-wrapper /static/multi -> flags unexpected 'jobs'")
 
     # 3c. Empty body -> missing required
-    e = errs_for("/jobs/submit/multi/doc", {})
+    e = errs_for("/static/multi", {})
     check(any("missing required field 'multiDocJobs'" in x for x in e),
-          "empty multi/doc -> flags missing multiDocJobs")
+          "empty /static/multi -> flags missing multiDocJobs")
 
-    # 3d. Clean single/doc -> no errors
+    # 3d. Clean /static body -> no errors
     clean_single = {"docSourceAll": {"documentId": 1},
                     "recipientAddressSource": {"singleAddress": {"firstName": "A"}}}
-    check(errs_for("/jobs/submit/single/doc", clean_single) == [],
-          "clean single/doc body -> no errors")
+    check(errs_for("/static", clean_single) == [],
+          "clean /static body -> no errors")
 
     # 3e. Unexpected top-level field -> flagged
-    e = errs_for("/jobs/submit/single/doc", dict(clean_single, bogusField=1))
+    e = errs_for("/static", dict(clean_single, bogusField=1))
     check(any("unexpected field 'bogusField'" in x for x in e),
-          "single/doc with extra field -> flags unexpected 'bogusField'")
+          "/static with extra field -> flags unexpected 'bogusField'")
 
     # 3f. Missing a required field -> flagged
-    e = errs_for("/jobs/submit/single/doc", {"docSourceAll": {"documentId": 1}})
+    e = errs_for("/static", {"docSourceAll": {"documentId": 1}})
     check(any("missing required field 'recipientAddressSource'" in x for x in e),
-          "single/doc missing recipientAddressSource -> flagged")
+          "/static missing recipientAddressSource -> flagged")
 
     # 3g. Placeholder values must NOT cause type false-positives
     ph = {"docSourceAll": {"documentId": "<Integer>"},
           "recipientAddressSource": {"singleAddress": {"firstName": "<String>"}},
           "jobTemplate": "<String>"}
-    check(errs_for("/jobs/submit/single/doc", ph) == [],
-          "placeholder single/doc body -> no false positives")
+    check(errs_for("/static", ph) == [],
+          "placeholder /static body -> no false positives")
 
-    # 3h. pdf/split wrong field names -> both required flagged
-    e = errs_for("/jobs/submit/single/pdf/split", {"docSourceAll": {}, "jobs": []})
+    # 3h. /batch/split wrong field names -> both required flagged
+    e = errs_for("/batch/split", {"docSourceAll": {}, "jobs": []})
     check(any("missing required field 'docSourceStandard'" in x for x in e) and
           any("missing required field 'pdfSplitJobsWithAddress'" in x for x in e),
-          "pdf/split wrong names -> flags both missing required fields")
+          "/batch/split wrong names -> flags both missing required fields")
 
 
 def main():
