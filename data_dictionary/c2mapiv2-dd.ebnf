@@ -395,51 +395,6 @@ submitSinglePdfSplitAddressCaptureParams =
     + [ jobOptions ]
     + [ tags ] ;
 
-
-(* ------------------------------------------------------------------------- *)
-(* Endpoint: POST /static/multi                                                         *)
-(* ------------------------------------------------------------------------- *)
-
-(* English meaning:
-   - Submits multiple jobs in one request.
-   - Body MAY include a top-level jobTemplate.
-   - Body MUST include `multiDocJobs` (list of job items).
-   - Each `multiDocJobs[]` item is a `multiDocJobItem` containing:
-       [ jobTemplate ] + docSourceAll + recipientAddressSource
-     where per-job jobTemplate is optional when top-level jobTemplate is present.
-   - Body MAY include paymentDetails and tags.
-*)
-
-(* Decision / validation rules (implementation-required):
-   multiDocJobs constraint:
-     IF multiDocJobs missing OR multiDocJobs has 0 entries
-       THEN reject.
-
-   Allowed job item shape:
-     FOR EACH multiDocJobs[i]:
-       IF multiDocJobs[i] is not a multiDocJobItem shape
-         THEN reject (pdfSplitJobItem not allowed).
-
-   jobTemplate scoping:
-     IF top-level jobTemplate present:
-       THEN it applies to all multiDocJobs by default.
-            IF a job item also includes jobTemplate:
-              THEN enforce policy (allow per-job override OR reject; choose and document).
-     ELSE (no top-level jobTemplate):
-       THEN each job MUST include jobTemplate OR server must supply a default; otherwise reject.
-
-   Document and recipient rules:
-     FOR EACH multiDocJobs[i]:
-       Resolve multiDocJobs[i].docSourceAll using the same rules as /static.
-       Resolve multiDocJobs[i].recipientAddressSource using the same rules as /static.
-*)
-
-submitMultiDocParams =
-    multiDocJobs
-    + [ paymentDetails ]
-    + [ tags ] ;
-
-
 (* ------------------------------------------------------------------------- *)
 (* Endpoint: POST /mail-merge                                                           *)
 (* ------------------------------------------------------------------------- *)
