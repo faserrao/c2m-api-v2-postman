@@ -2151,7 +2151,7 @@ postman-api-clean-trash:
 	@echo "🗑️ Checking for trashed specs in workspace $(POSTMAN_WS)..."
 	@TRASH=$$(curl --silent \
 		$(POSTMAN_CURL_HEADERS_XC) \
-		"$(POSTMAN_SPECS_URL)$(POSTMAN_Q_ID)&status=trashed" \
+		"$(POSTMAN_SPECS_URL)$(POSTMAN_Q_ID)&status=trashed&limit=100" \
 		| jq -r '.specs // [] | .[].id'); \
 	if [ -z "$$TRASH" ]; then \
 		echo "   No trashed specs found in workspace $(POSTMAN_WS)."; \
@@ -2197,7 +2197,7 @@ postman-delete-specs-by-name:
 	while [ "$$KEEP_GOING" -eq 1 ]; do \
 		KEEP_GOING=0; \
 		SPECS=$$(curl --silent --location \
-			--request GET "$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS)" \
+			--request GET "$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS)&limit=100" \
 			$(POSTMAN_CURL_HEADERS_XC) | jq -r --arg name "$(NAME)" '.specs // [] | .[] | select(.name == $$name) | .id'); \
 		for SPEC in $$SPECS; do \
 			echo "🗑  Deleting spec $$SPEC..."; \
@@ -2222,7 +2222,7 @@ postman-delete-specs:
 	while [ "$$KEEP_GOING" -eq 1 ]; do \
 		KEEP_GOING=0; \
 		RESPONSE=$$(curl --silent --location \
-			--request GET "$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS)" \
+			--request GET "$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS)&limit=100" \
 			$(POSTMAN_CURL_HEADERS_XC) $(POSTMAN_CURL_HEADERS_AA)); \
 		SPECS=$$(echo "$$RESPONSE" | jq -r '.specs // [] | .[].id' 2>/dev/null); \
 		for SPEC in $$SPECS; do \
