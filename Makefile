@@ -798,6 +798,18 @@ generate-data-dictionary-table:
 		--output-dir reports
 	@echo "✅ Data dictionary table written to reports/data-dictionary-table.{md,csv}"
 
+ARTIFACTS_INDEX_ORG ?= click2mail
+
+.PHONY: generate-artifacts-index
+generate-artifacts-index:
+	@echo "📑 Generating artifacts index..."
+	@mkdir -p reports
+	@$(VENV_PYTHON) $(SCRIPTS_DIR)/active/generate_artifacts_index.py \
+		--org $(ARTIFACTS_INDEX_ORG) \
+		--reports-dir reports \
+		--output reports/artifacts-index.md
+	@echo "✅ Artifacts index written to reports/artifacts-index.md"
+
 # Merge auth overlay into base OpenAPI spec
 .PHONY: openapi-merge-overlays
 openapi-merge-overlays: $(C2MAPIV2_OPENAPI_SPEC_BASE) $(OPENAPI_AUTH_OVERLAY)

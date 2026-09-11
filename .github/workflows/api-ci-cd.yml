@@ -298,6 +298,12 @@ jobs:
           # Run CI validation script
           ./scripts/validation/ci_verify.sh "$WORKSPACE"
 
+      - name: Generate artifacts index
+        if: always()
+        run: |
+          make generate-artifacts-index \
+            ARTIFACTS_INDEX_ORG=${{ github.repository_owner }}
+
       - name: Upload Validation Reports
         continue-on-error: true  # A storage-quota hit here must NOT skip the artifacts-repo push below
         if: always()
