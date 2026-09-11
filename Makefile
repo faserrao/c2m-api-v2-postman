@@ -2185,46 +2185,58 @@ postman-api-delete-old-specs:
 	fi
 
 # Delete specs by name
+# Loops until no more matching specs are returned — the API may return only 1 per page.
 .PHONY: postman-delete-specs-by-name
 postman-delete-specs-by-name:
 	@if [ -z "$(NAME)" ]; then \
 		echo "❌ Error: NAME parameter required"; \
 		exit 1; \
 	fi
-	@echo "🔍 Looking for specs named '$(NAME)' in workspace $(POSTMAN_WS)..."
-	@SPECS=$$(curl --silent --location \
-		--request GET "$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS)" \
-		$(POSTMAN_CURL_HEADERS_XC) | jq -r --arg name "$(NAME)" '.specs // [] | .[] | select(.name == $$name) | .id'); \
-	if [ -z "$$SPECS" ]; then \
-		echo "ℹ️  No specs found with name '$(NAME)'"; \
-	else \
+	@echo "🔍 Deleting all specs named '$(NAME)' in workspace $(POSTMAN_WS)..."
+	@TOTAL=0; KEEP_GOING=1; \
+	while [ "$$KEEP_GOING" -eq 1 ]; do \
+		KEEP_GOING=0; \
+		SPECS=$$(curl --silent --location \
+			--request GET "$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS)" \
+			$(POSTMAN_CURL_HEADERS_XC) | jq -r --arg name "$(NAME)" '.specs // [] | .[] | select(.name == $$name) | .id'); \
 		for SPEC in $$SPECS; do \
 			echo "🗑  Deleting spec $$SPEC..."; \
 			curl --silent --location \
 				--request DELETE "$(POSTMAN_SPECS_URL)/$$SPEC" \
 				$(POSTMAN_CURL_HEADERS_XC) || echo "⚠️ Failed to delete spec $$SPEC"; \
+			TOTAL=$$((TOTAL + 1)); KEEP_GOING=1; \
 		done; \
-		echo "✅ Deleted all specs named '$(NAME)'"; \
+	done; \
+	if [ "$$TOTAL" -eq 0 ]; then \
+		echo "ℹ️  No specs found with name '$(NAME)'"; \
+	else \
+		echo "✅ Deleted $$TOTAL spec(s) named '$(NAME)'"; \
 	fi
 
 # Delete all specs in workspace
+# Loops until the API returns an empty list — the API may return only 1 per page.
 .PHONY: postman-delete-specs
 postman-delete-specs:
-	@echo "🔍 Fetching specs in workspace $(POSTMAN_WS)..."
-	@RESPONSE=$$(curl --silent --location \
-		--request GET "$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS)" \
-		$(POSTMAN_CURL_HEADERS_XC) $(POSTMAN_CURL_HEADERS_AA)); \
-	echo "$$RESPONSE" | jq -e '.specs' > /dev/null 2>&1 || { echo "⚠️  Unexpected response from specs API: $$(echo "$$RESPONSE" | head -c 200)"; exit 0; }; \
-	SPECS=$$(echo "$$RESPONSE" | jq -r '.specs // [] | .[].id'); \
-	if [ -z "$$SPECS" ]; then \
-		echo "ℹ️  No specs found in workspace"; \
-	else \
+	@echo "🔍 Deleting all specs in workspace $(POSTMAN_WS)..."
+	@TOTAL=0; KEEP_GOING=1; \
+	while [ "$$KEEP_GOING" -eq 1 ]; do \
+		KEEP_GOING=0; \
+		RESPONSE=$$(curl --silent --location \
+			--request GET "$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS)" \
+			$(POSTMAN_CURL_HEADERS_XC) $(POSTMAN_CURL_HEADERS_AA)); \
+		SPECS=$$(echo "$$RESPONSE" | jq -r '.specs // [] | .[].id' 2>/dev/null); \
 		for SPEC in $$SPECS; do \
 			echo "🗑 Deleting spec $$SPEC..."; \
 			curl --silent --location \
 				--request DELETE "$(POSTMAN_SPECS_URL)/$$SPEC" \
 				$(POSTMAN_CURL_HEADERS_XC) $(POSTMAN_CURL_HEADERS_AA) || echo "⚠️ Failed to delete spec $$SPEC"; \
+			TOTAL=$$((TOTAL + 1)); KEEP_GOING=1; \
 		done; \
+	done; \
+	if [ "$$TOTAL" -eq 0 ]; then \
+		echo "ℹ️  No specs found in workspace"; \
+	else \
+		echo "✅ Deleted $$TOTAL spec(s)"; \
 	fi
 
 # Clean all collections in workspace (careful!)
