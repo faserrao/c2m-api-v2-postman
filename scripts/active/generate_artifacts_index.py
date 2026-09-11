@@ -30,6 +30,11 @@ def _repo_url(org: str, path: str) -> str:
     return f"https://github.com/{org}/c2m-api-v2-postman-artifacts/blob/main/{path}"
 
 
+def _repo_tree_url(org: str, path: str) -> str:
+    """GitHub tree URL for a directory in the artifacts repo."""
+    return f"https://github.com/{org}/c2m-api-v2-postman-artifacts/tree/main/{path}"
+
+
 def _pages_url(org: str, path: str) -> str:
     """GitHub Pages URL (artifacts repo, docs/ served at root)."""
     return f"https://{org}.github.io/c2m-api-v2-postman-artifacts/{path}"
@@ -157,6 +162,29 @@ def generate(org: str, reports_dir: Path, output: Path) -> None:
         ),
     ]
 
+    # --- SDKs ---------------------------------------------------------------
+    _SDK_LANGS = [
+        ("Python",     "python",     "Python client library generated from the OpenAPI spec via OpenAPI Generator."),
+        ("JavaScript", "javascript", "JavaScript client library for browser and Node.js environments."),
+        ("TypeScript", "typescript", "TypeScript client library with full type definitions."),
+        ("Java",       "java",       "Java client library generated from the OpenAPI spec."),
+        ("Go",         "go",         "Go client library generated from the OpenAPI spec."),
+        ("Ruby",       "ruby",       "Ruby gem generated from the OpenAPI spec."),
+        ("PHP",        "php",        "PHP client library generated from the OpenAPI spec."),
+        ("C#",         "csharp",     "C# / .NET client library generated from the OpenAPI spec."),
+        ("Swift",      "swift",      "Swift client library for iOS and macOS applications."),
+        ("Kotlin",     "kotlin",     "Kotlin client library generated from the OpenAPI spec."),
+        ("Rust",       "rust",       "Rust client library generated from the OpenAPI spec."),
+    ]
+    sdk_rows = [
+        (
+            f"SDK — {label}",
+            _link("Browse", _repo_tree_url(org, f"sdks/{slug}")),
+            desc,
+        )
+        for label, slug, desc in _SDK_LANGS
+    ]
+
     # --- Data Dictionary Reports --------------------------------------------
     dd_rows = [
         (
@@ -232,6 +260,7 @@ def generate(org: str, reports_dir: Path, output: Path) -> None:
         _section("API Documentation", doc_rows),
         _section("OpenAPI Specifications", spec_rows),
         _section("Postman Collections", collection_rows),
+        _section("SDKs", sdk_rows),
         _section("Data Dictionary Reports", dd_rows),
         _section("CI Quality Reports", ci_rows),
     ]
