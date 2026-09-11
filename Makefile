@@ -2211,15 +2211,21 @@ postman-delete-specs-by-name:
 .PHONY: postman-delete-specs
 postman-delete-specs:
 	@echo "🔍 Fetching specs in workspace $(POSTMAN_WS)..."
-	@SPECS=$$(curl --silent --location \
+	@RESPONSE=$$(curl --silent --location \
 		--request GET "$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS)" \
-		$(POSTMAN_CURL_HEADERS_XC) | jq -r '.specs // [] | .[].id'); \
-	for SPEC in $$SPECS; do \
-		echo "🗑 Deleting spec $$SPEC..."; \
-		curl --silent --location \
-			--request DELETE "$(POSTMAN_SPECS_URL)/$$SPEC" \
-			$(POSTMAN_CURL_HEADERS_XC) || echo "⚠️ Failed to delete spec $$SPEC"; \
-	done
+		$(POSTMAN_CURL_HEADERS_XC) $(POSTMAN_CURL_HEADERS_AA)); \
+	echo "$$RESPONSE" | jq -e '.specs' > /dev/null 2>&1 || { echo "⚠️  Unexpected response from specs API: $$(echo "$$RESPONSE" | head -c 200)"; exit 0; }; \
+	SPECS=$$(echo "$$RESPONSE" | jq -r '.specs // [] | .[].id'); \
+	if [ -z "$$SPECS" ]; then \
+		echo "ℹ️  No specs found in workspace"; \
+	else \
+		for SPEC in $$SPECS; do \
+			echo "🗑 Deleting spec $$SPEC..."; \
+			curl --silent --location \
+				--request DELETE "$(POSTMAN_SPECS_URL)/$$SPEC" \
+				$(POSTMAN_CURL_HEADERS_XC) $(POSTMAN_CURL_HEADERS_AA) || echo "⚠️ Failed to delete spec $$SPEC"; \
+		done; \
+	fi
 
 # Clean all collections in workspace (careful!)
 .PHONY: postman-collections-clean

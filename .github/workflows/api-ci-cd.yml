@@ -31,6 +31,14 @@ on:
         type: boolean
         default: true
 
+# Only one publish run may touch a Postman workspace at a time.
+# If a new commit lands while a build is in progress, the in-progress build
+# is cancelled so the newer code always wins without leaving the workspace
+# in a partially-cleaned state.
+concurrency:
+  group: publish-${{ github.repository }}
+  cancel-in-progress: true
+
 # Pages is served from the artifacts repo, so this pipeline needs only
 # contents:write (auto-commit generated files). No pages:/id-token: here.
 permissions:
