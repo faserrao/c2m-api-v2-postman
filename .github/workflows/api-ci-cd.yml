@@ -37,7 +37,7 @@ on:
 # in a partially-cleaned state.
 concurrency:
   group: publish-${{ github.repository }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 # Pages is served from the artifacts repo, so this pipeline needs only
 # contents:write (auto-commit generated files). No pages:/id-token: here.
