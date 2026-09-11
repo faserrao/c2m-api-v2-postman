@@ -149,6 +149,11 @@ jobs:
           echo "📋 Building OpenAPI spec from EBNF data dictionary..."
           make openapi-build
 
+      - name: Generate data dictionary table
+        run: |
+          echo "📋 Generating data dictionary table from EBNF..."
+          make generate-data-dictionary-table
+
       # ---------- Conformance Gate (all events, before publish) ----------
       # Regenerates the must-be-correct (Linked) collection FRESH from the spec
       # just built above and fails the build if it drifts. Fresh-vs-fresh, so it
@@ -340,6 +345,7 @@ jobs:
           echo "📊 Copying test reports..."
           mkdir -p artifacts-repo/reports
           cp -v reports/*.md  artifacts-repo/reports/ 2>/dev/null || echo "  ⚠️  No markdown reports to copy"
+          cp -v reports/*.csv  artifacts-repo/reports/ 2>/dev/null || echo "  ⚠️  No CSV reports to copy"
           cp -v reports/*.json artifacts-repo/reports/ 2>/dev/null || echo "  ⚠️  No JSON reports to copy"
           cp -v reports/*.html artifacts-repo/reports/ 2>/dev/null || echo "  ⚠️  No HTML reports to copy"
           cp -v reports/*.txt  artifacts-repo/reports/ 2>/dev/null || echo "  ⚠️  No txt reports to copy"

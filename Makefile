@@ -788,6 +788,16 @@ generate-openapi-spec-from-ebnf-dd:
 	$(VENV_PYTHON) $(SCRIPTS_DIR)/active/fix_openapi_oneOf_schemas.py $(C2MAPIV2_OPENAPI_SPEC_BASE) $(C2MAPIV2_OPENAPI_SPEC_BASE)
 	@echo "✅ OneOf schemas fixed (anonymous → named)"
 
+# Generate data dictionary reference table (Markdown + CSV) from EBNF
+.PHONY: generate-data-dictionary-table
+generate-data-dictionary-table:
+	@echo "📋 Generating data dictionary table from $(DD_EBNF_FILE)..."
+	@mkdir -p reports
+	@$(VENV_PYTHON) $(SCRIPTS_DIR)/active/generate_dd_table.py \
+		--ebnf $(DD_EBNF_FILE) \
+		--output-dir reports
+	@echo "✅ Data dictionary table written to reports/data-dictionary-table.{md,csv}"
+
 # Merge auth overlay into base OpenAPI spec
 .PHONY: openapi-merge-overlays
 openapi-merge-overlays: $(C2MAPIV2_OPENAPI_SPEC_BASE) $(OPENAPI_AUTH_OVERLAY)
