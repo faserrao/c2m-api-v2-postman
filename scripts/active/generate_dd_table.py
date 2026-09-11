@@ -247,6 +247,15 @@ _DESC: dict[str, str] = {
     # Primitive aliases
     "id":            "Integer identifier — alias for integer, used for all ID fields.",
     "number":        "Numeric value (integer or decimal).",
+    # Bare primitive type names (shown as array-item elements in the type-reference table)
+    "string":        "A plain text string value.",
+    "integer":       "A whole-number integer value.",
+    "boolean":       "A boolean true/false value.",
+    # Payment variant type-discriminator keys (JSON property name that identifies the variant)
+    '"creditCard"':  "JSON property key identifying the credit-card payment variant.",
+    '"invoice"':     "JSON property key identifying the invoice payment variant.",
+    '"ach"':         "JSON property key identifying the ACH bank-transfer payment variant.",
+    '"userCredit"':  "JSON property key identifying the account-credit payment variant.",
 }
 
 # Which rules are the top-level endpoint param shapes and their endpoint path
@@ -416,8 +425,19 @@ def _display_type(name: str, rules: dict, depth: int = 0) -> str:
 
 
 def _desc(name: str) -> str:
-    """Return description, falling back to a generic one."""
-    return _DESC.get(name, f"See EBNF rule `{name}`.")
+    """Return a natural-language description for a rule or field name.
+
+    Strips trailing [] (array notation) before lookup so that 'tags[]'
+    resolves to the description for 'tags'.
+    """
+    # Direct hit
+    if name in _DESC:
+        return _DESC[name]
+    # Strip one or more trailing [] array suffixes (e.g. "tags[]" → "tags")
+    stripped = name.rstrip("]").rstrip("[").rstrip("]").rstrip("[")
+    if stripped != name and stripped in _DESC:
+        return _DESC[stripped]
+    return f"See EBNF rule `{name}`."
 
 
 # ---------------------------------------------------------------------------
