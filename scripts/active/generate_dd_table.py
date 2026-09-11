@@ -845,7 +845,7 @@ def write_endpoint_expanded_md(
 
 
 def write_endpoint_expanded_csv(endpoint_rows: dict, out_path: "Path") -> None:
-    fieldnames = ["method", "endpoint", "description", "field_path", "type", "required"]
+    fieldnames = ["method", "endpoint", "field_path", "description", "type", "required"]
     with out_path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
@@ -936,7 +936,7 @@ def write_markdown(rows: list[dict], out_path: Path, ebnf_path: Path) -> None:
 # ---------------------------------------------------------------------------
 
 def write_csv(rows: list[dict], out_path: Path) -> None:
-    fieldnames = ["component", "description", "category", "endpoint", "field",
+    fieldnames = ["component", "category", "endpoint", "field", "description",
                   "field_type", "required"]
     with out_path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
