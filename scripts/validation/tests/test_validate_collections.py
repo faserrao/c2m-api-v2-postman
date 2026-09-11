@@ -106,7 +106,6 @@ _ALL_JOB_PATHS = [
     "/static/address-capture",
     "/batch/split",
     "/batch/split/address-capture",
-    "/static/multi",
     "/mail-merge",
     "/batch/zip",
     "/batch/zip/address-capture",
@@ -137,26 +136,6 @@ def errs_for(path, body):
 
 def test_synthetic_faults():
     print("\n[3] Synthetic fault injection")
-
-    # 3a. Clean /static/multi body -> no errors
-    clean_multidoc = {"multiDocJobs": [
-        {"docSourceAll": {"documentId": 1},
-         "recipientAddressSource": {"singleAddress": {"firstName": "A", "lastName": "B",
-            "address1": "1 St", "city": "X", "state": "NY", "zip": "10001", "country": "USA"}}}]}
-    check(errs_for("/static/multi", clean_multidoc) == [],
-          "clean /static/multi body -> no errors")
-
-    # 3b. Wrong wrapper key (jobs instead of multiDocJobs) -> 2 defects
-    e = errs_for("/static/multi", {"jobs": []})
-    check(any("missing required field 'multiDocJobs'" in x for x in e),
-          "wrong-wrapper /static/multi -> flags missing multiDocJobs")
-    check(any("unexpected field 'jobs'" in x for x in e),
-          "wrong-wrapper /static/multi -> flags unexpected 'jobs'")
-
-    # 3c. Empty body -> missing required
-    e = errs_for("/static/multi", {})
-    check(any("missing required field 'multiDocJobs'" in x for x in e),
-          "empty /static/multi -> flags missing multiDocJobs")
 
     # 3d. Clean /static body -> no errors
     clean_single = {"docSourceAll": {"documentId": 1},

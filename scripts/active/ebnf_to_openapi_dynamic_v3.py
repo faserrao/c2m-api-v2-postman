@@ -499,11 +499,6 @@ class EBNFToOpenAPITranslator:
             "Submits a mailing job for a single PDF where recipient addresses are captured "
             "from the document via OCR. No inline recipient address is required."
         ),
-        '/static/multi': (
-            "Submit multiple documents",
-            "Submits a batch of independent mailing jobs in a single request. Each job "
-            "specifies its own document source and recipient address."
-        ),
         '/batch/split': (
             "Submit PDF split",
             "Splits a single PDF into page ranges and mails each range to a different "
