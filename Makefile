@@ -316,6 +316,7 @@ PYTHON3                          := python3
 # (e.g., fresh checkout before make openapi-build).
 _SPEC_ALLOWED_CODES := $(shell test -x "$(VENV_PYTHON)" && test -f "$(C2MAPIV2_OPENAPI_SPEC)" && $(VENV_PYTHON) -c "import yaml; d=yaml.safe_load(open('$(C2MAPIV2_OPENAPI_SPEC)')); codes=list(d.get('info',{}).get('x-http-error-map',{}).keys()); print(','.join(['200','201','204']+codes))" 2>/dev/null)
 POSTMAN_ALLOWED_CODES ?= $(if $(_SPEC_ALLOWED_CODES),$(_SPEC_ALLOWED_CODES),200,201,204,400,401,403,404,422,429,500)
+SUPPORT_EMAIL                    ?= support@click2mail.com
 PYTHON                           := $(PYTHON3)
 
 # ========================================================================
@@ -789,7 +790,7 @@ generate-openapi-spec-from-ebnf-dd:
 
 	# --- Run the conversion script ---
 	@echo "🛠  Running: $(EBNF_TO_OPENAPI_SCRIPT) → $(C2MAPIV2_OPENAPI_SPEC_BASE)"
-	$(VENV_PYTHON) $(EBNF_TO_OPENAPI_SCRIPT) -o $(C2MAPIV2_OPENAPI_SPEC_BASE) $(DD_EBNF_FILE)
+	$(VENV_PYTHON) $(EBNF_TO_OPENAPI_SCRIPT) -o $(C2MAPIV2_OPENAPI_SPEC_BASE) $(DD_EBNF_FILE) --support-email "$(SUPPORT_EMAIL)"
 	# --- Fix anonymous oneOf schemas to named schemas ---
 	@echo "🔧 Fixing anonymous oneOf schemas in OpenAPI spec..."
 	$(VENV_PYTHON) $(SCRIPTS_DIR)/active/fix_openapi_oneOf_schemas.py $(C2MAPIV2_OPENAPI_SPEC_BASE) $(C2MAPIV2_OPENAPI_SPEC_BASE)
@@ -1305,7 +1306,7 @@ postman-test-collection-add-error-responses:
 		echo "❌ Collection $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES) not found. Run postman-test-collection-add-examples first."; \
 		exit 1; \
 	fi
-	node scripts/active/add_error_responses_to_collection.js $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES) $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES)
+	node scripts/active/add_error_responses_to_collection.js $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES) $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES) --support-email "$(SUPPORT_EMAIL)"
 	@echo "✅ Error responses added to $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES)"
 	@echo " "
 	@echo " "

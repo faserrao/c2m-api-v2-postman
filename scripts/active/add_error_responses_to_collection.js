@@ -329,12 +329,22 @@ function processItems(items) {
 function main() {
   const args = process.argv.slice(2);
 
-  if (args.length !== 2) {
-    console.error('Usage: node add_error_responses_to_collection.js <input_collection> <output_collection>');
+  const supportEmailIdx = args.indexOf('--support-email');
+  const supportEmail = supportEmailIdx !== -1 ? args[supportEmailIdx + 1] : 'support@click2mail.com';
+  const positional = args.filter((_, i) => i !== supportEmailIdx && i !== supportEmailIdx + 1);
+
+  if (positional.length !== 2) {
+    console.error('Usage: node add_error_responses_to_collection.js <input_collection> <output_collection> [--support-email <email>]');
     process.exit(1);
   }
 
-  const [inputFile, outputFile] = args;
+  // Patch support email into ACCOUNT_SUSPENDED before building responses
+  if (ERROR_CODE_METADATA.ACCOUNT_SUSPENDED) {
+    ERROR_CODE_METADATA.ACCOUNT_SUSPENDED.details =
+      ERROR_CODE_METADATA.ACCOUNT_SUSPENDED.details.replace('support@click2mail.com', supportEmail);
+  }
+
+  const [inputFile, outputFile] = positional;
 
   // Determine OpenAPI spec path (relative to script location)
   const scriptDir = path.dirname(__filename);
