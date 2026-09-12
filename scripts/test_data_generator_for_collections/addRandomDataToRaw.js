@@ -278,6 +278,15 @@ const oneOfFixtures = {
         }
     ],
 
+    mergeDocumentSource: [
+        // Variant 1: two integer document IDs (mergeByDocumentId)
+        [12345, 67890],
+        // Variant 2: two requestId objects (mergeByRequestId)
+        [{ requestId: 12345, filename: "doc-a.pdf" }, { requestId: 67890, filename: "doc-b.pdf" }],
+        // Variant 3: mixed — one documentId integer, one requestId object
+        [12345, { requestId: 67890, filename: "doc-b.pdf" }]
+    ],
+
     errorResponse: [
         // Variant 1: ValidationError - Missing Field
         {
@@ -408,11 +417,28 @@ function getNextOneOfValue(fieldName) {
 }
 
 /**
+ * Returns true if the value is an array whose every item is a type placeholder.
+ * These arrays should be replaced wholesale rather than recursed into, because
+ * primitive items ("<integer>", "<string>") are not objects and the recursive
+ * traversal would silently skip them.
+ */
+function isPlaceholderArray(value) {
+    if (!Array.isArray(value) || value.length === 0) return false;
+    const placeholders = new Set(['<string>', '<integer>', '<number>', '<oneOf>']);
+    return value.every(item => typeof item === 'string' && placeholders.has(item));
+}
+
+/**
  * Check if a value should be replaced
  */
 function shouldReplaceValue(value, key) {
     // Always replace oneOf fields
     if (oneOfFixtures.hasOwnProperty(key)) {
+        return true;
+    }
+
+    // Replace arrays that contain only type placeholders (e.g. ["<integer>", "<integer>"])
+    if (isPlaceholderArray(value)) {
         return true;
     }
 
@@ -428,8 +454,8 @@ function shouldReplaceValue(value, key) {
 
     // Replace generic placeholder strings
     if (typeof value === 'string' && (
-        value === '<string>' || 
-        value === '<number>' || 
+        value === '<string>' ||
+        value === '<number>' ||
         value === '<integer>' ||
         value === '<oneOf>' ||
         value === 'string' ||
