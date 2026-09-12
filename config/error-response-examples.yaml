@@ -1,0 +1,64 @@
+# Error response examples for API mock data
+#
+# Used by scripts/active/add_response_examples.py to generate OpenAPI spec error examples.
+# Edit this file to change example content without touching Python code.
+#
+# Rules:
+#   - errorCode MUST match the EBNF data dictionary errorCode enum
+#   - errorType is NOT included here — derived from x-http-error-map in the spec at injection time
+#   - errorTrackingId is NOT included here — generated dynamically per invocation
+#   - Use {timestamp} in errorDetails where a current-time placeholder is needed
+
+400:
+  missing_field:
+    summary: "Missing required field"
+    errorMessage: "Required field is missing from request body"
+    errorCode: MISSING_REQUIRED_FIELD
+    errorDetails: '{"field": "documentId", "location": "requestBody"}'
+  invalid_format:
+    summary: "Invalid field format"
+    errorMessage: "Field contains invalid format or value"
+    errorCode: INVALID_FORMAT
+    errorDetails: '{"field": "postalCode", "provided": "1234", "expected": "5 or 9 digits"}'
+
+401:
+  missing_token:
+    summary: "Missing authentication"
+    errorMessage: "Authorization header is missing or invalid"
+    errorCode: MISSING_AUTH_HEADER
+    errorDetails: '{"expected": "Bearer <token>", "received": "none"}'
+
+403:
+  insufficient_permissions:
+    summary: "Insufficient permissions"
+    errorMessage: "User does not have required permissions for this operation"
+    errorCode: INSUFFICIENT_PERMISSIONS
+    errorDetails: '{"required": "jobs:write", "user": "read-only-user"}'
+
+404:
+  resource_not_found:
+    summary: "Resource not found"
+    errorMessage: "Requested resource does not exist"
+    errorCode: RESOURCE_NOT_FOUND
+    errorDetails: '{"resourceType": "document", "resourceId": "DOC-12345"}'
+
+422:
+  validation_failed:
+    summary: "Validation failed"
+    errorMessage: "Request validation failed for multiple fields"
+    errorCode: INVALID_FORMAT
+    errorDetails: '{"errors": [{"field": "documentId", "issue": "not found"}, {"field": "recipientAddress.postalCode", "issue": "invalid format"}]}'
+
+429:
+  rate_limit_exceeded:
+    summary: "Rate limit exceeded"
+    errorMessage: "Request rate limit exceeded — please slow down and retry"
+    errorCode: RATE_LIMIT_EXCEEDED
+    errorDetails: '{"limit": "100 requests/minute", "retryAfterSeconds": 60}'
+
+500:
+  server_error:
+    summary: "Internal server error"
+    errorMessage: "An unexpected error occurred while processing the request"
+    errorCode: SERVER_ERROR
+    errorDetails: '{"timestamp": "{timestamp}", "requestId": "req-abc123"}'

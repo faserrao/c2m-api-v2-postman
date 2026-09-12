@@ -35,6 +35,9 @@ import copy
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
+
+# Keep in sync with _DEFAULT_API_TITLE in ebnf_to_openapi_dynamic_v3.py
+_API_TITLE = "C2M API v2"
 from utilities.oneof_resolver import find_variant_by_discriminator_key, build_variant_placeholder_structure
 
 
@@ -807,10 +810,10 @@ def main():
     # Generate collection
     tag_filter = args.tags
     if tag_filter:
-        collection_name = f"C2M API v2 - {' + '.join(tag_filter).title()}"
+        collection_name = f"{_API_TITLE} - {' + '.join(tag_filter).title()}"
         output_name = args.output_name or f"c2mapiv2-{'-'.join(tag_filter)}-collection"
     else:
-        collection_name = "C2M API v2 - All Examples"
+        collection_name = f"{_API_TITLE} - All Examples"
         output_name = args.output_name or "c2mapiv2-all-examples-collection"
 
     print(f"\nGenerating collection: {collection_name} (mode={args.mode})")

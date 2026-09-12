@@ -18,6 +18,8 @@ from pathlib import Path
 
 # Centralized schema URL — matches POSTMAN_SCHEMA_V2 in Makefile
 _POSTMAN_SCHEMA_URL = 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'
+# Keep in sync with _DEFAULT_API_TITLE in ebnf_to_openapi_dynamic_v3.py
+_API_TITLE = "C2M API v2"
 
 # Educational pattern organization (16 patterns across 3 categories)
 # Same patterns as placeholder version, but will have realistic data
@@ -232,7 +234,7 @@ def generate_getting_started_with_examples(
     # Create new collection with educational structure
     getting_started = {
         "info": {
-            "name": "C2M API v2 - Getting Started (With Examples)",
+            "name": f"{_API_TITLE} - Getting Started (With Examples)",
             "description": (
                 "Educational collection with realistic test data organized by usage patterns "
                 "to help new users get started with the C2M API.\n\n"

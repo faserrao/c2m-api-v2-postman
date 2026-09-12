@@ -11,10 +11,38 @@ import copy
 import random
 import string
 from datetime import datetime, timezone
+from pathlib import Path
 
 def _generate_tracking_id():
     suffix = ''.join(random.choices('0123456789ABCDEF', k=6))
     return f"TRK-{datetime.now(timezone.utc).strftime('%Y%m%d')}-{suffix}"
+
+
+def _load_error_examples(examples_path):
+    """Load ERROR_EXAMPLES from config/error-response-examples.yaml.
+
+    Converts the flat YAML structure into the OpenAPI examples dict format.
+    Substitutes {timestamp} in errorDetails with the current UTC time.
+    """
+    now = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+    with open(examples_path, 'r') as f:
+        raw = yaml.safe_load(f)
+    result = {}
+    for http_status, examples in raw.items():
+        result[str(http_status)] = {}
+        for ex_key, ex_data in examples.items():
+            details = ex_data.get('errorDetails', '{}')
+            if '{timestamp}' in details:
+                details = details.replace('{timestamp}', now)
+            result[str(http_status)][ex_key] = {
+                'summary': ex_data['summary'],
+                'value': {
+                    'errorMessage': ex_data['errorMessage'],
+                    'errorCode': ex_data['errorCode'],
+                    'errorDetails': details
+                }
+            }
+    return result
 
 
 def extract_http_error_map(spec):
@@ -163,92 +191,14 @@ def build_effective_error_examples(spec, error_examples):
 
     return effective
 
-# Error example templates (realistic data, not placeholders)
+# Error example data lives in config/error-response-examples.yaml.
 # errorCode values MUST match the EBNF data dictionary errorCode enum.
-# errorType is NOT stored here — it is read from x-http-error-map in the spec
+# errorType is NOT stored there — it is read from x-http-error-map in the spec
 # (injected by ebnf_to_openapi_dynamic_v3.py from the EBNF @http_error_map block)
 # and merged in at injection time. Edit data_dictionary/c2mapiv2-dd.ebnf to change
 # the errorType assignment per status.
-ERROR_EXAMPLES = {
-    '400': {
-        'missing_field': {
-            'summary': 'Missing required field',
-            'value': {
-                'errorMessage': 'Required field is missing from request body',
-                'errorCode': 'MISSING_REQUIRED_FIELD',
-                'errorDetails': '{"field": "documentId", "location": "requestBody"}'
-            }
-        },
-        'invalid_format': {
-            'summary': 'Invalid field format',
-            'value': {
-                'errorMessage': 'Field contains invalid format or value',
-                'errorCode': 'INVALID_FORMAT',
-                'errorDetails': '{"field": "postalCode", "provided": "1234", "expected": "5 or 9 digits"}'
-            }
-        }
-    },
-    '401': {
-        'missing_token': {
-            'summary': 'Missing authentication',
-            'value': {
-                'errorMessage': 'Authorization header is missing or invalid',
-                'errorCode': 'MISSING_AUTH_HEADER',
-                'errorDetails': '{"expected": "Bearer <token>", "received": "none"}'
-            }
-        }
-    },
-    '403': {
-        'insufficient_permissions': {
-            'summary': 'Insufficient permissions',
-            'value': {
-                'errorMessage': 'User does not have required permissions for this operation',
-                'errorCode': 'INSUFFICIENT_PERMISSIONS',
-                'errorDetails': '{"required": "jobs:write", "user": "read-only-user"}'
-            }
-        }
-    },
-    '404': {
-        'resource_not_found': {
-            'summary': 'Resource not found',
-            'value': {
-                'errorMessage': 'Requested resource does not exist',
-                'errorCode': 'RESOURCE_NOT_FOUND',
-                'errorDetails': '{"resourceType": "document", "resourceId": "DOC-12345"}'
-            }
-        }
-    },
-    '422': {
-        'validation_failed': {
-            'summary': 'Validation failed',
-            'value': {
-                'errorMessage': 'Request validation failed for multiple fields',
-                'errorCode': 'INVALID_FORMAT',
-                'errorDetails': '{"errors": [{"field": "documentId", "issue": "not found"}, {"field": "recipientAddress.postalCode", "issue": "invalid format"}]}'
-            }
-        }
-    },
-    '429': {
-        'rate_limit_exceeded': {
-            'summary': 'Rate limit exceeded',
-            'value': {
-                'errorMessage': 'Request rate limit exceeded — please slow down and retry',
-                'errorCode': 'RATE_LIMIT_EXCEEDED',
-                'errorDetails': '{"limit": "100 requests/minute", "retryAfterSeconds": 60}'
-            }
-        }
-    },
-    '500': {
-        'server_error': {
-            'summary': 'Internal server error',
-            'value': {
-                'errorMessage': 'An unexpected error occurred while processing the request',
-                'errorCode': 'SERVER_ERROR',
-                'errorDetails': f'{{"timestamp": "{datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}", "requestId": "req-abc123"}}'
-            }
-        }
-    }
-}
+_EXAMPLES_CONFIG = Path(__file__).parent.parent.parent / 'config' / 'error-response-examples.yaml'
+ERROR_EXAMPLES = _load_error_examples(_EXAMPLES_CONFIG)
 
 def discover_job_response_schema_name(spec):
     """
