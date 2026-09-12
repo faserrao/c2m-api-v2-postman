@@ -86,7 +86,7 @@ def generate(org: str, reports_dir: Path, output: Path) -> None:
     doc_rows = [
         (
             "API Reference — Redoc",
-            _link("Open", _pages_url(org, "redoc.html")),
+            _link("Open", _pages_url(org, "index.html")),
             "Interactive API documentation rendered with Redoc — browse endpoints, schemas, and examples.",
         ),
         (
