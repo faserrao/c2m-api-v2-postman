@@ -140,7 +140,7 @@ def generate(org: str, reports_dir: Path, output: Path) -> None:
         (
             "C2M API Linked Collection",
             _link("Download", _repo_url(org, "postman/collections/c2mapiv2-linked-collection-flat.json")),
-            "Primary API collection with all endpoints linked to the live OpenAPI spec for schema validation (C2mApiCollectionLinked).",
+            "Primary API collection with all endpoints linked to the live OpenAPI spec for schema validation (C2mApiV2CollectionLinked).",
         ),
         (
             "Test Collection",
