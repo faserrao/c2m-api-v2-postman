@@ -240,8 +240,6 @@ SECURITY_POSTMAN_SCRIPTS_DIR     := ../c2m-api-v2-security/postman/scripts
 endif
 # Token updated 2025-09-09
 
-# Default allowed status codes (comma-separated)
-POSTMAN_ALLOWED_CODES            ?= 200,201,204,400,401,403,404,422,429,500
 # JWT test collection output
 TEST_COLLECTION_WITH_JWT_TESTS   := $(POSTMAN_DIR)/generated/c2mapiv2-test-collection-jwt.json
 
@@ -309,6 +307,15 @@ VENV_DIR                         := $(PYTHON_ENV_DIR)/e2o.venv
 VENV_PIP                         := $(VENV_DIR)/bin/pip
 VENV_PYTHON                      := $(VENV_DIR)/bin/python
 PYTHON3                          := python3
+
+# Allowed status codes for Newman and Postman test generation.
+# Success codes (200, 201, 204) are fixed. Error codes are read from the
+# spec's x-http-error-map at parse time so that adding a new HTTP status
+# to the EBNF is sufficient — no Makefile edit needed.
+# Falls back to the hardcoded list when the spec hasn't been built yet
+# (e.g., fresh checkout before make openapi-build).
+_SPEC_ALLOWED_CODES := $(shell test -x "$(VENV_PYTHON)" && test -f "$(C2MAPIV2_OPENAPI_SPEC)" && $(VENV_PYTHON) -c "import yaml; d=yaml.safe_load(open('$(C2MAPIV2_OPENAPI_SPEC)')); codes=list(d.get('info',{}).get('x-http-error-map',{}).keys()); print(','.join(['200','201','204']+codes))" 2>/dev/null)
+POSTMAN_ALLOWED_CODES ?= $(if $(_SPEC_ALLOWED_CODES),$(_SPEC_ALLOWED_CODES),200,201,204,400,401,403,404,422,429,500)
 PYTHON                           := $(PYTHON3)
 
 # ========================================================================
@@ -880,7 +887,7 @@ postman-add-jwt-tests:
 		node scripts/active/add_tests_jwt.js \
 			"$(TEST_COLLECTION_WITH_TESTS)" \
 			"$(TEST_COLLECTION_WITH_JWT_TESTS)" \
-			--allowed-codes "200,201,204,400,401,403,404,422,429,500"; \
+			--allowed-codes "$(POSTMAN_ALLOWED_CODES)"; \
 		echo "✅ JWT tests added to collection"; \
 	else \
 		echo "⚠️  Test collection not found. Run 'make postman-create-test-collection' first."; \
