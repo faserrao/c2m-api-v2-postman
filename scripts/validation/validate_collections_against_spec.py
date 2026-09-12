@@ -26,15 +26,15 @@ Usage:
   $VENV scripts/validation/validate_collections_against_spec.py \
       [--spec openapi/c2mapiv2-openapi-spec-final.yaml] \
       [--collections <file> ...] \
-      [--path-prefix /jobs/submit] \
+      [--path-prefix /] \
       [--json] [--exit-status] [--report FILE]
 
 Defaults validate the four canonical collections against the FINAL spec
-(source-of-truth contract; identical to -base for job endpoints), limited to
-/jobs/submit/* endpoints (auth endpoints have no request-body divergence concerns
-here). Report-only by default (exit 0); pass --exit-status to fail on any
-non-conformance (for later CI gating). Do NOT point --spec at bundled.yaml — it
-flattens single-alias oneOf chains and misrepresents the contract.
+(source-of-truth contract). All job endpoints (/static, /batch/*, /mail-merge)
+and auth endpoints are validated. Report-only by default (exit 0); pass
+--exit-status to fail on any non-conformance (for CI gating). Do NOT point
+--spec at bundled.yaml — it flattens single-alias oneOf chains and misrepresents
+the contract.
 """
 
 import argparse
@@ -273,7 +273,7 @@ def main(argv=None):
     ap.add_argument("--spec", default=DEFAULT_SPEC)
     ap.add_argument("--collections", nargs="*", default=None,
                     help="collection JSON files (default: the 4 canonical collections)")
-    ap.add_argument("--path-prefix", default="/jobs/submit",
+    ap.add_argument("--path-prefix", default="/",
                     help="only validate requests whose path starts with this (default /jobs/submit)")
     ap.add_argument("--no-strict-unknown", action="store_true",
                     help="do not flag unexpected fields")

@@ -105,6 +105,24 @@ def validate_error_examples(spec, error_examples):
         sys.exit(1)
 
     print(f"✓ All errorCode values in ERROR_EXAMPLES are valid")
+
+    # Coverage check: warn about EBNF enum codes that have no example at all
+    covered_codes = {
+        ex_data['value'].get('errorCode')
+        for examples in error_examples.values()
+        for ex_data in examples.values()
+        if ex_data['value'].get('errorCode')
+    }
+    uncovered = [c for c in valid_codes if c not in covered_codes]
+    if uncovered:
+        print(f"\n⚠  WARNING: {len(uncovered)} errorCode(s) in EBNF have no example in ERROR_EXAMPLES:")
+        for c in uncovered:
+            print(f"   - {c}")
+        print("   These codes will have no example in generated response docs.")
+        print("   Add them to ERROR_EXAMPLES if mock server coverage is needed.")
+    else:
+        print(f"✓ All {len(valid_codes)} EBNF errorCode values have at least one example")
+
     return True
 
 # Error example templates (realistic data, not placeholders)

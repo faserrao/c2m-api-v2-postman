@@ -2813,6 +2813,15 @@ validate-collections-conformance-test: ## Run all validation golden tests (valid
 	@C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" POSTMAN_GENERATED_DIR="$(POSTMAN_GENERATED_DIR)" C2MAPIV2_POSTMAN_API_NAME_KC="$(C2MAPIV2_POSTMAN_API_NAME_KC)" $(VENV_PYTHON) scripts/validation/tests/test_validate_collections.py && \
 	C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" $(VENV_PYTHON) scripts/validation/tests/test_oneof_resolver.py
 
+.PHONY: validate-catalog-against-spec
+validate-catalog-against-spec: ## Validate curated-examples-catalog.yaml select: keys and variant names against the OpenAPI spec
+	@C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" \
+	POSTMAN_LINKED_COLLECTION_FLAT="$(POSTMAN_LINKED_COLLECTION_FLAT)" \
+	$(VENV_PYTHON) scripts/validation/validate_catalog_against_spec.py \
+		--catalog config/curated-examples-catalog.yaml \
+		--spec $(C2MAPIV2_OPENAPI_SPEC) \
+		--linked $(POSTMAN_LINKED_COLLECTION_FLAT)
+
 # CI GATE: regenerate the must-be-correct collection FRESH from the current spec
 # and fail the build if it drifts. Regenerates into a throwaway temp dir so the
 # working tree (and the PR drift-check) is never touched. Gates on the Linked

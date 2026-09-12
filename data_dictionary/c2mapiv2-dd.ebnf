@@ -252,7 +252,7 @@
             ApplePay / GooglePay variants are excluded for initial testing (commented out).
 *)
 
-submitSingleDocParams =
+submitDocParams =
       [ jobTemplate ]
     + docSourceAll
     + recipientAddressSource
@@ -607,13 +607,9 @@ address =
     + [ foo1 ] + [ foo2 ] ;
 
 recipientAddressSource =
-      recipientAddressBySingle
     | recipientAddressByList
     | recipientAddressByAddressId
     | recipientAddressByListId ;
-
-recipientAddressBySingle =
-    [ mappingId ] + singleAddress + [ addressName ] ;
 
 recipientAddressByList =
     [ mappingId ] + addressList + [ addressListName ] ;
@@ -630,7 +626,6 @@ addressListName = string ;
 addressListId = id ;
 addressId = id ;
 
-singleAddress = address ;
 addressList   = { address } ;
 
 (***********************************)

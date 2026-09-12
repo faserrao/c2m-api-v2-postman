@@ -15,6 +15,12 @@
 # - Only leaf primitive values (strings, numbers, booleans)
 # - Arrays are okay (tags, documentIds list)
 #
+# Note on jobTemplate values: jobTemplate is defined as type: string (no enum)
+# in the OpenAPI spec because template names are customer-defined in the C2M
+# system and passed to the API verbatim. The values used here (e.g.
+# standard_letter, legal_certified_mail) are illustrative — they are NOT
+# validated against the spec.
+#
 # Collections generated:
 # - Real World Use Cases (curated business scenarios)
 # - Getting Started (educational patterns with hierarchical folders)
@@ -112,7 +118,6 @@ examples:
       - document-merging
     description: Medical office merges patient test results with consultation letters
     select:
-      mergeDocumentSource: documentIds
       recipientAddressSource: singleAddress
       paymentDetails: ach
     values:
@@ -193,7 +198,6 @@ examples:
       - multi-document
     description: Marketing agency sends personalized multi-page campaign materials
     select:
-      mergeDocumentSource: documentIds
       recipientAddressSource: addressListId
       paymentDetails: invoice
     values:
@@ -354,7 +358,7 @@ examples:
       - address-capture
     description: Send documents where recipient addresses are embedded in the PDF
     select:
-      docSourceAll: documentId
+      docSourceStandard: documentId
       paymentDetails: invoice
     values:
       documentId: 1003
@@ -377,7 +381,7 @@ examples:
       - split-pdf
     description: Split a multi-page PDF where each page has embedded recipient address
     select:
-      docSourceAll: documentId
+      docSourceStandard: documentId
       paymentDetails: creditCard
     values:
       documentId: 2001
@@ -400,8 +404,7 @@ examples:
       - split-pdf
     description: Split a multi-page PDF and specify recipient addresses separately
     select:
-      docSourceAll: documentId
-      recipientAddressSource: addressListId
+      docSourceStandard: documentId
       paymentDetails: ach
     values:
       documentId: 2002
@@ -423,7 +426,7 @@ examples:
       - zip-processing
     description: Process multiple documents from ZIP file with embedded addresses
     select:
-      docSourceAll: zipDocumentId
+      zipDocumentSource: zipDocumentId
       paymentDetails: invoice
     values:
       zipDocumentId: 2003
@@ -447,7 +450,6 @@ examples:
       - merge
     description: Merge multiple separate documents into one mailing per recipient
     select:
-      documentsToMerge: documentIds
       recipientAddressSource: singleAddress
       paymentDetails: creditCard
     values:
@@ -633,7 +635,7 @@ examples:
       - zip-with-addresses
     description: Process ZIP with multiple documents and provide addresses separately
     select:
-      docSourceZipFileRef: documentId
+      docSourceZipFileRef: zipDocumentId
       paymentDetails: invoice
     values:
       docSourceZipFileRef:
