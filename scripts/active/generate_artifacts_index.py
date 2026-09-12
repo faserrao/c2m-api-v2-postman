@@ -34,6 +34,10 @@ def _repo_tree_url(org: str, path: str) -> str:
     return f"https://github.com/{org}/c2m-api-v2-postman-artifacts/tree/main/{path}"
 
 
+def _pages_url(org: str, path: str) -> str:
+    """GitHub Pages URL (artifacts repo, docs/ served at root)."""
+    return f"https://{org}.github.io/c2m-api-v2-postman-artifacts/{path}"
+
 
 def _link(label: str, url: str) -> str:
     return f"[{label}]({url})"
@@ -78,21 +82,21 @@ def generate(org: str, reports_dir: Path, output: Path) -> None:
     reports_readme = _repo_url(org, "reports/README.md")
     # openapi/ and postman/collections/ have no README — None omits the link
 
-    # --- Documentation ------------------------------------------------------
+    # --- Documentation (GitHub Pages) ---------------------------------------
     doc_rows = [
         (
             "API Reference — Redoc",
-            _link("Open", _repo_url(org, "docs/redoc.html")),
+            _link("Open", _pages_url(org, "redoc.html")),
             "Interactive API documentation rendered with Redoc — browse endpoints, schemas, and examples.",
         ),
         (
             "API Reference — Swagger UI",
-            _link("Open", _repo_url(org, "docs/swagger.html")),
+            _link("Open", _pages_url(org, "swagger.html")),
             "Interactive API documentation rendered with Swagger UI — supports try-it-out requests.",
         ),
         (
             "API Reference — Stoplight Elements",
-            _link("Open", _repo_url(org, "docs/elements.html")),
+            _link("Open", _pages_url(org, "elements.html")),
             "Interactive API documentation rendered with Stoplight Elements.",
         ),
     ]

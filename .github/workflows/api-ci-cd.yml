@@ -341,6 +341,11 @@ jobs:
           echo "📚 Copying documentation (Redocly)..."
           cp -rv ${{ env.DOCS_DIR }}/* artifacts-repo/docs/ 2>/dev/null || echo "  ⚠️  No docs to copy"
 
+          echo "🔗 Replacing localhost:8080 with GitHub Pages URL in docs/README.md..."
+          PAGES_BASE="https://${{ github.repository_owner }}.github.io/c2m-api-v2-postman-artifacts"
+          sed -i "s|http://localhost:8080|${PAGES_BASE}|g" artifacts-repo/docs/README.md 2>/dev/null || true
+          echo "  ✅ docs/README.md URLs updated to ${PAGES_BASE}"
+
           echo "🔧 Copying SDKs (Python, JavaScript, etc.)..."
           if [ -d "sdk" ]; then
             cp -rv sdk/* artifacts-repo/sdks/ 2>/dev/null || echo "  ⚠️  No SDKs to copy"
