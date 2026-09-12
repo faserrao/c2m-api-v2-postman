@@ -480,6 +480,19 @@ function generateRandomValue(key, existingValue) {
         return getNextOneOfValue(key);
     }
 
+    // Preserve array type for placeholder arrays — map each item individually.
+    // Key-specific overrides below take priority over the generic item-by-item fallback.
+    if (isPlaceholderArray(existingValue)) {
+        if (keyLower.includes('scope')) return ['api:read', 'api:write'];
+        if (keyLower.includes('tag'))   return ['important', 'customer-docs'];
+        // Generic: replace each placeholder item with an appropriately-typed value
+        return existingValue.map(item => {
+            if (item === '<integer>') return faker.number.int({ min: 10000, max: 99999 });
+            if (item === '<number>')  return parseFloat(faker.commerce.price());
+            return faker.lorem.word(); // '<string>'
+        });
+    }
+
     // Context-aware generation based on key name
     if (keyLower.includes('email')) {
         return faker.internet.email();
