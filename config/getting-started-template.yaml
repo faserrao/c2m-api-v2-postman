@@ -92,15 +92,15 @@ groups:
   order: 3
   description: Specialized use cases and advanced features
 examples:
-- name: /static - single recipient
+- name: /static - single or list of recipient
   method: POST
   path: /static
   group: most-frequently-used
   tags: []
-  description: /static - single recipient
+  description: /static - single or list of recipient
   select:
     docSourceAll: requestId
-    recipientAddressSource: singleAddress
+    recipientAddressSource: recipientAddressByList
   values:
     jobTemplate: <String>
 - name: /static - mail merge

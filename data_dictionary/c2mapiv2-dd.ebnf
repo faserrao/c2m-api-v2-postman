@@ -607,9 +607,12 @@ address =
     + [ foo1 ] + [ foo2 ] ;
 
 recipientAddressSource =
+      singleAddress
     | recipientAddressByList
     | recipientAddressByAddressId
     | recipientAddressByListId ;
+
+singleAddress = address ;
 
 recipientAddressByList =
     [ mappingId ] + addressList + [ addressListName ] ;

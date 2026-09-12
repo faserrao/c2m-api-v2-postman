@@ -88,6 +88,13 @@ def _search_oneof(
             if ref_target.lower() == discriminator_key.lower():
                 return candidate_name, candidate_schema
 
+        # Schema-name match: candidate schema name equals discriminator_key.
+        # Catches flat oneOf variants like: singleAddress = address (where
+        # the schema IS the type itself, not a wrapper that contains it as a property).
+        # Mirrors OpenAPI's native discriminator mapping convention.
+        if candidate_name.lower() == discriminator_key.lower():
+            return candidate_name, candidate_schema
+
         # Nested oneOf: recurse into this candidate's oneOf options
         if 'oneOf' in candidate_schema:
             result_name, result_schema = _search_oneof(
