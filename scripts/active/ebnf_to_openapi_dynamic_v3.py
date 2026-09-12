@@ -477,7 +477,32 @@ class EBNFToOpenAPITranslator:
             ])
             
             paths[endpoint.path][endpoint.method.lower()] = operation
-        
+
+        # Bidirectional drift check: warn if any generated path has no _ENDPOINT_META
+        # entry (spec falls back to terse auto-generated text) or if _ENDPOINT_META has
+        # an entry for a path that no longer exists in the EBNF (stale entry).
+        # Edit _ENDPOINT_META above to resolve either warning.
+        for path in paths:
+            if path not in self._ENDPOINT_META:
+                self.issues.append(Issue(
+                    severity="warning",
+                    message=(
+                        f"No _ENDPOINT_META entry for path '{path}' — spec will use "
+                        f"auto-generated summary/description. Add an entry to "
+                        f"_ENDPOINT_META in ebnf_to_openapi_dynamic_v3.py."
+                    )
+                ))
+        for path in self._ENDPOINT_META:
+            if path not in paths:
+                self.issues.append(Issue(
+                    severity="warning",
+                    message=(
+                        f"_ENDPOINT_META has a stale entry for '{path}' — this path "
+                        f"no longer exists in the EBNF. Remove the entry from "
+                        f"_ENDPOINT_META in ebnf_to_openapi_dynamic_v3.py."
+                    )
+                ))
+
         return paths
     
     def _generate_operation_id(self, endpoint: Endpoint) -> str:
