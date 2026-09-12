@@ -294,14 +294,26 @@ function processItems(items) {
         item.response = [];
       }
 
-      // Remove existing error responses (bad placeholders from OpenAPI spec)
-      // Keep only success responses (200-299) and auth responses (403 for /auth/*)
+      // Auth endpoints use the AuthError schema (code/message/details) from the overlay,
+      // not the job StandardResponse error format (errorType/errorCode/errorTrackingId).
+      // Skip error injection for auth endpoints entirely to avoid polluting the mock
+      // server with wrong-format examples that would be returned instead of the 201.
       const isAuthEndpoint = item.request.url &&
-        (item.request.url.path || []).some(p => p.includes('auth'));
+        (item.request.url.path || []).some(p => p === 'auth');
 
+      if (isAuthEndpoint) {
+        // Strip placeholder error responses but keep 2xx success examples
+        item.response = item.response.filter(resp => {
+          const code = parseInt(resp.code || resp.status || 200);
+          return code >= 200 && code < 300;
+        });
+        return; // Do not inject job-format errors into auth endpoints
+      }
+
+      // Remove existing placeholder error responses — keep only 2xx success examples
       item.response = item.response.filter(resp => {
         const code = parseInt(resp.code || resp.status || 200);
-        return (code >= 200 && code < 300) || (isAuthEndpoint && code === 403);
+        return code >= 200 && code < 300;
       });
 
       // Build originalRequest from the parent item's request

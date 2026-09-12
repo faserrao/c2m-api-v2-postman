@@ -78,23 +78,23 @@ paths:
               clientSecret:
                 value:
                   grant_type: client_credentials
-                  client_id: "c2m_abc123"
-                  client_secret: "supersecret123"
+                  client_id: "{{clientId}}"
+                  client_secret: "{{clientSecret}}"
                   scopes: ["jobs:submit", "templates:read"]
                   ttl_seconds: 7776000    # 90 days
               otp:
                 value:
                   grant_type: client_credentials
-                  client_id: "c2m_abc123"
-                  otp_code: "123456"
+                  client_id: "{{clientId}}"
+                  otp_code: "{{otpCode}}"
                   scopes: ["jobs:*"]
                   ttl_seconds: 2592000     # 30 days
               assertion:
                 value:
                   grant_type: assertion
-                  client_id: "c2m_abc123"
+                  client_id: "{{clientId}}"
                   assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
-                  assertion: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  assertion: "{{assertionJwt}}"
                   scopes: ["jobs:submit", "templates:read"]
       responses:
         '201':
