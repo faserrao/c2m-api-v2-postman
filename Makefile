@@ -308,11 +308,12 @@ VENV_PYTHON                      := $(VENV_DIR)/bin/python
 PYTHON3                          := python3
 
 # Allowed status codes for Newman and Postman test generation.
-# Success codes (200, 201, 204) are fixed. Error codes are read from the
-# spec's x-http-error-map at parse time so that adding a new HTTP status
-# to the EBNF is sufficient — no Makefile edit needed.
-# Falls back to the hardcoded list when the spec hasn't been built yet
-# (e.g., fresh checkout before make openapi-build).
+# Success codes (200, 201, 204) are fixed. Error codes are read dynamically
+# from the spec's x-http-error-map at parse time so that adding a new HTTP
+# status to the @http_error_map block in data_dictionary/c2mapiv2-dd.ebnf is
+# sufficient — no Makefile edit needed.
+# The fallback list is used only when the spec hasn't been built yet (e.g.,
+# fresh checkout before make openapi-build). It must mirror @http_error_map.
 _SPEC_ALLOWED_CODES := $(shell test -x "$(VENV_PYTHON)" && test -f "$(C2MAPIV2_OPENAPI_SPEC)" && $(VENV_PYTHON) -c "import yaml; d=yaml.safe_load(open('$(C2MAPIV2_OPENAPI_SPEC)')); codes=list(d.get('info',{}).get('x-http-error-map',{}).keys()); print(','.join(['200','201','204']+codes))" 2>/dev/null)
 POSTMAN_ALLOWED_CODES ?= $(if $(_SPEC_ALLOWED_CODES),$(_SPEC_ALLOWED_CODES),200,201,204,400,401,403,404,422,429,500)
 SUPPORT_EMAIL                    ?= support@click2mail.com
@@ -339,8 +340,9 @@ OPENAPI_DIFF                     := npx openapi-diff
 # POSTMAN WORKSPACE AND AUTHENTICATION
 # ========================================================================
 #--- Postman Workspaces ---
-SERRAO_WS                        := d8a1f479-a2aa-4471-869e-b12feea0a98c
-C2M_WS                           := c740f0f4-0de2-4db3-8ab6-f8a0fa6fbeb1
+# Override via .env: SERRAO_WS=<uid>  C2M_WS=<uid>
+SERRAO_WS                        ?= d8a1f479-a2aa-4471-869e-b12feea0a98c
+C2M_WS                           ?= c740f0f4-0de2-4db3-8ab6-f8a0fa6fbeb1
 
 #--- Default workspace configuration ---
 # Read context from .git-context file (personal or click2mail)

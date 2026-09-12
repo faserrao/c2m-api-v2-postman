@@ -14,6 +14,9 @@ const path = require('path');
 const crypto = require('crypto');
 const yaml = require('js-yaml');
 
+// Single source of truth — override via --support-email CLI arg (passed by Makefile)
+const DEFAULT_SUPPORT_EMAIL = 'support@click2mail.com';
+
 // HTTP status text mapping (required by Postman mock server for x-mock-response-code matching)
 const HTTP_STATUS_TEXT = {
   400: 'Bad Request',
@@ -81,7 +84,7 @@ const ERROR_CODE_METADATA = {
     status: 403,
     name: 'Account suspended',
     message: 'User account has been suspended',
-    details: '{"reason": "payment overdue", "contact": "support@click2mail.com"}'
+    details: `{"reason": "payment overdue", "contact": "${DEFAULT_SUPPORT_EMAIL}"}`
   },
   'JOB_NOT_FOUND': {
     status: 404,
@@ -330,7 +333,7 @@ function main() {
   const args = process.argv.slice(2);
 
   const supportEmailIdx = args.indexOf('--support-email');
-  const supportEmail = supportEmailIdx !== -1 ? args[supportEmailIdx + 1] : 'support@click2mail.com';
+  const supportEmail = supportEmailIdx !== -1 ? args[supportEmailIdx + 1] : DEFAULT_SUPPORT_EMAIL;
   const positional = args.filter((_, i) => i !== supportEmailIdx && i !== supportEmailIdx + 1);
 
   if (positional.length !== 2) {

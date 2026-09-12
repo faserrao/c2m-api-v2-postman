@@ -56,6 +56,14 @@ EBNF_GRAMMAR = r"""
     %ignore /\(\*(.|\n)*?\*\)/          // Multi-line comments
 """
 
+# ─────────────────────────── Default constants ───────────────────────────
+# Single source of truth for values that appear in __init__, generate_openapi(),
+# and argparse defaults.  Override via Makefile / CLI args — not by editing here.
+_DEFAULT_SERVER_URL   = "https://api.click2mail.com/v2"
+_DEFAULT_SUPPORT_EMAIL = "support@click2mail.com"
+_DEFAULT_API_TITLE    = "C2M API v2"
+_DEFAULT_API_VERSION  = "2.0.0"
+
 # ─────────────────────────── Data Classes ───────────────────────────
 @dataclass
 class EBNFProduction:
@@ -155,9 +163,9 @@ class EBNFToOpenAPITranslator:
         self.http_error_map: Dict[str, Any] = {}  # Parsed from @http_error_map block in EBNF
         self.numeric_constraints: Dict[str, Dict[str, Any]] = {}  # Parsed from @numeric_constraints block
         self.valid_combinations: List[Dict[str, Any]] = []  # Parsed from @valid_combinations block
-        self.support_email: str = "support@click2mail.com"
-        self.api_title: str = "C2M API v2"
-        self.api_version: str = "2.0.0"
+        self.support_email: str = _DEFAULT_SUPPORT_EMAIL
+        self.api_title: str = _DEFAULT_API_TITLE
+        self.api_version: str = _DEFAULT_API_VERSION
         
         # OpenAPI type mappings for primitives
         self.primitive_types = {
@@ -358,10 +366,10 @@ class EBNFToOpenAPITranslator:
             
             i += 1
     
-    def generate_openapi(self, server_url: str = "https://api.click2mail.com/v2",
-                         support_email: str = "support@click2mail.com",
-                         api_title: str = "C2M API v2",
-                         api_version: str = "2.0.0") -> Dict[str, Any]:
+    def generate_openapi(self, server_url: str = _DEFAULT_SERVER_URL,
+                         support_email: str = _DEFAULT_SUPPORT_EMAIL,
+                         api_title: str = _DEFAULT_API_TITLE,
+                         api_version: str = _DEFAULT_API_VERSION) -> Dict[str, Any]:
         """Generate the complete OpenAPI specification"""
         self.support_email = support_email
         self.api_title = api_title
@@ -1338,18 +1346,18 @@ def main():
     parser.add_argument("-r", "--report", action="store_true",
                         help="Show detailed report")
     parser.add_argument("--report-file", help="Save report to file")
-    parser.add_argument("--server-url", default="https://api.click2mail.com/v2",
-                        help="Production server URL written into the OpenAPI servers: block "
-                             "(default: https://api.click2mail.com/v2)")
-    parser.add_argument("--support-email", default="support@click2mail.com",
-                        help="Support contact email used in ACCOUNT_SUSPENDED error details "
-                             "(default: support@click2mail.com)")
-    parser.add_argument("--api-title", default="C2M API v2",
-                        help="API title written into the OpenAPI info block "
-                             "(default: C2M API v2)")
-    parser.add_argument("--api-version", default="2.0.0",
-                        help="API version written into the OpenAPI info block "
-                             "(default: 2.0.0)")
+    parser.add_argument("--server-url", default=_DEFAULT_SERVER_URL,
+                        help=f"Production server URL written into the OpenAPI servers: block "
+                             f"(default: {_DEFAULT_SERVER_URL})")
+    parser.add_argument("--support-email", default=_DEFAULT_SUPPORT_EMAIL,
+                        help=f"Support contact email used in ACCOUNT_SUSPENDED error details "
+                             f"(default: {_DEFAULT_SUPPORT_EMAIL})")
+    parser.add_argument("--api-title", default=_DEFAULT_API_TITLE,
+                        help=f"API title written into the OpenAPI info block "
+                             f"(default: {_DEFAULT_API_TITLE})")
+    parser.add_argument("--api-version", default=_DEFAULT_API_VERSION,
+                        help=f"API version written into the OpenAPI info block "
+                             f"(default: {_DEFAULT_API_VERSION})")
 
     args = parser.parse_args()
 
