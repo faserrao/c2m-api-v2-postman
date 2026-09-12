@@ -16,7 +16,6 @@ ${{ github.repository_owner }}.
 """
 
 import argparse
-import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -60,8 +59,11 @@ def _md_table(rows: list[tuple[str, str, str]]) -> str:
     return "\n".join(lines)
 
 
-def _section(title: str, rows: list[tuple[str, str, str]]) -> str:
-    return f"## {title}\n\n{_md_table(rows)}\n"
+def _section(title: str, rows: list[tuple[str, str, str]], readme_url: str | None = None) -> str:
+    heading = f"## {title}"
+    if readme_url:
+        heading += f" &nbsp;·&nbsp; {_link('README', readme_url)}"
+    return f"{heading}\n\n{_md_table(rows)}\n"
 
 
 # ---------------------------------------------------------------------------
@@ -74,6 +76,11 @@ def generate(org: str, reports_dir: Path, output: Path) -> None:
     # --- latest timestamped reports (glob in reports_dir) -------------------
     latest_newman_html = _latest_glob("newman-*.html", reports_dir)
     latest_validation_md = _latest_glob("validation-*.md", reports_dir)
+
+    # --- README URLs for directory-level READMEs ----------------------------
+    docs_readme    = _repo_url(org, "docs/README.md")
+    reports_readme = _repo_url(org, "reports/README.md")
+    # openapi/ and postman/collections/ have no README — None omits the link
 
     # --- Documentation (GitHub Pages) ---------------------------------------
     doc_rows = [
@@ -162,7 +169,7 @@ def generate(org: str, reports_dir: Path, output: Path) -> None:
         ),
     ]
 
-    # --- SDKs ---------------------------------------------------------------
+    # --- SDKs — no top-level sdks/README.md; each language has its own ------
     _SDK_LANGS = [
         ("Python",     "python",     "Python client library generated from the OpenAPI spec via OpenAPI Generator."),
         ("JavaScript", "javascript", "JavaScript client library for browser and Node.js environments."),
@@ -179,7 +186,9 @@ def generate(org: str, reports_dir: Path, output: Path) -> None:
     sdk_rows = [
         (
             f"SDK — {label}",
-            _link("Browse", _repo_tree_url(org, f"sdks/{slug}")),
+            _link("Browse", _repo_tree_url(org, f"sdks/{slug}"))
+            + " &nbsp;·&nbsp; "
+            + _link("README", _repo_url(org, f"sdks/{slug}/README.md")),
             desc,
         )
         for label, slug, desc in _SDK_LANGS
@@ -257,12 +266,12 @@ def generate(org: str, reports_dir: Path, output: Path) -> None:
         "",
         "All artifacts are produced by the CI pipeline and committed to this repository on every successful build.",
         "",
-        _section("API Documentation", doc_rows),
-        _section("OpenAPI Specifications", spec_rows),
-        _section("Postman Collections", collection_rows),
-        _section("SDKs", sdk_rows),
-        _section("Data Dictionary Reports", dd_rows),
-        _section("CI Quality Reports", ci_rows),
+        _section("API Documentation",    doc_rows,        readme_url=docs_readme),
+        _section("OpenAPI Specifications", spec_rows,      readme_url=None),
+        _section("Postman Collections",   collection_rows, readme_url=None),
+        _section("SDKs",                  sdk_rows,        readme_url=None),
+        _section("Data Dictionary Reports", dd_rows,       readme_url=reports_readme),
+        _section("CI Quality Reports",    ci_rows,         readme_url=reports_readme),
     ]
 
     output.parent.mkdir(parents=True, exist_ok=True)
