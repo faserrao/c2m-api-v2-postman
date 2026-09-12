@@ -47,7 +47,7 @@ permissions:
 env:
   # Tool versions — keep in sync with .tool-versions at repo root
   PYTHON_VERSION: '3.11'
-  NODE_VERSION: '20'
+  NODE_VERSION: '24'
   OPENAPI_DIR: openapi
   POSTMAN_DIR: postman
   DOCS_DIR: docs
@@ -70,32 +70,32 @@ jobs:
     steps:
       # ---------- Setup ----------
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0  # Full history for diff
 
       - name: Checkout security repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: ${{ github.repository_owner }}/c2m-api-v2-postman-security
           path: c2m-api-v2-security
           token: ${{ secrets.SECURITY_REPO_TOKEN }}
 
       - name: Checkout artifacts repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: ${{ github.repository_owner }}/c2m-api-v2-postman-artifacts
           path: artifacts-repo
           token: ${{ secrets.SECURITY_REPO_TOKEN }}
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
@@ -307,7 +307,7 @@ jobs:
       - name: Upload Validation Reports
         continue-on-error: true  # A storage-quota hit here must NOT skip the artifacts-repo push below
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: validation-reports
           path: reports/**
@@ -407,7 +407,7 @@ jobs:
       # ---------- Upload artifacts ----------
       - name: Upload build artifacts
         continue-on-error: true  # Non-essential; a storage-quota hit must NOT fail the run or block Pages
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: api-artifacts
           path: |
