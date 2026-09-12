@@ -1191,6 +1191,9 @@ postman-linked-collection-flatten:
 	@$(call guard-file,$(POSTMAN_COLLECTION_RAW))
 	@jq 'def all_items(i): (i // []) as $$a | [ $$a[] | if has("item") then all_items(.item)[] else . end ]; def req_name(r): (r.request.method // "REQ") as $$m | (r.request.url.path // []) as $$p | ($$p | join("/")) as $$path | if $$path == "" then $$m else ($$m + " /" + $$path) end; .item = (all_items(.item) | map( .name = req_name(.) ))' $(POSTMAN_COLLECTION_RAW) > $(POSTMAN_LINKED_COLLECTION_FLAT)
 	@echo "✅ Linked collection flattened with renamed requests"
+	@echo "🔧 Fixing URL raw fields in linked collection..."
+	@$(PYTHON) $(FIX_COLLECTION_URLS) $(POSTMAN_LINKED_COLLECTION_FLAT) $(POSTMAN_LINKED_COLLECTION_FLAT)
+	@echo "✅ URL raw fields fixed"
 	@echo "🔐 Adding auth examples to linked collection..."
 	@node scripts/active/add_auth_examples.js $(POSTMAN_LINKED_COLLECTION_FLAT) $(POSTMAN_LINKED_COLLECTION_FLAT) || echo "⚠️  Skipping auth examples"
 	@echo "✅ Auth examples added"
