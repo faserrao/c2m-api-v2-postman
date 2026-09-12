@@ -568,14 +568,14 @@ jobOptions =
     + printOption
     + mailClass ;
 
-documentClass  = string ;
-layout         = string ;
-productionTime = string ;
-envelope       = string ;
-color          = string ;
-paperType      = string ;
-printOption    = string ;
-mailClass      = string ;
+documentClass  = "letter" | "postcard" | "brochure" | "flat" ;
+layout         = "address_on_first_page" | "address_on_back_page" ;
+productionTime = "next_day" | "two_day" | "three_day" | "standard" | "same_day" ;
+envelope       = "standard" | "none" | "flat" | "double_window" ;
+color          = "full_color" | "black_and_white" ;
+paperType      = "white" | "white_24" | "ivory" | "glossy" ;
+printOption    = "double_sided" | "single_sided" ;
+mailClass      = "first_class" | "standard" | "non_profit" ;
 
 tags = tagsList ;
 tagsList = { string } ;
@@ -987,3 +987,29 @@ HTTP_500_INTERNAL_SERVER_ERROR = errorResponse ;
    429: errorType=RateLimitError; errorCodes=RATE_LIMIT_EXCEEDED
    500: errorType=ServerError; errorCodes=SERVER_ERROR,DATABASE_ERROR,EXTERNAL_SERVICE_ERROR
    @end_http_error_map *)
+
+(* ----------------------------------------------------------------
+   NUMERIC CONSTRAINTS
+   Declares minimum/maximum bounds for integer fields.
+   Parsed by ebnf_to_openapi_dynamic_v3.py at build time.
+   Format: fieldName: minimum=N, maximum=N
+   (exclusiveMinimum and exclusiveMaximum are also supported)
+   ----------------------------------------------------------------
+   @numeric_constraints
+   month: minimum=1, maximum=12
+   year: minimum=2000, maximum=2099
+   quantity: minimum=1
+   @end_numeric_constraints *)
+
+(* ----------------------------------------------------------------
+   VALID COMBINATIONS
+   Documents which combinations of jobOptions fields are valid
+   together.  Parsed by ebnf_to_openapi_dynamic_v3.py and emitted
+   as x-valid-combinations in the OpenAPI spec info block.
+   Format: fieldA=value: fieldB must be one of (v1|v2|...)
+   ----------------------------------------------------------------
+   @valid_combinations
+   color=black_and_white: paperType must be one of (white|white_24|ivory)
+   mailClass=non_profit: documentClass must be one of (letter|flat)
+   envelope=none: layout must be one of (address_on_first_page|address_on_back_page)
+   @end_valid_combinations *)

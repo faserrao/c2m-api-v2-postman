@@ -149,14 +149,14 @@ _DESC: dict[str, str] = {
     "addressListId":   "Integer ID of a previously stored recipient address list.",
     "addressId":       "Integer ID of a previously stored individual recipient address.",
     # Job options fields
-    "documentClass":   "Document class (e.g. letter, flat).",
-    "layout":          "Page layout (e.g. address_on_top, address_on_bottom).",
-    "productionTime":  "Production time preference (e.g. next_day, standard).",
-    "envelope":        "Envelope type (e.g. standard, window).",
-    "color":           "Color mode (e.g. full_color, black_and_white).",
-    "paperType":       "Paper stock (e.g. white, recycled).",
-    "printOption":     "Duplex setting (e.g. single_sided, double_sided).",
-    "mailClass":       "USPS mail class (e.g. first_class, standard).",
+    "documentClass":   "Document class. Legal values: letter, postcard, brochure, flat.",
+    "layout":          "Page layout for address placement. Legal values: address_on_first_page, address_on_back_page.",
+    "productionTime":  "Production time preference. Legal values: next_day, two_day, three_day, standard, same_day.",
+    "envelope":        "Envelope type. Legal values: standard, none, flat, double_window.",
+    "color":           "Color mode. Legal values: full_color, black_and_white.",
+    "paperType":       "Paper stock. Legal values: white, white_24, ivory, glossy.",
+    "printOption":     "Duplex setting. Legal values: double_sided, single_sided.",
+    "mailClass":       "USPS mail class. Legal values: first_class, standard, non_profit.",
     # Job lists / split jobs
     "pdfSplitJobsWithAddress":
         "List of page-range job items, each with its own inline recipient address.",

@@ -2820,9 +2820,10 @@ validate-collections-conformance: ## Validate generated collections conform to t
 	@C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" POSTMAN_GENERATED_DIR="$(POSTMAN_GENERATED_DIR)" C2MAPIV2_POSTMAN_API_NAME_KC="$(C2MAPIV2_POSTMAN_API_NAME_KC)" $(VENV_PYTHON) scripts/validation/validate_collections_against_spec.py $(VALIDATE_ARGS)
 
 .PHONY: validate-collections-conformance-test
-validate-collections-conformance-test: ## Run all validation golden tests (validator + resolver unit tests)
+validate-collections-conformance-test: ## Run all validation golden tests (validator + resolver + DD constraints unit tests)
 	@C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" POSTMAN_GENERATED_DIR="$(POSTMAN_GENERATED_DIR)" C2MAPIV2_POSTMAN_API_NAME_KC="$(C2MAPIV2_POSTMAN_API_NAME_KC)" $(VENV_PYTHON) scripts/validation/tests/test_validate_collections.py && \
-	C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" $(VENV_PYTHON) scripts/validation/tests/test_oneof_resolver.py
+	C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" $(VENV_PYTHON) scripts/validation/tests/test_oneof_resolver.py && \
+	$(VENV_PYTHON) -m pytest scripts/validation/tests/test_dd_constraints.py -v
 
 .PHONY: validate-catalog-against-spec
 validate-catalog-against-spec: ## Validate curated-examples-catalog.yaml select: keys and variant names against the OpenAPI spec

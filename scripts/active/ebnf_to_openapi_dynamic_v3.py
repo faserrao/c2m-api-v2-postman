@@ -153,6 +153,8 @@ class EBNFToOpenAPITranslator:
         self.generated_schemas: Dict[str, Dict[str, Any]] = {}  # Store generated named schemas
         self.schema_counter = 0  # Counter for unique schema names
         self.http_error_map: Dict[str, Any] = {}  # Parsed from @http_error_map block in EBNF
+        self.numeric_constraints: Dict[str, Dict[str, Any]] = {}  # Parsed from @numeric_constraints block
+        self.valid_combinations: List[Dict[str, Any]] = []  # Parsed from @valid_combinations block
         self.support_email: str = "support@click2mail.com"
         self.api_title: str = "C2M API v2"
         self.api_version: str = "2.0.0"
@@ -186,8 +188,10 @@ class EBNFToOpenAPITranslator:
         """Parse EBNF content and extract productions"""
         lines = content.split('\n')
         
-        # Parse HTTP error map from @http_error_map annotation block
+        # Parse annotation blocks from EBNF
         self.http_error_map = self._parse_http_error_map(content)
+        self.numeric_constraints = self._parse_numeric_constraints(content)
+        self.valid_combinations = self._parse_valid_combinations(content)
 
         # First extract endpoints from comments
         self._extract_endpoints(lines)
@@ -230,6 +234,70 @@ class EBNFToOpenAPITranslator:
                 error_type = m.group(2)
                 codes = [c.strip() for c in m.group(3).split(',')]
                 result[status] = {'errorType': error_type, 'errorCodes': codes}
+        return result
+
+    def _parse_numeric_constraints(self, content: str) -> Dict[str, Dict[str, Any]]:
+        """Parse @numeric_constraints annotation block from EBNF content.
+
+        Returns dict keyed by field name: {'month': {'minimum': 1, 'maximum': 12}}
+        Returns empty dict if the block is absent.
+
+        Line format:  fieldName: minimum=N, maximum=N
+        (exclusiveMinimum and exclusiveMaximum are also recognised.)
+        """
+        match = re.search(r'@numeric_constraints\s*\n(.*?)@end_numeric_constraints', content, re.DOTALL)
+        if not match:
+            return {}
+        result: Dict[str, Dict[str, Any]] = {}
+        kw_map = {
+            'minimum': 'minimum', 'maximum': 'maximum',
+            'exclusiveMinimum': 'exclusiveMinimum', 'exclusiveMaximum': 'exclusiveMaximum',
+        }
+        for line in match.group(1).splitlines():
+            line = line.strip()
+            if not line or line.startswith('#'):
+                continue
+            m = re.match(r'(\w+)\s*:\s*(.+)', line)
+            if not m:
+                continue
+            field_name = m.group(1)
+            constraints: Dict[str, Any] = {}
+            for pair in re.findall(r'(minimum|maximum|exclusiveMinimum|exclusiveMaximum)\s*=\s*(-?\d+(?:\.\d+)?)', m.group(2)):
+                kw, val_str = pair
+                try:
+                    val = int(val_str) if '.' not in val_str else float(val_str)
+                except ValueError:
+                    continue
+                constraints[kw_map[kw]] = val
+            if constraints:
+                result[field_name] = constraints
+        return result
+
+    def _parse_valid_combinations(self, content: str) -> List[Dict[str, Any]]:
+        """Parse @valid_combinations annotation block from EBNF content.
+
+        Returns a list of combination rules, each a dict with keys:
+          'when_field', 'when_value', 'then_field', 'then_values'
+
+        Line format:  fieldA=value: fieldB must be one of (v1|v2|...)
+        Returns empty list if the block is absent.
+        """
+        match = re.search(r'@valid_combinations\s*\n(.*?)@end_valid_combinations', content, re.DOTALL)
+        if not match:
+            return []
+        result: List[Dict[str, Any]] = []
+        for line in match.group(1).splitlines():
+            line = line.strip()
+            if not line or line.startswith('#'):
+                continue
+            m = re.match(r'(\w+)=(\w+)\s*:\s*(\w+)\s+must\s+be\s+one\s+of\s+\(([^)]+)\)', line)
+            if m:
+                result.append({
+                    'when_field': m.group(1),
+                    'when_value': m.group(2),
+                    'then_field': m.group(3),
+                    'then_values': [v.strip() for v in m.group(4).split('|')],
+                })
         return result
 
     def _extract_endpoints(self, lines: List[str]) -> None:
@@ -306,14 +374,20 @@ class EBNFToOpenAPITranslator:
         paths = self._generate_paths()
 
         # Build the complete spec
+        info = OrderedDict([
+            ("title", self.api_title),
+            ("version", self.api_version),
+            ("description", "API for submitting mailing jobs with various document routing options"),
+            ("x-http-error-map", self.http_error_map),
+        ])
+        if self.numeric_constraints:
+            info["x-numeric-constraints"] = self.numeric_constraints
+        if self.valid_combinations:
+            info["x-valid-combinations"] = self.valid_combinations
+
         spec = OrderedDict([
             ("openapi", "3.0.3"),
-            ("info", OrderedDict([
-                ("title", self.api_title),
-                ("version", self.api_version),
-                ("description", "API for submitting mailing jobs with various document routing options"),
-                ("x-http-error-map", self.http_error_map)
-            ])),
+            ("info", info),
             ("servers", [
                 {
                     "url": server_url,
@@ -347,15 +421,20 @@ class EBNFToOpenAPITranslator:
         """Generate all schemas dynamically from EBNF productions"""
         schemas = OrderedDict()
         
-        # OpenAPI constraint overrides - only for fields where EBNF cannot express
-        # the full constraint (standard EBNF has no range syntax).
-        # All other simple types (string aliases, integer aliases, etc.) are
-        # generated dynamically from the EBNF productions below.
-        # TODO (Option C): Replace this dict by parsing structured EBNF directive
-        # comments, e.g.:  month = integer ; (* openapi: minimum=1, maximum=12 *)
-        simple_type_schemas = {
-            'month': {'type': 'integer', 'minimum': 1, 'maximum': 12},
-        }
+        # Numeric constraint overrides — driven by the @numeric_constraints block in the EBNF.
+        # Each entry becomes a schema override for integer fields that need min/max bounds.
+        # The EBNF itself has no range syntax, so these live in the annotation block.
+        simple_type_schemas: Dict[str, Any] = {}
+        for field_name, constraints in self.numeric_constraints.items():
+            prod = self.productions.get(field_name)
+            if prod is None:
+                continue
+            type_info = self._resolve_type(field_name)
+            base = {'type': type_info.openapi_type}
+            if type_info.format:
+                base['format'] = type_info.format
+            base.update(constraints)
+            simple_type_schemas[field_name] = base
         
         # Add simple type schemas first
         schemas.update(simple_type_schemas)

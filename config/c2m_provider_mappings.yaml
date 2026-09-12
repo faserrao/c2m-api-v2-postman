@@ -1,0 +1,79 @@
+# c2m_provider_mappings.yaml
+#
+# Maps Click2Mail canonical jobOptions values (as defined in the EBNF data dictionary)
+# to the literal strings accepted by each provider or legacy system.
+#
+# Usage: import this file wherever provider-specific values must be produced.
+#        The pipeline's primary interface (Postman collections, OpenAPI spec) always
+#        uses canonical values.  Translate only at the provider boundary.
+#
+# Format:
+#   field:
+#     canonical_value: provider_literal    # (or a dict for multi-provider)
+#
+# A null provider_literal means the canonical value IS the provider literal (no mapping needed).
+
+mailClass:
+  first_class: "first_class"       # canonical == provider
+  standard:    "standard"
+  non_profit:  "non_profit"
+  # Legacy / catalog aliases (not canonical; normalise these on ingest)
+  _aliases:
+    firstClass:    first_class
+    "First Class": first_class
+    "Standard":    standard
+
+color:
+  full_color:     "full_color"
+  black_and_white: "black_and_white"
+  _aliases:
+    fullColor:       full_color
+    "Full Color":    full_color
+    "Black & White": black_and_white
+    grayscale:       black_and_white
+
+paperType:
+  white:    "white"
+  white_24: "white_24"
+  ivory:    "ivory"
+  glossy:   "glossy"
+  _aliases:
+    "White 24#": white_24
+    "Glossy":    glossy
+
+printOption:
+  double_sided: "double_sided"
+  single_sided: "single_sided"
+  _aliases:
+    printing_one_side:  single_sided
+    printing_both_sides: double_sided
+    "Double Sided":     double_sided
+    "Single Sided":     single_sided
+
+productionTime:
+  next_day:  "next_day"
+  two_day:   "two_day"
+  three_day: "three_day"
+  standard:  "standard"
+  same_day:  "same_day"
+
+envelope:
+  standard:      "standard"
+  none:          "none"
+  flat:          "flat"
+  double_window: "double_window"
+  _aliases:
+    "#10 double window": double_window
+    windowed:            double_window
+
+documentClass:
+  letter:   "letter"
+  postcard: "postcard"
+  brochure: "brochure"
+  flat:     "flat"
+
+layout:
+  address_on_first_page: "address_on_first_page"
+  address_on_back_page:  "address_on_back_page"
+  _aliases:
+    address_on_top: address_on_first_page   # legacy name
