@@ -287,14 +287,14 @@ class EBNFToOpenAPITranslator:
             
             i += 1
     
-    def generate_openapi(self) -> Dict[str, Any]:
+    def generate_openapi(self, server_url: str = "https://api.click2mail.com/v2") -> Dict[str, Any]:
         """Generate the complete OpenAPI specification"""
         # First, generate all schemas
         schemas = self._generate_all_schemas()
 
         # Generate paths based on endpoints
         paths = self._generate_paths()
-        
+
         # Build the complete spec
         spec = OrderedDict([
             ("openapi", "3.0.3"),
@@ -306,7 +306,7 @@ class EBNFToOpenAPITranslator:
             ])),
             ("servers", [
                 {
-                    "url": "https://api.click2mail.com/v2",
+                    "url": server_url,
                     "description": "Production server"
                 }
             ]),
@@ -1249,9 +1249,12 @@ def main():
     parser.add_argument("-r", "--report", action="store_true",
                         help="Show detailed report")
     parser.add_argument("--report-file", help="Save report to file")
-    
+    parser.add_argument("--server-url", default="https://api.click2mail.com/v2",
+                        help="Production server URL written into the OpenAPI servers: block "
+                             "(default: https://api.click2mail.com/v2)")
+
     args = parser.parse_args()
-    
+
     # Read input file
     try:
         with open(args.input, 'r') as f:
@@ -1259,13 +1262,13 @@ def main():
     except Exception as e:
         print(f"Error reading input file: {e}", file=sys.stderr)
         sys.exit(1)
-    
+
     # Create translator and parse
     translator = EBNFToOpenAPITranslator()
     translator.parse_ebnf(ebnf_content)
-    
+
     # Generate OpenAPI spec
-    openapi_spec = translator.generate_openapi()
+    openapi_spec = translator.generate_openapi(server_url=args.server_url)
     
     # Convert OrderedDict to regular dict for clean YAML output
     openapi_spec = convert_ordered_dict_to_dict(openapi_spec)
