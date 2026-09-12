@@ -593,7 +593,7 @@ def categorize_getting_started_examples(filtered_examples, groups):
     return result
 
 
-def generate_collection(examples, groups, linked_collection, openapi_spec, collection_name, tag_filter=None, mode='examples'):
+def generate_collection(examples, groups, linked_collection, openapi_spec, collection_name, tag_filter=None, mode='examples', schema_url='https://schema.getpostman.com/json/collection/v2.1.0/collection.json'):
     """
     Generate a Postman collection from filtered examples.
 
@@ -626,7 +626,7 @@ def generate_collection(examples, groups, linked_collection, openapi_spec, colle
         "info": {
             "name": collection_name,
             "description": f"Generated from YAML catalog with tag filter: {tag_filter or 'all'}",
-            "schema": args.schema_url
+            "schema": schema_url
         },
         "item": []
     }
@@ -817,7 +817,7 @@ def main():
         output_name = args.output_name or "c2mapiv2-all-examples-collection"
 
     print(f"\nGenerating collection: {collection_name} (mode={args.mode})")
-    collection = generate_collection(examples, groups, linked_collection, openapi_spec, collection_name, tag_filter, args.mode)
+    collection = generate_collection(examples, groups, linked_collection, openapi_spec, collection_name, tag_filter, args.mode, args.schema_url)
 
     # Write output
     output_dir = Path(args.output_dir)
