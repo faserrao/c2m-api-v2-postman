@@ -193,14 +193,29 @@ function loadErrorResponsesFromSpec(openapiSpecPath) {
 
   console.log(`Found ${errorCodes.length} error codes in OpenAPI spec`);
 
+  // Build reverse map: errorCode → HTTP status, from x-http-error-map in the spec.
+  // Used to auto-stub any code not in ERROR_CODE_METADATA so nothing is silently dropped.
+  const httpErrorMap = (spec.info && spec.info['x-http-error-map']) || {};
+  const codeToStatus = {};
+  Object.entries(httpErrorMap).forEach(([status, entry]) => {
+    (entry.errorCodes || []).forEach(code => { codeToStatus[code] = parseInt(status, 10); });
+  });
+
   // Group error codes by HTTP status
   const errorResponsesByStatus = {};
+  const stubs = [];
 
   errorCodes.forEach(errorCode => {
-    const metadata = ERROR_CODE_METADATA[errorCode];
+    let metadata = ERROR_CODE_METADATA[errorCode];
     if (!metadata) {
-      console.warn(`⚠️  No metadata for error code: ${errorCode}, skipping`);
-      return;
+      const status = codeToStatus[errorCode];
+      if (!status) {
+        console.warn(`⚠️  No metadata and no x-http-error-map entry for ${errorCode}, skipping`);
+        return;
+      }
+      const label = errorCode.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      metadata = { status, name: label, message: label, details: '{}' };
+      stubs.push(`  ${status}: ${errorCode}`);
     }
 
     const statusCode = metadata.status.toString();
@@ -218,7 +233,7 @@ function loadErrorResponsesFromSpec(openapiSpecPath) {
     errorResponsesByStatus[statusCode].push({
       id: generateUUID(),
       name: metadata.name,
-      status: HTTP_STATUS_TEXT[metadata.status],
+      status: HTTP_STATUS_TEXT[metadata.status] || `HTTP ${metadata.status}`,
       code: metadata.status,
       _postman_previewlanguage: 'json',
       header: [{ key: 'Content-Type', value: 'application/json' }],
@@ -231,6 +246,13 @@ function loadErrorResponsesFromSpec(openapiSpecPath) {
       }, null, 2)
     });
   });
+
+  if (stubs.length > 0) {
+    console.log(`Auto-generated ${stubs.length} stub(s) for errorCodes not in ERROR_CODE_METADATA:`);
+    stubs.forEach(s => console.log(s));
+  } else {
+    console.log('All EBNF errorCode values have hand-crafted metadata');
+  }
 
   return errorResponsesByStatus;
 }
