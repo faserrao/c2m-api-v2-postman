@@ -105,25 +105,52 @@ def validate_error_examples(spec, error_examples):
         sys.exit(1)
 
     print(f"✓ All errorCode values in ERROR_EXAMPLES are valid")
-
-    # Coverage check: warn about EBNF enum codes that have no example at all
-    covered_codes = {
-        ex_data['value'].get('errorCode')
-        for examples in error_examples.values()
-        for ex_data in examples.values()
-        if ex_data['value'].get('errorCode')
-    }
-    uncovered = [c for c in valid_codes if c not in covered_codes]
-    if uncovered:
-        print(f"\n⚠  WARNING: {len(uncovered)} errorCode(s) in EBNF have no example in ERROR_EXAMPLES:")
-        for c in uncovered:
-            print(f"   - {c}")
-        print("   These codes will have no example in generated response docs.")
-        print("   Add them to ERROR_EXAMPLES if mock server coverage is needed.")
-    else:
-        print(f"✓ All {len(valid_codes)} EBNF errorCode values have at least one example")
-
     return True
+
+
+def build_effective_error_examples(spec, error_examples):
+    """Merge ERROR_EXAMPLES with auto-generated stubs for any errorCode in
+    x-http-error-map that has no hand-crafted entry.
+
+    The spec is the authority on which codes exist. Hand-crafted entries are
+    kept verbatim; missing codes get a minimal stub so no EBNF code is ever
+    silently absent from generated docs.
+
+    Returns a new dict structured identically to ERROR_EXAMPLES.
+    """
+    http_error_map = extract_http_error_map(spec)
+    effective = {k: dict(v) for k, v in error_examples.items()}
+    stubs_added = []
+
+    for http_status, entry in http_error_map.items():
+        covered = {
+            ex_data['value'].get('errorCode')
+            for ex_data in effective.get(http_status, {}).values()
+        }
+        for code in entry.get('errorCodes', []):
+            if code not in covered:
+                stub_key = code.lower().replace('_', '-')
+                if http_status not in effective:
+                    effective[http_status] = {}
+                effective[http_status][stub_key] = {
+                    'summary': code.replace('_', ' ').title(),
+                    'value': {
+                        'errorMessage': code.replace('_', ' ').capitalize(),
+                        'errorCode': code,
+                        'errorDetails': '{}',
+                        'errorTrackingId': 'TRK-AUTO'
+                    }
+                }
+                stubs_added.append(f"  {http_status}: {code}")
+
+    if stubs_added:
+        print(f"✓ Auto-generated {len(stubs_added)} stub example(s) for errorCodes not in ERROR_EXAMPLES:")
+        for s in stubs_added:
+            print(s)
+    else:
+        print(f"✓ All EBNF errorCode values have hand-crafted examples")
+
+    return effective
 
 # Error example templates (realistic data, not placeholders)
 # errorCode values MUST match the EBNF data dictionary errorCode enum.
@@ -233,8 +260,10 @@ def discover_job_response_schema_name(spec):
     return None
 
 
-def add_response_examples(spec):
+def add_response_examples(spec, error_examples=None):
     """Add example values to the job response schema and all job endpoints."""
+    if error_examples is None:
+        error_examples = ERROR_EXAMPLES
 
     http_error_map = extract_http_error_map(spec)
     if not http_error_map:
@@ -286,18 +315,22 @@ def add_response_examples(spec):
                                             }
                                         }
 
-                                        # Add error examples to error responses (400, 401, 403, 404, 422, 500)
-                                        for error_code in ['400', '401', '403', '404', '422', '500']:
+                                        # Add error examples to all error responses defined in x-http-error-map
+                                        error_statuses = (
+                                            http_error_map.keys() if http_error_map
+                                            else error_examples.keys()
+                                        )
+                                        for error_code in error_statuses:
                                             if error_code in operation['responses']:
                                                 error_response = operation['responses'][error_code]
                                                 if 'content' in error_response and 'application/json' in error_response['content']:
                                                     error_json = error_response['content']['application/json']
 
                                                     # Merge errorType from EBNF map into each example at injection time
-                                                    if error_code in ERROR_EXAMPLES:
+                                                    if error_code in error_examples:
                                                         error_type = http_error_map.get(error_code, {}).get('errorType')
                                                         examples = {}
-                                                        for ex_name, ex_data in ERROR_EXAMPLES[error_code].items():
+                                                        for ex_name, ex_data in error_examples[error_code].items():
                                                             merged_value = ex_data['value']
                                                             if error_type:
                                                                 merged_value = {'errorType': error_type, **merged_value}
@@ -318,12 +351,13 @@ def main():
     with open(input_file, 'r') as f:
         spec = yaml.safe_load(f)
 
-    # Validate errorCode and errorType values against EBNF enums (via OpenAPI spec)
-    print("\n🔍 Validating errorCode and errorType values against EBNF data dictionary...")
+    # Validate errorCode values against EBNF enum; auto-generate stubs for any uncovered codes
+    print("\n🔍 Validating errorCode values against EBNF data dictionary...")
     validate_error_examples(spec, ERROR_EXAMPLES)
+    effective_examples = build_effective_error_examples(spec, ERROR_EXAMPLES)
 
     # Add examples
-    spec = add_response_examples(spec)
+    spec = add_response_examples(spec, effective_examples)
 
     # Save the updated spec
     with open(output_file, 'w') as f:
