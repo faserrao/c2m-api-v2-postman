@@ -20,7 +20,7 @@ import random
 import string
 import yaml
 import textwrap
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Dict, List, Tuple, Set, Optional, Any, Union
 from dataclasses import dataclass, field
@@ -837,8 +837,8 @@ class EBNFToOpenAPITranslator:
                 "issue": "token signature verification failed"
             },
             'EXPIRED_TOKEN': {
-                "expiresAt": "2026-02-15T10:30:00Z",
-                "currentTime": "2026-02-16T14:00:00Z"
+                "expiresAt": (datetime.now(timezone.utc) - timedelta(hours=1)).strftime('%Y-%m-%dT%H:%M:%SZ'),
+                "currentTime": datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
             },
             'INSUFFICIENT_PERMISSIONS': {
                 "required": "jobs:write",

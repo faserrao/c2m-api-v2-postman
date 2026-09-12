@@ -623,7 +623,7 @@ def generate_collection(examples, groups, linked_collection, openapi_spec, colle
         "info": {
             "name": collection_name,
             "description": f"Generated from YAML catalog with tag filter: {tag_filter or 'all'}",
-            "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+            "schema": args.schema_url
         },
         "item": []
     }
@@ -782,6 +782,11 @@ def main():
         choices=['placeholders', 'examples'],
         default='examples',
         help='Generation mode: placeholders (show types) or examples (show values)'
+    )
+    parser.add_argument(
+        '--schema-url',
+        default='https://schema.getpostman.com/json/collection/v2.1.0/collection.json',
+        help='Postman collection schema URL (default: v2.1.0; override via POSTMAN_SCHEMA_V2 in Makefile)'
     )
 
     args = parser.parse_args()

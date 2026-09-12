@@ -1547,7 +1547,8 @@ postman-generate-use-case-collection:
 		--openapi openapi/c2mapiv2-openapi-spec-base.yaml \
 		--output-dir $(POSTMAN_GENERATED_DIR) \
 		--tags real-world \
-		--output-name $(C2MAPIV2_POSTMAN_API_NAME_KC)-real-world-use-cases-collection
+		--output-name $(C2MAPIV2_POSTMAN_API_NAME_KC)-real-world-use-cases-collection \
+		--schema-url $(POSTMAN_SCHEMA_V2)
 	@echo "✅ Real World Use Cases collection generated"
 
 # Upload enhanced test collection with all oneOf examples
@@ -1625,7 +1626,8 @@ postman-generate-getting-started-collection: postman-api-linked-collection-gener
 		--output-dir $(POSTMAN_GENERATED_DIR)/ \
 		--tags getting-started \
 		--mode placeholders \
-		--output-name $(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-collection
+		--output-name $(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-collection \
+		--schema-url $(POSTMAN_SCHEMA_V2)
 	@echo "✅ Getting Started collection (placeholders) generated"
 
 # Generates Getting Started collections (both placeholder and test versions) from template

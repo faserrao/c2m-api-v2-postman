@@ -12,6 +12,11 @@ import random
 import string
 from datetime import datetime, timezone
 
+def _generate_tracking_id():
+    suffix = ''.join(random.choices('0123456789ABCDEF', k=6))
+    return f"TRK-{datetime.now(timezone.utc).strftime('%Y%m%d')}-{suffix}"
+
+
 def extract_http_error_map(spec):
     """Read the x-http-error-map extension from the OpenAPI spec info block.
 
@@ -137,8 +142,7 @@ def build_effective_error_examples(spec, error_examples):
                     'value': {
                         'errorMessage': code.replace('_', ' ').capitalize(),
                         'errorCode': code,
-                        'errorDetails': '{}',
-                        'errorTrackingId': 'TRK-AUTO'
+                        'errorDetails': '{}'
                     }
                 }
                 stubs_added.append(f"  {http_status}: {code}")
@@ -149,6 +153,13 @@ def build_effective_error_examples(spec, error_examples):
             print(s)
     else:
         print(f"✓ All EBNF errorCode values have hand-crafted examples")
+
+    # Inject a fresh tracking ID into every example (hand-crafted and stubs)
+    for http_status, examples in effective.items():
+        for ex_key, ex_data in examples.items():
+            val = dict(ex_data['value'])
+            val['errorTrackingId'] = _generate_tracking_id()
+            effective[http_status][ex_key] = {**ex_data, 'value': val}
 
     return effective
 
@@ -165,8 +176,7 @@ ERROR_EXAMPLES = {
             'value': {
                 'errorMessage': 'Required field is missing from request body',
                 'errorCode': 'MISSING_REQUIRED_FIELD',
-                'errorDetails': '{"field": "documentId", "location": "requestBody"}',
-                'errorTrackingId': 'TRK-20260216-ABC123'
+                'errorDetails': '{"field": "documentId", "location": "requestBody"}'
             }
         },
         'invalid_format': {
@@ -174,8 +184,7 @@ ERROR_EXAMPLES = {
             'value': {
                 'errorMessage': 'Field contains invalid format or value',
                 'errorCode': 'INVALID_FORMAT',
-                'errorDetails': '{"field": "postalCode", "provided": "1234", "expected": "5 or 9 digits"}',
-                'errorTrackingId': 'TRK-20260216-DEF456'
+                'errorDetails': '{"field": "postalCode", "provided": "1234", "expected": "5 or 9 digits"}'
             }
         }
     },
@@ -185,8 +194,7 @@ ERROR_EXAMPLES = {
             'value': {
                 'errorMessage': 'Authorization header is missing or invalid',
                 'errorCode': 'MISSING_AUTH_HEADER',
-                'errorDetails': '{"expected": "Bearer <token>", "received": "none"}',
-                'errorTrackingId': 'TRK-20260216-GHI789'
+                'errorDetails': '{"expected": "Bearer <token>", "received": "none"}'
             }
         }
     },
@@ -196,8 +204,7 @@ ERROR_EXAMPLES = {
             'value': {
                 'errorMessage': 'User does not have required permissions for this operation',
                 'errorCode': 'INSUFFICIENT_PERMISSIONS',
-                'errorDetails': '{"required": "jobs:write", "user": "read-only-user"}',
-                'errorTrackingId': 'TRK-20260216-JKL012'
+                'errorDetails': '{"required": "jobs:write", "user": "read-only-user"}'
             }
         }
     },
@@ -207,8 +214,7 @@ ERROR_EXAMPLES = {
             'value': {
                 'errorMessage': 'Requested resource does not exist',
                 'errorCode': 'RESOURCE_NOT_FOUND',
-                'errorDetails': '{"resourceType": "document", "resourceId": "DOC-12345"}',
-                'errorTrackingId': 'TRK-20260216-MNO345'
+                'errorDetails': '{"resourceType": "document", "resourceId": "DOC-12345"}'
             }
         }
     },
@@ -218,8 +224,7 @@ ERROR_EXAMPLES = {
             'value': {
                 'errorMessage': 'Request validation failed for multiple fields',
                 'errorCode': 'INVALID_FORMAT',
-                'errorDetails': '{"errors": [{"field": "documentId", "issue": "not found"}, {"field": "recipientAddress.postalCode", "issue": "invalid format"}]}',
-                'errorTrackingId': 'TRK-20260216-PQR678'
+                'errorDetails': '{"errors": [{"field": "documentId", "issue": "not found"}, {"field": "recipientAddress.postalCode", "issue": "invalid format"}]}'
             }
         }
     },
@@ -229,8 +234,7 @@ ERROR_EXAMPLES = {
             'value': {
                 'errorMessage': 'Request rate limit exceeded — please slow down and retry',
                 'errorCode': 'RATE_LIMIT_EXCEEDED',
-                'errorDetails': '{"limit": "100 requests/minute", "retryAfterSeconds": 60}',
-                'errorTrackingId': 'TRK-20260216-VWX234'
+                'errorDetails': '{"limit": "100 requests/minute", "retryAfterSeconds": 60}'
             }
         }
     },
@@ -240,8 +244,7 @@ ERROR_EXAMPLES = {
             'value': {
                 'errorMessage': 'An unexpected error occurred while processing the request',
                 'errorCode': 'SERVER_ERROR',
-                'errorDetails': '{"timestamp": "2026-02-16T18:30:45Z", "requestId": "req-abc123"}',
-                'errorTrackingId': 'TRK-20260216-STU901'
+                'errorDetails': f'{{"timestamp": "{datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}", "requestId": "req-abc123"}}'
             }
         }
     }

@@ -14,6 +14,9 @@ import sys
 from typing import Dict, List, Any
 from pathlib import Path
 
+# Centralized schema URL — matches POSTMAN_SCHEMA_V2 in Makefile
+_POSTMAN_SCHEMA_URL = 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'
+
 # Educational pattern organization (16 patterns across 3 categories)
 PATTERNS = [
     {
@@ -214,7 +217,7 @@ def generate_getting_started_collection(
                 "All request bodies show complete API structure with placeholders "
                 "(<string>, <integer>, <oneOf>) for learning purposes."
             ),
-            "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+            "schema": _POSTMAN_SCHEMA_URL
         },
         "item": []
     }

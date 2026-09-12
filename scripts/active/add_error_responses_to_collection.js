@@ -17,6 +17,10 @@ const yaml = require('js-yaml');
 // Single source of truth — override via --support-email CLI arg (passed by Makefile)
 const DEFAULT_SUPPORT_EMAIL = 'support@click2mail.com';
 
+// Computed once per invocation — ensures example timestamps reflect the build date
+const _NOW_ISO = new Date().toISOString();
+const _EXPIRED_ISO = new Date(Date.now() - 3600000).toISOString();
+
 // HTTP status text mapping (required by Postman mock server for x-mock-response-code matching)
 const HTTP_STATUS_TEXT = {
   400: 'Bad Request',
@@ -72,7 +76,7 @@ const ERROR_CODE_METADATA = {
     status: 401,
     name: 'Expired token',
     message: 'Authentication token has expired',
-    details: '{"expired": "2026-03-10T15:30:00Z", "current": "2026-03-11T10:00:00Z"}'
+    details: `{"expired": "${_EXPIRED_ISO}", "current": "${_NOW_ISO}"}`
   },
   'INSUFFICIENT_PERMISSIONS': {
     status: 403,
@@ -120,7 +124,7 @@ const ERROR_CODE_METADATA = {
     status: 500,
     name: 'Internal server error',
     message: 'An unexpected error occurred while processing the request',
-    details: '{"timestamp": "2026-03-11T18:30:45Z", "requestId": "req-abc123"}'
+    details: `{"timestamp": "${_NOW_ISO}", "requestId": "req-abc123"}`
   },
   'DATABASE_ERROR': {
     status: 500,
