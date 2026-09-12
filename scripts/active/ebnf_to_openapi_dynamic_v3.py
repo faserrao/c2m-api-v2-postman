@@ -154,6 +154,8 @@ class EBNFToOpenAPITranslator:
         self.schema_counter = 0  # Counter for unique schema names
         self.http_error_map: Dict[str, Any] = {}  # Parsed from @http_error_map block in EBNF
         self.support_email: str = "support@click2mail.com"
+        self.api_title: str = "C2M API v2"
+        self.api_version: str = "2.0.0"
         
         # OpenAPI type mappings for primitives
         self.primitive_types = {
@@ -289,9 +291,13 @@ class EBNFToOpenAPITranslator:
             i += 1
     
     def generate_openapi(self, server_url: str = "https://api.click2mail.com/v2",
-                         support_email: str = "support@click2mail.com") -> Dict[str, Any]:
+                         support_email: str = "support@click2mail.com",
+                         api_title: str = "C2M API v2",
+                         api_version: str = "2.0.0") -> Dict[str, Any]:
         """Generate the complete OpenAPI specification"""
         self.support_email = support_email
+        self.api_title = api_title
+        self.api_version = api_version
 
         # First, generate all schemas
         schemas = self._generate_all_schemas()
@@ -303,8 +309,8 @@ class EBNFToOpenAPITranslator:
         spec = OrderedDict([
             ("openapi", "3.0.3"),
             ("info", OrderedDict([
-                ("title", "C2M API v2"),
-                ("version", "2.0.0"),
+                ("title", self.api_title),
+                ("version", self.api_version),
                 ("description", "API for submitting mailing jobs with various document routing options"),
                 ("x-http-error-map", self.http_error_map)
             ])),
@@ -1259,6 +1265,12 @@ def main():
     parser.add_argument("--support-email", default="support@click2mail.com",
                         help="Support contact email used in ACCOUNT_SUSPENDED error details "
                              "(default: support@click2mail.com)")
+    parser.add_argument("--api-title", default="C2M API v2",
+                        help="API title written into the OpenAPI info block "
+                             "(default: C2M API v2)")
+    parser.add_argument("--api-version", default="2.0.0",
+                        help="API version written into the OpenAPI info block "
+                             "(default: 2.0.0)")
 
     args = parser.parse_args()
 
@@ -1276,7 +1288,9 @@ def main():
 
     # Generate OpenAPI spec
     openapi_spec = translator.generate_openapi(server_url=args.server_url,
-                                               support_email=args.support_email)
+                                               support_email=args.support_email,
+                                               api_title=args.api_title,
+                                               api_version=args.api_version)
     
     # Convert OrderedDict to regular dict for clean YAML output
     openapi_spec = convert_ordered_dict_to_dict(openapi_spec)

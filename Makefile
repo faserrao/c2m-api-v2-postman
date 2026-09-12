@@ -316,6 +316,9 @@ PYTHON3                          := python3
 _SPEC_ALLOWED_CODES := $(shell test -x "$(VENV_PYTHON)" && test -f "$(C2MAPIV2_OPENAPI_SPEC)" && $(VENV_PYTHON) -c "import yaml; d=yaml.safe_load(open('$(C2MAPIV2_OPENAPI_SPEC)')); codes=list(d.get('info',{}).get('x-http-error-map',{}).keys()); print(','.join(['200','201','204']+codes))" 2>/dev/null)
 POSTMAN_ALLOWED_CODES ?= $(if $(_SPEC_ALLOWED_CODES),$(_SPEC_ALLOWED_CODES),200,201,204,400,401,403,404,422,429,500)
 SUPPORT_EMAIL                    ?= support@click2mail.com
+API_TITLE                        ?= C2M API v2
+API_VERSION                      ?= 2.0.0
+ARTIFACTS_REPO_NAME              ?= c2m-api-v2-postman-artifacts
 PYTHON                           := $(PYTHON3)
 
 # ========================================================================
@@ -789,7 +792,7 @@ generate-openapi-spec-from-ebnf-dd:
 
 	# --- Run the conversion script ---
 	@echo "🛠  Running: $(EBNF_TO_OPENAPI_SCRIPT) → $(C2MAPIV2_OPENAPI_SPEC_BASE)"
-	$(VENV_PYTHON) $(EBNF_TO_OPENAPI_SCRIPT) -o $(C2MAPIV2_OPENAPI_SPEC_BASE) $(DD_EBNF_FILE) --support-email "$(SUPPORT_EMAIL)"
+	$(VENV_PYTHON) $(EBNF_TO_OPENAPI_SCRIPT) -o $(C2MAPIV2_OPENAPI_SPEC_BASE) $(DD_EBNF_FILE) --support-email "$(SUPPORT_EMAIL)" --api-title "$(API_TITLE)" --api-version "$(API_VERSION)"
 	# --- Fix anonymous oneOf schemas to named schemas ---
 	@echo "🔧 Fixing anonymous oneOf schemas in OpenAPI spec..."
 	$(VENV_PYTHON) $(SCRIPTS_DIR)/active/fix_openapi_oneOf_schemas.py $(C2MAPIV2_OPENAPI_SPEC_BASE) $(C2MAPIV2_OPENAPI_SPEC_BASE)
@@ -813,6 +816,7 @@ generate-artifacts-index:
 	@mkdir -p reports
 	@$(VENV_PYTHON) $(SCRIPTS_DIR)/active/generate_artifacts_index.py \
 		--org $(ARTIFACTS_INDEX_ORG) \
+		--artifacts-repo "$(ARTIFACTS_REPO_NAME)" \
 		--reports-dir reports \
 		--output reports/artifacts-index.md
 	@echo "✅ Artifacts index written to reports/artifacts-index.md"

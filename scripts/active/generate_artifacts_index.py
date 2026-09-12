@@ -24,19 +24,19 @@ from pathlib import Path
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _repo_url(org: str, path: str) -> str:
+def _repo_url(org: str, path: str, artifacts_repo: str = "c2m-api-v2-postman-artifacts") -> str:
     """GitHub blob URL for a file in the artifacts repo."""
-    return f"https://github.com/{org}/c2m-api-v2-postman-artifacts/blob/main/{path}"
+    return f"https://github.com/{org}/{artifacts_repo}/blob/main/{path}"
 
 
-def _repo_tree_url(org: str, path: str) -> str:
+def _repo_tree_url(org: str, path: str, artifacts_repo: str = "c2m-api-v2-postman-artifacts") -> str:
     """GitHub tree URL for a directory in the artifacts repo."""
-    return f"https://github.com/{org}/c2m-api-v2-postman-artifacts/tree/main/{path}"
+    return f"https://github.com/{org}/{artifacts_repo}/tree/main/{path}"
 
 
-def _pages_url(org: str, path: str) -> str:
+def _pages_url(org: str, path: str, artifacts_repo: str = "c2m-api-v2-postman-artifacts") -> str:
     """GitHub Pages URL (artifacts repo, docs/ served at root)."""
-    return f"https://{org}.github.io/c2m-api-v2-postman-artifacts/{path}"
+    return f"https://{org}.github.io/{artifacts_repo}/{path}"
 
 
 def _link(label: str, url: str) -> str:
@@ -70,33 +70,44 @@ def _section(title: str, rows: list[tuple[str, str, str]], readme_url: str | Non
 # Main
 # ---------------------------------------------------------------------------
 
-def generate(org: str, reports_dir: Path, output: Path) -> None:
+def generate(org: str, reports_dir: Path, output: Path,
+             artifacts_repo: str = "c2m-api-v2-postman-artifacts") -> None:
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+
+    # Local URL helpers with artifacts_repo baked in
+    def _url(path: str) -> str:
+        return _repo_url(org, path, artifacts_repo)
+
+    def _tree(path: str) -> str:
+        return _repo_tree_url(org, path, artifacts_repo)
+
+    def _pages(path: str) -> str:
+        return _pages_url(org, path, artifacts_repo)
 
     # --- latest timestamped reports (glob in reports_dir) -------------------
     latest_newman_html = _latest_glob("newman-*.html", reports_dir)
     latest_validation_md = _latest_glob("validation-*.md", reports_dir)
 
     # --- README URLs for directory-level READMEs ----------------------------
-    docs_readme    = _repo_url(org, "docs/README.md")
-    reports_readme = _repo_url(org, "reports/README.md")
+    docs_readme    = _url("docs/README.md")
+    reports_readme = _url("reports/README.md")
     # openapi/ and postman/collections/ have no README — None omits the link
 
     # --- Documentation (GitHub Pages) ---------------------------------------
     doc_rows = [
         (
             "API Reference — Redoc",
-            _link("Open", _pages_url(org, "index.html")),
+            _link("Open", _pages("index.html")),
             "Interactive API documentation rendered with Redoc — browse endpoints, schemas, and examples.",
         ),
         (
             "API Reference — Swagger UI",
-            _link("Open", _pages_url(org, "swagger.html")),
+            _link("Open", _pages("swagger.html")),
             "Interactive API documentation rendered with Swagger UI — supports try-it-out requests.",
         ),
         (
             "API Reference — Stoplight Elements",
-            _link("Open", _pages_url(org, "elements.html")),
+            _link("Open", _pages("elements.html")),
             "Interactive API documentation rendered with Stoplight Elements.",
         ),
     ]
@@ -105,32 +116,32 @@ def generate(org: str, reports_dir: Path, output: Path) -> None:
     spec_rows = [
         (
             "Final Spec",
-            _link("Download", _repo_url(org, "openapi/c2mapiv2-openapi-spec-final.yaml")),
+            _link("Download", _url("openapi/c2mapiv2-openapi-spec-final.yaml")),
             "Production-ready OpenAPI 3.0 specification generated from the EBNF data dictionary.",
         ),
         (
             "Final Spec — With Examples",
-            _link("Download", _repo_url(org, "openapi/c2mapiv2-openapi-spec-final-with-examples.yaml")),
+            _link("Download", _url("openapi/c2mapiv2-openapi-spec-final-with-examples.yaml")),
             "Final spec augmented with curated request/response examples for each endpoint.",
         ),
         (
             "Final Spec — With Multi-Examples",
-            _link("Download", _repo_url(org, "openapi/c2mapiv2-openapi-spec-final-with-multi-examples.yaml")),
+            _link("Download", _url("openapi/c2mapiv2-openapi-spec-final-with-multi-examples.yaml")),
             "Final spec with multiple named examples per endpoint, used by Postman mock servers.",
         ),
         (
             "Final Spec — Fixed oneOf",
-            _link("Download", _repo_url(org, "openapi/c2mapiv2-openapi-spec-final-fixed-oneOf.yaml")),
+            _link("Download", _url("openapi/c2mapiv2-openapi-spec-final-fixed-oneOf.yaml")),
             "Final spec with oneOf discriminators corrected for stricter validators and code generators.",
         ),
         (
             "Base Spec",
-            _link("Download", _repo_url(org, "openapi/c2mapiv2-openapi-spec-base.yaml")),
+            _link("Download", _url("openapi/c2mapiv2-openapi-spec-base.yaml")),
             "Unprocessed OpenAPI spec generated directly from the EBNF before example injection.",
         ),
         (
             "Bundled Spec",
-            _link("Download", _repo_url(org, "openapi/bundled.yaml")),
+            _link("Download", _url("openapi/bundled.yaml")),
             "Single-file version of the spec with all $refs resolved inline — useful for tools that don't support multi-file specs.",
         ),
     ]
@@ -139,32 +150,32 @@ def generate(org: str, reports_dir: Path, output: Path) -> None:
     collection_rows = [
         (
             "C2M API Linked Collection",
-            _link("Download", _repo_url(org, "postman/collections/c2mapiv2-linked-collection-flat.json")),
+            _link("Download", _url("postman/collections/c2mapiv2-linked-collection-flat.json")),
             "Primary API collection with all endpoints linked to the live OpenAPI spec for schema validation (C2mApiV2CollectionLinked).",
         ),
         (
             "Test Collection",
-            _link("Download", _repo_url(org, "postman/collections/c2mapiv2-test-collection-flat.json")),
+            _link("Download", _url("postman/collections/c2mapiv2-test-collection-flat.json")),
             "Newman-compatible test collection with pre-request auth scripts and response assertions (C2mApiV2TestCollection).",
         ),
         (
             "Getting Started — With Examples",
-            _link("Download", _repo_url(org, "postman/collections/c2mapiv2-getting-started-with-examples-collection.json")),
+            _link("Download", _url("postman/collections/c2mapiv2-getting-started-with-examples-collection.json")),
             "Getting Started collection populated with concrete example request bodies for hands-on exploration.",
         ),
         (
             "Getting Started — Linked",
-            _link("Download", _repo_url(org, "postman/collections/c2mapiv2-getting-started-linked-collection.json")),
+            _link("Download", _url("postman/collections/c2mapiv2-getting-started-linked-collection.json")),
             "Getting Started collection linked to the live spec for real-time schema validation.",
         ),
         (
             "Getting Started — Test",
-            _link("Download", _repo_url(org, "postman/collections/c2mapiv2-getting-started-test-collection.json")),
+            _link("Download", _url("postman/collections/c2mapiv2-getting-started-test-collection.json")),
             "Getting Started collection with Newman test assertions for automated verification.",
         ),
         (
             "Real World Use Cases",
-            _link("Download", _repo_url(org, "postman/collections/c2mapiv2-real-world-use-cases-collection.json")),
+            _link("Download", _url("postman/collections/c2mapiv2-real-world-use-cases-collection.json")),
             "Collection demonstrating realistic end-to-end request sequences across multiple endpoints.",
         ),
     ]
@@ -186,9 +197,9 @@ def generate(org: str, reports_dir: Path, output: Path) -> None:
     sdk_rows = [
         (
             f"SDK — {label}",
-            _link("Browse", _repo_tree_url(org, f"sdks/{slug}"))
+            _link("Browse", _tree(f"sdks/{slug}"))
             + " &nbsp;·&nbsp; "
-            + _link("README", _repo_url(org, f"sdks/{slug}/README.md")),
+            + _link("README", _url(f"sdks/{slug}/README.md")),
             desc,
         )
         for label, slug, desc in _SDK_LANGS
@@ -198,22 +209,22 @@ def generate(org: str, reports_dir: Path, output: Path) -> None:
     dd_rows = [
         (
             "Data Dictionary — Component Reference (Markdown)",
-            _link("View", _repo_url(org, "reports/data-dictionary-table.md")),
+            _link("View", _url("reports/data-dictionary-table.md")),
             "Every EBNF component and its elements with field types, required flags, and natural-language descriptions.",
         ),
         (
             "Data Dictionary — Component Reference (CSV)",
-            _link("Download", _repo_url(org, "reports/data-dictionary-table.csv")),
+            _link("Download", _url("reports/data-dictionary-table.csv")),
             "CSV export of the component reference table for use in spreadsheets and data tools.",
         ),
         (
             "Data Dictionary — Endpoints Expanded (Markdown)",
-            _link("View", _repo_url(org, "reports/data-dictionary-endpoints-expanded.md")),
+            _link("View", _url("reports/data-dictionary-endpoints-expanded.md")),
             "Each API endpoint recursively expanded to every primitive leaf field with dot-path notation and descriptions.",
         ),
         (
             "Data Dictionary — Endpoints Expanded (CSV)",
-            _link("Download", _repo_url(org, "reports/data-dictionary-endpoints-expanded.csv")),
+            _link("Download", _url("reports/data-dictionary-endpoints-expanded.csv")),
             "CSV export of the endpoint expanded table for use in spreadsheets and data tools.",
         ),
     ]
@@ -222,12 +233,12 @@ def generate(org: str, reports_dir: Path, output: Path) -> None:
     ci_rows: list[tuple[str, str, str]] = [
         (
             "Conformance Gate",
-            _link("View", _repo_url(org, "reports/conformance-gate.md")),
+            _link("View", _url("reports/conformance-gate.md")),
             "Postman collection conformance results — validates every request body against the generated OpenAPI spec.",
         ),
         (
             "Golden Test Suite",
-            _link("View", _repo_url(org, "reports/golden-tests.txt")),
+            _link("View", _url("reports/golden-tests.txt")),
             "Validator and resolver unit test results — positive/negative controls and synthetic fault injection.",
         ),
     ]
@@ -235,7 +246,7 @@ def generate(org: str, reports_dir: Path, output: Path) -> None:
     if latest_newman_html:
         ci_rows.append((
             "Newman Test Run (latest)",
-            _link("View", _repo_url(org, f"reports/{latest_newman_html}")),
+            _link("View", _url(f"reports/{latest_newman_html}")),
             "Most recent Newman end-to-end test run against the live API — HTML report with request/response details and pass/fail counts.",
         ))
     else:
@@ -248,7 +259,7 @@ def generate(org: str, reports_dir: Path, output: Path) -> None:
     if latest_validation_md:
         ci_rows.append((
             "Collection Validation Report (latest)",
-            _link("View", _repo_url(org, f"reports/{latest_validation_md}")),
+            _link("View", _url(f"reports/{latest_validation_md}")),
             "Most recent per-endpoint conformance validation showing any fields that don't match the spec.",
         ))
     else:
@@ -300,12 +311,18 @@ def main() -> None:
         default="reports/artifacts-index.md",
         help="Output path (default: reports/artifacts-index.md)",
     )
+    parser.add_argument(
+        "--artifacts-repo",
+        default="c2m-api-v2-postman-artifacts",
+        help="Name of the GitHub artifacts repository (default: c2m-api-v2-postman-artifacts)",
+    )
     args = parser.parse_args()
 
     generate(
         org=args.org,
         reports_dir=Path(args.reports_dir),
         output=Path(args.output),
+        artifacts_repo=args.artifacts_repo,
     )
 
 
