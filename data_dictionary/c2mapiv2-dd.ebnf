@@ -934,6 +934,7 @@ errorType = "ValidationError"
           | "AuthenticationError"
           | "AuthorizationError"
           | "ResourceNotFoundError"
+          | "RateLimitError"
           | "ServerError" ;
 
 errorMessage = string ;  (* Human-readable error description *)
@@ -953,7 +954,8 @@ errorCode = "MISSING_REQUIRED_FIELD"
           | "INVALID_FORMAT"
           | "SERVER_ERROR"
           | "DATABASE_ERROR"
-          | "EXTERNAL_SERVICE_ERROR" ;
+          | "EXTERNAL_SERVICE_ERROR"
+          | "RATE_LIMIT_EXCEEDED" ;
 
 errorDetails = string ;  (* JSON object with error context - additionalProperties in OpenAPI *)
 
@@ -965,6 +967,7 @@ HTTP_401_UNAUTHORIZED = errorResponse ;
 HTTP_403_FORBIDDEN = errorResponse ;
 HTTP_404_NOT_FOUND = errorResponse ;
 HTTP_422_UNPROCESSABLE_ENTITY = errorResponse ;
+HTTP_429_TOO_MANY_REQUESTS = errorResponse ;
 HTTP_500_INTERNAL_SERVER_ERROR = errorResponse ;
 
 (* ----------------------------------------------------------------
@@ -981,5 +984,6 @@ HTTP_500_INTERNAL_SERVER_ERROR = errorResponse ;
    403: errorType=AuthorizationError; errorCodes=INSUFFICIENT_PERMISSIONS,ACCOUNT_SUSPENDED
    404: errorType=ResourceNotFoundError; errorCodes=JOB_NOT_FOUND,RESOURCE_NOT_FOUND
    422: errorType=ValidationError; errorCodes=INVALID_ENUM_VALUE,MUTUAL_EXCLUSION_VIOLATION,INVALID_FORMAT
+   429: errorType=RateLimitError; errorCodes=RATE_LIMIT_EXCEEDED
    500: errorType=ServerError; errorCodes=SERVER_ERROR,DATABASE_ERROR,EXTERNAL_SERVICE_ERROR
    @end_http_error_map *)

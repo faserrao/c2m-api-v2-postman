@@ -21,6 +21,7 @@ const HTTP_STATUS_TEXT = {
   403: 'Forbidden',
   404: 'Not Found',
   422: 'Unprocessable Entity',
+  429: 'Too Many Requests',
   500: 'Internal Server Error'
 };
 
@@ -129,6 +130,12 @@ const ERROR_CODE_METADATA = {
     name: 'External service error',
     message: 'External service call failed',
     details: '{"service": "address-validation", "error": "timeout after 30s"}'
+  },
+  'RATE_LIMIT_EXCEEDED': {
+    status: 429,
+    name: 'Rate limit exceeded',
+    message: 'Request rate limit exceeded — please slow down and retry',
+    details: '{"limit": "100 requests/minute", "retryAfterSeconds": 60}'
   }
 };
 
@@ -154,6 +161,7 @@ function loadErrorTypesFromSpec(spec) {
  *   _NOT_FOUND suffix      → ResourceNotFoundError
  *   AUTH / TOKEN / EXPIRED → AuthenticationError
  *   INSUFFICIENT_ / ACCOUNT_ prefix → AuthorizationError
+ *   RATE_LIMIT_*           → RateLimitError
  *   _ERROR suffix          → ServerError
  *   (default)              → ValidationError
  */
@@ -163,6 +171,7 @@ function deriveErrorType(errorCode, validErrorTypes) {
   if (errorCode.endsWith('_NOT_FOUND')) return pick('ResourceNotFoundError');
   if (errorCode === 'MISSING_AUTH_HEADER' || errorCode === 'INVALID_TOKEN' || errorCode === 'EXPIRED_TOKEN') return pick('AuthenticationError');
   if (errorCode.startsWith('INSUFFICIENT_') || errorCode.startsWith('ACCOUNT_')) return pick('AuthorizationError');
+  if (errorCode.startsWith('RATE_LIMIT_') || errorCode === 'RATE_LIMIT_EXCEEDED') return pick('RateLimitError');
   if (errorCode.endsWith('_ERROR')) return pick('ServerError');
   return pick('ValidationError');
 }

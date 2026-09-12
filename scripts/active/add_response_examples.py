@@ -223,6 +223,17 @@ ERROR_EXAMPLES = {
             }
         }
     },
+    '429': {
+        'rate_limit_exceeded': {
+            'summary': 'Rate limit exceeded',
+            'value': {
+                'errorMessage': 'Request rate limit exceeded — please slow down and retry',
+                'errorCode': 'RATE_LIMIT_EXCEEDED',
+                'errorDetails': '{"limit": "100 requests/minute", "retryAfterSeconds": 60}',
+                'errorTrackingId': 'TRK-20260216-VWX234'
+            }
+        }
+    },
     '500': {
         'server_error': {
             'summary': 'Internal server error',
