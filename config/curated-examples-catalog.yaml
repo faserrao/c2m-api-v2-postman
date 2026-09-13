@@ -78,8 +78,8 @@ examples:
       # Payment (flat values - creditCard structure from Linked Collection)
       cardType: visa
       cardNumber: "4111111111111111"
-      expirationMonth: 12
-      expirationYear: 2029
+      month: 12
+      year: 2029
       cvv: 123
       # Tags
       tags:
@@ -132,7 +132,6 @@ examples:
       zip: "90001"
       country: USA
       jobTemplate: medical_correspondence
-      accountType: checking
       routingNumber: "123456789"
       accountNumber: "9876543210"
       tags:
@@ -158,8 +157,8 @@ examples:
       jobTemplate: newsletter_monthly
       cardType: mastercard
       cardNumber: "5555555555554444"
-      expirationMonth: 6
-      expirationYear: 2026
+      month: 6
+      year: 2026
       cvv: 456
       tags:
         - newsletter
@@ -181,8 +180,8 @@ examples:
       documentId: 33333
       cardType: americanExpress
       cardNumber: "378282246310005"
-      expirationMonth: 9
-      expirationYear: 2027
+      month: 9
+      year: 2027
       cvv: 789
       tags:
         - e-commerce
@@ -249,7 +248,6 @@ examples:
               state: OR
               zip: "97201"
               country: USA
-      accountType: business
       routingNumber: "987654321"
       accountNumber: "1234567890"
       tags:
@@ -276,8 +274,8 @@ examples:
       jobTemplate: non_profit_appeal
       cardType: discover
       cardNumber: "6011111111111117"
-      expirationMonth: 3
-      expirationYear: 2028
+      month: 3
+      year: 2028
       cvv: 321
       tags:
         - non-profit
@@ -317,8 +315,8 @@ examples:
       jobTemplate: standard_letter
       cardType: visa
       cardNumber: "4111111111111111"
-      expirationMonth: 1
-      expirationYear: 2026
+      month: 1
+      year: 2026
       cvv: 111
       tags:
         - example
@@ -341,7 +339,6 @@ examples:
       documentId: 1002
       addressListId: "EXAMPLE-LIST-001"
       jobTemplate: mail_merge_template
-      accountType: checking
       routingNumber: "111000025"
       accountNumber: "1234567890"
       tags:
@@ -387,8 +384,8 @@ examples:
       documentId: 2001
       cardType: mastercard
       cardNumber: "5555555555554444"
-      expirationMonth: 6
-      expirationYear: 2027
+      month: 6
+      year: 2027
       cvv: 222
       tags:
         - bulk
@@ -409,7 +406,6 @@ examples:
     values:
       documentId: 2002
       addressListId: "BULK-LIST-001"
-      accountType: savings
       routingNumber: "222222226"
       accountNumber: "9876543210"
       tags:
@@ -466,8 +462,8 @@ examples:
       country: USA
       cardType: visa
       cardNumber: "4111111111111111"
-      expirationMonth: 12
-      expirationYear: 2026
+      month: 12
+      year: 2026
       cvv: 333
       tags:
         - advanced
@@ -498,11 +494,11 @@ examples:
       mailClass: firstClass
       color: fullColor
       paperType: glossy
-      envelopeType: windowed
+      envelope: double_window
       cardType: mastercard
       cardNumber: "5555555555554444"
-      expirationMonth: 3
-      expirationYear: 2028
+      month: 3
+      year: 2028
       cvv: 444
       tags:
         - advanced
@@ -525,7 +521,6 @@ examples:
       url: "https://example.com/documents/newsletter.pdf"
       addressListId: "URL-LIST-001"
       jobTemplate: standard_letter
-      accountType: checking
       routingNumber: "333333338"
       accountNumber: "5555555555"
       tags:
@@ -588,8 +583,8 @@ examples:
           country: USA
       cardType: americanExpress
       cardNumber: "378282246310005"
-      expirationMonth: 9
-      expirationYear: 2027
+      month: 9
+      year: 2027
       cvv: 555
       tags:
         - advanced
@@ -618,7 +613,6 @@ examples:
       zip: "97201"
       country: USA
       jobTemplate: invoice_statement
-      accountType: business
       routingNumber: "444444440"
       accountNumber: "7777777777"
       tags:
@@ -693,8 +687,8 @@ examples:
       jobTemplate: stored_template
       cardType: discover
       cardNumber: "6011111111111117"
-      expirationMonth: 8
-      expirationYear: 2028
+      month: 8
+      year: 2028
       cvv: 777
       tags:
         - advanced
@@ -717,7 +711,6 @@ examples:
       documentId: 3011
       addressListId: "SAVED-LIST-12345"
       jobTemplate: bulk_mailing
-      accountType: checking
       routingNumber: "555555552"
       accountNumber: "8888888888"
       tags:

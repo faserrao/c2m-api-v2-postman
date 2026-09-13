@@ -795,7 +795,10 @@ generate-openapi-spec-from-ebnf-dd:
 
 	# --- Run the conversion script ---
 	@echo "🛠  Running: $(EBNF_TO_OPENAPI_SCRIPT) → $(C2MAPIV2_OPENAPI_SPEC_BASE)"
-	$(VENV_PYTHON) $(EBNF_TO_OPENAPI_SCRIPT) -o $(C2MAPIV2_OPENAPI_SPEC_BASE) $(DD_EBNF_FILE) --support-email "$(SUPPORT_EMAIL)" --api-title "$(API_TITLE)" --api-version "$(API_VERSION)"
+	$(VENV_PYTHON) $(EBNF_TO_OPENAPI_SCRIPT) -o $(C2MAPIV2_OPENAPI_SPEC_BASE) $(DD_EBNF_FILE) \
+		--support-email "$(SUPPORT_EMAIL)" --api-title "$(API_TITLE)" --api-version "$(API_VERSION)" \
+		--faker-hints-output config/faker_hints.yaml
+	@echo "✅ Faker hints derived from DD @hint annotations → config/faker_hints.yaml"
 	# --- Fix anonymous oneOf schemas to named schemas ---
 	@echo "🔧 Fixing anonymous oneOf schemas in OpenAPI spec..."
 	$(VENV_PYTHON) $(SCRIPTS_DIR)/active/fix_openapi_oneOf_schemas.py $(C2MAPIV2_OPENAPI_SPEC_BASE) $(C2MAPIV2_OPENAPI_SPEC_BASE)
@@ -1640,6 +1643,7 @@ postman-generate-getting-started-with-examples:
 	@echo "📚 Generating Getting Started collections from template..."
 	@$(VENV_PYTHON) scripts/utilities/generate_getting_started_collections.py \
 		--template config/getting-started-template.yaml \
+		--faker-hints config/faker_hints.yaml \
 		--output-linked $(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-linked-collection.json \
 		--output-test $(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-test-collection.json
 	@echo "✅ Getting Started collections generated (linked + test, template-based)"
@@ -2853,6 +2857,16 @@ validate-collections-conformance-test: ## Run all validation golden tests (valid
 	@C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" POSTMAN_GENERATED_DIR="$(POSTMAN_GENERATED_DIR)" C2MAPIV2_POSTMAN_API_NAME_KC="$(C2MAPIV2_POSTMAN_API_NAME_KC)" $(VENV_PYTHON) scripts/validation/tests/test_validate_collections.py && \
 	C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" $(VENV_PYTHON) scripts/validation/tests/test_oneof_resolver.py && \
 	$(VENV_PYTHON) -m pytest scripts/validation/tests/test_dd_constraints.py -v
+
+.PHONY: validate-configs
+validate-configs: ## Validate all config file field names against the EBNF Data Dictionary
+	@echo "🔍 Validating config files against DD rule names..."
+	@DD_EBNF_FILE="$(DD_EBNF_FILE)" \
+	$(VENV_PYTHON) scripts/validation/validate_configs_against_dd.py \
+		--dd $(DD_EBNF_FILE) \
+		--catalog config/curated-examples-catalog.yaml \
+		--template config/getting-started-template.yaml \
+		--faker-hints config/faker_hints.yaml
 
 .PHONY: validate-catalog-against-spec
 validate-catalog-against-spec: ## Validate curated-examples-catalog.yaml select: keys and variant names against the OpenAPI spec

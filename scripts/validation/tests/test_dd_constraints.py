@@ -226,15 +226,27 @@ class TestDDConstraints(unittest.TestCase):
         self.assertEqual(aliases.get("address_on_top"), "address_on_first_page",
                          "Legacy address_on_top must alias to address_on_first_page")
 
-    # ── 9. No address_on_top in getting-started-template ─────────────────────
+    # ── 9. No address_on_top in getting-started-template or derived hints ───────
+    # faker_hints moved from getting-started-template.yaml to EBNF @hint annotations
+    # (derived into config/faker_hints.yaml). Check both sources.
 
     def test_getting_started_template_uses_canonical_layout(self):
         template_path = REPO_ROOT / "config" / "getting-started-template.yaml"
-        content = template_path.read_text(encoding="utf-8")
-        self.assertNotIn("address_on_top", content,
+        template_content = template_path.read_text(encoding="utf-8")
+        self.assertNotIn("address_on_top", template_content,
                          "getting-started-template.yaml must not use legacy address_on_top")
-        self.assertIn("address_on_first_page", content,
-                      "getting-started-template.yaml must use address_on_first_page")
+
+        # faker_hints now live in the DD (@hint annotations) and derived config/faker_hints.yaml
+        dd_path = REPO_ROOT / "data_dictionary" / "c2mapiv2-dd.ebnf"
+        dd_content = dd_path.read_text(encoding="utf-8")
+        self.assertIn("address_on_first_page", dd_content,
+                      "EBNF DD must define address_on_first_page (used as @hint for layout rule)")
+        self.assertNotIn("address_on_top", dd_content,
+                         "EBNF DD must not reference legacy address_on_top")
+
+        # Also verify template itself has no legacy value (belt-and-suspenders)
+        self.assertNotIn("address_on_top", template_content,
+                         "getting-started-template.yaml must not use legacy address_on_top")
 
 
 if __name__ == "__main__":

@@ -549,7 +549,7 @@ submitMultiZipAddressCaptureParams =
 (*           CORE OBJECTS           *)
 (***********************************)
 
-jobTemplate = string ;
+jobTemplate = string ; (* @hint static standard_letter *)
 
 returnAddress =
       firstName + lastName
@@ -568,14 +568,14 @@ jobOptions =
     + printOption
     + mailClass ;
 
-documentClass  = "letter" | "postcard" | "brochure" | "flat" ;
-layout         = "address_on_first_page" | "address_on_back_page" ;
-productionTime = "next_day" | "two_day" | "three_day" | "standard" | "same_day" ;
-envelope       = "standard" | "none" | "flat" | "double_window" ;
-color          = "full_color" | "black_and_white" ;
-paperType      = "white" | "white_24" | "ivory" | "glossy" ;
-printOption    = "double_sided" | "single_sided" ;
-mailClass      = "first_class" | "standard" | "non_profit" ;
+documentClass  = "letter" | "postcard" | "brochure" | "flat" ; (* @hint static letter *)
+layout         = "address_on_first_page" | "address_on_back_page" ; (* @hint static address_on_first_page *)
+productionTime = "next_day" | "two_day" | "three_day" | "standard" | "same_day" ; (* @hint static next_day *)
+envelope       = "standard" | "none" | "flat" | "double_window" ; (* @hint static standard *)
+color          = "full_color" | "black_and_white" ; (* @hint static full_color *)
+paperType      = "white" | "white_24" | "ivory" | "glossy" ; (* @hint static white *)
+printOption    = "double_sided" | "single_sided" ; (* @hint static double_sided *)
+mailClass      = "first_class" | "standard" | "non_profit" ; (* @hint static first_class *)
 
 tags = tagsList ;
 tagsList = { string } ;
@@ -584,20 +584,21 @@ tagsList = { string } ;
 (*          ADDRESS OBJECTS         *)
 (***********************************)
 
-firstName = string ;
-lastName  = string ;
+firstName = string ; (* @hint faker first_name *)
+lastName  = string ; (* @hint faker last_name *)
+company   = string ; (* @hint faker company *)
 
-address1  = string ;
-address2  = string ;
-address3  = string ;
+address1  = string ; (* @hint faker street_address *)
+address2  = string ; (* @hint static Suite 100 *)
+address3  = string ; (* @hint static  *)
 
-city     = string ;
-state    = string ;
-zip      = string ;
-country  = string ;
+city     = string ; (* @hint faker city *)
+state    = string ; (* @hint faker state_abbr *)
+zip      = string ; (* @hint faker zipcode *)
+country  = string ; (* @hint static USA *)
 
-foo1 = string ;
-foo2 = string ;
+foo1 = string ; (* @hint static Custom Field 1 *)
+foo2 = string ; (* @hint static Custom Field 2 *)
 
 address =
       firstName + lastName
@@ -623,10 +624,10 @@ recipientAddressByListId =
 recipientAddressByAddressId =
     addressId ;
 
-mappingId = id ;
+mappingId = id ; (* @hint static 5001 *)
 addressName = string ;
-addressListName = string ;
-addressListId = id ;
+addressListName = string ; (* @hint static Marketing Campaign Q1 *)
+addressListId = id ; (* @hint static 1001 *)
 addressId = id ;
 
 addressList   = { address } ;
@@ -636,17 +637,17 @@ addressList   = { address } ;
 (***********************************)
 
 documentIdSource = documentId ;
-documentId = id ;
+documentId = id ; (* @hint random_int 10000 99999 *)
 
 requestIdSource = requestId + [ filename ] ;
-requestId = id ;
-filename = string ;
+requestId = id ; (* @hint random_int 10000 99999 *)
+filename = string ; (* @hint static document.pdf *)
 
 urlSource = url ;
-url = string ;
+url = string ; (* @hint static https://example.com/documents/sample.pdf *)
 
 zipDocumentIdSource = zipDocumentId + filename ;
-zipDocumentId = id ;
+zipDocumentId = id ; (* @hint random_int 10000 99999 *)
 
 zipRequestIdSource = requestId + zipFilename + filename ;
 zipFilename = string ;
@@ -702,8 +703,8 @@ pdfSplitJobsNoAddress   = { pdfSplitJobItemNoAddress } ;
 pdfSplitJobItemWithAddress = [ jobTemplate ] + startPage + endPage + recipientAddressSource ;
 pdfSplitJobItemNoAddress   = startPage + endPage ;
 
-startPage = integer ;
-endPage   = integer ;
+startPage = integer ; (* @hint static 1 *)
+endPage   = integer ; (* @hint static 5 *)
 
 (* Zip-only jobs list:
    - Used by POST /batch/zip.
@@ -781,22 +782,18 @@ creditAmount =
 currency = "USD" | "EUR" | "GBP" | "CAD" | "AUD" ;
 amount = number ;
 
-cardNumber = string ;
+cardNumber = string ; (* @hint static 4111111111111111 *)
 expirationDate = month + year ;
-month = integer ;
-year = integer ;
-cvv = integer ;
-routingNumber = string ;
-accountNumber = string ;
+month = integer ; (* @hint static 12 *)
+year = integer ; (* @hint static 2029 *)
+cvv = integer ; (* @hint static 123 *)
+routingNumber = string ; (* @hint static 111000025 *)
+accountNumber = string ; (* @hint static 1234567890 *)
 checkDigit = integer ;
 invoiceNumber = string ;
 amountDue = number ;
 
-cardType =
-      "visa"
-    | "mastercard"
-    | "discover"
-    | "americanExpress" ;
+cardType = "visa" | "mastercard" | "discover" | "americanExpress" ; (* @hint static visa *)
 
 (********************************)
 (*      APPLE PAY (TOKENIZED)       *)

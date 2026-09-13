@@ -290,7 +290,8 @@ def apply_template_to_request(template_example: Dict, linked_request: Dict, open
 
     return request
 
-def generate_collection(template: Dict, linked_collection: Dict, openapi_spec: Dict, use_realistic_values: bool = False) -> Dict:
+def generate_collection(template: Dict, linked_collection: Dict, openapi_spec: Dict,
+                        use_realistic_values: bool = False, faker_hints: dict = None) -> Dict:
     """
     Generate a Postman collection from template.
 
@@ -299,11 +300,13 @@ def generate_collection(template: Dict, linked_collection: Dict, openapi_spec: D
         linked_collection: Canonical linked collection (structure source)
         openapi_spec: OpenAPI specification (structure definitions from EBNF)
         use_realistic_values: If True, generate test collection; if False, linked collection
+        faker_hints: Field hint dict. If None, falls back to template faker_hints section.
 
     Returns:
         Complete Postman collection
     """
-    faker_hints = template.get('faker_hints', {})
+    if faker_hints is None:
+        faker_hints = template.get('faker_hints', {})
 
     # Collection metadata
     collection_info = template.get("collection", {})
@@ -515,6 +518,12 @@ def main():
         default="postman/generated/c2mapiv2-getting-started-test-collection.json",
         help="Output path for test collection (realistic values)"
     )
+    parser.add_argument(
+        "--faker-hints",
+        default=None,
+        help="Path to derived config/faker_hints.yaml (generated from EBNF @hint annotations). "
+             "Takes precedence over faker_hints section in the template."
+    )
 
     args = parser.parse_args()
 
@@ -535,16 +544,33 @@ def main():
     print(f"Loading OpenAPI spec from {openapi_path}...", file=sys.stderr)
     openapi_spec = load_yaml(openapi_path)
 
+    # Resolve faker_hints: derived file takes precedence over template section
+    faker_hints: dict = {}
+    if args.faker_hints:
+        hints_path = Path(args.faker_hints)
+        if hints_path.exists():
+            hints_file = load_yaml(str(hints_path))
+            faker_hints = hints_file.get('faker_hints', {})
+            print(f"Using {len(faker_hints)} faker hints from {hints_path}", file=sys.stderr)
+        else:
+            print(f"⚠️  faker_hints file not found: {hints_path} — falling back to template section",
+                  file=sys.stderr)
+            faker_hints = template.get('faker_hints', {})
+    else:
+        faker_hints = template.get('faker_hints', {})
+
     # Validate faker_hints keys against spec field names
-    validate_faker_hints_keys(template.get('faker_hints', {}), openapi_spec)
+    validate_faker_hints_keys(faker_hints, openapi_spec)
 
     # Generate linked collection (placeholders)
     print("Generating linked collection (placeholders)...", file=sys.stderr)
-    linked_output = generate_collection(template, linked_collection, openapi_spec, use_realistic_values=False)
+    linked_output = generate_collection(template, linked_collection, openapi_spec,
+                                        use_realistic_values=False, faker_hints=faker_hints)
 
     # Generate test collection (realistic values)
     print("Generating test collection (realistic values)...", file=sys.stderr)
-    test_output = generate_collection(template, linked_collection, openapi_spec, use_realistic_values=True)
+    test_output = generate_collection(template, linked_collection, openapi_spec,
+                                      use_realistic_values=True, faker_hints=faker_hints)
 
     # Save outputs
     print(f"Writing linked collection to {args.output_linked}...", file=sys.stderr)
