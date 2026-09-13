@@ -47,7 +47,7 @@ generate_env_json() {
       {
         "key": "clientSecret",
         "value": "$client_secret",
-        "type": "secret",
+        "type": "default",
         "enabled": true
       },
       {
@@ -109,7 +109,7 @@ update_env_file() {
            'if .environment then
                .environment.values |= map(
                    if .key == "clientId" then .value = $client_id
-                   elif .key == "clientSecret" then .value = $client_secret
+                   elif .key == "clientSecret" then .value = $client_secret | .type = "default"
                    elif .key == "baseUrl" then .value = $base_url
                    elif .key == "authUrl" then .value = $auth_url
                    else . end
@@ -117,7 +117,7 @@ update_env_file() {
            else
                .values |= map(
                    if .key == "clientId" then .value = $client_id
-                   elif .key == "clientSecret" then .value = $client_secret
+                   elif .key == "clientSecret" then .value = $client_secret | .type = "default"
                    elif .key == "baseUrl" then .value = $base_url
                    elif .key == "authUrl" then .value = $auth_url
                    else . end
