@@ -316,14 +316,23 @@ function processItems(items) {
         return code >= 200 && code < 300;
       });
 
-      // Build originalRequest from the parent item's request
-      // Required by Postman mock server for x-mock-response-code header matching
+      // Build originalRequest from the parent item's request.
+      // Required by Postman mock server for x-mock-response-code header matching.
+      // ALL examples (2xx and errors) must share the same originalRequest body so that
+      // Postman's body-matching score is equal across all examples and it falls back to
+      // lowest-status-code selection (returning 200/201 by default).
       const originalRequest = {
         method: item.request.method,
         header: item.request.header || [],
         body: item.request.body || null,
         url: item.request.url
       };
+
+      // Sync existing 2xx examples to the same originalRequest so body-match scores
+      // are equal and Postman selects by status code (lowest wins = 200/201).
+      item.response.forEach(resp => {
+        resp.originalRequest = originalRequest;
+      });
 
       // Add all error responses (400, 401, 403, 404, 422, 500)
       Object.keys(ERROR_RESPONSES).forEach(errorCode => {
