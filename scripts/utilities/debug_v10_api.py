@@ -7,12 +7,13 @@ import requests
 import json
 import sys
 import os
+from pathlib import Path
 from typing import Dict, Any, Optional
 
 class PostmanV10Debugger:
     def __init__(self, api_key: str):
         self.api_key = api_key
-        self.base_url = "https://api.getpostman.com"
+        self.base_url = "https://api.postman.com"
         self.headers = {
             "X-API-Key": api_key,
             "Content-Type": "application/json"
@@ -149,22 +150,25 @@ class PostmanV10Debugger:
         return results
 
 def main():
-    # Read API key from .env
-    env_path = "/Users/frankserrao/Dropbox/Customers/c2m/projects/c2m-api/C2M_API_v2/c2m-api-repo/.env"
-    api_key = None
-    
-    with open(env_path, 'r') as f:
-        for line in f:
-            if line.startswith("POSTMAN_SERRAO_API_KEY"):
-                api_key = line.split("=", 1)[1].strip()
-                break
-    
+    _repo_root = Path(__file__).resolve().parent.parent.parent
+
+    # Read API key from env var or .env at repo root
+    api_key = os.environ.get("POSTMAN_SERRAO_API_KEY")
     if not api_key:
-        print("Error: Could not find POSTMAN_SERRAO_API_KEY in .env")
+        env_path = _repo_root / ".env"
+        if env_path.exists():
+            with open(env_path, 'r') as f:
+                for line in f:
+                    if line.startswith("POSTMAN_SERRAO_API_KEY"):
+                        api_key = line.split("=", 1)[1].strip()
+                        break
+
+    if not api_key:
+        print("Error: POSTMAN_SERRAO_API_KEY not set in environment or .env")
         sys.exit(1)
-    
-    # Read API ID
-    api_uid_path = "/Users/frankserrao/Dropbox/Customers/c2m/projects/c2m-api/C2M_API_v2/c2m-api-repo/postman/postman_api_uid.txt"
+
+    # Read API ID from postman/postman_api_uid.txt relative to repo root
+    api_uid_path = _repo_root / "postman" / "postman_api_uid.txt"
     with open(api_uid_path, 'r') as f:
         api_id = f.read().strip()
     
@@ -219,8 +223,8 @@ def main():
         for endpoint in successful_endpoints:
             print(f"  - {endpoint}")
     
-    # Write detailed results to file
-    output_path = "/Users/frankserrao/Dropbox/Customers/c2m/projects/c2m-api/C2M_API_v2/c2m-api-repo/postman/v10_api_debug_results.json"
+    # Write detailed results to file next to the postman UID file
+    output_path = _repo_root / "postman" / "v10_api_debug_results.json"
     
     all_results = {
         "api_id": api_id,

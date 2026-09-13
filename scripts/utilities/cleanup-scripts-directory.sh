@@ -3,8 +3,8 @@
 # Cleanup script specifically for the scripts directory
 # This script moves potentially obsolete scripts to possible-trash
 
-# Set project root
-PROJECT_ROOT="/Users/frankserrao/Dropbox/Customers/c2m/projects/c2m-api/C2M_API_v3/c2m-api-repo"
+# Set project root (two levels up from scripts/utilities/)
+PROJECT_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 TRASH_DIR="$PROJECT_ROOT/possible-trash"
 SCRIPTS_TRASH="$TRASH_DIR/scripts-cleanup"
 
