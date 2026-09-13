@@ -81,7 +81,7 @@ function updateAuthEndpoints(items) {
         item.request.body.mode = 'raw';
         item.request.body.raw = JSON.stringify(authExamples[requestName], null, 2);
         
-        // Ensure JSON content type
+        // Ensure JSON content type and X-Client-Id header
         if (!item.request.header) {
           item.request.header = [];
         }
@@ -90,6 +90,16 @@ function updateAuthEndpoints(items) {
           item.request.header.push({
             key: 'Content-Type',
             value: 'application/json'
+          });
+        }
+        // The security server requires X-Client-Id for the ClientKey scheme.
+        // The pre-request script sends this when it calls the endpoint internally,
+        // but direct requests from the collection also need it.
+        const clientIdHeader = item.request.header.find(h => h.key.toLowerCase() === 'x-client-id');
+        if (!clientIdHeader) {
+          item.request.header.push({
+            key: 'X-Client-Id',
+            value: '{{clientId}}'
           });
         }
         
