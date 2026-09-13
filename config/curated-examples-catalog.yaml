@@ -101,7 +101,7 @@ examples:
       paymentDetails: invoice
     values:
       documentId: 67890
-      addressListId: "LIST-2024-001"
+      addressListId: "LIST-A001"
       jobTemplate: real_estate_marketing
       customerAccountId: "ACCT-987654"
       tags:
@@ -153,8 +153,8 @@ examples:
       recipientAddressSource: addressListId
       paymentDetails: creditCard
     values:
-      url: "https://storage.example.com/newsletters/march-2024.pdf"
-      addressListId: "SUBSCRIBERS-MARCH-2024"
+      url: "https://storage.example.com/newsletters/march.pdf"
+      addressListId: "SUBSCRIBERS-MARCH"
       jobTemplate: newsletter_monthly
       cardType: mastercard
       cardNumber: "5555555555554444"
@@ -205,7 +205,7 @@ examples:
         - 44444
         - 55555
         - 66666
-      addressListId: "CAMPAIGN-Q1-2024"
+      addressListId: "CAMPAIGN-Q1"
       customerAccountId: "ACCT-MARKETING-789"
       tags:
         - marketing
@@ -271,8 +271,8 @@ examples:
       paymentDetails: creditCard
     values:
       requestId: 99999
-      filename: fundraising-appeal-spring-2024.pdf
-      addressListId: "DONORS-SPRING-2024"
+      filename: fundraising-appeal-spring.pdf
+      addressListId: "DONORS-SPRING"
       jobTemplate: non_profit_appeal
       cardType: discover
       cardNumber: "6011111111111117"
@@ -576,8 +576,8 @@ examples:
       paymentDetails: creditCard
     values:
       documentId: 3006
-      mappingId: "REUSABLE-LIST-Q1-2024"
-      addressListName: "Q1 2024 Marketing Campaign"
+      mappingId: "REUSABLE-LIST-Q1"
+      addressListName: "Q1 Marketing Campaign"
       addressList:
         - firstName: Emma
           lastName: Davis
