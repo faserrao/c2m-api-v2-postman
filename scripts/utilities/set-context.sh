@@ -40,6 +40,16 @@ if [[ "$ORIGIN_URL" == *"click2mail"* ]] && [ "$CONTEXT" = "personal" ]; then
     echo ""
 fi
 
+# Load workspace IDs from .env if present (same defaults as Makefile SERRAO_WS / C2M_WS)
+SERRAO_WS="${SERRAO_WS:-d8a1f479-a2aa-4471-869e-b12feea0a98c}"
+C2M_WS="${C2M_WS:-c740f0f4-0de2-4db3-8ab6-f8a0fa6fbeb1}"
+if [ -f ".env" ]; then
+    # shellcheck source=/dev/null
+    source .env
+    SERRAO_WS="${SERRAO_WS:-d8a1f479-a2aa-4471-869e-b12feea0a98c}"
+    C2M_WS="${C2M_WS:-c740f0f4-0de2-4db3-8ab6-f8a0fa6fbeb1}"
+fi
+
 # Set context
 echo "$CONTEXT" > $CONTEXT_FILE
 echo "✓ Context set to: $CONTEXT"
@@ -47,12 +57,12 @@ echo ""
 echo "This will affect:"
 case $CONTEXT in
     personal)
-        echo "  - Postman workspace: Personal (d8a1f479-a2aa-4471-869e-b12feea0a98c)"
+        echo "  - Postman workspace: Personal ($SERRAO_WS)"
         echo "  - API key: POSTMAN_SERRAO_API_KEY"
         echo "  - Git remote: origin (faserrao)"
         ;;
     click2mail)
-        echo "  - Postman workspace: Corporate (c740f0f4-0de2-4db3-8ab6-f8a0fa6fbeb1)"
+        echo "  - Postman workspace: Corporate ($C2M_WS)"
         echo "  - API key: POSTMAN_C2M_API_KEY"
         echo "  - Git remote: click2mail"
         ;;

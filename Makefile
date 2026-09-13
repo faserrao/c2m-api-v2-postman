@@ -747,7 +747,7 @@ postman-apis: ## List all Postman APIs
 	@echo "Fetching APIs using POSTMAN_API_KEY..."
 	curl --silent --location \
 	--header "X-Api-Key: $(POSTMAN_API_KEY)" \
-	"https://api.getpostman.com/apis" | jq .
+	"https://api.postman.com/apis" | jq .
 
 # Check mock server URL configuration
 .PHONY: check-mock
