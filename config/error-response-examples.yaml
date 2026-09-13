@@ -1,13 +1,15 @@
 # Error response examples for API mock data
 #
-# Used by scripts/active/add_response_examples.py to generate OpenAPI spec error examples.
-# Edit this file to change example content without touching Python code.
+# Single source of truth consumed by both:
+#   - scripts/active/add_response_examples.py   (OpenAPI spec examples)
+#   - scripts/active/add_error_responses_to_collection.js (Postman collection examples)
 #
 # Rules:
 #   - errorCode MUST match the EBNF data dictionary errorCode enum
 #   - errorType is NOT included here — derived from x-http-error-map in the spec at injection time
 #   - errorTrackingId is NOT included here — generated dynamically per invocation
-#   - Use {timestamp} in errorDetails where a current-time placeholder is needed
+#   - Use {timestamp} in errorDetails for current UTC time
+#   - Use {expired} in errorDetails for 1 hour ago (token-expiry context)
 
 400:
   missing_field:
@@ -15,6 +17,16 @@
     errorMessage: "Required field is missing from request body"
     errorCode: MISSING_REQUIRED_FIELD
     errorDetails: '{"field": "documentId", "location": "requestBody"}'
+  invalid_oneof:
+    summary: "Invalid oneOf selection"
+    errorMessage: "Request must match exactly one of the defined schemas"
+    errorCode: INVALID_ONEOF
+    errorDetails: '{"field": "document", "issue": "matches multiple schemas or no schema"}'
+  invalid_json:
+    summary: "Invalid JSON"
+    errorMessage: "Request body contains malformed JSON"
+    errorCode: INVALID_JSON
+    errorDetails: '{"error": "Unexpected token at position 42", "line": 3}'
   invalid_format:
     summary: "Invalid field format"
     errorMessage: "Field contains invalid format or value"
@@ -27,6 +39,16 @@
     errorMessage: "Authorization header is missing or invalid"
     errorCode: MISSING_AUTH_HEADER
     errorDetails: '{"expected": "Bearer <token>", "received": "none"}'
+  invalid_token:
+    summary: "Invalid token"
+    errorMessage: "Authentication token is invalid or malformed"
+    errorCode: INVALID_TOKEN
+    errorDetails: '{"reason": "invalid signature", "token": "<redacted>"}'
+  expired_token:
+    summary: "Expired token"
+    errorMessage: "Authentication token has expired"
+    errorCode: EXPIRED_TOKEN
+    errorDetails: '{"expired": "{expired}", "current": "{timestamp}"}'
 
 403:
   insufficient_permissions:
@@ -34,6 +56,11 @@
     errorMessage: "User does not have required permissions for this operation"
     errorCode: INSUFFICIENT_PERMISSIONS
     errorDetails: '{"required": "jobs:write", "user": "read-only-user"}'
+  account_suspended:
+    summary: "Account suspended"
+    errorMessage: "User account has been suspended"
+    errorCode: ACCOUNT_SUSPENDED
+    errorDetails: '{"reason": "payment overdue", "contact": "support@click2mail.com"}'
 
 404:
   resource_not_found:
@@ -41,6 +68,11 @@
     errorMessage: "Requested resource does not exist"
     errorCode: RESOURCE_NOT_FOUND
     errorDetails: '{"resourceType": "document", "resourceId": "DOC-12345"}'
+  job_not_found:
+    summary: "Job not found"
+    errorMessage: "The specified job does not exist"
+    errorCode: JOB_NOT_FOUND
+    errorDetails: '{"resourceType": "job", "jobId": "JOB-12345"}'
 
 422:
   validation_failed:
@@ -48,6 +80,16 @@
     errorMessage: "Request validation failed for multiple fields"
     errorCode: INVALID_FORMAT
     errorDetails: '{"errors": [{"field": "documentId", "issue": "not found"}, {"field": "recipientAddress.postalCode", "issue": "invalid format"}]}'
+  invalid_enum_value:
+    summary: "Invalid enum value"
+    errorMessage: "Field contains a value not allowed by the enumeration"
+    errorCode: INVALID_ENUM_VALUE
+    errorDetails: '{"field": "mailClass", "provided": "express", "allowed": ["First", "Standard"]}'
+  mutual_exclusion:
+    summary: "Mutually exclusive fields"
+    errorMessage: "Request contains mutually exclusive fields"
+    errorCode: MUTUAL_EXCLUSION_VIOLATION
+    errorDetails: '{"conflict": "documentId and documentUrl cannot both be specified"}'
 
 429:
   rate_limit_exceeded:
@@ -61,4 +103,14 @@
     summary: "Internal server error"
     errorMessage: "An unexpected error occurred while processing the request"
     errorCode: SERVER_ERROR
-    errorDetails: '{"timestamp": "{timestamp}", "requestId": "req-abc123"}'
+    errorDetails: '{"timestamp": "{timestamp}", "requestId": "{requestId}"}'
+  database_error:
+    summary: "Database error"
+    errorMessage: "Database operation failed"
+    errorCode: DATABASE_ERROR
+    errorDetails: '{"operation": "insert", "table": "jobs", "error": "connection timeout"}'
+  external_service_error:
+    summary: "External service error"
+    errorMessage: "External service call failed"
+    errorCode: EXTERNAL_SERVICE_ERROR
+    errorDetails: '{"service": "address-validation", "error": "timeout after 30s"}'

@@ -17,9 +17,10 @@ const yaml = require('js-yaml');
 // Single source of truth — override via --support-email CLI arg (passed by Makefile)
 const DEFAULT_SUPPORT_EMAIL = 'support@click2mail.com';
 
-// Computed once per invocation — ensures example timestamps reflect the build date
+// Computed once per invocation — ensures example values reflect the build date
 const _NOW_ISO = new Date().toISOString();
 const _EXPIRED_ISO = new Date(Date.now() - 3600000).toISOString();
+const _REQUEST_ID = `req-${crypto.randomBytes(4).toString('hex')}`;
 
 // HTTP status text mapping (required by Postman mock server for x-mock-response-code matching)
 const HTTP_STATUS_TEXT = {
@@ -39,112 +40,38 @@ function generateUUID() {
   });
 }
 
-// Error code metadata: maps error code to HTTP status and message template.
-// errorType is intentionally omitted — derived dynamically via deriveErrorType().
-const ERROR_CODE_METADATA = {
-  'MISSING_REQUIRED_FIELD': {
-    status: 400,
-    name: 'Missing required field',
-    message: 'Required field is missing from request body',
-    details: '{"field": "documentId", "location": "requestBody"}'
-  },
-  'INVALID_ONEOF': {
-    status: 400,
-    name: 'Invalid oneOf selection',
-    message: 'Request must match exactly one of the defined schemas',
-    details: '{"field": "document", "issue": "matches multiple schemas or no schema"}'
-  },
-  'INVALID_JSON': {
-    status: 400,
-    name: 'Invalid JSON',
-    message: 'Request body contains malformed JSON',
-    details: '{"error": "Unexpected token at position 42", "line": 3}'
-  },
-  'MISSING_AUTH_HEADER': {
-    status: 401,
-    name: 'Missing authentication',
-    message: 'Authorization header is missing or invalid',
-    details: '{"expected": "Bearer <token>", "received": "none"}'
-  },
-  'INVALID_TOKEN': {
-    status: 401,
-    name: 'Invalid token',
-    message: 'Authentication token is invalid or malformed',
-    details: '{"reason": "invalid signature", "token": "<redacted>"}'
-  },
-  'EXPIRED_TOKEN': {
-    status: 401,
-    name: 'Expired token',
-    message: 'Authentication token has expired',
-    details: `{"expired": "${_EXPIRED_ISO}", "current": "${_NOW_ISO}"}`
-  },
-  'INSUFFICIENT_PERMISSIONS': {
-    status: 403,
-    name: 'Insufficient permissions',
-    message: 'User does not have required permissions for this operation',
-    details: '{"required": "jobs:write", "user": "read-only-user"}'
-  },
-  'ACCOUNT_SUSPENDED': {
-    status: 403,
-    name: 'Account suspended',
-    message: 'User account has been suspended',
-    details: `{"reason": "payment overdue", "contact": "${DEFAULT_SUPPORT_EMAIL}"}`
-  },
-  'JOB_NOT_FOUND': {
-    status: 404,
-    name: 'Job not found',
-    message: 'The specified job does not exist',
-    details: '{"resourceType": "job", "jobId": "JOB-12345"}'
-  },
-  'RESOURCE_NOT_FOUND': {
-    status: 404,
-    name: 'Resource not found',
-    message: 'Requested resource does not exist',
-    details: '{"resourceType": "document", "resourceId": "DOC-12345"}'
-  },
-  'INVALID_ENUM_VALUE': {
-    status: 422,
-    name: 'Invalid enum value',
-    message: 'Field contains a value not allowed by the enumeration',
-    details: '{"field": "mailClass", "provided": "express", "allowed": ["First", "Standard"]}'
-  },
-  'MUTUAL_EXCLUSION_VIOLATION': {
-    status: 422,
-    name: 'Mutually exclusive fields',
-    message: 'Request contains mutually exclusive fields',
-    details: '{"conflict": "documentId and documentUrl cannot both be specified"}'
-  },
-  'INVALID_FORMAT': {
-    status: 422,
-    name: 'Invalid field format',
-    message: 'Field contains invalid format or value',
-    details: '{"field": "postalCode", "provided": "1234", "expected": "5 or 9 digits"}'
-  },
-  'SERVER_ERROR': {
-    status: 500,
-    name: 'Internal server error',
-    message: 'An unexpected error occurred while processing the request',
-    details: `{"timestamp": "${_NOW_ISO}", "requestId": "req-abc123"}`
-  },
-  'DATABASE_ERROR': {
-    status: 500,
-    name: 'Database error',
-    message: 'Database operation failed',
-    details: '{"operation": "insert", "table": "jobs", "error": "connection timeout"}'
-  },
-  'EXTERNAL_SERVICE_ERROR': {
-    status: 500,
-    name: 'External service error',
-    message: 'External service call failed',
-    details: '{"service": "address-validation", "error": "timeout after 30s"}'
-  },
-  'RATE_LIMIT_EXCEEDED': {
-    status: 429,
-    name: 'Rate limit exceeded',
-    message: 'Request rate limit exceeded — please slow down and retry',
-    details: '{"limit": "100 requests/minute", "retryAfterSeconds": 60}'
+// Error code metadata — loaded from config/error-response-examples.yaml in main().
+// That file is the single source of truth shared with add_response_examples.py.
+let ERROR_CODE_METADATA = {};
+
+/**
+ * Load ERROR_CODE_METADATA from config/error-response-examples.yaml.
+ * Converts the YAML structure (keyed by HTTP status then example name) into a flat
+ * dict keyed by errorCode, substituting {timestamp} and {expired} placeholders.
+ * When the same errorCode appears under multiple HTTP statuses the higher status wins
+ * (e.g. INVALID_FORMAT appears at 400 and 422 — the 422 entry is used for the JS dict).
+ */
+function loadErrorCodeMetadataFromYaml(yamlPath) {
+  const content = fs.readFileSync(yamlPath, 'utf8');
+  const raw = yaml.load(content);
+  const metadata = {};
+  for (const [httpStatus, examples] of Object.entries(raw)) {
+    for (const exData of Object.values(examples)) {
+      let details = String(exData.errorDetails || '{}');
+      details = details
+        .replace(/{timestamp}/g, _NOW_ISO)
+        .replace(/{expired}/g, _EXPIRED_ISO)
+        .replace(/{requestId}/g, _REQUEST_ID);
+      metadata[exData.errorCode] = {
+        status: parseInt(httpStatus, 10),
+        name: exData.summary,
+        message: exData.errorMessage,
+        details
+      };
+    }
   }
-};
+  return metadata;
+}
 
 /**
  * Read the errorType enum from the OpenAPI spec.
@@ -366,6 +293,12 @@ function main() {
     process.exit(1);
   }
 
+  const scriptDir = path.dirname(__filename);
+
+  // Load error code metadata from YAML (single source of truth with add_response_examples.py)
+  const errYamlPath = path.resolve(scriptDir, '../../config/error-response-examples.yaml');
+  ERROR_CODE_METADATA = loadErrorCodeMetadataFromYaml(errYamlPath);
+
   // Patch support email into ACCOUNT_SUSPENDED before building responses
   if (ERROR_CODE_METADATA.ACCOUNT_SUSPENDED) {
     ERROR_CODE_METADATA.ACCOUNT_SUSPENDED.details =
@@ -375,7 +308,6 @@ function main() {
   const [inputFile, outputFile] = positional;
 
   // Determine OpenAPI spec path (relative to script location)
-  const scriptDir = path.dirname(__filename);
   const openapiSpecPath = path.resolve(scriptDir, '../../openapi/c2mapiv2-openapi-spec-final.yaml');
 
   // Load error responses from OpenAPI spec

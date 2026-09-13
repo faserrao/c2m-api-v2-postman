@@ -10,7 +10,7 @@ import sys
 import copy
 import random
 import string
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 def _generate_tracking_id():
@@ -22,9 +22,11 @@ def _load_error_examples(examples_path):
     """Load ERROR_EXAMPLES from config/error-response-examples.yaml.
 
     Converts the flat YAML structure into the OpenAPI examples dict format.
-    Substitutes {timestamp} in errorDetails with the current UTC time.
+    Substitutes {timestamp} with the current UTC time and {expired} with 1 hour ago.
     """
     now = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+    expired = (datetime.now(timezone.utc) - timedelta(hours=1)).strftime('%Y-%m-%dT%H:%M:%SZ')
+    request_id = f"req-{''.join(random.choices('0123456789abcdef', k=8))}"
     with open(examples_path, 'r') as f:
         raw = yaml.safe_load(f)
     result = {}
@@ -34,6 +36,10 @@ def _load_error_examples(examples_path):
             details = ex_data.get('errorDetails', '{}')
             if '{timestamp}' in details:
                 details = details.replace('{timestamp}', now)
+            if '{expired}' in details:
+                details = details.replace('{expired}', expired)
+            if '{requestId}' in details:
+                details = details.replace('{requestId}', request_id)
             result[str(http_status)][ex_key] = {
                 'summary': ex_data['summary'],
                 'value': {

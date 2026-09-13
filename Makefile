@@ -184,7 +184,8 @@ POSTMAN_ENV_NAME                 := $(C2MAPIV2_POSTMAN_API_NAME_PC)Env
 POSTMAN_ENV_FILE_TEMP            := $(POSTMAN_DIR)/mock-env-temp.json
 POSTMAN_ENV_FILE_NEW             := $(POSTMAN_DIR)/mock-env-new.json
 POSTMAN_ENV_UID_FILE             := $(POSTMAN_DIR)/postman_env_uid.txt
-POSTMAN_ENV_UID                  := $(shell cat $(POSTMAN_ENV_UID_FILE))
+POSTMAN_ENV_UID                  := $(shell cat $(POSTMAN_ENV_UID_FILE) 2>/dev/null || true)
+POSTMAN_AWS_ENV_UID_FILE         := $(POSTMAN_DIR)/postman_aws_env_uid.txt
 POSTMAN_ENV_UPLOAD_DEBUG         := $(POSTMAN_DIR)/env-upload-debug.json
 POSTMAN_ENVIRONMENTS_URL         := $(POSTMAN_BASE_URL)/environments
 
@@ -1775,34 +1776,55 @@ postman-env-create:
 # Upload environment to Postman workspace
 .PHONY: postman-env-upload
 postman-env-upload:
-	@echo "📤 Uploading Mock environment file to workspace $(POSTMAN_WS)..."
+	@echo "📤 Uploading Mock environment to workspace $(POSTMAN_WS)..."
 	@$(call guard-file,$(POSTMAN_ENV_FILE))
-	@RESPONSE=$$(curl --silent --show-error --fail --location \
-		--request POST "$(POSTMAN_ENVIRONMENTS_URL)$(POSTMAN_Q)" \
-		$(POSTMAN_CURL_HEADERS_XC) \
-		--data-binary '@$(POSTMAN_ENV_FILE)' || true); \
-	echo "$$RESPONSE" | jq . > $(POSTMAN_ENV_UPLOAD_DEBUG) || echo "$$RESPONSE" > $(POSTMAN_ENV_UPLOAD_DEBUG); \
-	POSTMAN_ENV_UID=$$(echo "$$RESPONSE" | jq -r '.environment.uid // empty'); \
-	if [ -z "$$POSTMAN_ENV_UID" ]; then \
-		echo "❌ Failed to upload environment. See $(POSTMAN_ENV_UPLOAD_DEBUG)."; \
-		exit 1; \
+	@if [ -f "$(POSTMAN_ENV_UID_FILE)" ] && [ -s "$(POSTMAN_ENV_UID_FILE)" ]; then \
+		EXISTING_UID=$$(cat $(POSTMAN_ENV_UID_FILE)); \
+		echo "🔄 Updating existing Mock environment (UID: $$EXISTING_UID)..."; \
+		RESPONSE=$$(curl --silent --show-error --fail --location \
+			--request PUT "$(POSTMAN_ENVIRONMENTS_URL)/$$EXISTING_UID$(POSTMAN_Q)" \
+			$(POSTMAN_CURL_HEADERS_XC) \
+			--data-binary '@$(POSTMAN_ENV_FILE)' || true); \
 	else \
-		echo "✅ Mock environment uploaded with UID: $$POSTMAN_ENV_UID"; \
-		echo $$POSTMAN_ENV_UID > $(POSTMAN_ENV_UID_FILE); \
-	fi
-	
-	@echo "📤 Uploading AWS Dev environment file to workspace $(POSTMAN_WS)..."
-	@AWS_ENV_FILE="postman/environments/c2m-aws-dev.postman_environment.json"; \
-	if [ -f "$$AWS_ENV_FILE" ]; then \
+		echo "🆕 Creating new Mock environment..."; \
 		RESPONSE=$$(curl --silent --show-error --fail --location \
 			--request POST "$(POSTMAN_ENVIRONMENTS_URL)$(POSTMAN_Q)" \
 			$(POSTMAN_CURL_HEADERS_XC) \
-			--data-binary "@$$AWS_ENV_FILE" || true); \
+			--data-binary '@$(POSTMAN_ENV_FILE)' || true); \
+	fi; \
+	echo "$$RESPONSE" | jq . > $(POSTMAN_ENV_UPLOAD_DEBUG) || echo "$$RESPONSE" > $(POSTMAN_ENV_UPLOAD_DEBUG); \
+	POSTMAN_ENV_UID=$$(echo "$$RESPONSE" | jq -r '.environment.uid // empty'); \
+	if [ -z "$$POSTMAN_ENV_UID" ]; then \
+		echo "❌ Failed to upload Mock environment. See $(POSTMAN_ENV_UPLOAD_DEBUG)."; \
+		exit 1; \
+	else \
+		echo "✅ Mock environment upserted with UID: $$POSTMAN_ENV_UID"; \
+		echo $$POSTMAN_ENV_UID > $(POSTMAN_ENV_UID_FILE); \
+	fi
+
+	@echo "📤 Uploading AWS Dev environment to workspace $(POSTMAN_WS)..."
+	@AWS_ENV_FILE="postman/environments/c2m-aws-dev.postman_environment.json"; \
+	if [ -f "$$AWS_ENV_FILE" ]; then \
+		if [ -f "$(POSTMAN_AWS_ENV_UID_FILE)" ] && [ -s "$(POSTMAN_AWS_ENV_UID_FILE)" ]; then \
+			EXISTING_UID=$$(cat $(POSTMAN_AWS_ENV_UID_FILE)); \
+			echo "🔄 Updating existing AWS Dev environment (UID: $$EXISTING_UID)..."; \
+			RESPONSE=$$(curl --silent --show-error --fail --location \
+				--request PUT "$(POSTMAN_ENVIRONMENTS_URL)/$$EXISTING_UID$(POSTMAN_Q)" \
+				$(POSTMAN_CURL_HEADERS_XC) \
+				--data-binary "@$$AWS_ENV_FILE" || true); \
+		else \
+			echo "🆕 Creating new AWS Dev environment..."; \
+			RESPONSE=$$(curl --silent --show-error --fail --location \
+				--request POST "$(POSTMAN_ENVIRONMENTS_URL)$(POSTMAN_Q)" \
+				$(POSTMAN_CURL_HEADERS_XC) \
+				--data-binary "@$$AWS_ENV_FILE" || true); \
+		fi; \
 		AWS_ENV_UID=$$(echo "$$RESPONSE" | jq -r '.environment.uid // empty'); \
 		if [ -z "$$AWS_ENV_UID" ]; then \
 			echo "⚠️  Failed to upload AWS Dev environment"; \
 		else \
-			echo "✅ AWS Dev environment uploaded with UID: $$AWS_ENV_UID"; \
+			echo "✅ AWS Dev environment upserted with UID: $$AWS_ENV_UID"; \
+			echo $$AWS_ENV_UID > $(POSTMAN_AWS_ENV_UID_FILE); \
 		fi \
 	else \
 		echo "⚠️  AWS Dev environment file not found: $$AWS_ENV_FILE"; \

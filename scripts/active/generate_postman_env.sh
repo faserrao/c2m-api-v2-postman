@@ -11,8 +11,8 @@ OUTPUT_FILE="${2:-}"
 # Default values
 DEFAULT_CLIENT_ID="${C2M_CLIENT_ID:-test-client-123}"
 DEFAULT_CLIENT_SECRET="${C2M_CLIENT_SECRET:-super-secret-password-123}"
-DEFAULT_BASE_URL="${C2M_BASE_URL:-https://j0dos52r5e.execute-api.us-east-1.amazonaws.com/dev}"
-DEFAULT_AUTH_URL="${C2M_AUTH_URL:-https://j0dos52r5e.execute-api.us-east-1.amazonaws.com/dev}"
+DEFAULT_BASE_URL="${C2M_BASE_URL:-}"
+DEFAULT_AUTH_URL="${C2M_AUTH_URL:-}"
 
 # Function to generate environment JSON
 generate_env_json() {

@@ -57,7 +57,7 @@ parse_credentials() {
     # Use default values if not found in secret
     CLIENT_ID="${CLIENT_ID:-test-client-123}"
     CLIENT_SECRET="${CLIENT_SECRET:-super-secret-password-123}"
-    BASE_URL="${BASE_URL:-https://j0dos52r5e.execute-api.us-east-1.amazonaws.com/dev}"
+    BASE_URL="${BASE_URL:-}"
     
     # Output as environment variable exports
     cat <<EOF
@@ -69,13 +69,14 @@ EOF
 
 # Main execution
 main() {
-    # Check if we should use local defaults (for CI/CD or local testing)
+    # Check if we should use environment variable credentials (for CI/CD or local testing)
+    # Set C2M_CLIENT_ID, C2M_CLIENT_SECRET, C2M_BASE_URL in your CI secrets or shell profile.
     if [[ "${USE_LOCAL_CREDS:-false}" == "true" ]]; then
-        echo "ℹ️  Using local test credentials (USE_LOCAL_CREDS=true)" >&2
+        echo "ℹ️  Using environment variable credentials (USE_LOCAL_CREDS=true)" >&2
         cat <<EOF
-export C2M_CLIENT_ID="test-client-123"
-export C2M_CLIENT_SECRET="super-secret-password-123"
-export C2M_BASE_URL="https://j0dos52r5e.execute-api.us-east-1.amazonaws.com/dev"
+export C2M_CLIENT_ID="${C2M_CLIENT_ID:-test-client-123}"
+export C2M_CLIENT_SECRET="${C2M_CLIENT_SECRET:-super-secret-password-123}"
+export C2M_BASE_URL="${C2M_BASE_URL:-}"
 EOF
         exit 0
     fi

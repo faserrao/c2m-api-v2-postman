@@ -4,8 +4,8 @@
 // Configuration - Set these in your Postman environment
 const config = {
     // Use authUrl for authentication endpoints, fallback to baseUrl for compatibility
-    authUrl: pm.environment.get('authUrl') || pm.environment.get('baseUrl') || 'http://localhost:4010',
-    baseUrl: pm.environment.get('baseUrl') || 'http://localhost:4010',
+    authUrl: pm.environment.get('authUrl') || pm.environment.get('baseUrl') || '',
+    baseUrl: pm.environment.get('baseUrl') || '',
     clientId: pm.environment.get('clientId'),
     clientSecret: pm.environment.get('clientSecret'),
     longTokenVar: 'longTermToken',
@@ -13,6 +13,15 @@ const config = {
     tokenExpiryVar: 'tokenExpiry',
     tokenIdVar: 'currentTokenId'
 };
+
+// Helper: read a JSON-array env var, falling back to defaultArr.
+// Env vars are strings; store as JSON e.g. '["jobs:submit","templates:read"]'.
+// Optional overrides: longTokenScopes, shortTokenScopes (arrays), longTokenTtl (seconds).
+function envArray(key, defaultArr) {
+    const raw = pm.environment.get(key);
+    if (!raw) return defaultArr;
+    try { return JSON.parse(raw); } catch { return defaultArr; }
+}
 
 // Helper function to check if token is expired
 function isTokenExpired(expiryTime) {
@@ -40,8 +49,8 @@ async function getLongTermToken() {
                 grant_type: 'client_credentials',
                 client_id: config.clientId,
                 client_secret: config.clientSecret,
-                scopes: ['jobs:submit', 'templates:read', 'tokens:revoke'],
-                ttl_seconds: 2592000 // 30 days
+                scopes: envArray('longTokenScopes', ['jobs:submit', 'templates:read', 'tokens:revoke']),
+                ttl_seconds: parseInt(pm.environment.get('longTokenTtl') || '2592000', 10)
             })
         }
     };
@@ -83,7 +92,7 @@ async function getShortTermToken(longTermToken) {
         body: {
             mode: 'raw',
             raw: JSON.stringify({
-                scopes: ['jobs:submit'] // Narrow scope for actual API calls
+                scopes: envArray('shortTokenScopes', ['jobs:submit'])
             })
         }
     };
@@ -121,6 +130,12 @@ async function authenticate() {
             return;
         }
         
+        // Guard: no environment selected or baseUrl/authUrl not configured
+        if (!config.authUrl) {
+            console.warn('No authUrl or baseUrl configured in environment. Skipping authentication.');
+            return;
+        }
+
         // Check if we need client credentials
         if (!config.clientId || !config.clientSecret) {
             console.warn('Client credentials not configured. Set clientId and clientSecret in environment.');
@@ -157,7 +172,7 @@ async function authenticate() {
         const isMockServer = urlHost.includes('mock.pstmn.io') ||
                            urlHost.includes('localhost') ||
                            baseUrlVar.includes('mock.pstmn.io') ||
-                           baseUrlVar.includes('localhost:4010') ||
+                           baseUrlVar.includes('localhost') ||
                            pm.environment.get('isMockServer') === 'true';
 
         // Enhanced logging for debugging
