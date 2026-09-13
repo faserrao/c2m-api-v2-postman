@@ -11,6 +11,7 @@ Usage:
         --output getting-started-curated-test.yaml
 """
 
+import argparse
 import json
 import yaml
 import sys
@@ -205,9 +206,13 @@ def extract_examples(collection):
     return examples
 
 def main():
-    # Hard-coded paths for this use case
-    input_file = Path("/Users/frankserrao/Dropbox/Customers/c2m/C2M-General/Invoices/022026/REST API V2.postman_collection (3).json")
-    output_file = Path("/Users/frankserrao/Dropbox/Customers/c2m/projects/c2m-api/C2M_API_v2/c2m-api-v2-postman/config/getting-started-curated-test.yaml")
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--input", required=True, help="Path to input Postman collection JSON file")
+    parser.add_argument("--output", required=True, help="Path to write output YAML catalog file")
+    args = parser.parse_args()
+
+    input_file = Path(args.input)
+    output_file = Path(args.output)
 
     # Read Postman collection
     print(f"Reading Postman collection from {input_file}...", file=sys.stderr)
