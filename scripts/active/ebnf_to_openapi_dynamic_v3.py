@@ -816,7 +816,14 @@ class EBNFToOpenAPITranslator:
         return field_names
 
     def _generate_error_details(self, status_code: str, error_code: str, field_names: Dict[str, str]) -> str:
-        """Generate contextual error details based on error type"""
+        """Generate contextual error details based on error type.
+
+        NOTE: This dict is intentionally separate from config/error-response-examples.yaml.
+        That YAML drives Postman collection and Newman test examples.
+        This dict drives OpenAPI spec-level examples (rendered in Redoc/Swagger UI).
+        Unlike the YAML, it uses field_names.get() for spec-derived field names — do not
+        replace with YAML loading, as that would lose the dynamic field-name resolution.
+        """
         details_map = {
             'MISSING_REQUIRED_FIELD': {
                 "field": field_names.get('documentField', 'documentId'),

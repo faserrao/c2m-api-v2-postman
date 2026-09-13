@@ -43,7 +43,7 @@ pm.sendRequest(authRequest, (err, response) => {
     const isMockServer = urlHost.includes("mock.pstmn.io") ||
                         urlHost.includes("localhost") ||
                         baseUrlVar.includes("mock.pstmn.io") ||
-                        baseUrlVar.includes("localhost:4010");
+                        baseUrlVar.includes("localhost");
 
     // Enhanced logging for debugging
     console.log("=== JWT AUTH DEBUG ===");
