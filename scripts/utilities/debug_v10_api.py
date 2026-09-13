@@ -195,7 +195,18 @@ def main():
     generation_results = debugger.test_collection_from_schema(api_id)
     
     # Test 5: List workspace APIs
-    workspace_id = "d8a1f479-a2aa-4471-869e-b12feea0a98c"  # From CLAUDE.md
+    workspace_id = os.environ.get("POSTMAN_WS")
+    if not workspace_id:
+        env_path = _repo_root / ".env"
+        if env_path.exists():
+            with open(env_path, 'r') as f:
+                for line in f:
+                    if line.startswith("POSTMAN_WS"):
+                        workspace_id = line.split("=", 1)[1].strip()
+                        break
+    if not workspace_id:
+        print("Error: POSTMAN_WS not set in environment or .env")
+        sys.exit(1)
     workspace_apis = debugger.test_workspace_apis(workspace_id)
     
     # Test 6: Test API tasks

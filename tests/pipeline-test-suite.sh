@@ -424,19 +424,19 @@ test_postman_connectivity() {
             # Test API key validity
             response=$(curl -s -o /dev/null -w "%{http_code}" \
                 -H "X-Api-Key: $POSTMAN_SERRAO_API_KEY" \
-                "https://api.getpostman.com/me")
-            
+                "https://api.postman.com/me")
+
             if [ "$response" = "200" ]; then
                 log_success "Postman API key is valid"
             else
                 log_error "Postman API key is invalid (HTTP $response)"
             fi
-            
+
             # Test workspace access
             if [ -n "${POSTMAN_WS:-}" ]; then
                 response=$(curl -s -o /dev/null -w "%{http_code}" \
                     -H "X-Api-Key: $POSTMAN_SERRAO_API_KEY" \
-                    "https://api.getpostman.com/workspaces/$POSTMAN_WS")
+                    "https://api.postman.com/workspaces/$POSTMAN_WS")
                 
                 if [ "$response" = "200" ]; then
                     log_success "Workspace $POSTMAN_WS is accessible"

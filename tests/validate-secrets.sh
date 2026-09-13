@@ -61,14 +61,14 @@ echo -e "\n2. Testing Postman API connectivity..."
 if [ -n "${POSTMAN_SERRAO_API_KEY:-}" ]; then
     response=$(curl -s -o /dev/null -w "%{http_code}" \
         -H "X-Api-Key: $POSTMAN_SERRAO_API_KEY" \
-        "https://api.getpostman.com/me")
-    
+        "https://api.postman.com/me")
+
     if [ "$response" = "200" ]; then
         echo -e "${GREEN}✓${NC} Postman API key is valid"
-        
+
         # Get user info
         user_info=$(curl -s -H "X-Api-Key: $POSTMAN_SERRAO_API_KEY" \
-            "https://api.getpostman.com/me" | jq -r '.user.username' 2>/dev/null)
+            "https://api.postman.com/me" | jq -r '.user.username' 2>/dev/null)
         if [ -n "$user_info" ]; then
             echo -e "${BLUE}  Logged in as: $user_info${NC}"
         fi
@@ -81,18 +81,18 @@ fi
 
 # Check workspace access
 echo -e "\n3. Testing workspace access..."
-workspace_id="${POSTMAN_WS:-d8a1f479-a2aa-4471-869e-b12feea0a98c}"
-if [ -n "${POSTMAN_SERRAO_API_KEY:-}" ]; then
+workspace_id="${POSTMAN_WS}"
+if [ -n "$workspace_id" ] && [ -n "${POSTMAN_SERRAO_API_KEY:-}" ]; then
     response=$(curl -s -o /dev/null -w "%{http_code}" \
         -H "X-Api-Key: $POSTMAN_SERRAO_API_KEY" \
-        "https://api.getpostman.com/workspaces/$workspace_id")
-    
+        "https://api.postman.com/workspaces/$workspace_id")
+
     if [ "$response" = "200" ]; then
         echo -e "${GREEN}✓${NC} Workspace accessible: $workspace_id"
-        
+
         # Get workspace name
         ws_name=$(curl -s -H "X-Api-Key: $POSTMAN_SERRAO_API_KEY" \
-            "https://api.getpostman.com/workspaces/$workspace_id" | \
+            "https://api.postman.com/workspaces/$workspace_id" | \
             jq -r '.workspace.name' 2>/dev/null)
         if [ -n "$ws_name" ] && [ "$ws_name" != "null" ]; then
             echo -e "${BLUE}  Workspace name: $ws_name${NC}"
@@ -100,6 +100,8 @@ if [ -n "${POSTMAN_SERRAO_API_KEY:-}" ]; then
     else
         echo -e "${RED}✗${NC} Cannot access workspace (HTTP $response)"
     fi
+elif [ -z "$workspace_id" ]; then
+    echo -e "${YELLOW}⚠${NC} POSTMAN_WS not set — skipping workspace check"
 fi
 
 # GitHub secrets info

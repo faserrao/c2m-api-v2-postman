@@ -86,7 +86,7 @@ if [ -f ".env" ]; then
     if [ -n "${POSTMAN_SERRAO_API_KEY:-}" ]; then
         response=$(curl -s -o /dev/null -w "%{http_code}" \
             -H "X-Api-Key: $POSTMAN_SERRAO_API_KEY" \
-            "https://api.getpostman.com/me")
+            "https://api.postman.com/me")
         [ "$response" = "200" ] && pass "Postman API connected" || fail "Postman API error (HTTP $response)"
     else
         echo -e "${YELLOW}⚠${NC} Postman API key not configured"
