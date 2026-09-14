@@ -558,6 +558,10 @@ function generateRandomValue(key, existingValue) {
         return 'Your request has been queued';
     } else if (keyLower === 'jobid' || (keyLower.includes('job') && keyLower.includes('id'))) {
         return `job_${Date.now()}_${faker.string.alphanumeric(6)}`;
+    } else if (keyLower.includes('page')) {
+        return faker.number.int({ min: 1, max: 50 });
+    } else if (existingValue === '<integer>') {
+        return faker.number.int({ min: 1, max: 9999 });
     } else {
         // Better default fallback - use a sensible default
         return faker.helpers.arrayElement(['default', 'standard', 'basic', 'primary']);
