@@ -84,8 +84,6 @@ examples:
     pdfSplitJobsNoAddress:
     - startPage: <Integer>
       endPage: <Integer>
-    - startPage: <Integer>
-      endPage: <Integer>
 - name: /batch/zip/address-capture - using zip file
   method: POST
   path: /batch/zip/address-capture
@@ -106,34 +104,6 @@ examples:
     docSourceStandard: requestId
   values:
     pdfSplitJobsWithAddress:
-    - jobTemplate: <String>
-      startPage: <Integer>
-      endPage: <Integer>
-      recipientAddressSource:
-        singleAddress:
-          firstName: <String>
-          lastName: <String>
-          address1: <String>
-          address2: <String>
-          address3: <String>
-          city: <String>
-          state: <String>
-          zip: <String>
-          country: <String>
-    - jobTemplate: <String>
-      startPage: <Integer>
-      endPage: <Integer>
-      recipientAddressSource:
-        singleAddress:
-          firstName: <String>
-          lastName: <String>
-          address1: <String>
-          address2: <String>
-          address3: <String>
-          city: <String>
-          state: <String>
-          zip: <String>
-          country: <String>
     - jobTemplate: <String>
       startPage: <Integer>
       endPage: <Integer>
@@ -263,32 +233,6 @@ examples:
           state: <String>
           zip: <String>
           country: <String>
-    - jobTemplate: <String>
-      filename: <String>
-      recipientAddressSource:
-        singleAddress:
-          firstName: <String>
-          lastName: <String>
-          address1: <String>
-          address2: <String>
-          address3: <String>
-          city: <String>
-          state: <String>
-          zip: <String>
-          country: <String>
-    - jobTemplate: <String>
-      filename: <String>
-      recipientAddressSource:
-        singleAddress:
-          firstName: <String>
-          lastName: <String>
-          address1: <String>
-          address2: <String>
-          address3: <String>
-          city: <String>
-          state: <String>
-          zip: <String>
-          country: <String>
 - name: /batch/zip - using documentId
   method: POST
   path: /batch/zip
@@ -299,32 +243,6 @@ examples:
     docSourceZipFileRef:
       documentId: <Integer>
     multiZipJobs:
-    - jobTemplate: <String>
-      filename: <String>
-      recipientAddressSource:
-        singleAddress:
-          firstName: <String>
-          lastName: <String>
-          address1: <String>
-          address2: <String>
-          address3: <String>
-          city: <String>
-          state: <String>
-          zip: <String>
-          country: <String>
-    - jobTemplate: <String>
-      filename: <String>
-      recipientAddressSource:
-        singleAddress:
-          firstName: <String>
-          lastName: <String>
-          address1: <String>
-          address2: <String>
-          address3: <String>
-          city: <String>
-          state: <String>
-          zip: <String>
-          country: <String>
     - jobTemplate: <String>
       filename: <String>
       recipientAddressSource:
