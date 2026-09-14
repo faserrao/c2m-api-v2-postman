@@ -533,7 +533,7 @@ def main():
 
     # Load schema references from template
     schema_refs = template.get("schema_references", {})
-    openapi_path = schema_refs.get("openapi_spec", "openapi/c2mapiv2-openapi-spec-base.yaml")
+    openapi_path = schema_refs.get("openapi_spec", "openapi/c2mapiv2-openapi-spec-final.yaml")
     linked_path = schema_refs.get("linked_collection", "postman/generated/c2mapiv2-linked-collection-flat.json")
 
     # Load linked collection
