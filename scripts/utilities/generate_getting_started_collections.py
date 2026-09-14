@@ -268,7 +268,10 @@ def apply_template_to_request(template_example: Dict, linked_request: Dict, open
         structure = get_oneof_structure_from_openapi(openapi_spec, field, variant)
         if structure is not None:
             if use_realistic_values:
-                new_body[field] = replace_placeholders_recursive(structure, field, faker_hints)
+                # Scalar variants (e.g. urlSource = string) resolve to a bare "<String>" placeholder.
+                # Use the variant name for hint lookup so faker_hints['url'] fires, not faker_hints['docSourceAll'].
+                hint_key = variant if isinstance(structure, str) and structure.startswith('<') else field
+                new_body[field] = replace_placeholders_recursive(structure, hint_key, faker_hints)
             else:
                 new_body[field] = structure
 
