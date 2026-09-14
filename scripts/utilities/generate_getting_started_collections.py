@@ -33,6 +33,7 @@ import sys
 import argparse
 import copy
 import subprocess
+import random
 from pathlib import Path
 from typing import Dict, List, Any, Optional
 from faker import Faker
@@ -204,6 +205,10 @@ def generate_realistic_value(field_name: str, field_type: str,
                 min=hint.get('min', 0),
                 max=hint.get('max', 9999)
             )
+        elif hint_type == 'aba_routing_number':
+            d = [random.randint(0, 9) for _ in range(8)]
+            check = (10 - (3*d[0] + 7*d[1] + d[2] + 3*d[3] + 7*d[4] + d[5] + 3*d[6] + 7*d[7]) % 10) % 10
+            return ''.join(map(str, d)) + str(check)
     # Generic fallback — degraded but not broken
     if field_type == 'integer':
         return 123

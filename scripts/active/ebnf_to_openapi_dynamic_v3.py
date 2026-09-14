@@ -1350,6 +1350,7 @@ def extract_faker_hints(ebnf_content: str) -> dict:
       ruleName = string  ; (* @hint faker  first_name *)
       ruleName = integer ; (* @hint static 123 *)
       ruleName = id      ; (* @hint random_int 10000 99999 *)
+      ruleName = string  ; (* @hint aba_routing_number *)
 
     Returns a dict in the same format as the faker_hints section of
     getting-started-template.yaml so the Getting Started generator can
@@ -1388,6 +1389,8 @@ def extract_faker_hints(ebnf_content: str) -> dict:
                     hints[rule_name] = {'type': 'random_int', 'min': int(parts[0]), 'max': int(parts[1])}
                 except ValueError:
                     pass  # malformed annotation — silently skip
+        elif hint_type == 'aba_routing_number':
+            hints[rule_name] = {'type': 'aba_routing_number'}
     return hints
 
 

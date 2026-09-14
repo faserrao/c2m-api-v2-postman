@@ -64,7 +64,6 @@ examples:
       paymentDetails: creditCard
     values:
       # Document source
-      documentId: 12345
       # Recipient address (flat values - structure from Linked Collection)
       firstName: John
       lastName: Doe
@@ -100,7 +99,6 @@ examples:
       recipientAddressSource: addressListId
       paymentDetails: invoice
     values:
-      documentId: 67890
       addressListId: "LIST-A001"
       jobTemplate: real_estate_marketing
       customerAccountId: "ACCT-987654"
@@ -132,7 +130,6 @@ examples:
       zip: "90001"
       country: USA
       jobTemplate: medical_correspondence
-      routingNumber: "123456789"
       accountNumber: "9876543210"
       tags:
         - medical
@@ -177,7 +174,6 @@ examples:
       docSourceStandard: documentId
       paymentDetails: creditCard
     values:
-      documentId: 33333
       cardType: americanExpress
       cardNumber: "378282246310005"
       month: 9
@@ -248,7 +244,6 @@ examples:
               state: OR
               zip: "97201"
               country: USA
-      routingNumber: "987654321"
       accountNumber: "1234567890"
       tags:
         - reseller
@@ -304,7 +299,6 @@ examples:
       recipientAddressSource: singleAddress
       paymentDetails: creditCard
     values:
-      documentId: 1001
       firstName: Alice
       lastName: Johnson
       address1: 789 Pine Street
@@ -336,10 +330,8 @@ examples:
       recipientAddressSource: addressListId
       paymentDetails: ach
     values:
-      documentId: 1002
       addressListId: "EXAMPLE-LIST-001"
       jobTemplate: mail_merge_template
-      routingNumber: "111000025"
       accountNumber: "1234567890"
       tags:
         - example
@@ -358,7 +350,6 @@ examples:
       docSourceStandard: documentId
       paymentDetails: invoice
     values:
-      documentId: 1003
       customerAccountId: "EXAMPLE-ACCT-001"
       tags:
         - example
@@ -381,7 +372,6 @@ examples:
       docSourceStandard: documentId
       paymentDetails: creditCard
     values:
-      documentId: 2001
       cardType: mastercard
       cardNumber: "5555555555554444"
       month: 6
@@ -404,9 +394,7 @@ examples:
       docSourceStandard: documentId
       paymentDetails: ach
     values:
-      documentId: 2002
       addressListId: "BULK-LIST-001"
-      routingNumber: "222222226"
       accountNumber: "9876543210"
       tags:
         - bulk
@@ -483,7 +471,6 @@ examples:
       recipientAddressSource: singleAddress
       paymentDetails: creditCard
     values:
-      documentId: 3004
       firstName: Carol
       lastName: White
       address1: 789 Elm Street
@@ -521,7 +508,6 @@ examples:
       url: "https://example.com/documents/newsletter.pdf"
       addressListId: "URL-LIST-001"
       jobTemplate: standard_letter
-      routingNumber: "333333338"
       accountNumber: "5555555555"
       tags:
         - advanced
@@ -541,7 +527,6 @@ examples:
       recipientAddressSource: singleAddress
       paymentDetails: invoice
     values:
-      documentId: 3005
       firstName: David
       lastName: Brown
       address1: 321 Maple Drive
@@ -570,7 +555,6 @@ examples:
       recipientAddressSource: addressList
       paymentDetails: creditCard
     values:
-      documentId: 3006
       mappingId: "REUSABLE-LIST-Q1"
       addressListName: "Q1 Marketing Campaign"
       addressList:
@@ -604,7 +588,6 @@ examples:
       recipientAddressSource: singleAddress
       paymentDetails: ach
     values:
-      documentId: 3007
       firstName: Frank
       lastName: Miller
       address1: 987 Cedar Court
@@ -613,7 +596,6 @@ examples:
       zip: "97201"
       country: USA
       jobTemplate: invoice_statement
-      routingNumber: "444444440"
       accountNumber: "7777777777"
       tags:
         - advanced
@@ -632,8 +614,6 @@ examples:
       docSourceZipFileRef: zipDocumentId
       paymentDetails: invoice
     values:
-      docSourceZipFileRef:
-        documentId: 3008
       multiZipJobs:
         - jobTemplate: standard_letter
           filename: letter_001.pdf
@@ -676,7 +656,6 @@ examples:
       recipientAddressSource: singleAddress
       paymentDetails: creditCard
     values:
-      documentId: 99999
       firstName: Grace
       lastName: Taylor
       address1: 135 Willow Way
@@ -708,10 +687,8 @@ examples:
       recipientAddressSource: addressListId
       paymentDetails: ach
     values:
-      documentId: 3011
       addressListId: "SAVED-LIST-12345"
       jobTemplate: bulk_mailing
-      routingNumber: "555555552"
       accountNumber: "8888888888"
       tags:
         - advanced
