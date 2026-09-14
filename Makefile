@@ -2858,6 +2858,21 @@ validate-collections-conformance-test: ## Run all validation golden tests (valid
 	C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" $(VENV_PYTHON) scripts/validation/tests/test_oneof_resolver.py && \
 	$(VENV_PYTHON) -m pytest scripts/validation/tests/test_dd_constraints.py -v
 
+.PHONY: validate-all-collections
+validate-all-collections: ## Validate ALL active collections against the DD (fields + enum values)
+	@echo "🔍 Validating all active Postman collections against the DD (OpenAPI spec)..."
+	@$(VENV_PYTHON) scripts/validation/validate_all_collections_against_dd.py \
+		--spec $(C2MAPIV2_OPENAPI_SPEC_FINAL) \
+		--dir postman/generated
+
+.PHONY: validate-all-collections-report
+validate-all-collections-report: ## Same as validate-all-collections but writes a Markdown report
+	@echo "🔍 Validating all active Postman collections against the DD..."
+	@$(VENV_PYTHON) scripts/validation/validate_all_collections_against_dd.py \
+		--spec $(C2MAPIV2_OPENAPI_SPEC_FINAL) \
+		--dir postman/generated \
+		--report reports/dd-validation-report.md
+
 .PHONY: validate-configs
 validate-configs: ## Validate all config file field names against the EBNF Data Dictionary
 	@echo "🔍 Validating config files against DD rule names..."
