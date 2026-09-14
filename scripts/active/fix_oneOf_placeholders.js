@@ -163,6 +163,10 @@ function processObject(obj, oneOfFields, replacedFields, parentKey = '') {
     return result;
 }
 
+// Job array fields where openapi-to-postmanv2 generates 2 identical placeholder items.
+// Trim to 1 so the linked collection template has a single clean example item.
+const JOB_ARRAY_FIELDS = ['pdfSplitJobsNoAddress', 'pdfSplitJobsWithAddress', 'multiZipJobs', 'multiDocJobs'];
+
 /**
  * Process a raw body string (JSON in a string)
  */
@@ -177,6 +181,13 @@ function processRawBody(rawStr, oneOfFields, replacedFields) {
 
         // Process the object
         const processed = processObject(bodyObj, oneOfFields, replacedFields);
+
+        // Trim job arrays to 1 example item (faker generates 2 identical items by default)
+        for (const field of JOB_ARRAY_FIELDS) {
+            if (Array.isArray(processed[field]) && processed[field].length > 1) {
+                processed[field] = processed[field].slice(0, 1);
+            }
+        }
 
         // Convert back to formatted JSON string
         return JSON.stringify(processed, null, 2);
