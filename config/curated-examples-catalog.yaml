@@ -65,21 +65,9 @@ examples:
     values:
       # Document source
       # Recipient address (flat values - structure from Linked Collection)
-      firstName: John
-      lastName: Doe
-      address1: 123 Main Street
-      city: New York
-      state: NY
-      zip: "10001"
-      country: USA
       # Job template
       jobTemplate: legal_certified_mail
       # Payment (flat values - creditCard structure from Linked Collection)
-      cardType: visa
-      cardNumber: "4111111111111111"
-      month: 12
-      year: 2029
-      cvv: 123
       # Tags
       tags:
         - legal
@@ -122,13 +110,6 @@ examples:
       documentIds:
         - 11111
         - 22222
-      firstName: Jane
-      lastName: Smith
-      address1: 456 Oak Avenue
-      city: Los Angeles
-      state: CA
-      zip: "90001"
-      country: USA
       jobTemplate: medical_correspondence
       accountNumber: "9876543210"
       tags:
@@ -152,11 +133,6 @@ examples:
       url: "https://storage.example.com/newsletters/march.pdf"
       addressListId: "SUBSCRIBERS-MARCH"
       jobTemplate: newsletter_monthly
-      cardType: mastercard
-      cardNumber: "5555555555554444"
-      month: 6
-      year: 2026
-      cvv: 456
       tags:
         - newsletter
         - recurring
@@ -174,11 +150,6 @@ examples:
       docSourceStandard: documentId
       paymentDetails: creditCard
     values:
-      cardType: americanExpress
-      cardNumber: "378282246310005"
-      month: 9
-      year: 2027
-      cvv: 789
       tags:
         - e-commerce
         - catalog
@@ -226,24 +197,24 @@ examples:
           filename: invoice_001.pdf
           recipientAddressSource:
             singleAddress:
-              firstName: John
-              lastName: Smith
-              address1: 100 Main St
-              city: Seattle
-              state: WA
-              zip: "98101"
-              country: USA
+              firstName: <String>
+              lastName: <String>
+              address1: <String>
+              city: <String>
+              state: <String>
+              zip: <String>
+              country: <String>
         - jobTemplate: standard_letter
           filename: invoice_002.pdf
           recipientAddressSource:
             singleAddress:
-              firstName: Jane
-              lastName: Doe
-              address1: 200 Oak Ave
-              city: Portland
-              state: OR
-              zip: "97201"
-              country: USA
+              firstName: <String>
+              lastName: <String>
+              address1: <String>
+              city: <String>
+              state: <String>
+              zip: <String>
+              country: <String>
       accountNumber: "1234567890"
       tags:
         - reseller
@@ -267,11 +238,6 @@ examples:
       filename: fundraising-appeal-spring.pdf
       addressListId: "DONORS-SPRING"
       jobTemplate: non_profit_appeal
-      cardType: discover
-      cardNumber: "6011111111111117"
-      month: 3
-      year: 2028
-      cvv: 321
       tags:
         - non-profit
         - fundraising
@@ -299,19 +265,7 @@ examples:
       recipientAddressSource: singleAddress
       paymentDetails: creditCard
     values:
-      firstName: Alice
-      lastName: Johnson
-      address1: 789 Pine Street
-      city: Chicago
-      state: IL
-      zip: "60601"
-      country: USA
       jobTemplate: standard_letter
-      cardType: visa
-      cardNumber: "4111111111111111"
-      month: 1
-      year: 2026
-      cvv: 111
       tags:
         - example
         - basic
@@ -372,11 +326,6 @@ examples:
       docSourceStandard: documentId
       paymentDetails: creditCard
     values:
-      cardType: mastercard
-      cardNumber: "5555555555554444"
-      month: 6
-      year: 2027
-      cvv: 222
       tags:
         - bulk
         - split-pdf
@@ -441,18 +390,6 @@ examples:
         - 3001
         - 3002
         - 3003
-      firstName: Bob
-      lastName: Smith
-      address1: 456 Oak Avenue
-      city: Seattle
-      state: WA
-      zip: "98101"
-      country: USA
-      cardType: visa
-      cardNumber: "4111111111111111"
-      month: 12
-      year: 2026
-      cvv: 333
       tags:
         - advanced
         - merge
@@ -471,22 +408,10 @@ examples:
       recipientAddressSource: singleAddress
       paymentDetails: creditCard
     values:
-      firstName: Carol
-      lastName: White
-      address1: 789 Elm Street
-      city: Boston
-      state: MA
-      zip: "02101"
-      country: USA
       mailClass: firstClass
       color: fullColor
       paperType: glossy
       envelope: double_window
-      cardType: mastercard
-      cardNumber: "5555555555554444"
-      month: 3
-      year: 2028
-      cvv: 444
       tags:
         - advanced
         - job-options
@@ -527,13 +452,6 @@ examples:
       recipientAddressSource: singleAddress
       paymentDetails: invoice
     values:
-      firstName: David
-      lastName: Brown
-      address1: 321 Maple Drive
-      city: Denver
-      state: CO
-      zip: "80201"
-      country: USA
       jobTemplate: marketing_postcard
       customerAccountId: "TAG-ACCT-001"
       tags:
@@ -558,18 +476,13 @@ examples:
       mappingId: "REUSABLE-LIST-Q1"
       addressListName: "Q1 Marketing Campaign"
       addressList:
-        - firstName: Emma
-          lastName: Davis
-          address1: 654 Birch Lane
-          city: Miami
-          state: FL
-          zip: "33101"
-          country: USA
-      cardType: americanExpress
-      cardNumber: "378282246310005"
-      month: 9
-      year: 2027
-      cvv: 555
+        - firstName: <String>
+          lastName: <String>
+          address1: <String>
+          city: <String>
+          state: <String>
+          zip: <String>
+          country: <String>
       tags:
         - advanced
         - list-naming
@@ -588,13 +501,6 @@ examples:
       recipientAddressSource: singleAddress
       paymentDetails: ach
     values:
-      firstName: Frank
-      lastName: Miller
-      address1: 987 Cedar Court
-      city: Portland
-      state: OR
-      zip: "97201"
-      country: USA
       jobTemplate: invoice_statement
       accountNumber: "7777777777"
       tags:
@@ -619,24 +525,24 @@ examples:
           filename: letter_001.pdf
           recipientAddressSource:
             singleAddress:
-              firstName: Alice
-              lastName: Johnson
-              address1: 500 Pine St
-              city: San Francisco
-              state: CA
-              zip: "94102"
-              country: USA
+              firstName: <String>
+              lastName: <String>
+              address1: <String>
+              city: <String>
+              state: <String>
+              zip: <String>
+              country: <String>
         - jobTemplate: standard_letter
           filename: letter_002.pdf
           recipientAddressSource:
             singleAddress:
-              firstName: Bob
-              lastName: Williams
-              address1: 600 Elm St
-              city: Los Angeles
-              state: CA
-              zip: "90001"
-              country: USA
+              firstName: <String>
+              lastName: <String>
+              address1: <String>
+              city: <String>
+              state: <String>
+              zip: <String>
+              country: <String>
       customerAccountId: "ZIP-ACCT-001"
       tags:
         - advanced
@@ -656,19 +562,7 @@ examples:
       recipientAddressSource: singleAddress
       paymentDetails: creditCard
     values:
-      firstName: Grace
-      lastName: Taylor
-      address1: 135 Willow Way
-      city: Austin
-      state: TX
-      zip: "73301"
-      country: USA
       jobTemplate: stored_template
-      cardType: discover
-      cardNumber: "6011111111111117"
-      month: 8
-      year: 2028
-      cvv: 777
       tags:
         - advanced
         - stored-id
