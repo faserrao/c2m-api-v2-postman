@@ -536,10 +536,8 @@ function generateRandomValue(key, existingValue) {
         return faker.internet.url();
     } else if (keyLower.includes('image') || keyLower.includes('photo') || keyLower.includes('avatar')) {
         return faker.image.url();
-    } else if (keyLower === 'documentid' || keyLower === 'zipdocumentid' || keyLower === 'requestid') {
-        return faker.number.int({ min: 10000, max: 99999 });
     } else if (keyLower.includes('id') && !keyLower.includes('email')) {
-        return faker.string.alphanumeric(10);
+        return faker.number.int({ min: 10000, max: 99999 });
     } else if (keyLower.includes('tags')) {
         return ['important', 'customer-docs'];
     } else if (keyLower.includes('template')) {
