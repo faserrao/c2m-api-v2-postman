@@ -498,6 +498,8 @@ function generateRandomValue(key, existingValue) {
         return faker.internet.email();
     } else if (keyLower.includes('phone') || keyLower.includes('tel')) {
         return faker.phone.number();
+    } else if (keyLower === 'filename' || keyLower.includes('filename')) {
+        return 'document.pdf';
     } else if (keyLower.includes('firstname') || keyLower === 'fname') {
         return faker.person.firstName();
     } else if (keyLower.includes('lastname') || keyLower === 'lname') {
@@ -540,6 +542,8 @@ function generateRandomValue(key, existingValue) {
         return faker.number.int({ min: 10000, max: 99999 });
     } else if (keyLower.includes('tags')) {
         return ['important', 'customer-docs'];
+    } else if (keyLower === 'jobtemplate' || keyLower === 'job_template') {
+        return 'standard_letter';
     } else if (keyLower.includes('template')) {
         return `template_${faker.string.alphanumeric(8)}`;
     } else if (keyLower.includes('year')) {
@@ -551,7 +555,7 @@ function generateRandomValue(key, existingValue) {
     } else if (keyLower.includes('routing')) {
         return faker.finance.routingNumber();
     } else if (keyLower.includes('account')) {
-        return faker.finance.accountNumber();
+        return '1234567890';
     } else if (keyLower.includes('status')) {
         return 'accepted';
     } else if (keyLower.includes('message')) {
