@@ -87,7 +87,6 @@ examples:
       recipientAddressSource: addressListId
       paymentDetails: invoice
     values:
-      addressListId: "LIST-A001"
       jobTemplate: real_estate_marketing
       customerAccountId: "ACCT-987654"
       tags:
@@ -130,8 +129,6 @@ examples:
       recipientAddressSource: addressListId
       paymentDetails: creditCard
     values:
-      url: "https://storage.example.com/newsletters/march.pdf"
-      addressListId: "SUBSCRIBERS-MARCH"
       jobTemplate: newsletter_monthly
       tags:
         - newsletter
@@ -171,7 +168,6 @@ examples:
         - 44444
         - 55555
         - 66666
-      addressListId: "CAMPAIGN-Q1"
       customerAccountId: "ACCT-MARKETING-789"
       tags:
         - marketing
@@ -190,8 +186,6 @@ examples:
       docSourceZipFileRef: requestId
       paymentDetails: ach
     values:
-      docSourceZipFileRef:
-        requestId: 77777
       multiZipJobs:
         - jobTemplate: standard_letter
           filename: invoice_001.pdf
@@ -234,9 +228,7 @@ examples:
       recipientAddressSource: addressListId
       paymentDetails: creditCard
     values:
-      requestId: 99999
       filename: fundraising-appeal-spring.pdf
-      addressListId: "DONORS-SPRING"
       jobTemplate: non_profit_appeal
       tags:
         - non-profit
@@ -284,7 +276,6 @@ examples:
       recipientAddressSource: addressListId
       paymentDetails: ach
     values:
-      addressListId: "EXAMPLE-LIST-001"
       jobTemplate: mail_merge_template
       accountNumber: "1234567890"
       tags:
@@ -343,7 +334,6 @@ examples:
       docSourceStandard: documentId
       paymentDetails: ach
     values:
-      addressListId: "BULK-LIST-001"
       accountNumber: "9876543210"
       tags:
         - bulk
@@ -362,7 +352,6 @@ examples:
       zipDocumentSource: zipDocumentId
       paymentDetails: invoice
     values:
-      zipDocumentId: 2003
       filename: bulk_documents.zip
       customerAccountId: "BULK-ACCT-001"
       tags:
@@ -408,10 +397,6 @@ examples:
       recipientAddressSource: singleAddress
       paymentDetails: creditCard
     values:
-      mailClass: firstClass
-      color: fullColor
-      paperType: glossy
-      envelope: double_window
       tags:
         - advanced
         - job-options
@@ -430,8 +415,6 @@ examples:
       recipientAddressSource: addressListId
       paymentDetails: ach
     values:
-      url: "https://example.com/documents/newsletter.pdf"
-      addressListId: "URL-LIST-001"
       jobTemplate: standard_letter
       accountNumber: "5555555555"
       tags:
@@ -474,7 +457,6 @@ examples:
       paymentDetails: creditCard
     values:
       mappingId: "REUSABLE-LIST-Q1"
-      addressListName: "Q1 Marketing Campaign"
       addressList:
         - firstName: <String>
           lastName: <String>
@@ -581,7 +563,6 @@ examples:
       recipientAddressSource: addressListId
       paymentDetails: ach
     values:
-      addressListId: "SAVED-LIST-12345"
       jobTemplate: bulk_mailing
       accountNumber: "8888888888"
       tags:
