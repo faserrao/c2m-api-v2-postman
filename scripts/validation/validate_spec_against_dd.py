@@ -73,6 +73,18 @@ SINGLE_FIELD_WRAPPER_RULES: frozenset = frozenset({
     "mergeByDocumentId",  # mergeByDocumentId = documentId ; → { documentId: integer }
 })
 
+# oneOf rules whose variants must be named-wrapper objects rather than bare $refs.
+# e.g. docSourceStandard → oneOf: [{ type:object, properties:{ requestIdSource:$ref } }]
+# Must stay in sync with _NAMED_WRAPPER_ONEOF_RULES in ebnf_to_openapi_dynamic_v3.py.
+NAMED_WRAPPER_ONEOF_RULES: frozenset = frozenset({
+    "docSourceStandard",
+    "docSourceZipFile",
+    "docSourceZipFileRef",
+    "zipDocumentSource",
+    "mergeDocumentRef",
+    "recipientAddressSource",
+})
+
 # Rules only referenced inside multi-line block comments (Apple Pay /
 # Google Pay).  strip_block_comments() removes them from the parsed text, so
 # they never appear in extract_rules(); this set is kept for documentation.
@@ -454,6 +466,50 @@ def check_wrapper_rules(
     return findings
 
 
+def check_named_wrapper_oneofs(
+    rules: Dict[str, str],
+    all_schemas: dict,
+) -> List[Finding]:
+    """
+    Check 6: oneOf rules in NAMED_WRAPPER_ONEOF_RULES must emit each variant as a
+    named-wrapper object { type: object, properties: { variantName: $ref }, required: [v] }
+    rather than a bare $ref.  A bare $ref means the variant fields are inlined directly
+    (no intermediate type-name key in the JSON body).
+    """
+    findings: List[Finding] = []
+
+    for name in sorted(NAMED_WRAPPER_ONEOF_RULES):
+        if name not in all_schemas:
+            continue
+
+        schema = all_schemas[name]
+        variants = schema.get("oneOf", [])
+        if not variants:
+            findings.append((FAIL, name, "schema has no oneOf[] — expected named-wrapper variants"))
+            continue
+
+        bare_refs = []
+        wrapped = []
+        for v in variants:
+            if "$ref" in v and not v.get("properties"):
+                bare_refs.append(v["$ref"].split("/")[-1])
+            elif v.get("type") == "object" and v.get("properties"):
+                props = list(v["properties"].keys())
+                wrapped.append(props[0] if props else "?")
+
+        if bare_refs:
+            findings.append((FAIL, name,
+                f"bare $ref variants still present: {bare_refs} — "
+                f"translator should wrap each in its type name"))
+        elif not wrapped:
+            findings.append((FAIL, name, "no named-wrapper variants found in oneOf[]"))
+        else:
+            findings.append((PASS, name,
+                f"all {len(wrapped)} variants are named-wrapper objects: {wrapped}"))
+
+    return findings
+
+
 # ---------------------------------------------------------------------------
 # Reporting
 # ---------------------------------------------------------------------------
@@ -562,11 +618,12 @@ def main() -> int:
     print("\n" + "=" * 68)
 
     check_list = [
-        ("1. Schema existence",       check_schema_existence(rules, all_schemas, body_types)),
-        ("2. Enum parity",            check_enum_parity(rules, all_schemas, body_types)),
-        ("3. Object properties",      check_object_properties(rules, all_schemas, body_types)),
-        ("4. Required fields",        check_required_fields(rules, all_schemas, body_types)),
-        ("5. Wrapper rule structure", check_wrapper_rules(rules, all_schemas, body_types)),
+        ("1. Schema existence",           check_schema_existence(rules, all_schemas, body_types)),
+        ("2. Enum parity",                check_enum_parity(rules, all_schemas, body_types)),
+        ("3. Object properties",          check_object_properties(rules, all_schemas, body_types)),
+        ("4. Required fields",            check_required_fields(rules, all_schemas, body_types)),
+        ("5. Wrapper rule structure",     check_wrapper_rules(rules, all_schemas, body_types)),
+        ("6. Named-wrapper oneOf rules",  check_named_wrapper_oneofs(rules, all_schemas)),
     ]
 
     for title, findings in check_list:

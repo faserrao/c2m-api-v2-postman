@@ -59,7 +59,7 @@ examples:
       - certified-mail
     description: Law firm sends certified court appearance notices to clients with proof of delivery tracking
     select:
-      docSourceAll: documentId
+      docSourceAll: documentIdSource
       recipientAddressSource: singleAddress
       paymentDetails: creditCard
     values:
@@ -83,8 +83,8 @@ examples:
       - bulk-marketing
     description: Real estate agent sends property listings to address list with merge fields
     select:
-      docSourceAll: documentId
-      recipientAddressSource: addressListId
+      docSourceAll: documentIdSource
+      recipientAddressSource: recipientAddressByListId
       paymentDetails: invoice
     values:
       jobTemplate: real_estate_marketing
@@ -125,8 +125,8 @@ examples:
       - recurring
     description: Organization sends monthly newsletter to subscriber list
     select:
-      docSourceAll: url
-      recipientAddressSource: addressListId
+      docSourceAll: urlSource
+      recipientAddressSource: recipientAddressByListId
       paymentDetails: creditCard
     values:
       jobTemplate: newsletter_monthly
@@ -144,7 +144,7 @@ examples:
       - address-capture
     description: E-commerce company sends catalogs using addresses embedded in PDF
     select:
-      docSourceStandard: documentId
+      docSourceStandard: documentIdSource
       paymentDetails: creditCard
     values:
       tags:
@@ -161,7 +161,7 @@ examples:
       - multi-document
     description: Marketing agency sends personalized multi-page campaign materials
     select:
-      recipientAddressSource: addressListId
+      recipientAddressSource: recipientAddressByListId
       paymentDetails: invoice
     values:
       documentIds:
@@ -183,7 +183,7 @@ examples:
       - batch-processing
     description: Mail service bureau processes multiple documents from a single ZIP file
     select:
-      docSourceZipFileRef: requestId
+      docSourceZipFileRef: zipRequestIdOnly
       paymentDetails: ach
     values:
       multiZipJobs:
@@ -224,8 +224,8 @@ examples:
       - fundraising
     description: Non-profit organization sends personalized donation appeal letters
     select:
-      docSourceAll: requestId
-      recipientAddressSource: addressListId
+      docSourceAll: requestIdSource
+      recipientAddressSource: recipientAddressByListId
       paymentDetails: creditCard
     values:
       filename: fundraising-appeal-spring.pdf
@@ -253,7 +253,7 @@ examples:
       - basic
     description: Send a personalized document to one recipient (most common use case)
     select:
-      docSourceAll: documentId
+      docSourceAll: documentIdSource
       recipientAddressSource: singleAddress
       paymentDetails: creditCard
     values:
@@ -272,8 +272,8 @@ examples:
       - mail-merge
     description: Send personalized document to multiple recipients with merge fields
     select:
-      docSourceAll: documentId
-      recipientAddressSource: addressListId
+      docSourceAll: documentIdSource
+      recipientAddressSource: recipientAddressByListId
       paymentDetails: ach
     values:
       jobTemplate: mail_merge_template
@@ -292,7 +292,7 @@ examples:
       - address-capture
     description: Send documents where recipient addresses are embedded in the PDF
     select:
-      docSourceStandard: documentId
+      docSourceStandard: documentIdSource
       paymentDetails: invoice
     values:
       customerAccountId: "EXAMPLE-ACCT-001"
@@ -314,7 +314,7 @@ examples:
       - split-pdf
     description: Split a multi-page PDF where each page has embedded recipient address
     select:
-      docSourceStandard: documentId
+      docSourceStandard: documentIdSource
       paymentDetails: creditCard
     values:
       tags:
@@ -331,7 +331,7 @@ examples:
       - split-pdf
     description: Split a multi-page PDF and specify recipient addresses separately
     select:
-      docSourceStandard: documentId
+      docSourceStandard: documentIdSource
       paymentDetails: ach
     values:
       accountNumber: "9876543210"
@@ -349,7 +349,7 @@ examples:
       - zip-processing
     description: Process multiple documents from ZIP file with embedded addresses
     select:
-      zipDocumentSource: zipDocumentId
+      zipDocumentSource: zipDocumentIdSource
       paymentDetails: invoice
     values:
       filename: bulk_documents.zip
@@ -393,7 +393,7 @@ examples:
       - job-options
     description: Specify mailing options directly without using a saved template
     select:
-      docSourceAll: documentId
+      docSourceAll: documentIdSource
       recipientAddressSource: singleAddress
       paymentDetails: creditCard
     values:
@@ -411,8 +411,8 @@ examples:
       - url-source
     description: Provide document via URL instead of uploading file
     select:
-      docSourceAll: url
-      recipientAddressSource: addressListId
+      docSourceAll: urlSource
+      recipientAddressSource: recipientAddressByListId
       paymentDetails: ach
     values:
       jobTemplate: standard_letter
@@ -431,7 +431,7 @@ examples:
       - tags
     description: Add custom tags to organize and track your mailings
     select:
-      docSourceAll: documentId
+      docSourceAll: documentIdSource
       recipientAddressSource: singleAddress
       paymentDetails: invoice
     values:
@@ -452,8 +452,8 @@ examples:
       - address-naming
     description: Give your address list a name so you can reuse it later
     select:
-      docSourceAll: documentId
-      recipientAddressSource: addressList
+      docSourceAll: documentIdSource
+      recipientAddressSource: recipientAddressByList
       paymentDetails: creditCard
     values:
       mappingId: "REUSABLE-LIST-Q1"
@@ -479,7 +479,7 @@ examples:
       - payment
     description: Choose between credit card, ACH, or invoice billing
     select:
-      docSourceAll: documentId
+      docSourceAll: documentIdSource
       recipientAddressSource: singleAddress
       paymentDetails: ach
     values:
@@ -499,7 +499,7 @@ examples:
       - zip-with-addresses
     description: Process ZIP with multiple documents and provide addresses separately
     select:
-      docSourceZipFileRef: zipDocumentId
+      docSourceZipFileRef: zipDocumentIdOnly
       paymentDetails: invoice
     values:
       multiZipJobs:
@@ -540,7 +540,7 @@ examples:
       - stored-document
     description: Reference a previously uploaded document by its ID
     select:
-      docSourceAll: documentId
+      docSourceAll: documentIdSource
       recipientAddressSource: singleAddress
       paymentDetails: creditCard
     values:
@@ -559,8 +559,8 @@ examples:
       - saved-list
     description: Reference a previously saved address list by its ID
     select:
-      docSourceAll: documentId
-      recipientAddressSource: addressListId
+      docSourceAll: documentIdSource
+      recipientAddressSource: recipientAddressByListId
       paymentDetails: ach
     values:
       jobTemplate: bulk_mailing

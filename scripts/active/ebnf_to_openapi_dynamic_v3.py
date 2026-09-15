@@ -77,6 +77,27 @@ _SINGLE_FIELD_WRAPPER_RULES: frozenset = frozenset({
     "mergeByDocumentId",  # mergeByDocumentId = documentId ; → { documentId: integer }
 })
 
+# oneOf rules whose variants should be wrapped in the variant's type name as a JSON key.
+# e.g. docSourceStandard → { "requestIdSource": { "requestId": 57683 } }
+# paymentDetails is intentionally excluded — it uses inline literal discriminators
+# ("creditCard", "invoice", etc.) that already serve as named keys.
+_NAMED_WRAPPER_ONEOF_RULES: frozenset = frozenset({
+    "docSourceStandard",
+    "docSourceZipFile",
+    "docSourceZipFileRef",
+    "zipDocumentSource",
+    "mergeDocumentRef",
+    "recipientAddressSource",
+})
+
+# Grouping rules that are transparent at the wire level when referenced as oneOf choices.
+# When these appear as choices inside docSourceAll, their own variants are inlined
+# (expanded) rather than wrapped in a docSourceStandard/docSourceZipFile key.
+_TRANSPARENT_ONEOF_GROUPINGS: frozenset = frozenset({
+    "docSourceStandard",
+    "docSourceZipFile",
+})
+
 # ─────────────────────────── Data Classes ───────────────────────────
 @dataclass
 class EBNFProduction:
@@ -1030,29 +1051,71 @@ class EBNFToOpenAPITranslator:
         return {"type": "object"}
     
     def _generate_oneof_schema(self, choices: List[Any], context: str) -> Dict[str, Any]:
-        """Generate oneOf schema from alternation choices"""
-        schemas = []
-        
-        for i, choice in enumerate(choices):
-            if isinstance(choice, dict):
-                choice_type = choice.get('type')
-                
-                if choice_type == 'symbol':
-                    symbol_name = choice.get('name')
-                    if symbol_name:
-                        schemas.append({"$ref": f"#/components/schemas/{symbol_name}"})
+        """Generate oneOf schema from alternation choices.
 
-                elif choice_type == 'concatenation':
-                    schemas.append(self._expression_to_schema(choice, context))
-                
-                elif choice_type == 'group':
-                    # Process the grouped expression
-                    schemas.append(self._expression_to_schema(choice.get('expression'), context))
-        
+        For rules in _NAMED_WRAPPER_ONEOF_RULES each named-schema variant is wrapped in
+        its type name: { type: object, properties: { variantName: $ref }, required: [...] }.
+        For transparent groupings appearing as choices, their own variants are inlined.
+        All other rules use the legacy $ref behaviour.
+        """
+        schemas = []
+
+        for choice in choices:
+            if not isinstance(choice, dict):
+                continue
+            choice_type = choice.get('type')
+
+            if choice_type == 'symbol':
+                symbol_name = choice.get('name')
+                if not symbol_name:
+                    continue
+
+                if symbol_name in _TRANSPARENT_ONEOF_GROUPINGS:
+                    # Inline this grouping's own variants into the parent oneOf
+                    schemas.extend(self._expand_transparent_grouping(symbol_name))
+                elif context in _NAMED_WRAPPER_ONEOF_RULES:
+                    # Wrap the variant in its type name
+                    schemas.append({
+                        "type": "object",
+                        "properties": {
+                            symbol_name: {"$ref": f"#/components/schemas/{symbol_name}"}
+                        },
+                        "required": [symbol_name],
+                    })
+                else:
+                    schemas.append({"$ref": f"#/components/schemas/{symbol_name}"})
+
+            elif choice_type == 'concatenation':
+                schemas.append(self._expression_to_schema(choice, context))
+
+            elif choice_type == 'group':
+                schemas.append(self._expression_to_schema(choice.get('expression'), context))
+
         if len(schemas) == 1:
             return schemas[0]
-        else:
-            return {"oneOf": schemas}
+        return {"oneOf": schemas}
+
+    def _expand_transparent_grouping(self, symbol_name: str) -> List[Dict[str, Any]]:
+        """Return named-wrapper schemas for each choice inside a transparent grouping rule."""
+        prod = self.productions.get(symbol_name)
+        if not (prod and hasattr(prod, 'expression')):
+            return [{"$ref": f"#/components/schemas/{symbol_name}"}]
+        expr = prod.expression
+        if not (isinstance(expr, dict) and expr.get('type') == 'alternation'):
+            return [{"$ref": f"#/components/schemas/{symbol_name}"}]
+        result = []
+        for sub_choice in expr.get('choices', []):
+            if isinstance(sub_choice, dict) and sub_choice.get('type') == 'symbol':
+                sub_name = sub_choice.get('name')
+                if sub_name:
+                    result.append({
+                        "type": "object",
+                        "properties": {
+                            sub_name: {"$ref": f"#/components/schemas/{sub_name}"}
+                        },
+                        "required": [sub_name],
+                    })
+        return result
     
     def _is_enum(self, choices: List[Any]) -> bool:
         """Check if alternation represents an enum"""

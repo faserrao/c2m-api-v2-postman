@@ -86,6 +86,69 @@ SYNTHETIC_SPEC = {
 }
 
 
+# Synthetic spec using the named-wrapper format (current real-spec format)
+NAMED_WRAPPER_SYNTHETIC_SPEC = {
+    "components": {
+        "schemas": {
+            "docSourceAll": {
+                "oneOf": [
+                    {
+                        "type": "object",
+                        "properties": {"requestIdSource": {"$ref": "#/components/schemas/requestIdSource"}},
+                        "required": ["requestIdSource"],
+                    },
+                    {
+                        "type": "object",
+                        "properties": {"documentIdSource": {"$ref": "#/components/schemas/documentIdSource"}},
+                        "required": ["documentIdSource"],
+                    },
+                ]
+            },
+            "requestIdSource": {
+                "type": "object",
+                "properties": {"requestId": {"type": "integer"}},
+            },
+            "documentIdSource": {
+                "type": "object",
+                "properties": {"documentId": {"type": "integer"}},
+            },
+        }
+    }
+}
+
+
+class TestNamedWrapperResolver(unittest.TestCase):
+    """Tests for named-wrapper oneOf format (current real-spec format)."""
+
+    def test_find_wrapper_by_type_name(self):
+        name, schema = find_variant_by_discriminator_key(
+            NAMED_WRAPPER_SYNTHETIC_SPEC, "docSourceAll", "requestIdSource"
+        )
+        self.assertEqual(name, "requestIdSource")
+        self.assertIsNotNone(schema)
+
+    def test_find_second_wrapper_by_type_name(self):
+        name, schema = find_variant_by_discriminator_key(
+            NAMED_WRAPPER_SYNTHETIC_SPEC, "docSourceAll", "documentIdSource"
+        )
+        self.assertEqual(name, "documentIdSource")
+        self.assertIsNotNone(schema)
+
+    def test_unknown_wrapper_returns_none(self):
+        name, schema = find_variant_by_discriminator_key(
+            NAMED_WRAPPER_SYNTHETIC_SPEC, "docSourceAll", "urlSource"
+        )
+        self.assertIsNone(name)
+
+    def test_placeholder_structure_for_inline_wrapper(self):
+        """build_variant_placeholder_structure with an inline wrapper dict produces nested output."""
+        _, schema = find_variant_by_discriminator_key(
+            NAMED_WRAPPER_SYNTHETIC_SPEC, "docSourceAll", "requestIdSource"
+        )
+        structure = build_variant_placeholder_structure(NAMED_WRAPPER_SYNTHETIC_SPEC, schema)
+        self.assertEqual(structure, {"requestIdSource": {"requestId": "<Integer>"}})
+
+
 class TestFindVariantByDiscriminatorKey(unittest.TestCase):
 
     def test_direct_oneof_match(self):
@@ -174,11 +237,11 @@ class TestWithRealSpec(unittest.TestCase):
             cls.spec = yaml.safe_load(f)
 
     def test_request_id_source(self):
-        name, _ = find_variant_by_discriminator_key(self.spec, "docSourceAll", "requestId")
-        self.assertIsNotNone(name, "requestId variant not found in docSourceAll")
+        name, _ = find_variant_by_discriminator_key(self.spec, "docSourceAll", "requestIdSource")
+        self.assertIsNotNone(name, "requestIdSource variant not found in docSourceAll")
 
     def test_document_id_source(self):
-        name, _ = find_variant_by_discriminator_key(self.spec, "docSourceAll", "documentId")
+        name, _ = find_variant_by_discriminator_key(self.spec, "docSourceAll", "documentIdSource")
         self.assertIsNotNone(name)
 
     def test_single_address(self):
@@ -194,12 +257,12 @@ class TestWithRealSpec(unittest.TestCase):
     def test_all_known_variants_resolve(self):
         """Ensure every variant that the YAML configs use resolves correctly."""
         known_variants = [
-            ("docSourceAll",           "requestId"),
-            ("docSourceAll",           "documentId"),
-            ("docSourceAll",           "url"),
+            ("docSourceAll",           "requestIdSource"),
+            ("docSourceAll",           "documentIdSource"),
+            ("docSourceAll",           "urlSource"),
             ("recipientAddressSource", "singleAddress"),
-            ("recipientAddressSource", "addressList"),
-            ("recipientAddressSource", "addressListId"),
+            ("recipientAddressSource", "recipientAddressByList"),
+            ("recipientAddressSource", "recipientAddressByListId"),
             ("paymentDetails",         "creditCard"),
             ("paymentDetails",         "ach"),
             ("paymentDetails",         "invoice"),

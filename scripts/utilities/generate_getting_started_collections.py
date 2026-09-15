@@ -181,11 +181,15 @@ def get_oneof_structure_from_openapi(openapi_spec: Dict, field_name: str, varian
     """
     Get oneOf variant structure from OpenAPI spec with placeholder values.
     Replaces hardcoded variant_mappings with dynamic spec-driven lookup.
+
+    For named-wrapper variants the resolver returns the inline schema directly;
+    build_variant_placeholder_structure accepts either form.
     """
-    schema_name, _ = find_variant_by_discriminator_key(openapi_spec, field_name, variant)
+    schema_name, variant_schema = find_variant_by_discriminator_key(openapi_spec, field_name, variant)
     if schema_name is None:
         return None
-    return build_variant_placeholder_structure(openapi_spec, schema_name)
+    # Prefer the returned schema (handles inline wrapper variants) over name lookup
+    return build_variant_placeholder_structure(openapi_spec, variant_schema if variant_schema is not None else schema_name)
 
 def generate_realistic_value(field_name: str, field_type: str,
                               faker_hints: dict = None) -> Any:

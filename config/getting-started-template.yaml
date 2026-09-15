@@ -46,7 +46,7 @@ examples:
   tags: []
   description: /static - single or list of recipient
   select:
-    docSourceAll: requestId
+    docSourceAll: requestIdSource
     recipientAddressSource: recipientAddressByList
   values:
     jobTemplate: <String>
@@ -57,8 +57,8 @@ examples:
   tags: []
   description: /static - mail merge
   select:
-    docSourceAll: requestId
-    recipientAddressSource: addressList
+    docSourceAll: requestIdSource
+    recipientAddressSource: recipientAddressByList
   values:
     jobTemplate: <String>
 - name: /static/address-capture
@@ -68,7 +68,7 @@ examples:
   tags: []
   description: /static/address-capture
   select:
-    docSourceStandard: requestId
+    docSourceStandard: requestIdSource
   values:
     jobTemplate: <String>
 - name: /batch/split/address-capture
@@ -78,7 +78,7 @@ examples:
   tags: []
   description: /batch/split/address-capture
   select:
-    docSourceStandard: requestId
+    docSourceStandard: requestIdSource
   values:
     jobTemplate: <String>
     pdfSplitJobsNoAddress:
@@ -93,7 +93,8 @@ examples:
   values:
     jobTemplate: <String>
     zipDocumentSource:
-      requestId: <Integer>
+      zipRequestIdSource:
+        requestId: <Integer>
 - name: /batch/split
   method: POST
   path: /batch/split
@@ -101,7 +102,7 @@ examples:
   tags: []
   description: /batch/split
   select:
-    docSourceStandard: requestId
+    docSourceStandard: requestIdSource
   values:
     pdfSplitJobsWithAddress:
     - jobTemplate: <String>
@@ -129,9 +130,12 @@ examples:
   values:
     jobTemplate: <String>
     mergeDocumentSource:
-    - requestId: <Integer>
-    - documentId: <Integer>
-    - documentId: <Integer>
+    - mergeByRequestId:
+        requestId: <Integer>
+    - mergeByDocumentId:
+        documentId: <Integer>
+    - mergeByDocumentId:
+        documentId: <Integer>
 - name: /static - using options
   method: POST
   path: /static
@@ -139,7 +143,7 @@ examples:
   tags: []
   description: /static - using options
   select:
-    docSourceAll: requestId
+    docSourceAll: requestIdSource
     recipientAddressSource: singleAddress
   values:
     jobOptions:
@@ -158,7 +162,7 @@ examples:
   tags: []
   description: /static - using URL
   select:
-    docSourceAll: url
+    docSourceAll: urlSource
     recipientAddressSource: singleAddress
   values:
     jobTemplate: <String>
@@ -169,7 +173,7 @@ examples:
   tags: []
   description: /static - setting tags
   select:
-    docSourceAll: requestId
+    docSourceAll: requestIdSource
     recipientAddressSource: singleAddress
   values:
     jobTemplate: <String>
@@ -184,20 +188,21 @@ examples:
   tags: []
   description: /static - naming addressList
   select:
-    docSourceAll: requestId
+    docSourceAll: requestIdSource
   values:
     jobTemplate: <String>
     recipientAddressSource:
-      mappingId: <Integer>
-      addressList:
-      - firstName: <String>
-        lastName: <String>
-        address1: <String>
-        city: <String>
-        state: <String>
-        zip: <String>
-        country: <String>
-      addressListName: <String>
+      recipientAddressByList:
+        mappingId: <Integer>
+        addressList:
+        - firstName: <String>
+          lastName: <String>
+          address1: <String>
+          city: <String>
+          state: <String>
+          zip: <String>
+          country: <String>
+        addressListName: <String>
 - name: /static - payment option
   method: POST
   path: /static
@@ -205,7 +210,7 @@ examples:
   tags: []
   description: /static - payment option
   select:
-    docSourceAll: requestId
+    docSourceAll: requestIdSource
     recipientAddressSource: singleAddress
     paymentDetails: creditCard
   values:
@@ -218,7 +223,8 @@ examples:
   description: /batch/zip - using requestId
   values:
     docSourceZipFileRef:
-      requestId: <Integer>
+      zipRequestIdOnly:
+        requestId: <Integer>
     multiZipJobs:
     - jobTemplate: <String>
       filename: <String>
@@ -241,7 +247,8 @@ examples:
   description: /batch/zip - using documentId
   values:
     docSourceZipFileRef:
-      documentId: <Integer>
+      zipDocumentIdOnly:
+        documentId: <Integer>
     multiZipJobs:
     - jobTemplate: <String>
       filename: <String>
@@ -263,7 +270,7 @@ examples:
   tags: []
   description: /static - using documentID
   select:
-    docSourceAll: documentId
+    docSourceAll: documentIdSource
     recipientAddressSource: singleAddress
   values:
     jobTemplate: <String>
@@ -274,8 +281,8 @@ examples:
   tags: []
   description: /static - using addressListId
   select:
-    docSourceAll: requestId
-    recipientAddressSource: addressListId
+    docSourceAll: requestIdSource
+    recipientAddressSource: recipientAddressByListId
   values:
     jobTemplate: <String>
 - name: /static - return address
@@ -285,7 +292,7 @@ examples:
   tags: []
   description: /static - return address
   select:
-    docSourceAll: requestId
+    docSourceAll: requestIdSource
     recipientAddressSource: singleAddress
   values:
     jobTemplate: <String>
