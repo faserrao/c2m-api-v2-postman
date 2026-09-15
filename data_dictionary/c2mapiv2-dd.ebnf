@@ -701,7 +701,7 @@ pdfSplitJobsWithAddress = { pdfSplitJobItemWithAddress } ;
 pdfSplitJobsNoAddress   = { pdfSplitJobItemNoAddress } ;
 
 pdfSplitJobItemWithAddress = [ jobTemplate ] + startPage + endPage + recipientAddressSource ;
-pdfSplitJobItemNoAddress   = startPage + endPage ;
+pdfSplitJobItemNoAddress   = [ jobTemplate ] + startPage + endPage ;
 
 startPage = integer ; (* @hint static 1 *)
 endPage   = integer ; (* @hint static 5 *)
