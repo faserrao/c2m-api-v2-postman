@@ -2858,6 +2858,12 @@ validate-collections-conformance-test: ## Run all validation golden tests (valid
 	C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" $(VENV_PYTHON) scripts/validation/tests/test_oneof_resolver.py && \
 	$(VENV_PYTHON) -m pytest scripts/validation/tests/test_dd_constraints.py -v
 
+.PHONY: validate-collections-deep
+validate-collections-deep: ## Deep field audit of all *.json files in postman/generated (auto-discovers, exit 1 on errors)
+	@$(VENV_PYTHON) scripts/validation/validate_collections_deep.py \
+		--spec $(C2MAPIV2_OPENAPI_SPEC) \
+		--dir $(POSTMAN_GENERATED_DIR)
+
 .PHONY: validate-all-collections
 validate-all-collections: ## Validate ALL active collections against the OpenAPI spec (fields + enums)
 	@echo "🔍 Validating all active Postman collections against the OpenAPI spec..."
