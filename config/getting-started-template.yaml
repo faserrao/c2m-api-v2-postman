@@ -50,17 +50,19 @@ examples:
     recipientAddressSource: recipientAddressByList
   values:
     jobTemplate: <String>
-- name: /static - mail merge
+- name: /mail-merge - to address list
   method: POST
-  path: /static
+  path: /mail-merge
   group: most-frequently-used
   tags: []
-  description: /static - mail merge
+  description: /mail-merge - to address list
   select:
-    docSourceAll: requestIdSource
     recipientAddressSource: recipientAddressByList
   values:
     jobTemplate: <String>
+    mergeDocumentSource:
+    - mergeByRequestId:
+        requestId: <Integer>
 - name: /static/address-capture
   method: POST
   path: /static/address-capture
