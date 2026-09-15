@@ -269,20 +269,23 @@ examples:
 
   - name: Mail Merge to Address List
     method: POST
-    path: /static
+    path: /mail-merge
     group: most-frequently-used
     tags:
       - getting-started
       - frequent
       - mail-merge
-    description: Send personalized document to multiple recipients with merge fields
+    description: Merge multiple documents and send combined output to recipients from a stored address list
     select:
-      docSourceAll: documentIdSource
       recipientAddressSource: recipientAddressByListId
       paymentDetails: ach
     values:
       jobTemplate: mail_merge_template
-      accountNumber: "1234567890"
+      mergeDocumentSource:
+        - mergeByDocumentId:
+            documentId: 11111
+        - mergeByDocumentId:
+            documentId: 22222
       tags:
         - example
         - mail-merge
@@ -402,6 +405,15 @@ examples:
       recipientAddressSource: singleAddress
       paymentDetails: creditCard
     values:
+      jobOptions:
+        documentClass: letter
+        layout: address_on_first_page
+        productionTime: standard
+        envelope: double_window
+        color: full_color
+        paperType: white
+        printOption: double_sided
+        mailClass: first_class
       tags:
         - advanced
         - job-options
