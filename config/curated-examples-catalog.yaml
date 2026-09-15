@@ -321,6 +321,9 @@ examples:
       docSourceStandard: documentIdSource
       paymentDetails: creditCard
     values:
+      pdfSplitJobsNoAddress:
+        - startPage: 1
+          endPage: 3
       tags:
         - bulk
         - split-pdf
@@ -338,6 +341,18 @@ examples:
       docSourceStandard: documentIdSource
       paymentDetails: ach
     values:
+      pdfSplitJobsWithAddress:
+        - startPage: 1
+          endPage: 3
+          recipientAddressSource:
+            singleAddress:
+              firstName: <String>
+              lastName: <String>
+              address1: <String>
+              city: <String>
+              state: <String>
+              zip: <String>
+              country: <String>
       tags:
         - bulk
         - split-pdf
@@ -376,10 +391,13 @@ examples:
       recipientAddressSource: singleAddress
       paymentDetails: creditCard
     values:
-      documentIds:
-        - 3001
-        - 3002
-        - 3003
+      mergeDocumentSource:
+        - mergeByDocumentId:
+            documentId: 3001
+        - mergeByDocumentId:
+            documentId: 3002
+        - mergeByDocumentId:
+            documentId: 3003
       tags:
         - advanced
         - merge
