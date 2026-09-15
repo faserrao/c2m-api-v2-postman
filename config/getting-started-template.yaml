@@ -63,6 +63,8 @@ examples:
     mergeDocumentSource:
     - mergeByRequestId:
         requestId: <Integer>
+    - mergeByDocumentId:
+        documentId: <Integer>
 - name: /static/address-capture
   method: POST
   path: /static/address-capture
