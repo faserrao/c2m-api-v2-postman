@@ -2904,6 +2904,28 @@ validate-configs: ## Validate all config file field names against the EBNF Data 
 		--template config/getting-started-template.yaml \
 		--faker-hints config/faker_hints.yaml
 
+.PHONY: validate-postman-against-dd
+validate-postman-against-dd: ## Detailed Postman-to-DD validator: enum values, field names, numeric ranges, cross-field constraints
+	@DD_EBNF_FILE="$(DD_EBNF_FILE)" \
+	C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" \
+	POSTMAN_GENERATED_DIR="$(POSTMAN_GENERATED_DIR)" \
+	C2MAPIV2_POSTMAN_API_NAME_KC="$(C2MAPIV2_POSTMAN_API_NAME_KC)" \
+	$(VENV_PYTHON) scripts/validation/validate_postman_against_dd.py \
+		--dd $(DD_EBNF_FILE) \
+		--spec $(C2MAPIV2_OPENAPI_SPEC)
+
+.PHONY: validate-postman-against-dd-report
+validate-postman-against-dd-report: ## Same as validate-postman-against-dd but writes a Markdown report
+	@mkdir -p reports
+	@DD_EBNF_FILE="$(DD_EBNF_FILE)" \
+	C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" \
+	POSTMAN_GENERATED_DIR="$(POSTMAN_GENERATED_DIR)" \
+	C2MAPIV2_POSTMAN_API_NAME_KC="$(C2MAPIV2_POSTMAN_API_NAME_KC)" \
+	$(VENV_PYTHON) scripts/validation/validate_postman_against_dd.py \
+		--dd $(DD_EBNF_FILE) \
+		--spec $(C2MAPIV2_OPENAPI_SPEC) \
+		--report reports/postman-vs-dd-report.md
+
 .PHONY: validate-catalog-against-spec
 validate-catalog-against-spec: ## Validate curated-examples-catalog.yaml select: keys and variant names against the OpenAPI spec
 	@C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" \
