@@ -88,7 +88,7 @@ examples:
       paymentDetails: invoice
     values:
       jobTemplate: real_estate_marketing
-      customerAccountId: "ACCT-987654"
+
       tags:
         - real-estate
         - marketing
@@ -112,7 +112,6 @@ examples:
         - mergeByDocumentId:
             documentId: 22222
       jobTemplate: medical_correspondence
-      accountNumber: "9876543210"
       tags:
         - medical
         - hipaa
@@ -173,7 +172,7 @@ examples:
             documentId: 55555
         - mergeByDocumentId:
             documentId: 66666
-      customerAccountId: "ACCT-MARKETING-789"
+
       tags:
         - marketing
         - campaign
@@ -214,7 +213,6 @@ examples:
               state: <String>
               zip: <String>
               country: <String>
-      accountNumber: "1234567890"
       tags:
         - reseller
         - batch
@@ -233,7 +231,6 @@ examples:
       recipientAddressSource: recipientAddressByListId
       paymentDetails: creditCard
     values:
-      filename: fundraising-appeal-spring.pdf
       jobTemplate: non_profit_appeal
       tags:
         - non-profit
@@ -303,7 +300,6 @@ examples:
       docSourceStandard: documentIdSource
       paymentDetails: invoice
     values:
-      customerAccountId: "EXAMPLE-ACCT-001"
       tags:
         - example
         - address-capture
@@ -342,7 +338,6 @@ examples:
       docSourceStandard: documentIdSource
       paymentDetails: ach
     values:
-      accountNumber: "9876543210"
       tags:
         - bulk
         - split-pdf
@@ -360,8 +355,6 @@ examples:
       zipDocumentSource: zipDocumentIdSource
       paymentDetails: invoice
     values:
-      filename: bulk_documents.zip
-      customerAccountId: "BULK-ACCT-001"
       tags:
         - bulk
         - zip
@@ -433,7 +426,6 @@ examples:
       paymentDetails: ach
     values:
       jobTemplate: standard_letter
-      accountNumber: "5555555555"
       tags:
         - advanced
         - url
@@ -453,7 +445,6 @@ examples:
       paymentDetails: invoice
     values:
       jobTemplate: marketing_postcard
-      customerAccountId: "TAG-ACCT-001"
       tags:
         - campaign-q1
         - region-west
@@ -501,7 +492,6 @@ examples:
       paymentDetails: ach
     values:
       jobTemplate: invoice_statement
-      accountNumber: "7777777777"
       tags:
         - advanced
         - ach-payment
@@ -542,7 +532,6 @@ examples:
               state: <String>
               zip: <String>
               country: <String>
-      customerAccountId: "ZIP-ACCT-001"
       tags:
         - advanced
         - zip
@@ -581,7 +570,6 @@ examples:
       paymentDetails: ach
     values:
       jobTemplate: bulk_mailing
-      accountNumber: "8888888888"
       tags:
         - advanced
         - saved-list
