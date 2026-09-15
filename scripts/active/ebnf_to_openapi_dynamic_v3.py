@@ -64,6 +64,19 @@ _DEFAULT_SUPPORT_EMAIL = "support@click2mail.com"
 _DEFAULT_API_TITLE    = "C2M API v2"
 _DEFAULT_API_VERSION  = "2.0.0"
 
+# EBNF rules of the form `a = b ;` where b is the field name inside a single-field
+# wrapper object rather than a transparent alias.  These rules appear as discriminated
+# oneOf variants alongside multi-field object siblings, so they must become
+# { type: object, properties: { b: <type> }, required: [b] } in the spec rather than
+# $ref aliases — otherwise the union is ambiguous at the wire level.
+_SINGLE_FIELD_WRAPPER_RULES: frozenset = frozenset({
+    "documentIdSource",   # documentIdSource = documentId ; → { documentId: integer }
+    "urlSource",          # urlSource = url ;              → { url: string }
+    "zipDocumentIdOnly",  # zipDocumentIdOnly = zipDocumentId ; → { zipDocumentId: integer }
+    "zipRequestIdOnly",   # zipRequestIdOnly = requestId ; → { requestId: integer }
+    "mergeByDocumentId",  # mergeByDocumentId = documentId ; → { documentId: integer }
+})
+
 # ─────────────────────────── Data Classes ───────────────────────────
 @dataclass
 class EBNFProduction:
@@ -992,6 +1005,17 @@ class EBNFToOpenAPITranslator:
                         # Inline the primitive type instead of creating a $ref
                         return {"type": symbol_name}
                     elif symbol_name in self.productions:
+                        # Single-field wrapper rules (e.g. documentIdSource = documentId)
+                        # must be emitted as { type: object, properties: { b: T } } so
+                        # they are structurally distinguishable from sibling oneOf variants.
+                        if context in _SINGLE_FIELD_WRAPPER_RULES:
+                            return {
+                                "type": "object",
+                                "properties": {
+                                    symbol_name: self._get_field_type(symbol_name)
+                                },
+                                "required": [symbol_name],
+                            }
                         return {"$ref": f"#/components/schemas/{symbol_name}"}
                     else:
                         return self._get_field_type(symbol_name)
