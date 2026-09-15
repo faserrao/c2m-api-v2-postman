@@ -59,6 +59,20 @@ PRIMITIVE_TYPES = {"string", "integer", "number"}
 # spec as $ref entries, but checking them adds no signal — they always pass.
 HTTP_ALIAS_PREFIX = "HTTP_"
 
+# EBNF rules of the form `a = b ;` (single-symbol body) that represent
+# single-field WRAPPER OBJECTS rather than transparent aliases.  These appear
+# as discriminated oneOf variants alongside multi-field object siblings, so
+# their spec schema must be { type: object, properties: { b: T }, required: [b] }
+# rather than a $ref alias.  Must stay in sync with _SINGLE_FIELD_WRAPPER_RULES
+# in ebnf_to_openapi_dynamic_v3.py.
+SINGLE_FIELD_WRAPPER_RULES: frozenset = frozenset({
+    "documentIdSource",   # documentIdSource = documentId ; → { documentId: integer }
+    "urlSource",          # urlSource = url ;              → { url: string }
+    "zipDocumentIdOnly",  # zipDocumentIdOnly = zipDocumentId ; → { zipDocumentId: integer }
+    "zipRequestIdOnly",   # zipRequestIdOnly = requestId ; → { requestId: integer }
+    "mergeByDocumentId",  # mergeByDocumentId = documentId ; → { documentId: integer }
+})
+
 # Rules only referenced inside multi-line block comments (Apple Pay /
 # Google Pay).  strip_block_comments() removes them from the parsed text, so
 # they never appear in extract_rules(); this set is kept for documentation.
@@ -385,6 +399,61 @@ def check_required_fields(
     return findings
 
 
+def check_wrapper_rules(
+    rules: Dict[str, str],
+    all_schemas: dict,
+    body_types: Dict[str, str],
+) -> List[Finding]:
+    """
+    Check 5: single-field wrapper rules (a = b ; where b is the field name)
+    must be emitted as { type: object, properties: { b: T }, required: [b] }
+    rather than $ref aliases.  A $ref here means the translator treated it as
+    a transparent alias, making the oneOf variants structurally ambiguous.
+    """
+    findings: List[Finding] = []
+
+    for name in SINGLE_FIELD_WRAPPER_RULES:
+        if name not in rules:
+            continue  # rule commented out or not present in this DD version
+        if name not in all_schemas:
+            continue  # already flagged by existence check
+
+        # Derive the expected single field name from the EBNF body
+        field_name = rules[name].strip()  # body is just the field identifier
+        schema = all_schemas[name]
+
+        if "$ref" in schema:
+            findings.append((FAIL, name,
+                f"spec emits a $ref alias; expected single-field object "
+                f"{{ {field_name}: T }} — translator treated it as a transparent alias"))
+            continue
+
+        schema_type = schema.get("type")
+        if schema_type != "object":
+            findings.append((FAIL, name,
+                f"spec schema type is '{schema_type}'; expected 'object' "
+                f"with property '{field_name}'"))
+            continue
+
+        props = set(schema.get("properties", {}).keys())
+        required = set(schema.get("required", []))
+
+        missing_prop = field_name not in props
+        missing_req  = field_name not in required
+
+        if missing_prop:
+            findings.append((FAIL, name,
+                f"spec object missing property '{field_name}'"))
+        elif missing_req:
+            findings.append((WARN, name,
+                f"property '{field_name}' present but not in required[]"))
+        else:
+            findings.append((PASS, name,
+                f"single-field wrapper object correct: {{ {field_name}: T }}"))
+
+    return findings
+
+
 # ---------------------------------------------------------------------------
 # Reporting
 # ---------------------------------------------------------------------------
@@ -493,10 +562,11 @@ def main() -> int:
     print("\n" + "=" * 68)
 
     check_list = [
-        ("1. Schema existence",   check_schema_existence(rules, all_schemas, body_types)),
-        ("2. Enum parity",        check_enum_parity(rules, all_schemas, body_types)),
-        ("3. Object properties",  check_object_properties(rules, all_schemas, body_types)),
-        ("4. Required fields",    check_required_fields(rules, all_schemas, body_types)),
+        ("1. Schema existence",       check_schema_existence(rules, all_schemas, body_types)),
+        ("2. Enum parity",            check_enum_parity(rules, all_schemas, body_types)),
+        ("3. Object properties",      check_object_properties(rules, all_schemas, body_types)),
+        ("4. Required fields",        check_required_fields(rules, all_schemas, body_types)),
+        ("5. Wrapper rule structure", check_wrapper_rules(rules, all_schemas, body_types)),
     ]
 
     for title, findings in check_list:
