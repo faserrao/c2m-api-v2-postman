@@ -2919,6 +2919,15 @@ validate-catalog-against-spec: ## Validate curated-examples-catalog.yaml select:
 # collection — canonical, all 11 endpoints (8 job + 3 auth); the Test collection
 # shares the same request bodies. Run AFTER `make openapi-build` (needs the fresh
 # spec + the venv it creates). Validates job AND auth endpoints (--path-prefix /).
+.PHONY: validate-collections-conformance-gate-all
+validate-collections-conformance-gate-all: ## CI gate: fail if ANY of the 4 canonical collections have FAIL > 0
+	@C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" \
+	POSTMAN_GENERATED_DIR="$(POSTMAN_GENERATED_DIR)" \
+	C2MAPIV2_POSTMAN_API_NAME_KC="$(C2MAPIV2_POSTMAN_API_NAME_KC)" \
+	$(VENV_PYTHON) scripts/validation/validate_collections_against_spec.py \
+		--path-prefix "/" --exit-status \
+		$(CONFORMANCE_GATE_REPORT)
+
 .PHONY: validate-collections-conformance-gate
 validate-collections-conformance-gate: ## CI gate: fail if the freshly-built Linked collection drifts from the OpenAPI spec
 	@set -e; \
