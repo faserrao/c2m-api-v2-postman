@@ -2859,16 +2859,16 @@ validate-collections-conformance-test: ## Run all validation golden tests (valid
 	$(VENV_PYTHON) -m pytest scripts/validation/tests/test_dd_constraints.py -v
 
 .PHONY: validate-all-collections
-validate-all-collections: ## Validate ALL active collections against the DD (fields + enum values)
-	@echo "🔍 Validating all active Postman collections against the DD (OpenAPI spec)..."
-	@$(VENV_PYTHON) scripts/validation/validate_all_collections_against_dd.py \
+validate-all-collections: ## Validate ALL active collections against the OpenAPI spec (fields + enums)
+	@echo "🔍 Validating all active Postman collections against the OpenAPI spec..."
+	@$(VENV_PYTHON) scripts/validation/validate_all_collections_against_spec.py \
 		--spec $(C2MAPIV2_OPENAPI_SPEC_FINAL) \
 		--dir postman/generated
 
 .PHONY: validate-all-collections-report
 validate-all-collections-report: ## Same as validate-all-collections but writes a Markdown report
-	@echo "🔍 Validating all active Postman collections against the DD..."
-	@$(VENV_PYTHON) scripts/validation/validate_all_collections_against_dd.py \
+	@echo "🔍 Validating all active Postman collections against the OpenAPI spec..."
+	@$(VENV_PYTHON) scripts/validation/validate_all_collections_against_spec.py \
 		--spec $(C2MAPIV2_OPENAPI_SPEC_FINAL) \
 		--dir postman/generated \
 		--report reports/dd-validation-report.md

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-validate_all_collections_against_dd.py
+validate_all_collections_against_spec.py
 
 Validates ALL generated Postman collections against the OpenAPI spec
 (which is derived from the EBNF Data Dictionary — single source of truth).
