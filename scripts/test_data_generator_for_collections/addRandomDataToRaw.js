@@ -77,214 +77,145 @@ function parseArgs() {
 }
 
 /**
- * OneOf fixtures for C2M API fields
- * Each field has an array of valid variants that match the oneOf schema
+ * OneOf fixtures for C2M API fields — named-wrapper format.
+ * Each variant is wrapped in its type name as the top-level key,
+ * matching the OpenAPI spec's named-wrapper oneOf structure.
  */
 const oneOfFixtures = {
-    documentSourceIdentifier: [
-        // Variant 1: Just documentId (integer)
-        { "documentId": "<integer>" },
-        // Variant 2: Just externalUrl (string with URI format)
-        { "externalUrl": "<string>" },
-        // Variant 3: uploadRequestId + documentName
-        {
-            uploadRequestId: "<integer>",
-            documentName: "<string>"
-        },
-        // Variant 4: uploadRequestId + zipId + documentName
-        {
-            uploadRequestId: "<integer>",
-            zipId: "<integer>",
-            documentName: "<string>"
-        },
-        // Variant 5: zipId + documentName
-        {
-            zipId: "<integer>",
-            documentName: "<string>"
-        }
-    ],
-    
     recipientAddressSource: [
-        // Variant 1: recipientAddressBySingle (full address)
-        // Note: All non-oneOf fields will be populated dynamically by generateRandomValue()
+        // Variant 1: singleAddress
         {
-            mappingId: "<string>",
-            firstName: "<string>",
-            lastName: "<string>",
-            address1: "<string>",
-            address2: "<string>",
-            address3: "<string>",
-            city: "<string>",
-            state: "<string>",
-            zip: "<string>",
-            country: "USA",
-            nickName: "<string>",
-            phoneNumber: "<string>",
-            addressName: "<string>"
+            singleAddress: {
+                firstName: "John",
+                lastName: "Smith",
+                address1: "123 Main St",
+                address2: "",
+                address3: "",
+                city: "Springfield",
+                state: "IL",
+                zip: "62701",
+                country: "USA",
+                foo1: "",
+                foo2: ""
+            }
         },
-        // Variant 2: recipientAddressByList (address list array)
-        // Note: addressList array items will be populated dynamically by generateRandomValue()
+        // Variant 2: recipientAddressByList
         {
-            mappingId: "<string>",
-            addressList: [
-                {
-                    firstName: "<string>",
-                    lastName: "<string>",
-                    address1: "<string>",
-                    city: "<string>",
-                    state: "<string>",
-                    zip: "<string>",
-                    country: "USA"
-                },
-                {
-                    firstName: "<string>",
-                    lastName: "<string>",
-                    address1: "<string>",
-                    city: "<string>",
-                    state: "<string>",
-                    zip: "<string>",
-                    country: "USA"
-                }
-            ],
-            addressListName: "<string>"
+            recipientAddressByList: {
+                mappingId: 1,
+                addressList: [
+                    {
+                        firstName: "Jane",
+                        lastName: "Doe",
+                        address1: "456 Oak Ave",
+                        city: "Chicago",
+                        state: "IL",
+                        zip: "60601",
+                        country: "USA"
+                    }
+                ],
+                addressListName: "Marketing Campaign Q1"
+            }
         },
-        // Variant 3: recipientAddressByAddressId (addressId)
+        // Variant 3: recipientAddressByAddressId (integer)
         {
-            addressId: 5000
+            recipientAddressByAddressId: 5000
         },
-        // Variant 4: recipientAddressByListId (addressListId)
+        // Variant 4: recipientAddressByListId (integer)
         {
-            addressListId: 100
+            recipientAddressByListId: 1001
         }
     ],
-    
+
     paymentDetails: [
         // Variant 1: creditCardPayment
-        // Note: All non-oneOf fields will be populated dynamically by generateRandomValue()
         {
             creditCardDetails: {
                 cardType: "visa",
-                cardNumber: "<string>",
+                cardNumber: "4111111111111111",
                 expirationDate: {
-                    month: "<integer>",
-                    year: "<integer>"
+                    month: 12,
+                    year: 2029
                 },
-                cvv: "<integer>"
+                cvv: 123
             }
         },
         // Variant 2: invoicePayment
         {
             invoiceDetails: {
-                invoiceNumber: "<string>",
-                amountDue: "<number>"
+                invoiceNumber: "INV-2026-001",
+                amountDue: 99.99
             }
         },
         // Variant 3: achPayment
         {
             achDetails: {
-                routingNumber: "<string>",
-                accountNumber: "<string>",
-                checkDigit: "<integer>"
+                routingNumber: "021000021",
+                accountNumber: "1234567890",
+                checkDigit: 5
             }
         },
         // Variant 4: userCreditPayment
         {
-            userCreditDetails: {
-                creditAmount: "<number>"
-            }
-        },
-        // Variant 5: applePayPayment
-        {
-            applePayDetails: {
-                applePaymentDetails: {}
-            }
-        },
-        // Variant 6: googlePayPayment
-        {
-            googlePayDetails: {
-                googlePaymentDetails: {}
+            creditAmount: {
+                amount: 50.00,
+                currency: "USD"
             }
         }
     ],
 
     docSourceAll: [
-        // Variant 1: documentIdSource (just documentId)
-        {
-            documentId: "<integer>"
-        },
-        // Variant 2: requestIdSource (requestId + optional filename)
-        {
-            requestId: "<integer>",
-            filename: "<string>"
-        },
-        // Variant 3: urlSource (just url)
-        {
-            url: "<string>"
-        },
-        // Variant 4: zipDocumentIdSource (zipDocumentId + filename)
-        {
-            zipDocumentId: "<integer>",
-            filename: "<string>"
-        },
-        // Variant 5: zipRequestIdSource (requestId + zipFilename + filename)
-        {
-            requestId: "<integer>",
-            zipFilename: "<string>",
-            filename: "<string>"
-        }
+        // Variant 1: documentIdSource
+        { documentIdSource: { documentId: 12345 } },
+        // Variant 2: requestIdSource
+        { requestIdSource: { requestId: 67890, filename: "document.pdf" } },
+        // Variant 3: urlSource
+        { urlSource: { url: "https://example.com/documents/sample.pdf" } },
+        // Variant 4: zipDocumentIdSource
+        { zipDocumentIdSource: { zipDocumentId: 11111, filename: "letter.pdf" } },
+        // Variant 5: zipRequestIdSource
+        { zipRequestIdSource: { requestId: 22222, zipFilename: "archive.zip", filename: "letter.pdf" } }
     ],
 
     docSourceStandard: [
-        // Variant 1: documentIdSource (just documentId)
-        {
-            documentId: "<integer>"
-        },
-        // Variant 2: requestIdSource (requestId + optional filename)
-        {
-            requestId: "<integer>",
-            filename: "<string>"
-        },
-        // Variant 3: urlSource (just url)
-        {
-            url: "<string>"
-        }
+        // Variant 1: documentIdSource
+        { documentIdSource: { documentId: 12345 } },
+        // Variant 2: requestIdSource
+        { requestIdSource: { requestId: 67890, filename: "document.pdf" } },
+        // Variant 3: urlSource
+        { urlSource: { url: "https://example.com/documents/sample.pdf" } }
     ],
 
     docSourceZipFile: [
-        // Variant 1: zipDocumentIdSource (zipDocumentId + filename)
-        {
-            zipDocumentId: "<integer>",
-            filename: "<string>"
-        },
-        // Variant 2: zipRequestIdSource (requestId + zipFilename + filename)
-        {
-            requestId: "<integer>",
-            zipFilename: "<string>",
-            filename: "<string>"
-        }
+        // Variant 1: zipDocumentIdSource
+        { zipDocumentIdSource: { zipDocumentId: 11111, filename: "letter.pdf" } },
+        // Variant 2: zipRequestIdSource
+        { zipRequestIdSource: { requestId: 22222, zipFilename: "archive.zip", filename: "letter.pdf" } }
     ],
 
     zipDocumentSource: [
-        // Variant 1: zipDocumentIdSource (zipDocumentId + filename)
-        {
-            zipDocumentId: "<integer>",
-            filename: "<string>"
-        },
-        // Variant 2: zipRequestIdSource (requestId + zipFilename + filename)
-        {
-            requestId: "<integer>",
-            zipFilename: "<string>",
-            filename: "<string>"
-        }
+        // Variant 1: zipDocumentIdSource
+        { zipDocumentIdSource: { zipDocumentId: 11111, filename: "letter.pdf" } },
+        // Variant 2: zipRequestIdSource
+        { zipRequestIdSource: { requestId: 22222, zipFilename: "archive.zip", filename: "letter.pdf" } }
     ],
 
     mergeDocumentSource: [
-        // Variant 1: two integer document IDs (mergeByDocumentId)
-        [12345, 67890],
-        // Variant 2: two requestId objects (mergeByRequestId)
-        [{ requestId: 12345, filename: "doc-a.pdf" }, { requestId: 67890, filename: "doc-b.pdf" }],
-        // Variant 3: mixed — one documentId integer, one requestId object
-        [12345, { requestId: 67890, filename: "doc-b.pdf" }]
+        // Variant 1: two mergeByDocumentId items
+        [
+            { mergeByDocumentId: { documentId: 12345 } },
+            { mergeByDocumentId: { documentId: 67890 } }
+        ],
+        // Variant 2: two mergeByRequestId items
+        [
+            { mergeByRequestId: { requestId: 12345, filename: "doc-a.pdf" } },
+            { mergeByRequestId: { requestId: 67890, filename: "doc-b.pdf" } }
+        ],
+        // Variant 3: mixed
+        [
+            { mergeByDocumentId: { documentId: 11111 } },
+            { mergeByRequestId: { requestId: 22222, filename: "doc-b.pdf" } }
+        ]
     ],
 
     errorResponse: [

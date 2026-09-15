@@ -176,10 +176,10 @@ def get_variant_structure_from_spec(spec, field_name, variant_name):
     property key within the oneOf candidates of field_name — no hardcoded
     name mapping required.
     """
-    schema_name, _ = find_variant_by_discriminator_key(spec, field_name, variant_name)
+    schema_name, variant_schema = find_variant_by_discriminator_key(spec, field_name, variant_name)
     if not schema_name:
         return None
-    return build_variant_placeholder_structure(spec, schema_name)
+    return build_variant_placeholder_structure(spec, variant_schema if variant_schema is not None else schema_name)
 
 
 def schema_to_example(schema):

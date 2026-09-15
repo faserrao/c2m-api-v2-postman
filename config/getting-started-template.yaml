@@ -95,6 +95,8 @@ examples:
     zipDocumentSource:
       zipRequestIdSource:
         requestId: <Integer>
+        zipFilename: <String>
+        filename: <String>
 - name: /batch/split
   method: POST
   path: /batch/split
@@ -248,7 +250,7 @@ examples:
   values:
     docSourceZipFileRef:
       zipDocumentIdOnly:
-        documentId: <Integer>
+        zipDocumentId: <Integer>
     multiZipJobs:
     - jobTemplate: <String>
       filename: <String>
