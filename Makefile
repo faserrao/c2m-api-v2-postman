@@ -2862,16 +2862,31 @@ validate-collections-conformance-test: ## Run all validation golden tests (valid
 validate-all-collections: ## Validate ALL active collections against the OpenAPI spec (fields + enums)
 	@echo "🔍 Validating all active Postman collections against the OpenAPI spec..."
 	@$(VENV_PYTHON) scripts/validation/validate_all_collections_against_spec.py \
-		--spec $(C2MAPIV2_OPENAPI_SPEC_FINAL) \
+		--spec $(C2MAPIV2_OPENAPI_SPEC) \
 		--dir postman/generated
 
 .PHONY: validate-all-collections-report
 validate-all-collections-report: ## Same as validate-all-collections but writes a Markdown report
 	@echo "🔍 Validating all active Postman collections against the OpenAPI spec..."
 	@$(VENV_PYTHON) scripts/validation/validate_all_collections_against_spec.py \
-		--spec $(C2MAPIV2_OPENAPI_SPEC_FINAL) \
+		--spec $(C2MAPIV2_OPENAPI_SPEC) \
 		--dir postman/generated \
 		--report reports/dd-validation-report.md
+
+.PHONY: validate-spec-against-dd
+validate-spec-against-dd: ## Validate OpenAPI spec faithfully represents the EBNF DD (enums, properties, required)
+	@echo "🔍 Validating OpenAPI spec against EBNF Data Dictionary..."
+	@$(VENV_PYTHON) scripts/validation/validate_spec_against_dd.py \
+		--dd $(DD_EBNF_FILE) \
+		--spec $(C2MAPIV2_OPENAPI_SPEC)
+
+.PHONY: validate-spec-against-dd-report
+validate-spec-against-dd-report: ## Same as validate-spec-against-dd but writes a Markdown report
+	@echo "🔍 Validating OpenAPI spec against EBNF Data Dictionary..."
+	@$(VENV_PYTHON) scripts/validation/validate_spec_against_dd.py \
+		--dd $(DD_EBNF_FILE) \
+		--spec $(C2MAPIV2_OPENAPI_SPEC) \
+		--report reports/spec-vs-dd-report.md
 
 .PHONY: validate-configs
 validate-configs: ## Validate all config file field names against the EBNF Data Dictionary
