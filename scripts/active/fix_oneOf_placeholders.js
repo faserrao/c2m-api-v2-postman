@@ -39,8 +39,8 @@ function parseArgs() {
 }
 
 /**
- * Discover oneOf fields from OpenAPI spec
- * Returns a Set of field names that have oneOf definitions
+ * Discover oneOf fields and cross-field constraints from OpenAPI spec.
+ * Returns { oneOfFields: Set, crossFieldRules: Array }
  */
 function discoverOneOfFields(specPath) {
     console.log(`Reading OpenAPI spec from: ${specPath}`);
@@ -78,7 +78,13 @@ function discoverOneOfFields(specPath) {
             console.log(`  - ${field}`);
         });
 
-        return oneOfFields;
+        // Load cross-field jobOptions constraints from spec info
+        const crossFieldRules = (spec.info && spec.info['x-valid-combinations']) || [];
+        if (crossFieldRules.length > 0) {
+            console.log(`Loaded ${crossFieldRules.length} cross-field constraints from spec`);
+        }
+
+        return { oneOfFields, crossFieldRules };
 
     } catch (error) {
         console.error(`Error reading OpenAPI spec: ${error.message}`);
@@ -168,9 +174,25 @@ function processObject(obj, oneOfFields, replacedFields, parentKey = '') {
 const JOB_ARRAY_FIELDS = ['pdfSplitJobsNoAddress', 'pdfSplitJobsWithAddress', 'multiZipJobs', 'multiDocJobs'];
 
 /**
+ * Enforce x-valid-combinations rules on jobOptions.
+ * When a triggering field value is present and the constrained field violates the rule,
+ * reset the constrained field to the first allowed value.
+ */
+function fixCrossFieldConstraints(bodyObj, rules) {
+    if (!bodyObj || !bodyObj.jobOptions || !rules || rules.length === 0) return;
+    const jo = bodyObj.jobOptions;
+    for (const rule of rules) {
+        const { when_field, when_value, then_field, then_values } = rule;
+        if (jo[when_field] === when_value && jo[then_field] !== undefined && !then_values.includes(jo[then_field])) {
+            jo[then_field] = then_values[0];
+        }
+    }
+}
+
+/**
  * Process a raw body string (JSON in a string)
  */
-function processRawBody(rawStr, oneOfFields, replacedFields) {
+function processRawBody(rawStr, oneOfFields, replacedFields, crossFieldRules) {
     if (!rawStr || typeof rawStr !== 'string') {
         return rawStr;
     }
@@ -189,6 +211,9 @@ function processRawBody(rawStr, oneOfFields, replacedFields) {
             }
         }
 
+        // Enforce cross-field jobOptions constraints (rules from spec x-valid-combinations)
+        fixCrossFieldConstraints(processed, crossFieldRules);
+
         // Convert back to formatted JSON string
         return JSON.stringify(processed, null, 2);
     } catch (e) {
@@ -201,10 +226,10 @@ function processRawBody(rawStr, oneOfFields, replacedFields) {
 /**
  * Process a single collection item (request)
  */
-function processItem(item, oneOfFields, replacedFields) {
+function processItem(item, oneOfFields, replacedFields, crossFieldRules) {
     // Process request body
     if (item.request && item.request.body && item.request.body.raw) {
-        item.request.body.raw = processRawBody(item.request.body.raw, oneOfFields, replacedFields);
+        item.request.body.raw = processRawBody(item.request.body.raw, oneOfFields, replacedFields, crossFieldRules);
     }
 
     // Process response examples
@@ -212,19 +237,19 @@ function processItem(item, oneOfFields, replacedFields) {
         item.response.forEach(response => {
             // Process response body
             if (response.body) {
-                response.body = processRawBody(response.body, oneOfFields, replacedFields);
+                response.body = processRawBody(response.body, oneOfFields, replacedFields, crossFieldRules);
             }
 
             // Process originalRequest in responses
             if (response.originalRequest && response.originalRequest.body && response.originalRequest.body.raw) {
-                response.originalRequest.body.raw = processRawBody(response.originalRequest.body.raw, oneOfFields, replacedFields);
+                response.originalRequest.body.raw = processRawBody(response.originalRequest.body.raw, oneOfFields, replacedFields, crossFieldRules);
             }
         });
     }
 
     // Recursively process sub-items (folders)
     if (item.item && Array.isArray(item.item)) {
-        item.item.forEach(subItem => processItem(subItem, oneOfFields, replacedFields));
+        item.item.forEach(subItem => processItem(subItem, oneOfFields, replacedFields, crossFieldRules));
     }
 }
 
@@ -235,8 +260,8 @@ function main() {
     const options = parseArgs();
 
     try {
-        // Step 1: Discover oneOf fields from OpenAPI spec
-        const oneOfFields = discoverOneOfFields(options.spec);
+        // Step 1: Discover oneOf fields and cross-field constraints from OpenAPI spec
+        const { oneOfFields, crossFieldRules } = discoverOneOfFields(options.spec);
 
         if (oneOfFields.size === 0) {
             console.warn('Warning: No oneOf fields discovered in OpenAPI spec');
@@ -252,7 +277,7 @@ function main() {
         // Step 3: Process all items in the collection, tracking actual replacements
         const replacedFields = new Set();
         if (collection.item && Array.isArray(collection.item)) {
-            collection.item.forEach(item => processItem(item, oneOfFields, replacedFields));
+            collection.item.forEach(item => processItem(item, oneOfFields, replacedFields, crossFieldRules));
         }
 
         // Step 4: Write the output
