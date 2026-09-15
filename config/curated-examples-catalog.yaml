@@ -324,6 +324,8 @@ examples:
       pdfSplitJobsNoAddress:
         - startPage: 1
           endPage: 3
+        - startPage: 4
+          endPage: 6
       tags:
         - bulk
         - split-pdf
@@ -344,6 +346,17 @@ examples:
       pdfSplitJobsWithAddress:
         - startPage: 1
           endPage: 3
+          recipientAddressSource:
+            singleAddress:
+              firstName: <String>
+              lastName: <String>
+              address1: <String>
+              city: <String>
+              state: <String>
+              zip: <String>
+              country: <String>
+        - startPage: 4
+          endPage: 6
           recipientAddressSource:
             singleAddress:
               firstName: <String>
