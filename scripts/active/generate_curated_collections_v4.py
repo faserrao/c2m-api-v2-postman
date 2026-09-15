@@ -261,8 +261,9 @@ def select_oneof_variants(template_obj, select_map, openapi_spec=None):
                 variant_structure = get_variant_structure_from_spec(openapi_spec, key, variant_name)
 
             # Use the structure if we got it
+            # variant_structure already contains the named-wrapper key (e.g. {documentIdSource: {...}})
             if variant_structure is not None:
-                result[key] = {variant_name: variant_structure}
+                result[key] = variant_structure
             else:
                 # Fallback: Create generic nested structure
                 if variant_name.endswith("Id"):
