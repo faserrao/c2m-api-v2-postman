@@ -86,9 +86,11 @@ examples:
   values:
     jobTemplate: <String>
     pdfSplitJobsNoAddress:
-    - startPage: <Integer>
+    - jobTemplate: <String>
+      startPage: <Integer>
       endPage: <Integer>
-    - startPage: <Integer>
+    - jobTemplate: <String>
+      startPage: <Integer>
       endPage: <Integer>
 - name: /batch/zip/address-capture - using zip file
   method: POST
