@@ -84,7 +84,23 @@ function discoverOneOfFields(specPath) {
             console.log(`Loaded ${crossFieldRules.length} cross-field constraints from spec`);
         }
 
-        return { oneOfFields, crossFieldRules };
+        // Build ph<val1|val2|...> placeholder map for jobOptions enum properties.
+        // json-schema-faker picks a random concrete value for each enum-constrained
+        // field; fix_oneOf only handles oneOf schemas so these slip through.
+        const enumPlaceholders = {};
+        const joSchema = spec.components &&
+                         spec.components.schemas &&
+                         spec.components.schemas.jobOptions;
+        if (joSchema && joSchema.properties) {
+            for (const [propName, propDef] of Object.entries(joSchema.properties)) {
+                if (Array.isArray(propDef.enum) && propDef.enum.length > 0) {
+                    enumPlaceholders[propName] = `ph<${propDef.enum.join('|')}>`;
+                }
+            }
+            console.log(`Discovered ${Object.keys(enumPlaceholders).length} jobOptions enum placeholders`);
+        }
+
+        return { oneOfFields, crossFieldRules, enumPlaceholders };
 
     } catch (error) {
         console.error(`Error reading OpenAPI spec: ${error.message}`);
@@ -174,6 +190,22 @@ function processObject(obj, oneOfFields, replacedFields, parentKey = '') {
 const JOB_ARRAY_FIELDS = ['pdfSplitJobsNoAddress', 'pdfSplitJobsWithAddress', 'multiZipJobs', 'multiDocJobs'];
 
 /**
+ * Replace actual enum values in jobOptions with ph<val1|val2|...> placeholders.
+ * Skips values already in placeholder notation (start with '<' or 'ph<').
+ */
+function convertJobOptionsToPlaceholders(bodyObj, enumPlaceholders) {
+    if (!bodyObj || !bodyObj.jobOptions ||
+        !enumPlaceholders || Object.keys(enumPlaceholders).length === 0) return;
+    const jo = bodyObj.jobOptions;
+    for (const [prop, placeholder] of Object.entries(enumPlaceholders)) {
+        if (jo[prop] !== undefined && typeof jo[prop] === 'string' &&
+            !jo[prop].startsWith('<') && !jo[prop].startsWith('ph<')) {
+            jo[prop] = placeholder;
+        }
+    }
+}
+
+/**
  * Enforce x-valid-combinations rules on jobOptions.
  * When a triggering field value is present and the constrained field violates the rule,
  * reset the constrained field to the first allowed value.
@@ -192,7 +224,7 @@ function fixCrossFieldConstraints(bodyObj, rules) {
 /**
  * Process a raw body string (JSON in a string)
  */
-function processRawBody(rawStr, oneOfFields, replacedFields, crossFieldRules) {
+function processRawBody(rawStr, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders) {
     if (!rawStr || typeof rawStr !== 'string') {
         return rawStr;
     }
@@ -214,6 +246,9 @@ function processRawBody(rawStr, oneOfFields, replacedFields, crossFieldRules) {
         // Enforce cross-field jobOptions constraints (rules from spec x-valid-combinations)
         fixCrossFieldConstraints(processed, crossFieldRules);
 
+        // Replace concrete enum values in jobOptions with ph<...> type placeholders
+        convertJobOptionsToPlaceholders(processed, enumPlaceholders);
+
         // Convert back to formatted JSON string
         return JSON.stringify(processed, null, 2);
     } catch (e) {
@@ -226,10 +261,10 @@ function processRawBody(rawStr, oneOfFields, replacedFields, crossFieldRules) {
 /**
  * Process a single collection item (request)
  */
-function processItem(item, oneOfFields, replacedFields, crossFieldRules) {
+function processItem(item, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders) {
     // Process request body
     if (item.request && item.request.body && item.request.body.raw) {
-        item.request.body.raw = processRawBody(item.request.body.raw, oneOfFields, replacedFields, crossFieldRules);
+        item.request.body.raw = processRawBody(item.request.body.raw, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders);
     }
 
     // Process response examples
@@ -237,19 +272,19 @@ function processItem(item, oneOfFields, replacedFields, crossFieldRules) {
         item.response.forEach(response => {
             // Process response body
             if (response.body) {
-                response.body = processRawBody(response.body, oneOfFields, replacedFields, crossFieldRules);
+                response.body = processRawBody(response.body, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders);
             }
 
             // Process originalRequest in responses
             if (response.originalRequest && response.originalRequest.body && response.originalRequest.body.raw) {
-                response.originalRequest.body.raw = processRawBody(response.originalRequest.body.raw, oneOfFields, replacedFields, crossFieldRules);
+                response.originalRequest.body.raw = processRawBody(response.originalRequest.body.raw, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders);
             }
         });
     }
 
     // Recursively process sub-items (folders)
     if (item.item && Array.isArray(item.item)) {
-        item.item.forEach(subItem => processItem(subItem, oneOfFields, replacedFields, crossFieldRules));
+        item.item.forEach(subItem => processItem(subItem, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders));
     }
 }
 
@@ -260,8 +295,8 @@ function main() {
     const options = parseArgs();
 
     try {
-        // Step 1: Discover oneOf fields and cross-field constraints from OpenAPI spec
-        const { oneOfFields, crossFieldRules } = discoverOneOfFields(options.spec);
+        // Step 1: Discover oneOf fields, cross-field constraints, and enum placeholders
+        const { oneOfFields, crossFieldRules, enumPlaceholders } = discoverOneOfFields(options.spec);
 
         if (oneOfFields.size === 0) {
             console.warn('Warning: No oneOf fields discovered in OpenAPI spec');
@@ -277,7 +312,7 @@ function main() {
         // Step 3: Process all items in the collection, tracking actual replacements
         const replacedFields = new Set();
         if (collection.item && Array.isArray(collection.item)) {
-            collection.item.forEach(item => processItem(item, oneOfFields, replacedFields, crossFieldRules));
+            collection.item.forEach(item => processItem(item, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders));
         }
 
         // Step 4: Write the output

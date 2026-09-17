@@ -1556,6 +1556,7 @@ postman-generate-use-case-collection:
 		--openapi $(C2MAPIV2_OPENAPI_SPEC) \
 		--output-dir $(POSTMAN_GENERATED_DIR) \
 		--tags real-world \
+		--faker-hints config/faker_hints.yaml \
 		--output-name $(C2MAPIV2_POSTMAN_API_NAME_KC)-real-world-use-cases-collection \
 		--schema-url $(POSTMAN_SCHEMA_V2)
 	@echo "✅ Real World Use Cases collection generated"

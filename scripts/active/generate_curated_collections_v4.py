@@ -32,13 +32,65 @@ import yaml
 import argparse
 import sys
 import copy
+import random
 from pathlib import Path
+from faker import Faker
+
+fake = Faker()
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # Keep in sync with _DEFAULT_API_TITLE in ebnf_to_openapi_dynamic_v3.py
 _API_TITLE = "C2M API v2"
 from utilities.oneof_resolver import find_variant_by_discriminator_key, build_variant_placeholder_structure
+
+
+def load_faker_hints(path):
+    """Load the faker_hints section from config/faker_hints.yaml."""
+    try:
+        with open(path) as f:
+            data = yaml.safe_load(f)
+        return (data or {}).get('faker_hints', {})
+    except FileNotFoundError:
+        print(f"WARNING: faker_hints file not found: {path}", file=sys.stderr)
+        return {}
+
+
+def generate_realistic_value(field_name, field_type, faker_hints=None):
+    """Return a realistic value for field_name using faker_hints, with type fallback."""
+    if faker_hints and field_name in faker_hints:
+        hint = faker_hints[field_name]
+        hint_type = hint.get('type')
+        if hint_type == 'static':
+            return hint['value']
+        elif hint_type == 'faker':
+            return getattr(fake, hint['method'])()
+        elif hint_type == 'random_int':
+            return fake.random_int(min=hint.get('min', 0), max=hint.get('max', 9999))
+        elif hint_type == 'aba_routing_number':
+            d = [random.randint(0, 9) for _ in range(8)]
+            check = (10 - (3*d[0] + 7*d[1] + d[2] + 3*d[3] + 7*d[4] + d[5] + 3*d[6] + 7*d[7]) % 10) % 10
+            return ''.join(map(str, d)) + str(check)
+    if field_type == 'integer':
+        return 123
+    elif field_type == 'number':
+        return 123.45
+    elif field_type == 'boolean':
+        return True
+    return f"example_{field_name}"
+
+
+def replace_placeholders_recursive(obj, parent_key="", faker_hints=None):
+    """Replace <...> placeholder strings throughout obj with realistic values."""
+    if isinstance(obj, dict):
+        return {k: replace_placeholders_recursive(v, k, faker_hints) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [replace_placeholders_recursive(item, parent_key, faker_hints) for item in obj]
+    elif isinstance(obj, str) and obj.startswith("<"):
+        # Enum placeholders like <visa|mastercard|...> contain '|' — treat as string
+        field_type = "string" if "String" in obj or "oneOf" in obj or "|" in obj else "integer"
+        return generate_realistic_value(parent_key, field_type, faker_hints)
+    return obj
 
 
 def load_yaml_catalog(catalog_path):
@@ -441,7 +493,7 @@ def convert_values_to_placeholders(body_obj):
     return result
 
 
-def materialize_request_body(canonical_request_item, example, openapi_spec, mode='examples'):
+def materialize_request_body(canonical_request_item, example, openapi_spec, mode='examples', faker_hints=None):
     """
     Produce the final Postman request item:
     - Deep clone canonical request
@@ -483,6 +535,12 @@ def materialize_request_body(canonical_request_item, example, openapi_spec, mode
     # Step 5: Filter to only YAML-specified fields
     selections = example.get('select', {})
     filtered_body = filter_to_yaml_fields(filled_body, values, selections)
+
+    # Step 5.5: Fill any remaining <...> placeholder strings with realistic values.
+    # Variant structures from build_variant_placeholder_structure contain <String>,
+    # <Integer>, and <val1|val2|...> enum placeholders for fields not in catalog values.
+    if mode == 'examples' and faker_hints:
+        filtered_body = replace_placeholders_recursive(filtered_body, faker_hints=faker_hints)
 
     # Step 6: Convert to placeholders if in placeholder mode
     if mode == 'placeholders':
@@ -594,7 +652,7 @@ def categorize_getting_started_examples(filtered_examples, groups):
     return result
 
 
-def generate_collection(examples, groups, linked_collection, openapi_spec, collection_name, tag_filter=None, mode='examples', schema_url='https://schema.getpostman.com/json/collection/v2.1.0/collection.json'):
+def generate_collection(examples, groups, linked_collection, openapi_spec, collection_name, tag_filter=None, mode='examples', schema_url='https://schema.getpostman.com/json/collection/v2.1.0/collection.json', faker_hints=None):
     """
     Generate a Postman collection from filtered examples.
 
@@ -684,7 +742,7 @@ def generate_collection(examples, groups, linked_collection, openapi_spec, colle
                         print(f"      WARNING: {warning}", file=sys.stderr)
 
                 # Materialize request body
-                request_item = materialize_request_body(canonical_item, example, openapi_spec, mode)
+                request_item = materialize_request_body(canonical_item, example, openapi_spec, mode, faker_hints)
 
                 # Add to folder
                 folder['item'].append(request_item)
@@ -724,7 +782,7 @@ def generate_collection(examples, groups, linked_collection, openapi_spec, colle
                     print(f"    WARNING: {warning}", file=sys.stderr)
 
             # Materialize request body (clone → select → overlay → filter → placeholders → serialize)
-            request_item = materialize_request_body(canonical_item, example, openapi_spec, mode)
+            request_item = materialize_request_body(canonical_item, example, openapi_spec, mode, faker_hints)
 
             # Add to collection
             collection['item'].append(request_item)
@@ -792,6 +850,13 @@ def main():
         default='https://schema.getpostman.com/json/collection/v2.1.0/collection.json',
         help='Postman collection schema URL (default: v2.1.0; override via POSTMAN_SCHEMA_V2 in Makefile)'
     )
+    parser.add_argument(
+        '--faker-hints',
+        default=None,
+        help='Path to config/faker_hints.yaml (derived from EBNF @hint annotations). '
+             'When provided, remaining <...> placeholder strings in example mode are '
+             'replaced with realistic values instead of left as placeholders.'
+    )
 
     args = parser.parse_args()
 
@@ -817,8 +882,13 @@ def main():
         collection_name = f"{_API_TITLE} - All Examples"
         output_name = args.output_name or "c2mapiv2-all-examples-collection"
 
+    faker_hints = {}
+    if args.faker_hints:
+        faker_hints = load_faker_hints(args.faker_hints)
+        print(f"  Loaded {len(faker_hints)} faker hints from {args.faker_hints}")
+
     print(f"\nGenerating collection: {collection_name} (mode={args.mode})")
-    collection = generate_collection(examples, groups, linked_collection, openapi_spec, collection_name, tag_filter, args.mode, args.schema_url)
+    collection = generate_collection(examples, groups, linked_collection, openapi_spec, collection_name, tag_filter, args.mode, args.schema_url, faker_hints)
 
     # Write output
     output_dir = Path(args.output_dir)
