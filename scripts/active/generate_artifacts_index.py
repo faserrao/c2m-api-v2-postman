@@ -71,7 +71,8 @@ def _section(title: str, rows: list[tuple[str, str, str]], readme_url: str | Non
 # ---------------------------------------------------------------------------
 
 def generate(org: str, reports_dir: Path, output: Path,
-             artifacts_repo: str = "c2m-api-v2-postman-artifacts") -> None:
+             artifacts_repo: str = "c2m-api-v2-postman-artifacts",
+             api_name: str = "c2mapiv2") -> None:
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
     # Local URL helpers with artifacts_repo baked in
@@ -112,31 +113,35 @@ def generate(org: str, reports_dir: Path, output: Path,
         ),
     ]
 
+    # Shorthand for building artifact paths from the API name prefix.
+    # api_name is set by --api-name (Makefile: $(C2MAPIV2_POSTMAN_API_NAME_KC)).
+    n = api_name
+
     # --- OpenAPI Specifications ---------------------------------------------
     spec_rows = [
         (
             "Final Spec",
-            _link("Download", _url("openapi/c2mapiv2-openapi-spec-final.yaml")),
+            _link("Download", _url(f"openapi/{n}-openapi-spec-final.yaml")),
             "Production-ready OpenAPI 3.0 specification generated from the EBNF data dictionary.",
         ),
         (
             "Final Spec — With Examples",
-            _link("Download", _url("openapi/c2mapiv2-openapi-spec-final-with-examples.yaml")),
+            _link("Download", _url(f"openapi/{n}-openapi-spec-final-with-examples.yaml")),
             "Final spec augmented with curated request/response examples for each endpoint.",
         ),
         (
             "Final Spec — With Multi-Examples",
-            _link("Download", _url("openapi/c2mapiv2-openapi-spec-final-with-multi-examples.yaml")),
+            _link("Download", _url(f"openapi/{n}-openapi-spec-final-with-multi-examples.yaml")),
             "Final spec with multiple named examples per endpoint, used by Postman mock servers.",
         ),
         (
             "Final Spec — Fixed oneOf",
-            _link("Download", _url("openapi/c2mapiv2-openapi-spec-final-fixed-oneOf.yaml")),
+            _link("Download", _url(f"openapi/{n}-openapi-spec-final-fixed-oneOf.yaml")),
             "Final spec with oneOf discriminators corrected for stricter validators and code generators.",
         ),
         (
             "Base Spec",
-            _link("Download", _url("openapi/c2mapiv2-openapi-spec-base.yaml")),
+            _link("Download", _url(f"openapi/{n}-openapi-spec-base.yaml")),
             "Unprocessed OpenAPI spec generated directly from the EBNF before example injection.",
         ),
         (
@@ -150,32 +155,32 @@ def generate(org: str, reports_dir: Path, output: Path,
     collection_rows = [
         (
             "C2M API Linked Collection",
-            _link("Download", _url("postman/collections/c2mapiv2-linked-collection-flat.json")),
+            _link("Download", _url(f"postman/collections/{n}-linked-collection-flat.json")),
             "Primary API collection with all endpoints linked to the live OpenAPI spec for schema validation (C2mApiV2CollectionLinked).",
         ),
         (
             "Test Collection",
-            _link("Download", _url("postman/collections/c2mapiv2-test-collection-flat.json")),
+            _link("Download", _url(f"postman/collections/{n}-test-collection-flat.json")),
             "Newman-compatible test collection with pre-request auth scripts and response assertions (C2mApiV2TestCollection).",
         ),
         (
             "Getting Started — With Examples",
-            _link("Download", _url("postman/collections/c2mapiv2-getting-started-with-examples-collection.json")),
+            _link("Download", _url(f"postman/collections/{n}-getting-started-with-examples-collection.json")),
             "Getting Started collection populated with concrete example request bodies for hands-on exploration.",
         ),
         (
             "Getting Started — Linked",
-            _link("Download", _url("postman/collections/c2mapiv2-getting-started-linked-collection.json")),
+            _link("Download", _url(f"postman/collections/{n}-getting-started-linked-collection.json")),
             "Getting Started collection linked to the live spec for real-time schema validation.",
         ),
         (
             "Getting Started — Test",
-            _link("Download", _url("postman/collections/c2mapiv2-getting-started-test-collection.json")),
+            _link("Download", _url(f"postman/collections/{n}-getting-started-test-collection.json")),
             "Getting Started collection with Newman test assertions for automated verification.",
         ),
         (
             "Real World Use Cases",
-            _link("Download", _url("postman/collections/c2mapiv2-real-world-use-cases-collection.json")),
+            _link("Download", _url(f"postman/collections/{n}-real-world-use-cases-collection.json")),
             "Collection demonstrating realistic end-to-end request sequences across multiple endpoints.",
         ),
     ]
@@ -316,6 +321,12 @@ def main() -> None:
         default="c2m-api-v2-postman-artifacts",
         help="Name of the GitHub artifacts repository (default: c2m-api-v2-postman-artifacts)",
     )
+    parser.add_argument(
+        "--api-name",
+        default="c2mapiv2",
+        help="API name prefix used in artifact filenames (Makefile: C2MAPIV2_POSTMAN_API_NAME_KC). "
+             "Default: c2mapiv2",
+    )
     args = parser.parse_args()
 
     generate(
@@ -323,6 +334,7 @@ def main() -> None:
         reports_dir=Path(args.reports_dir),
         output=Path(args.output),
         artifacts_repo=args.artifacts_repo,
+        api_name=args.api_name,
     )
 
 

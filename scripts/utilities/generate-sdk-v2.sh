@@ -204,7 +204,7 @@ import time
 from datetime import datetime, timedelta
 
 class C2MClient:
-    def __init__(self, client_id, client_secret, base_url="https://api.c2m.com/v2"):
+    def __init__(self, client_id, client_secret, base_url="https://api.click2mail.com/v2"):
         self.client_id = client_id
         self.client_secret = client_secret
         self.base_url = base_url
@@ -325,7 +325,7 @@ const C2mApi = require('c2m_api');
 const axios = require('axios');
 
 class C2MClient {
-    constructor(clientId, clientSecret, baseUrl = 'https://api.c2m.com/v2') {
+    constructor(clientId, clientSecret, baseUrl = 'https://api.click2mail.com/v2') {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.baseUrl = baseUrl;
@@ -469,7 +469,7 @@ class C2MClient {
     private shortToken: string | null = null;
     private tokenExpiry: Date | null = null;
     
-    constructor(clientId: string, clientSecret: string, baseUrl = 'https://api.c2m.com/v2') {
+    constructor(clientId: string, clientSecret: string, baseUrl = 'https://api.click2mail.com/v2') {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.baseUrl = baseUrl;
@@ -615,7 +615,7 @@ public class C2MClientJWT {
     private final ObjectMapper objectMapper;
     
     public C2MClientJWT(String clientId, String clientSecret) {
-        this(clientId, clientSecret, "https://api.c2m.com/v2");
+        this(clientId, clientSecret, "https://api.click2mail.com/v2");
     }
     
     public C2MClientJWT(String clientId, String clientSecret, String baseUrl) {
@@ -777,8 +777,8 @@ func NewC2MClient(clientID, clientSecret string) *C2MClient {
     return &C2MClient{
         clientID:     clientID,
         clientSecret: clientSecret,
-        baseURL:      "https://api.c2m.com/v2",
-        authURL:      "https://api.c2m.com/v2",
+        baseURL:      "https://api.click2mail.com/v2",
+        authURL:      "https://api.click2mail.com/v2",
         httpClient:   &http.Client{Timeout: 30 * time.Second},
     }
 }
@@ -862,7 +862,7 @@ func (c *C2MClient) CreateAPIClient() (*c2mapi.APIClient, context.Context, error
     }
     
     configuration := c2mapi.NewConfiguration()
-    configuration.Host = "api.c2m.com"
+    configuration.Host = "api.click2mail.com"
     configuration.Scheme = "https"
     
     apiClient := c2mapi.NewAPIClient(configuration)

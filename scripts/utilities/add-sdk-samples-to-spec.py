@@ -24,7 +24,7 @@ SDK_LANGUAGES = {
 
 def generate_curl_sample(method, path, operation_id, parameters, request_body):
     """Generate cURL sample"""
-    url = f"https://api.c2m.com/v2{path}"
+    url = f"https://api.click2mail.com/v2{path}"
     
     # Replace path parameters
     if parameters:
@@ -59,7 +59,7 @@ def generate_python_sample(method, path, operation_id, parameters, request_body)
     
     sample = f'''import requests
 
-url = f"https://api.c2m.com/v2{path_with_params}"
+url = f"https://api.click2mail.com/v2{path_with_params}"
 headers = {{
     "Authorization": "Bearer <your-jwt-token>",
     "Content-Type": "application/json"
@@ -84,7 +84,7 @@ def generate_javascript_sample(method, path, operation_id, parameters, request_b
             if param.get('in') == 'path':
                 path_with_params = path_with_params.replace(f"{{{param['name']}}}", f"${{{param['name']}}}")
     
-    sample = f'''const url = `https://api.c2m.com/v2{path_with_params}`;
+    sample = f'''const url = `https://api.click2mail.com/v2{path_with_params}`;
 const headers = {{
     'Authorization': 'Bearer <your-jwt-token>',
     'Content-Type': 'application/json'

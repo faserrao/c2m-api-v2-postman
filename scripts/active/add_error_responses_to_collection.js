@@ -83,8 +83,8 @@ function loadErrorTypesFromSpec(spec) {
     console.log(`Found ${schema.enum.length} errorType values in spec: ${schema.enum.join(', ')}`);
     return schema.enum;
   }
-  console.warn('⚠️  No errorType enum found in spec, using defaults');
-  return ['ValidationError', 'AuthenticationError', 'AuthorizationError', 'ResourceNotFoundError', 'ServerError'];
+  console.error('❌ No errorType enum found in spec — cannot derive error types. Ensure the OpenAPI spec is built before running this script.');
+  process.exit(1);
 }
 
 /**

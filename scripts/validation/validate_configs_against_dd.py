@@ -30,15 +30,11 @@ from pathlib import Path
 _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 
 # ── known intentional extras (not in DD but accepted as custom catalog fields) ──
-# These are documented exceptions: values that the v4 generator handles
-# specifically and that do not map to a leaf DD rule.
-_KNOWN_EXTRA_KEYS = {
-    "foo1",       # custom merge-field passthrough (DD rule exists, kept for clarity)
-    "foo2",       # custom merge-field passthrough
-    "documentIds",  # catalog shorthand for a list of documentId values; documented in catalog header
-    "addressList",  # structural key resolved from linked collection, not a leaf value
-    "customerAccountId",  # custom account identifier passthrough (not an API field — separate bug, tracked)
-}
+# Add keys here only for values that: (a) appear in a config file, (b) are not
+# DD rules, and (c) are intentionally present (document the reason inline).
+# foo1/foo2/addressList are DD rules and don't need an exception.
+# customerAccountId was removed from the catalog in the Sep 2026 cleanup.
+_KNOWN_EXTRA_KEYS: set = set()
 
 # ── helpers ─────────────────────────────────────────────────────────────────
 
