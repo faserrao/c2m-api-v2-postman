@@ -1607,19 +1607,10 @@ postman-upload-use-case-collection:
 		echo $$RW_UID > $(POSTMAN_GENERATED_DIR)/real-world-collection-uid.txt; \
 	fi
 
-# OLD Getting Started generators - DEPRECATED (keeping scripts for reference)
-# NOTE: Now using YAML-based v4 generator for Getting Started collections
-# .PHONY: postman-generate-getting-started-collection
-# postman-generate-getting-started-collection: postman-api-linked-collection-generate
-# 	@echo "📚 Generating Getting Started collection from linked collection..."
-# 	@$(VENV_PYTHON) scripts/active/generate_getting_started_from_linked.py
-# 	@echo "✅ Getting Started collection generated (correct field names from EBNF)"
-#
-# .PHONY: postman-generate-getting-started-with-examples
-# postman-generate-getting-started-with-examples: postman-test-collection-add-examples
-# 	@echo "📚 Generating Getting Started collection from test collection (with success examples only)..."
-# 	@$(VENV_PYTHON) scripts/active/generate_getting_started_with_examples_from_test.py
-# 	@echo "✅ Getting Started collection (with examples) generated from test collection"
+# OLD Getting Started generators - ARCHIVED to archive/scripts/most-recent/
+# (generate_getting_started_from_linked.py, generate_getting_started_with_examples_from_test.py)
+# Both used a hardcoded PATTERNS list with legacy /jobs/submit/... endpoint paths.
+# Superseded by the YAML-based v4 generator below.
 
 # NEW Getting Started generators - YAML-based v4 (Phase 1 implementation)
 # Generates Getting Started collection with placeholders (shows structure)

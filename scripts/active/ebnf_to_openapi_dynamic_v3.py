@@ -64,39 +64,19 @@ _DEFAULT_SUPPORT_EMAIL = "support@click2mail.com"
 _DEFAULT_API_TITLE    = "C2M API v2"
 _DEFAULT_API_VERSION  = "2.0.0"
 
-# EBNF rules of the form `a = b ;` where b is the field name inside a single-field
-# wrapper object rather than a transparent alias.  These rules appear as discriminated
-# oneOf variants alongside multi-field object siblings, so they must become
-# { type: object, properties: { b: <type> }, required: [b] } in the spec rather than
-# $ref aliases — otherwise the union is ambiguous at the wire level.
-_SINGLE_FIELD_WRAPPER_RULES: frozenset = frozenset({
-    "documentIdSource",   # documentIdSource = documentId ; → { documentId: integer }
-    "urlSource",          # urlSource = url ;              → { url: string }
-    "zipDocumentIdOnly",  # zipDocumentIdOnly = zipDocumentId ; → { zipDocumentId: integer }
-    "zipRequestIdOnly",   # zipRequestIdOnly = requestId ; → { requestId: integer }
-    "mergeByDocumentId",  # mergeByDocumentId = documentId ; → { documentId: integer }
-})
-
-# oneOf rules whose variants should be wrapped in the variant's type name as a JSON key.
-# e.g. docSourceStandard → { "requestIdSource": { "requestId": 57683 } }
-# paymentDetails is intentionally excluded — it uses inline literal discriminators
-# ("creditCard", "invoice", etc.) that already serve as named keys.
-_NAMED_WRAPPER_ONEOF_RULES: frozenset = frozenset({
-    "docSourceStandard",
-    "docSourceZipFile",
-    "docSourceZipFileRef",
-    "zipDocumentSource",
-    "mergeDocumentRef",
-    "recipientAddressSource",
-})
-
-# Grouping rules that are transparent at the wire level when referenced as oneOf choices.
-# When these appear as choices inside docSourceAll, their own variants are inlined
-# (expanded) rather than wrapped in a docSourceStandard/docSourceZipFile key.
-_TRANSPARENT_ONEOF_GROUPINGS: frozenset = frozenset({
-    "docSourceStandard",
-    "docSourceZipFile",
-})
+# Structural role classifications for EBNF rules are declared via (* @structural role *)
+# annotations in the DD itself and loaded dynamically in parse_ebnf() below.
+# See _extract_structural_annotations() for the extraction logic.
+#
+# Role semantics (used in _expression_to_schema / _generate_oneof_schema):
+#   single_field_wrapper     — rule of form `a = b ;` that must become
+#                              { type: object, properties: { b: T }, required: [b] }
+#                              so it is structurally distinct from sibling oneOf variants.
+#   named_wrapper_oneof      — union rule whose variants are wrapped in the variant's
+#                              type name as a JSON key:
+#                              { "variantName": { ...variantSchema } }
+#   transparent_oneof_grouping — union rule that is inlined (expanded) when it appears
+#                              as a choice inside another union (e.g. docSourceAll).
 
 # ─────────────────────────── Data Classes ───────────────────────────
 @dataclass
@@ -129,6 +109,31 @@ class Endpoint:
     path: str
     production_name: Optional[str] = None
     line_number: int = 0
+
+def _extract_structural_annotations(ebnf_text: str) -> Dict[str, Set[str]]:
+    """Extract @structural role annotations from EBNF rules.
+
+    Format: (* @structural role1 role2 *) — space-separated roles.
+    Works for both single-line and multi-line rules: the annotation must appear
+    on the same line as (or after) the rule's closing ';'.
+
+    Returns {rule_name: {role1, role2, ...}}
+    """
+    result: Dict[str, Set[str]] = {}
+    current_rule: Optional[str] = None
+    rule_start = re.compile(r'^([a-zA-Z][a-zA-Z0-9_]*)\s*=')
+    annotation = re.compile(r'\(\*\s*@structural\s+([^*]+?)\s*\*\)')
+
+    for line in ebnf_text.split('\n'):
+        m = rule_start.match(line)
+        if m:
+            current_rule = m.group(1)
+        if current_rule:
+            sm = annotation.search(line)
+            if sm:
+                result[current_rule] = set(sm.group(1).split())
+    return result
+
 
 # ─────────────────────────── AST Transformer ───────────────────────────
 class EBNFTransformer(Transformer):
@@ -197,6 +202,10 @@ class EBNFToOpenAPITranslator:
         self.http_error_map: Dict[str, Any] = {}  # Parsed from @http_error_map block in EBNF
         self.numeric_constraints: Dict[str, Dict[str, Any]] = {}  # Parsed from @numeric_constraints block
         self.valid_combinations: List[Dict[str, Any]] = []  # Parsed from @valid_combinations block
+        # Structural role sets — populated by parse_ebnf() from @structural annotations in the DD
+        self._single_field_wrapper_rules: frozenset = frozenset()
+        self._named_wrapper_oneof_rules: frozenset = frozenset()
+        self._transparent_oneof_groupings: frozenset = frozenset()
         self.support_email: str = _DEFAULT_SUPPORT_EMAIL
         self.api_title: str = _DEFAULT_API_TITLE
         self.api_version: str = _DEFAULT_API_VERSION
@@ -234,6 +243,34 @@ class EBNFToOpenAPITranslator:
         self.http_error_map = self._parse_http_error_map(content)
         self.numeric_constraints = self._parse_numeric_constraints(content)
         self.valid_combinations = self._parse_valid_combinations(content)
+
+        # Load structural role sets from @structural annotations in the DD
+        structural = _extract_structural_annotations(content)
+        self._single_field_wrapper_rules = frozenset(
+            name for name, roles in structural.items() if 'single_field_wrapper' in roles
+        )
+        self._named_wrapper_oneof_rules = frozenset(
+            name for name, roles in structural.items() if 'named_wrapper_oneof' in roles
+        )
+        self._transparent_oneof_groupings = frozenset(
+            name for name, roles in structural.items() if 'transparent_oneof_grouping' in roles
+        )
+        # Guard: missing annotations mean silently wrong spec output — fail loudly
+        for attr, min_expected in [
+            ('_single_field_wrapper_rules', 5),
+            ('_named_wrapper_oneof_rules', 6),
+            ('_transparent_oneof_groupings', 2),
+        ]:
+            actual = len(getattr(self, attr))
+            if actual < min_expected:
+                self.issues.append(Issue(
+                    severity='error',
+                    message=(
+                        f"@structural annotations: {attr} has {actual} member(s), "
+                        f"expected at least {min_expected}. "
+                        f"Add (* @structural ... *) to the relevant EBNF rules."
+                    )
+                ))
 
         # First extract endpoints from comments
         self._extract_endpoints(lines)
@@ -1029,7 +1066,7 @@ class EBNFToOpenAPITranslator:
                         # Single-field wrapper rules (e.g. documentIdSource = documentId)
                         # must be emitted as { type: object, properties: { b: T } } so
                         # they are structurally distinguishable from sibling oneOf variants.
-                        if context in _SINGLE_FIELD_WRAPPER_RULES:
+                        if context in self._single_field_wrapper_rules:
                             return {
                                 "type": "object",
                                 "properties": {
@@ -1070,10 +1107,10 @@ class EBNFToOpenAPITranslator:
                 if not symbol_name:
                     continue
 
-                if symbol_name in _TRANSPARENT_ONEOF_GROUPINGS:
+                if symbol_name in self._transparent_oneof_groupings:
                     # Inline this grouping's own variants into the parent oneOf
                     schemas.extend(self._expand_transparent_grouping(symbol_name))
-                elif context in _NAMED_WRAPPER_ONEOF_RULES:
+                elif context in self._named_wrapper_oneof_rules:
                     # Wrap the variant in its type name
                     schemas.append({
                         "type": "object",

@@ -611,7 +611,7 @@ recipientAddressSource =
       singleAddress
     | recipientAddressByList
     | recipientAddressByAddressId
-    | recipientAddressByListId ;
+    | recipientAddressByListId ; (* @structural named_wrapper_oneof *)
 
 singleAddress = address ;
 
@@ -636,14 +636,14 @@ addressList   = { address } ;
 (*        DOCUMENT SOURCE MODES     *)
 (***********************************)
 
-documentIdSource = documentId ;
+documentIdSource = documentId ; (* @structural single_field_wrapper *)
 documentId = id ; (* @hint random_int 10000 99999 *)
 
 requestIdSource = requestId + [ filename ] ;
 requestId = id ; (* @hint random_int 10000 99999 *)
 filename = string ; (* @hint static document.pdf *)
 
-urlSource = url ;
+urlSource = url ; (* @structural single_field_wrapper *)
 url = string ; (* @hint static https://example.com/documents/sample.pdf *)
 
 zipDocumentIdSource = zipDocumentId + filename ;
@@ -653,12 +653,12 @@ zipRequestIdSource = requestId + zipFilename + filename ;
 zipFilename = string ;
 
 (* Zip file reference without filename - for multi/zip top-level *)
-zipDocumentIdOnly = zipDocumentId ;
-zipRequestIdOnly = requestId ;
+zipDocumentIdOnly = zipDocumentId ; (* @structural single_field_wrapper *)
+zipRequestIdOnly = requestId ; (* @structural single_field_wrapper *)
 
 zipDocumentSource =
       zipDocumentIdSource
-    | zipRequestIdSource ;
+    | zipRequestIdSource ; (* @structural named_wrapper_oneof *)
 
 (* Translator note:
    - docSourceStandard/docSourceZipFile/docSourceAll are specialized document source variants used to keep
@@ -667,9 +667,9 @@ zipDocumentSource =
    - Zip-only behavior for /batch/zip is enforced indirectly via multiZipJobItem using docSourceZipFile.
 *)
 
-docSourceStandard = documentIdSource | requestIdSource | urlSource ;
-docSourceZipFile  = zipDocumentIdSource | zipRequestIdSource ;
-docSourceZipFileRef = zipDocumentIdOnly | zipRequestIdOnly ;  (* For multi/zip top-level - zip reference without filename *)
+docSourceStandard = documentIdSource | requestIdSource | urlSource ; (* @structural named_wrapper_oneof transparent_oneof_grouping *)
+docSourceZipFile  = zipDocumentIdSource | zipRequestIdSource ; (* @structural named_wrapper_oneof transparent_oneof_grouping *)
+docSourceZipFileRef = zipDocumentIdOnly | zipRequestIdOnly ;  (* For multi/zip top-level - zip reference without filename *) (* @structural named_wrapper_oneof *)
 docSourceAll      = docSourceStandard | docSourceZipFile ;
 
 (***********************************)
@@ -681,9 +681,9 @@ documentsToMerge = { mergeDocumentRef } ;
 
 mergeDocumentRef =
       mergeByDocumentId
-    | mergeByRequestId ;
+    | mergeByRequestId ; (* @structural named_wrapper_oneof *)
 
-mergeByDocumentId = documentId ;
+mergeByDocumentId = documentId ; (* @structural single_field_wrapper *)
 mergeByRequestId  = requestId + [ filename ] ;
 
 (***********************************)
