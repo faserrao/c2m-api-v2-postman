@@ -216,6 +216,7 @@ function addTestsToCollection(inputPath, outputPath) {
       listen: 'prerequest', 
       script: { 
         type: 'text/javascript', 
+        // Assumed layout: this script lives in scripts/active/; ../postman/ is scripts/postman/.
         exec: fs.readFileSync(`${__dirname}/../postman/scripts/jwt-pre-request.js`, 'utf-8').split('\n')
       } 
     };

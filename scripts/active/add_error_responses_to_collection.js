@@ -286,13 +286,20 @@ function main() {
 
   const supportEmailIdx = args.indexOf('--support-email');
   const supportEmail = supportEmailIdx !== -1 ? args[supportEmailIdx + 1] : DEFAULT_SUPPORT_EMAIL;
-  const positional = args.filter((_, i) => i !== supportEmailIdx && i !== supportEmailIdx + 1);
+  const specIdx = args.indexOf('--spec');
+  const specArg = specIdx !== -1 ? args[specIdx + 1] : null;
+  const positional = args.filter((_, i) =>
+    i !== supportEmailIdx && i !== supportEmailIdx + 1 &&
+    i !== specIdx && i !== specIdx + 1
+  );
 
   if (positional.length !== 2) {
-    console.error('Usage: node add_error_responses_to_collection.js <input_collection> <output_collection> [--support-email <email>]');
+    console.error('Usage: node add_error_responses_to_collection.js <input_collection> <output_collection> [--support-email <email>] [--spec <path>]');
     process.exit(1);
   }
 
+  // Assumed layout: this script lives in scripts/active/; ../../ is the repo root.
+  // If the script is ever moved, update the defaults below accordingly.
   const scriptDir = path.dirname(__filename);
 
   // Load error code metadata from YAML (single source of truth with add_response_examples.py)
@@ -307,8 +314,8 @@ function main() {
 
   const [inputFile, outputFile] = positional;
 
-  // Determine OpenAPI spec path (relative to script location)
-  const openapiSpecPath = path.resolve(scriptDir, '../../openapi/c2mapiv2-openapi-spec-final.yaml');
+  // --spec overrides the default; Makefile passes $(C2MAPIV2_OPENAPI_SPEC).
+  const openapiSpecPath = specArg || path.resolve(scriptDir, '../../openapi/c2mapiv2-openapi-spec-final.yaml');
 
   // Load error responses from OpenAPI spec
   ERROR_RESPONSES = loadErrorResponsesFromSpec(openapiSpecPath);

@@ -58,6 +58,7 @@ function loadAuthExamplesFromOverlay(overlayPath) {
 }
 
 // Load auth examples from the overlay (single source of truth)
+// Assumed layout: this script lives in scripts/active/; ../../ is the repo root.
 const overlayPath = path.resolve(__dirname, '../../openapi/overlays/auth.tokens.yaml');
 const authExamples = loadAuthExamplesFromOverlay(overlayPath);
 

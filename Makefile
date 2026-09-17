@@ -1320,7 +1320,7 @@ postman-test-collection-add-error-responses:
 		echo "❌ Collection $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES) not found. Run postman-test-collection-add-examples first."; \
 		exit 1; \
 	fi
-	node scripts/active/add_error_responses_to_collection.js $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES) $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES) --support-email "$(SUPPORT_EMAIL)"
+	node scripts/active/add_error_responses_to_collection.js $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES) $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES) --support-email "$(SUPPORT_EMAIL)" --spec $(C2MAPIV2_OPENAPI_SPEC)
 	@echo "✅ Error responses added to $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES)"
 	@echo " "
 	@echo " "
