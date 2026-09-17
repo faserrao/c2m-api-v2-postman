@@ -19,6 +19,10 @@ import io
 import re
 import sys
 from pathlib import Path
+try:
+    import yaml as _yaml
+except ImportError:
+    _yaml = None
 
 # ---------------------------------------------------------------------------
 # Description catalog.  Every EBNF rule should have an entry here.
@@ -26,7 +30,7 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 _DESC: dict[str, str] = {
     # Endpoint request body shapes
-    "submitSingleDocParams":
+    "submitDocParams":
         "Request body for POST /static — submit a single document to one or more recipients.",
     "submitSinglePdfAddressCaptureParams":
         "Request body for POST /static/address-capture — recipient addresses are captured "
@@ -260,7 +264,7 @@ _DESC: dict[str, str] = {
 
 # Which rules are the top-level endpoint param shapes and their endpoint path
 _ENDPOINT_MAP: dict[str, tuple[str, str]] = {
-    "submitSingleDocParams":                  ("POST", "/static"),
+    "submitDocParams":                        ("POST", "/static"),
     "submitSinglePdfAddressCaptureParams":    ("POST", "/static/address-capture"),
     "submitSinglePdfSplitParams":             ("POST", "/batch/split"),
     "submitSinglePdfSplitAddressCaptureParams": ("POST", "/batch/split/address-capture"),
@@ -270,6 +274,48 @@ _ENDPOINT_MAP: dict[str, tuple[str, str]] = {
 }
 
 PRIMITIVES = {"string", "integer", "id", "number", "boolean"}
+
+
+# ---------------------------------------------------------------------------
+# Spec-derived helpers
+# ---------------------------------------------------------------------------
+
+def _load_endpoint_map_from_spec(spec_path: str) -> dict:
+    """Derive {rule_name: (method, path)} from OpenAPI spec operationId fields.
+
+    Falls back gracefully (returns {}) if yaml is unavailable or spec can't be read.
+    """
+    if _yaml is None:
+        print("⚠️  PyYAML not available — cannot derive endpoint map from spec; using built-in _ENDPOINT_MAP", file=sys.stderr)
+        return {}
+    try:
+        with open(spec_path) as f:
+            spec = _yaml.safe_load(f)
+    except Exception as e:
+        print(f"⚠️  Could not load spec '{spec_path}': {e} — using built-in _ENDPOINT_MAP", file=sys.stderr)
+        return {}
+    result = {}
+    for path, path_item in (spec.get("paths") or {}).items():
+        for method, operation in path_item.items():
+            if not isinstance(operation, dict):
+                continue
+            op_id = operation.get("operationId")
+            if op_id:
+                result[op_id] = (method.upper(), path)
+    return result
+
+
+def _desc_completeness_check(rules: dict) -> None:
+    """Warn about DD rules that have no entry in the _DESC lookup table."""
+    missing = [name for name in rules if name not in _DESC]
+    if missing:
+        print(
+            f"\n⚠️  {len(missing)} DD rules have no _DESC entry "
+            f"(add descriptions to improve table quality):",
+            file=sys.stderr,
+        )
+        for name in sorted(missing):
+            print(f"   • {name}", file=sys.stderr)
 
 
 # ---------------------------------------------------------------------------
@@ -961,6 +1007,12 @@ def main() -> int:
         default="reports",
         help="Directory for output files (default: reports/)",
     )
+    parser.add_argument(
+        "--spec",
+        default=None,
+        help="Path to generated OpenAPI spec YAML; when provided, derives _ENDPOINT_MAP "
+             "from operationId fields instead of the built-in constant.",
+    )
     args = parser.parse_args()
 
     ebnf_path = Path(args.ebnf)
@@ -970,11 +1022,22 @@ def main() -> int:
         print(f"❌ EBNF file not found: {ebnf_path}", file=sys.stderr)
         return 1
 
+    # Replace built-in _ENDPOINT_MAP with spec-derived version when --spec is given.
+    global _ENDPOINT_MAP
+    if args.spec:
+        derived = _load_endpoint_map_from_spec(args.spec)
+        if derived:
+            _ENDPOINT_MAP = derived
+        else:
+            print("⚠️  Spec-derived endpoint map is empty — using built-in _ENDPOINT_MAP", file=sys.stderr)
+
     out_dir.mkdir(parents=True, exist_ok=True)
 
     print(f"📖 Parsing {ebnf_path}...")
     rules = parse_ebnf(ebnf_path)
     print(f"   Found {len(rules)} rules.")
+
+    _desc_completeness_check(rules)
 
     rows = build_rows(rules)
     components = len({r["component"] for r in rows})

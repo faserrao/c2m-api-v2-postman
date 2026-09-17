@@ -811,7 +811,8 @@ generate-data-dictionary-table:
 	@mkdir -p reports
 	@$(VENV_PYTHON) $(SCRIPTS_DIR)/active/generate_dd_table.py \
 		--ebnf $(DD_EBNF_FILE) \
-		--output-dir reports
+		--output-dir reports \
+		--spec $(C2MAPIV2_OPENAPI_SPEC)
 	@echo "✅ Data dictionary table written to reports/data-dictionary-table.{md,csv}"
 
 ARTIFACTS_INDEX_ORG ?= click2mail

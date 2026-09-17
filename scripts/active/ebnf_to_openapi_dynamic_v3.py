@@ -109,6 +109,8 @@ class Endpoint:
     path: str
     production_name: Optional[str] = None
     line_number: int = 0
+    summary: Optional[str] = None
+    description: Optional[str] = None
 
 def _extract_structural_annotations(ebnf_text: str) -> Dict[str, Set[str]]:
     """Extract @structural role annotations from EBNF rules.
@@ -395,12 +397,23 @@ class EBNFToOpenAPITranslator:
                     line_number=i + 1
                 )
                 
-                # Look for the production name after the comment block(s)
+                # Look for the production name after the comment block(s).
+                # Also capture @summary / @description annotations from comment lines.
                 j = i + 1
                 in_comment = '(*' in lines[i] and not lines[i].strip().endswith('*)')
+                summary_pat = re.compile(r'\(\*\s*@summary\s+(.+?)\s*\*\)')
+                desc_pat = re.compile(r'\(\*\s*@description\s+(.+?)\s*\*\)')
 
                 while j < len(lines):
                     line_content = lines[j].strip()
+
+                    # Capture @summary / @description before any skip logic
+                    sm = summary_pat.search(lines[j])
+                    if sm:
+                        endpoint.summary = sm.group(1).strip()
+                    dm = desc_pat.search(lines[j])
+                    if dm:
+                        endpoint.description = dm.group(1).strip()
 
                     # Check if entering a new comment block
                     if not in_comment and line_content.startswith('(*'):
@@ -646,28 +659,18 @@ class EBNFToOpenAPITranslator:
             
             paths[endpoint.path][endpoint.method.lower()] = operation
 
-        # Bidirectional drift check: warn if any generated path has no _ENDPOINT_META
-        # entry (spec falls back to terse auto-generated text) or if _ENDPOINT_META has
-        # an entry for a path that no longer exists in the EBNF (stale entry).
-        # Edit _ENDPOINT_META above to resolve either warning.
+        # Drift check: warn if any endpoint is missing @summary or @description
+        # annotations in the EBNF DD. Add (* @summary ... *) and (* @description ... *)
+        # lines after the (* Endpoint: METHOD /path *) header to resolve.
         for path in paths:
-            if path not in self._ENDPOINT_META:
+            ep = next((e for e in self.endpoints if e.path == path), None)
+            if ep and not ep.summary:
                 self.issues.append(Issue(
                     severity="warning",
                     message=(
-                        f"No _ENDPOINT_META entry for path '{path}' — spec will use "
-                        f"auto-generated summary/description. Add an entry to "
-                        f"_ENDPOINT_META in ebnf_to_openapi_dynamic_v3.py."
-                    )
-                ))
-        for path in self._ENDPOINT_META:
-            if path not in paths:
-                self.issues.append(Issue(
-                    severity="warning",
-                    message=(
-                        f"_ENDPOINT_META has a stale entry for '{path}' — this path "
-                        f"no longer exists in the EBNF. Remove the entry from "
-                        f"_ENDPOINT_META in ebnf_to_openapi_dynamic_v3.py."
+                        f"No @summary annotation for endpoint '{path}' — spec will use "
+                        f"auto-generated text. Add (* @summary ... *) after the "
+                        f"(* Endpoint: ... *) header in the EBNF DD."
                     )
                 ))
 
@@ -678,60 +681,17 @@ class EBNFToOpenAPITranslator:
         # Use the production name as the operation ID
         return endpoint.production_name
 
-    # Human-readable metadata keyed by endpoint path.
-    # Update this table whenever endpoint paths change in the EBNF.
-    _ENDPOINT_META = {
-        '/static': (
-            "Submit single document",
-            "Submits a mailing job for a single document to one or more recipients. "
-            "The request body must include a document source, recipient address information, "
-            "and payment details."
-        ),
-        '/static/address-capture': (
-            "Submit single document — address capture",
-            "Submits a mailing job for a single PDF where recipient addresses are captured "
-            "from the document via OCR. No inline recipient address is required."
-        ),
-        '/batch/split': (
-            "Submit PDF split",
-            "Splits a single PDF into page ranges and mails each range to a different "
-            "recipient. Each job item specifies page range and recipient address."
-        ),
-        '/batch/split/address-capture': (
-            "Submit PDF split — address capture",
-            "Splits a single PDF into page ranges where recipient addresses are captured "
-            "from the PDF. No inline recipient addresses are required."
-        ),
-        '/mail-merge': (
-            "Submit mail merge",
-            "Merges multiple documents into a single mailing sent to one recipient. "
-            "Useful for creating document packets or multi-page letters."
-        ),
-        '/batch/zip': (
-            "Submit ZIP batch",
-            "Submits multiple mailing jobs sourced from files inside a single ZIP archive. "
-            "Each job item specifies which file within the ZIP and the recipient address."
-        ),
-        '/batch/zip/address-capture': (
-            "Submit ZIP batch — address capture",
-            "Submits a ZIP-based mailing batch where recipient addresses are captured "
-            "externally. No inline recipient addresses are required."
-        ),
-    }
-
     def _generate_summary(self, endpoint: Endpoint) -> str:
         """Generate a brief summary from endpoint path."""
-        meta = self._ENDPOINT_META.get(endpoint.path)
-        if meta:
-            return meta[0]
+        if endpoint.summary:
+            return endpoint.summary
         # Fallback: preserve camelCase production name (never call .title() on camelCase)
         return endpoint.production_name
 
     def _generate_description(self, endpoint: Endpoint) -> str:
         """Generate a detailed description from endpoint."""
-        meta = self._ENDPOINT_META.get(endpoint.path)
-        if meta:
-            return meta[1]
+        if endpoint.description:
+            return endpoint.description
         # Fallback description
         return f"API endpoint for {endpoint.production_name}"
 
@@ -823,7 +783,7 @@ class EBNFToOpenAPITranslator:
 
         if isinstance(expr, dict) and expr.get('type') == 'alternation':
             values = []
-            for item in expr.get('items', []):
+            for item in expr.get('choices', []):
                 if isinstance(item, dict) and item.get('type') == 'literal':
                     values.append(item.get('value', ''))
             return values
@@ -895,6 +855,9 @@ class EBNFToOpenAPITranslator:
         Unlike the YAML, it uses field_names.get() for spec-derived field names — do not
         replace with YAML loading, as that would lose the dynamic field-name resolution.
         """
+        # "operation"/"table" (DATABASE_ERROR), "service" (EXTERNAL_SERVICE_ERROR), and
+        # auth scope strings (INSUFFICIENT_PERMISSIONS) are internal constants —
+        # intentionally hardcoded, not derivable from EBNF or OpenAPI spec.
         details_map = {
             'MISSING_REQUIRED_FIELD': {
                 "field": field_names.get('documentField', 'documentId'),
@@ -936,7 +899,8 @@ class EBNFToOpenAPITranslator:
             'INVALID_ENUM_VALUE': {
                 "field": field_names.get('documentField', 'documentType'),
                 "value": "invalid_value",
-                "allowedValues": ["pdf", "doc", "docx"]
+                # Derived from EBNF documentClass enum; fallback matches actual DD values.
+                "allowedValues": self._get_enum_values('documentClass') or ["letter", "postcard", "brochure", "flat"]
             },
             'MUTUAL_EXCLUSION_VIOLATION': {
                 "fields": ["jobTemplate", "jobOptions"],
