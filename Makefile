@@ -2896,7 +2896,8 @@ validate-configs: ## Validate all config file field names against the EBNF Data 
 		--dd $(DD_EBNF_FILE) \
 		--catalog config/curated-examples-catalog.yaml \
 		--template config/getting-started-template.yaml \
-		--faker-hints config/faker_hints.yaml
+		--faker-hints config/faker_hints.yaml \
+		--spec $(C2MAPIV2_OPENAPI_SPEC_BASE)
 
 .PHONY: validate-postman-against-dd
 validate-postman-against-dd: ## Detailed Postman-to-DD validator: enum values, field names, numeric ranges, cross-field constraints
