@@ -222,6 +222,24 @@ function fixCrossFieldConstraints(bodyObj, rules) {
 }
 
 /**
+ * Correct split job items where json-schema-faker generated startPage >= endPage.
+ * Uses canonical ranges (1–5 / 6–10) matching faker_hints to produce a valid pair.
+ */
+function fixSplitJobPageRanges(bodyObj) {
+    const splitArrayFields = ['pdfSplitJobsNoAddress', 'pdfSplitJobsWithAddress'];
+    for (const field of splitArrayFields) {
+        if (!Array.isArray(bodyObj[field])) continue;
+        bodyObj[field].forEach((item, idx) => {
+            if (typeof item.startPage === 'number' && typeof item.endPage === 'number' &&
+                item.startPage >= item.endPage) {
+                item.startPage = 1 + idx * 5;
+                item.endPage   = 5 + idx * 5;
+            }
+        });
+    }
+}
+
+/**
  * Process a raw body string (JSON in a string)
  */
 function processRawBody(rawStr, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders) {
@@ -242,6 +260,9 @@ function processRawBody(rawStr, oneOfFields, replacedFields, crossFieldRules, en
                 processed[field] = processed[field].slice(0, 1);
             }
         }
+
+        // Ensure startPage < endPage in all split job items (json-schema-faker picks independently)
+        fixSplitJobPageRanges(processed);
 
         // Enforce cross-field jobOptions constraints (rules from spec x-valid-combinations)
         fixCrossFieldConstraints(processed, crossFieldRules);
