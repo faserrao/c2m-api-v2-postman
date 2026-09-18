@@ -663,6 +663,7 @@ url = string ; (* @hint static https://example.com/documents/sample.pdf *)
 zipDocumentIdSource = zipDocumentId + filename ;
 zipDocumentId = id ; (* @hint random_int 10000 99999 *)
 
+(* TO CHECK *)
 zipRequestIdSource = requestId + zipFilename + filename ;
 zipFilename = string ; (* @hint static documents.zip *)
 
