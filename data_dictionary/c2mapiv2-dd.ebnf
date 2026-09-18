@@ -664,7 +664,7 @@ zipDocumentIdSource = zipDocumentId + filename ;
 zipDocumentId = id ; (* @hint random_int 10000 99999 *)
 
 zipRequestIdSource = requestId + zipFilename + filename ;
-zipFilename = string ;
+zipFilename = string ; (* @hint static documents.zip *)
 
 (* Zip file reference without filename - for multi/zip top-level *)
 zipDocumentIdOnly = zipDocumentId ; (* @structural single_field_wrapper *)
