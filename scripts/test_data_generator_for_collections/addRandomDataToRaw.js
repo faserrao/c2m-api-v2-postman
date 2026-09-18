@@ -16,6 +16,7 @@
 const fs = require('fs');
 const path = require('path');
 const { faker } = require('@faker-js/faker');
+const yaml = require('js-yaml');
 
 /**
  * Parse command line arguments
@@ -28,7 +29,9 @@ function parseArgs() {
         errorRate: 0,
         preview: false,
         force: false,
-        defaultTemplate: null
+        defaultTemplate: null,
+        spec: null,
+        fakerHints: null
     };
 
     for (let i = 0; i < args.length; i++) {
@@ -50,6 +53,12 @@ function parseArgs() {
                 break;
             case '--default-template':
                 options.defaultTemplate = args[++i];
+                break;
+            case '--spec':
+                options.spec = args[++i];
+                break;
+            case '--faker-hints':
+                options.fakerHints = args[++i];
                 break;
         }
     }
@@ -77,11 +86,21 @@ function parseArgs() {
 }
 
 /**
+ * Faker hints loaded from config/faker_hints.yaml (populated in main() when --faker-hints is passed).
+ * Keys are DD rule names; values are hint descriptors { type, method/value/min/max }.
+ */
+let fakerHints = {};
+
+/**
  * OneOf fixtures for C2M API fields — named-wrapper format.
  * Each variant is wrapped in its type name as the top-level key,
  * matching the OpenAPI spec's named-wrapper oneOf structure.
+ *
+ * When --spec is passed, loadOneOfFixturesFromSpec() replaces all spec-derivable entries
+ * at startup so this block serves only as a fallback (and for errorResponse, which has no
+ * spec schema and remains hardcoded here permanently).
  */
-const oneOfFixtures = {
+let oneOfFixtures = {
     recipientAddressSource: [
         // Variant 1: singleAddress
         {
@@ -307,6 +326,192 @@ const oneOfFixtures = {
     ]
 };
 
+// ── HC1/HC2: spec-driven fixtures and faker hints ────────────────────────────
+
+/**
+ * Apply a faker_hints entry to produce a concrete value.
+ */
+function applyHint(hint) {
+    if (!hint) return null;
+    switch (hint.type) {
+        case 'static':
+            return hint.value;
+        case 'random_int':
+            return faker.number.int({ min: hint.min || 1, max: hint.max || 9999 });
+        case 'faker': {
+            // Map Python faker method names to @faker-js/faker v9 equivalents
+            const FAKER_METHOD_MAP = {
+                'first_name':     () => faker.person.firstName(),
+                'last_name':      () => faker.person.lastName(),
+                'company':        () => faker.company.name(),
+                'street_address': () => faker.location.streetAddress(),
+                'city':           () => faker.location.city(),
+                'state':          () => faker.location.state(),
+                'state_abbr':     () => faker.location.state({ abbreviated: true }),
+                'zipcode':        () => faker.location.zipCode(),
+                'zip_code':       () => faker.location.zipCode(),
+                'email':          () => faker.internet.email(),
+                'url':            () => faker.internet.url(),
+                'phone_number':   () => faker.phone.number(),
+            };
+            const fn = FAKER_METHOD_MAP[hint.method];
+            return fn ? fn() : faker.lorem.word();
+        }
+        case 'aba_routing_number':
+            return faker.finance.routingNumber();
+        default:
+            return null;
+    }
+}
+
+/**
+ * Load faker hints from a YAML file.
+ * Returns the faker_hints map keyed by DD rule name.
+ */
+function loadFakerHints(hintsPath) {
+    try {
+        const content = fs.readFileSync(hintsPath, 'utf8');
+        const data = yaml.load(content);
+        return (data && data.faker_hints) || {};
+    } catch (err) {
+        console.error(`Warning: Could not load faker hints from ${hintsPath}: ${err.message}`);
+        return {};
+    }
+}
+
+/**
+ * Resolve a $ref string (e.g. '#/components/schemas/Foo') to its schema object.
+ */
+function resolveRef(spec, ref) {
+    if (!ref || !ref.startsWith('#/')) return null;
+    const parts = ref.slice(2).split('/');
+    let node = spec;
+    for (const part of parts) {
+        if (!node || typeof node !== 'object') return null;
+        node = node[part];
+    }
+    // Follow one more level of $ref if the resolved node is itself a $ref
+    if (node && node.$ref && node.$ref !== ref) {
+        return resolveRef(spec, node.$ref);
+    }
+    return node || null;
+}
+
+/**
+ * Build a sample JSON value from an OpenAPI schema, using fakerHints for leaf fields.
+ * fieldName is the property name used for hint lookup (DD rule name).
+ */
+function buildSampleFromSchema(spec, schema, depth, fieldName) {
+    if (depth > 7 || !schema) return null;
+
+    // Hint lookup by property name
+    if (fieldName && fakerHints[fieldName] !== undefined) {
+        return applyHint(fakerHints[fieldName]);
+    }
+
+    // Resolve $ref — also try the schema name from the ref for hint lookup
+    if (schema.$ref) {
+        const refSchemaName = schema.$ref.split('/').pop();
+        if (fakerHints[refSchemaName] !== undefined) {
+            return applyHint(fakerHints[refSchemaName]);
+        }
+        const resolved = resolveRef(spec, schema.$ref);
+        if (!resolved) return null;
+        return buildSampleFromSchema(spec, resolved, depth + 1, fieldName);
+    }
+
+    if (schema.type === 'object' && schema.properties) {
+        const result = {};
+        for (const [propName, propSchema] of Object.entries(schema.properties)) {
+            const val = buildSampleFromSchema(spec, propSchema, depth + 1, propName);
+            if (val !== null && val !== undefined) result[propName] = val;
+        }
+        return Object.keys(result).length > 0 ? result : null;
+    }
+
+    if (schema.type === 'array') {
+        if (!schema.items) return [];
+        const item = buildSampleFromSchema(spec, schema.items, depth + 1, fieldName);
+        return item !== null ? [item] : [];
+    }
+
+    if (schema.type === 'integer') return faker.number.int({ min: 10000, max: 99999 });
+    if (schema.type === 'number')  return parseFloat(faker.commerce.price());
+    if (schema.type === 'string') {
+        if (schema.enum && schema.enum.length > 0) return schema.enum[0];
+        if (schema.format === 'uri') return 'https://example.com/documents/sample.pdf';
+        return faker.lorem.word();
+    }
+    if (schema.type === 'boolean') return true;
+
+    return null;
+}
+
+/**
+ * Load oneOf fixtures from the OpenAPI spec at runtime.
+ * Discovers all top-level schemas with oneOf and builds named-wrapper variant objects.
+ *
+ * Special case: mergeDocumentSource is an array (documentsToMerge) whose items are
+ * mergeDocumentRef (oneOf) — so its variants are arrays of items, not single objects.
+ *
+ * errorResponse is excluded — it is not a spec schema and remains hardcoded above.
+ */
+function loadOneOfFixturesFromSpec(spec) {
+    const schemas = (spec.components && spec.components.schemas) || {};
+    const fixtures = {};
+
+    for (const [schemaName, schema] of Object.entries(schemas)) {
+        // mergeDocumentRef items are composed into mergeDocumentSource below
+        if (schemaName === 'mergeDocumentRef') continue;
+
+        const resolved = schema.$ref ? resolveRef(spec, schema.$ref) : schema;
+        if (!resolved || !resolved.oneOf) continue;
+
+        const variants = resolved.oneOf
+            .map(variant => {
+                const s = variant.$ref ? resolveRef(spec, variant.$ref) : variant;
+                return s ? buildSampleFromSchema(spec, s, 0, null) : null;
+            })
+            .filter(v => v !== null && v !== undefined);
+
+        if (variants.length > 0) fixtures[schemaName] = variants;
+    }
+
+    // Special case: mergeDocumentSource = array of mergeDocumentRef variants
+    const mergeRefSchema = schemas['mergeDocumentRef'];
+    if (mergeRefSchema && mergeRefSchema.oneOf) {
+        const buildItem = (idx) => {
+            const v = mergeRefSchema.oneOf[idx];
+            const s = v.$ref ? resolveRef(spec, v.$ref) : v;
+            return s ? buildSampleFromSchema(spec, s, 0, null) : null;
+        };
+        const n = mergeRefSchema.oneOf.length;
+        const arrayVariants = [];
+
+        // Two items both using first variant (e.g. two mergeByDocumentId)
+        const a = buildItem(0), b = buildItem(0);
+        if (a && b) arrayVariants.push([a, b]);
+
+        // Two items both using second variant (e.g. two mergeByRequestId)
+        if (n >= 2) {
+            const c = buildItem(1), d = buildItem(1);
+            if (c && d) arrayVariants.push([c, d]);
+        }
+
+        // Mixed: one item per variant
+        if (n >= 2) {
+            const e = buildItem(0), f = buildItem(1);
+            if (e && f) arrayVariants.push([e, f]);
+        }
+
+        if (arrayVariants.length > 0) fixtures['mergeDocumentSource'] = arrayVariants;
+    }
+
+    return fixtures;
+}
+
+// ── end HC1/HC2 ──────────────────────────────────────────────────────────────
+
 // Track rotation index per field to ensure we cycle through all variants
 const rotationIndex = {};
 
@@ -409,6 +614,11 @@ function generateRandomValue(key, existingValue) {
     // Check if this is a oneOf field first
     if (oneOfFixtures.hasOwnProperty(key)) {
         return getNextOneOfValue(key);
+    }
+
+    // HC2: Check faker hints for this field name before key-name heuristics
+    if (fakerHints[key] !== undefined) {
+        return applyHint(fakerHints[key]);
     }
 
     // Preserve array type for placeholder arrays — map each item individually.
@@ -635,6 +845,22 @@ function main() {
     const options = parseArgs();
 
     try {
+        // HC2: Load faker hints if provided — must come before spec loading (buildSampleFromSchema uses them)
+        if (options.fakerHints) {
+            fakerHints = loadFakerHints(options.fakerHints);
+            console.log(`Loaded ${Object.keys(fakerHints).length} faker hint(s) from ${options.fakerHints}`);
+        }
+
+        // HC1: Load spec-derived oneOf fixtures if spec provided
+        if (options.spec) {
+            const specContent = fs.readFileSync(options.spec, 'utf8');
+            const spec = yaml.load(specContent);
+            const specFixtures = loadOneOfFixturesFromSpec(spec);
+            Object.assign(oneOfFixtures, specFixtures);
+            const variantCount = Object.values(specFixtures).reduce((s, v) => s + v.length, 0);
+            console.log(`Loaded ${Object.keys(specFixtures).length} oneOf fixture(s) from spec (${variantCount} total variants)`);
+        }
+
         // Read collection
         const collectionData = fs.readFileSync(options.input, 'utf8');
         const collection = JSON.parse(collectionData);

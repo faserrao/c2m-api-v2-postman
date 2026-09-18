@@ -294,7 +294,8 @@ POSTMAN_VALIDATOR                := $(SCRIPTS_DIR)/active/validate_collection.js
 INSTALL_PYTHON_MODULES           := install -r $(SCRIPTS_DIR)/python_env/requirements.txt
 
 ADD_EXAMPLES_TO_COLLECTION_SCRIPT := node $(SCRIPTS_DIR)/test_data_generator_for_collections/addRandomDataToRaw.js
-ADD_EXAMPLES_TO_COLLECTION_ARGS  := --input  $(POSTMAN_COLLECTION_RAW) --output $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES)
+ADD_EXAMPLES_TO_COLLECTION_ARGS  := --input  $(POSTMAN_COLLECTION_RAW) --output $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES) \
+                                    --spec $(C2MAPIV2_OPENAPI_SPEC_BASE) --faker-hints config/faker_hints.yaml
 ADD_EXAMPLES_TO_COLLECTION       := $(ADD_EXAMPLES_TO_COLLECTION_SCRIPT) $(ADD_EXAMPLES_TO_COLLECTION_ARGS)
 
 # ========================================================================
