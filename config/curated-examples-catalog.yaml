@@ -15,11 +15,15 @@
 # - Only leaf primitive values (strings, numbers, booleans)
 # - Arrays are okay (tags, documentIds list)
 #
-# Note on jobTemplate values: jobTemplate is defined as type: string (no enum)
-# in the OpenAPI spec because template names are customer-defined in the C2M
-# system and passed to the API verbatim. The values used here (e.g.
-# standard_letter, legal_certified_mail) are illustrative — they are NOT
-# validated against the spec.
+# Note on jobTemplate values:
+# jobTemplate is type: string with no enum in the OpenAPI spec because template
+# names are customer-defined in the C2M system — each customer's account has its
+# own set of named templates. The values here (e.g. standard_letter,
+# legal_certified_mail) are ILLUSTRATIVE PLACEHOLDERS ONLY. They are:
+#   - NOT validated against the spec (no enum exists to validate against)
+#   - NOT usable in a real API call without substitution
+#   - NOT pre-existing templates in any C2M account
+# Replace them with the actual jobTemplate names configured in the target account.
 #
 # Collections generated:
 # - Real World Use Cases (curated business scenarios)
