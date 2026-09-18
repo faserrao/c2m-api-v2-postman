@@ -493,6 +493,10 @@ function generateRandomValue(key, existingValue) {
         return 'Your request has been queued';
     } else if (keyLower === 'jobid' || (keyLower.includes('job') && keyLower.includes('id'))) {
         return `job_${Date.now()}_${faker.string.alphanumeric(6)}`;
+    } else if (keyLower === 'startpage') {
+        return faker.number.int({ min: 1, max: 10 });
+    } else if (keyLower === 'endpage') {
+        return faker.number.int({ min: 11, max: 50 });
     } else if (keyLower.includes('page')) {
         return faker.number.int({ min: 1, max: 50 });
     } else if (existingValue === '<integer>') {
