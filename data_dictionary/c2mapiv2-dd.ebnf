@@ -717,8 +717,8 @@ pdfSplitJobsNoAddress   = { pdfSplitJobItemNoAddress } ;
 pdfSplitJobItemWithAddress = [ jobTemplate ] + startPage + endPage + recipientAddressSource ;
 pdfSplitJobItemNoAddress   = [ jobTemplate ] + startPage + endPage ;
 
-startPage = integer ; (* @hint static 1 *)
-endPage   = integer ; (* @hint static 5 *)
+startPage = integer ; (* @hint random_int 1 5 *)
+endPage   = integer ; (* @hint random_int 6 10 *)
 
 (* Zip-only jobs list:
    - Used by POST /batch/zip.
