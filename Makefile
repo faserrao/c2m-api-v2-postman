@@ -900,7 +900,8 @@ postman-add-jwt-tests:
 		node scripts/active/add_tests_jwt.js \
 			"$(TEST_COLLECTION_WITH_TESTS)" \
 			"$(TEST_COLLECTION_WITH_JWT_TESTS)" \
-			--allowed-codes "$(POSTMAN_ALLOWED_CODES)"; \
+			--allowed-codes "$(POSTMAN_ALLOWED_CODES)" \
+			--auth-overlay "$(OPENAPI_AUTH_OVERLAY)"; \
 		echo "✅ JWT tests added to collection"; \
 	else \
 		echo "⚠️  Test collection not found. Run 'make postman-create-test-collection' first."; \

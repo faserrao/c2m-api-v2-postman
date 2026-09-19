@@ -11,15 +11,12 @@ it automatically. This is the deliberate contrast with the legacy hardcoded
 validator in c2m-api-v2-manuals/validate_collections.py, which duplicated the
 contract by hand and drifted.
 
-Phase 1 = STRUCTURAL validation (spec-driven):
+Structural validation (spec-driven):
   - required fields present (recursively, following $ref/oneOf/anyOf/allOf)
   - no unexpected top-level/nested fields (when additionalProperties is not allowed)
-  - oneOf/anyOf branch selection by structural fit
-  - scalar TYPE/enum/format checks are intentionally SKIPPED so that placeholder
-    values ("<String>", "<Integer>") in the linked/getting-started collections do
-    not produce false positives.
-Phase 2 (future, --deep) would add jsonschema type/enum validation for collections
-that carry realistic values.
+  - oneOf/anyOf branch discrimination by required-key overlap (named-wrapper pattern)
+  - scalar type and enum checks for non-placeholder values; placeholder strings
+    ("<String>", "<Integer>") are always skipped
 
 Usage:
   VENV=scripts/python_env/e2o.venv/bin/python
@@ -135,15 +132,22 @@ def structural_errors(value, schema, spec, loc="body", strict_unknown=True):
             errors += structural_errors(value, sub, spec, loc, strict_unknown)
         # allOf may also carry its own properties/required alongside; fall through
 
-    # Phase 1: oneOf/anyOf branch SELECTION is intentionally NOT validated.
-    # Reliable branch discrimination needs type/discriminator awareness, which
-    # collides with placeholder values ("<Integer>") and produces false
-    # positives. Every known divergence (see §5a) is caught by the top-level
-    # required/unexpected-field checks below, so Phase 1 does not descend into
-    # oneOf/anyOf. Discriminator-aware branch validation is a Phase 2 (--deep)
-    # concern. If this node is purely a composition (no own properties/required),
-    # stop here rather than mis-treating it as a plain object.
+    # V3: oneOf/anyOf branch discrimination via required-key overlap (named-wrapper pattern).
+    # Each branch has exactly one required key that acts as the discriminator; we pick
+    # the branch with the most matching required keys and recurse. Placeholder strings
+    # ("<oneOf>") are skipped so the linked collection validates cleanly.
     if ("oneOf" in schema or "anyOf" in schema) and "properties" not in schema and "required" not in schema:
+        if isinstance(value, str) and PLACEHOLDER.search(value):
+            return errors
+        branches = schema.get("oneOf") or schema.get("anyOf", [])
+        branch = _best_branch(value, branches, spec)
+        if branch is not None:
+            errors += structural_errors(value, branch, spec, loc, strict_unknown)
+        elif isinstance(value, dict):
+            errors.append(
+                f"{loc}: value does not match any oneOf/anyOf variant"
+                f" — expected wrapper key from: {_variant_hint(branches, spec)}"
+            )
         return errors
 
     stype = schema.get("type")
@@ -180,8 +184,48 @@ def structural_errors(value, schema, spec, loc="body", strict_unknown=True):
                 errors += structural_errors(el, items, spec, f"{loc}[{i}]", strict_unknown)
         return errors
 
-    # Scalars: intentionally not type-checked in structural mode
+    # V4: type and enum checks — skipped for placeholder values ("<String>", "<Integer>", …)
+    if isinstance(value, str) and PLACEHOLDER.search(value):
+        return errors
+    if stype and not _type_matches(value, stype):
+        errors.append(f"{loc}: expected type '{stype}', got '{type(value).__name__}'")
+    if "enum" in schema and value not in schema["enum"]:
+        errors.append(f"{loc}: {value!r} not in allowed values {schema['enum']}")
     return errors
+
+
+def _best_branch(value, branches, spec):
+    """Select the oneOf/anyOf branch best matching value by required-key overlap.
+
+    Uses the named-wrapper pattern: each branch has one unique required key that
+    acts as the discriminator (e.g. { creditCardDetails: {...} } selects the
+    creditCardPayment branch whose required list is ['creditCardDetails']).
+    Returns the resolved branch dict, or None if no branch scores above zero.
+    """
+    if not isinstance(value, dict):
+        return None
+    best, best_score = None, -1
+    for branch in branches:
+        b = deref(spec, branch)
+        if not isinstance(b, dict):
+            continue
+        req = b.get("required") or []
+        score = sum(1 for r in req if r in value)
+        if req and score > 0 and score > best_score:
+            best, best_score = b, score
+    return best
+
+
+def _type_matches(value, stype):
+    """Return True if the Python value is compatible with the JSON Schema type string."""
+    if stype == "string":  return isinstance(value, str)
+    if stype == "integer": return isinstance(value, int) and not isinstance(value, bool)
+    if stype == "number":  return isinstance(value, (int, float)) and not isinstance(value, bool)
+    if stype == "boolean": return isinstance(value, bool)
+    if stype == "array":   return isinstance(value, list)
+    if stype == "object":  return isinstance(value, dict)
+    if stype == "null":    return value is None
+    return True
 
 
 def _variant_hint(branches, spec):

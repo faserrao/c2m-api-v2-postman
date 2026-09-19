@@ -137,9 +137,11 @@ def errs_for(path, body):
 def test_synthetic_faults():
     print("\n[3] Synthetic fault injection")
 
-    # 3d. Clean /static body -> no errors
-    clean_single = {"docSourceAll": {"documentId": 1},
-                    "recipientAddressSource": {"singleAddress": {"firstName": "A"}}}
+    # 3d. Clean /static body -> no errors (full address required by V3 branch descent)
+    clean_addr = {"firstName": "A", "lastName": "B", "address1": "1 Main St",
+                  "city": "Springfield", "state": "IL", "zip": "62701", "country": "USA"}
+    clean_single = {"docSourceAll": {"documentIdSource": {"documentId": 1}},
+                    "recipientAddressSource": {"singleAddress": clean_addr}}
     check(errs_for("/static", clean_single) == [],
           "clean /static body -> no errors")
 
@@ -149,13 +151,14 @@ def test_synthetic_faults():
           "/static with extra field -> flags unexpected 'bogusField'")
 
     # 3f. Missing a required field -> flagged
-    e = errs_for("/static", {"docSourceAll": {"documentId": 1}})
+    e = errs_for("/static", {"docSourceAll": {"documentIdSource": {"documentId": 1}}})
     check(any("missing required field 'recipientAddressSource'" in x for x in e),
           "/static missing recipientAddressSource -> flagged")
 
-    # 3g. Placeholder values must NOT cause type false-positives
-    ph = {"docSourceAll": {"documentId": "<Integer>"},
-          "recipientAddressSource": {"singleAddress": {"firstName": "<String>"}},
+    # 3g. Placeholder values must NOT cause type false-positives (V3 descends, V4 skips placeholders)
+    ph_addr = {f: "<String>" for f in ["firstName", "lastName", "address1", "city", "state", "zip", "country"]}
+    ph = {"docSourceAll": {"documentIdSource": {"documentId": "<Integer>"}},
+          "recipientAddressSource": {"singleAddress": ph_addr},
           "jobTemplate": "<String>"}
     check(errs_for("/static", ph) == [],
           "placeholder /static body -> no false positives")

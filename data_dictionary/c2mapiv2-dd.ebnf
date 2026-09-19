@@ -797,13 +797,13 @@ creditAmount =
 currency = "USD" | "EUR" | "GBP" | "CAD" | "AUD" ;
 amount = number ;
 
-cardNumber = string ; (* @hint static 4111111111111111 *)
+cardNumber = string ; (* @hint static "4111111111111111" *)
 expirationDate = month + year ;
 month = integer ; (* @hint static 12 *)
 year = integer ; (* @hint static 2029 *)
 cvv = integer ; (* @hint static 123 *)
 routingNumber = string ; (* @hint aba_routing_number *)
-accountNumber = string ; (* @hint static 1234567890 *)
+accountNumber = string ; (* @hint static "1234567890" *)
 checkDigit = integer ;
 invoiceNumber = string ;
 amountDue = number ;

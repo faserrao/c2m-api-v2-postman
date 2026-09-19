@@ -1461,14 +1461,19 @@ def extract_faker_hints(ebnf_content: str) -> dict:
             hints[rule_name] = {'type': 'faker', 'method': hint_args}
         elif hint_type == 'static':
             value: Any = hint_args
-            # Try numeric coercion so YAML output looks correct (no quotes on numbers)
-            try:
-                value = int(hint_args)
-            except ValueError:
+            # Quoted values ("...") are always kept as strings, preventing numeric coercion
+            # for string-typed fields that happen to contain digit-only values (cardNumber etc.)
+            if len(hint_args) >= 2 and hint_args[0] == '"' and hint_args[-1] == '"':
+                value = hint_args[1:-1]
+            else:
+                # Try numeric coercion so YAML output looks correct (no quotes on numbers)
                 try:
-                    value = float(hint_args)
+                    value = int(hint_args)
                 except ValueError:
-                    pass  # keep as string
+                    try:
+                        value = float(hint_args)
+                    except ValueError:
+                        pass  # keep as string
             hints[rule_name] = {'type': 'static', 'value': value}
         elif hint_type == 'random_int':
             parts = hint_args.split()

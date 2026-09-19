@@ -1,20 +1,64 @@
 #!/usr/bin/env node
 
 const fs = require('fs');
+const yaml = require('js-yaml');
 
 const args = process.argv.slice(2);
 if (args.length < 2) {
-  console.error("Usage: node scripts/add_tests_jwt.js <input_file> <output_file> [--allowed-codes \"200,400,401\"]");
+  console.error("Usage: node scripts/add_tests_jwt.js <input_file> <output_file> [--allowed-codes \"200,400,401\"] [--auth-overlay <path>]");
   process.exit(1);
 }
 
 const inputFile = args[0];
 const outputFile = args[1];
 let allowedCodes = "200";
+let authOverlayPath = null;
 
 const codesIndex = args.indexOf("--allowed-codes");
 if (codesIndex !== -1 && args[codesIndex + 1]) {
   allowedCodes = args[codesIndex + 1];
+}
+const overlayIndex = args.indexOf("--auth-overlay");
+if (overlayIndex !== -1 && args[overlayIndex + 1]) {
+  authOverlayPath = args[overlayIndex + 1];
+}
+
+// Load auth overlay for spec-derived test assertions
+let authOverlay = null;
+if (authOverlayPath) {
+  try {
+    authOverlay = yaml.load(fs.readFileSync(authOverlayPath, 'utf-8'));
+    console.log(`ℹ️ Auth overlay: ${authOverlayPath}`);
+  } catch (err) {
+    console.warn(`⚠️ Auth overlay load failed — falling back to hardcoded fields: ${err.message}`);
+  }
+}
+
+// Build "Response has required JWT fields" test from overlay schema.
+// Falls back to fallbackFields when no overlay is loaded, preserving existing behaviour.
+function buildRequiredFieldsTest(schemaName, fallbackFields) {
+  let fields = fallbackFields;
+  let tokenTypeValue = 'Bearer';
+  if (authOverlay) {
+    const schemas = ((authOverlay.components || {}).schemas) || {};
+    const schema = schemas[schemaName];
+    if (schema && schema.required && schema.required.length > 0) {
+      fields = schema.required;
+    }
+    const tp = schema && schema.properties && schema.properties.token_type;
+    if (tp && tp.enum && tp.enum[0]) {
+      tokenTypeValue = tp.enum[0];
+    }
+  }
+  const checks = fields.map(field =>
+    field === 'token_type'
+      ? `      pm.expect(jsonData).to.have.property(${JSON.stringify(field)}, ${JSON.stringify(tokenTypeValue)});`
+      : `      pm.expect(jsonData).to.have.property(${JSON.stringify(field)});`
+  ).join('\n');
+  return `pm.test("Response has required JWT fields", function () {
+      const jsonData = pm.response.json();
+${checks}
+    });`;
 }
 
 console.log(`ℹ️ Input file: ${inputFile}`);
@@ -30,14 +74,7 @@ const standardTests = [
 // JWT-specific tests by endpoint
 const jwtTests = {
   'issueShortTermToken': [
-    `pm.test("Response has required JWT fields", function () {
-      const jsonData = pm.response.json();
-      pm.expect(jsonData).to.have.property('token_type', 'Bearer');
-      pm.expect(jsonData).to.have.property('access_token');
-      pm.expect(jsonData).to.have.property('expires_in');
-      pm.expect(jsonData).to.have.property('expires_at');
-      pm.expect(jsonData).to.have.property('token_id');
-    });`,
+    buildRequiredFieldsTest('ShortTokenResponse', ['token_type', 'access_token', 'expires_in', 'expires_at', 'token_id']),
     `pm.test("Short token is short-lived (at most 1 hour)", function () {
       // Validates the token is short-lived without pinning to an exact TTL.
       // The auth overlay targets 900s (15 min); 3600s is the hard upper bound.
@@ -60,14 +97,7 @@ const jwtTests = {
     });`
   ],
   'issueLongTermToken': [
-    `pm.test("Response has required JWT fields", function () {
-      const jsonData = pm.response.json();
-      pm.expect(jsonData).to.have.property('token_type', 'Bearer');
-      pm.expect(jsonData).to.have.property('access_token');
-      pm.expect(jsonData).to.have.property('expires_in');
-      pm.expect(jsonData).to.have.property('expires_at');
-      pm.expect(jsonData).to.have.property('token_id');
-    });`,
+    buildRequiredFieldsTest('LongTokenResponse', ['token_type', 'access_token', 'expires_in', 'expires_at', 'token_id']),
     `pm.test("Long token has reasonable expiry", function () {
       const jsonData = pm.response.json();
       const minExpiry = 3600; // 1 hour
