@@ -72,7 +72,8 @@ def _section(title: str, rows: list[tuple[str, str, str]], readme_url: str | Non
 
 def generate(org: str, reports_dir: Path, output: Path,
              artifacts_repo: str = "c2m-api-v2-postman-artifacts",
-             api_name: str = "c2mapiv2") -> None:
+             api_name: str = "c2mapiv2",
+             linked_collection_name: str = "C2M API Linked Collection") -> None:
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
     # Local URL helpers with artifacts_repo baked in
@@ -154,9 +155,9 @@ def generate(org: str, reports_dir: Path, output: Path,
     # --- Postman Collections ------------------------------------------------
     collection_rows = [
         (
-            "C2M API Linked Collection",
+            linked_collection_name,
             _link("Download", _url(f"postman/collections/{n}-linked-collection-flat.json")),
-            "Primary API collection with all endpoints linked to the live OpenAPI spec for schema validation (C2mApiV2CollectionLinked).",
+            "Primary API collection with all endpoints linked to the live OpenAPI spec for schema validation.",
         ),
         (
             "Test Collection",
@@ -327,6 +328,12 @@ def main() -> None:
         help="API name prefix used in artifact filenames (Makefile: C2MAPIV2_POSTMAN_API_NAME_KC). "
              "Default: c2mapiv2",
     )
+    parser.add_argument(
+        "--linked-collection-name",
+        default="C2M API Linked Collection",
+        help="Display name for the linked collection row in the index table "
+             "(Makefile: POSTMAN_LINKED_COLLECTION_NAME). Default: 'C2M API Linked Collection'",
+    )
     args = parser.parse_args()
 
     generate(
@@ -335,6 +342,7 @@ def main() -> None:
         output=Path(args.output),
         artifacts_repo=args.artifacts_repo,
         api_name=args.api_name,
+        linked_collection_name=args.linked_collection_name,
     )
 
 

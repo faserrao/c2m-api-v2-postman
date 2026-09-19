@@ -830,7 +830,8 @@ generate-artifacts-index:
 		--artifacts-repo "$(ARTIFACTS_REPO_NAME)" \
 		--reports-dir reports \
 		--output reports/artifacts-index.md \
-		--api-name $(C2MAPIV2_POSTMAN_API_NAME_KC)
+		--api-name $(C2MAPIV2_POSTMAN_API_NAME_KC) \
+		--linked-collection-name "$(POSTMAN_LINKED_COLLECTION_NAME)"
 	@echo "✅ Artifacts index written to reports/artifacts-index.md"
 
 # Merge auth overlay into base OpenAPI spec
