@@ -319,6 +319,7 @@ PYTHON3                          := python3
 _SPEC_ALLOWED_CODES := $(shell test -x "$(VENV_PYTHON)" && test -f "$(C2MAPIV2_OPENAPI_SPEC)" && $(VENV_PYTHON) -c "import yaml; d=yaml.safe_load(open('$(C2MAPIV2_OPENAPI_SPEC)')); codes=list(d.get('info',{}).get('x-http-error-map',{}).keys()); print(','.join(['200','201','204']+codes))" 2>/dev/null)
 POSTMAN_ALLOWED_CODES ?= $(if $(_SPEC_ALLOWED_CODES),$(_SPEC_ALLOWED_CODES),200,201,204,400,401,403,404,422,429,500)
 SUPPORT_EMAIL                    ?= support@click2mail.com
+C2MAPIV2_API_URL                 ?= https://api.click2mail.com/v2
 API_TITLE                        ?= C2M API v2
 API_VERSION                      ?= 2.0.0
 ARTIFACTS_REPO_NAME              ?= c2m-api-v2-postman-artifacts
@@ -797,6 +798,7 @@ generate-openapi-spec-from-ebnf-dd:
 	# --- Run the conversion script ---
 	@echo "🛠  Running: $(EBNF_TO_OPENAPI_SCRIPT) → $(C2MAPIV2_OPENAPI_SPEC_BASE)"
 	$(VENV_PYTHON) $(EBNF_TO_OPENAPI_SCRIPT) -o $(C2MAPIV2_OPENAPI_SPEC_BASE) $(DD_EBNF_FILE) \
+		--server-url "$(C2MAPIV2_API_URL)" \
 		--support-email "$(SUPPORT_EMAIL)" --api-title "$(API_TITLE)" --api-version "$(API_VERSION)" \
 		--faker-hints-output config/faker_hints.yaml
 	@echo "✅ Faker hints derived from DD @hint annotations → config/faker_hints.yaml"
@@ -2764,6 +2766,7 @@ postman-build-golden-test-fixtures: ## Build all collection files needed by the 
 	$(MAKE) postman-api-linked-collection-generate
 	$(MAKE) postman-linked-collection-flatten
 	$(MAKE) postman-generate-getting-started-all
+	$(MAKE) postman-generate-use-case-collection
 	$(MAKE) postman-test-collection-generate
 	$(MAKE) postman-test-collection-add-examples || echo "⚠️  Skipping examples (optional)"
 	$(MAKE) postman-test-collection-add-error-responses || echo "⚠️  Skipping error responses (optional)"
@@ -2939,7 +2942,7 @@ validate-catalog-against-spec: ## Validate curated-examples-catalog.yaml select:
 # shares the same request bodies. Run AFTER `make openapi-build` (needs the fresh
 # spec + the venv it creates). Validates job AND auth endpoints (--path-prefix /).
 .PHONY: validate-collections-conformance-gate-all
-validate-collections-conformance-gate-all: ## CI gate: fail if ANY of the 4 canonical collections have FAIL > 0
+validate-collections-conformance-gate-all: ## CI gate: fail if ANY of the 5 canonical collections have FAIL > 0
 	@C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" \
 	POSTMAN_GENERATED_DIR="$(POSTMAN_GENERATED_DIR)" \
 	C2MAPIV2_POSTMAN_API_NAME_KC="$(C2MAPIV2_POSTMAN_API_NAME_KC)" \

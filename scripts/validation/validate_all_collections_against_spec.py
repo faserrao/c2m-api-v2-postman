@@ -59,7 +59,8 @@ ACTIVE_COLLECTIONS = {
     "c2mapiv2-getting-started-curated-collection.json", # GS curated examples
 }
 
-PLACEHOLDER = re.compile(r"^<[^>]+>$")
+PLACEHOLDER    = re.compile(r"^<[^>]+>$")
+PLACEHOLDER_PH = re.compile(r"^ph<[^>]+>$")  # HC6 enum placeholders: ph<val1|val2|...>
 
 # --------------------------------------------------------------------------- #
 # Path translation: curated/test collections use legacy /jobs/submit/... paths #
@@ -106,7 +107,9 @@ def deref(spec: Dict, schema: Any) -> Any:
 
 
 def is_placeholder(value: Any) -> bool:
-    return isinstance(value, str) and bool(PLACEHOLDER.match(value))
+    return isinstance(value, str) and (
+        bool(PLACEHOLDER.match(value)) or bool(PLACEHOLDER_PH.match(value))
+    )
 
 
 def any_placeholder(obj: Any) -> bool:

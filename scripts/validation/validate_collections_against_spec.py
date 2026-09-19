@@ -70,6 +70,7 @@ _COLLECTION_BASENAMES = [
     f"{_API_NAME}-test-collection-flat.json",
     f"{_API_NAME}-getting-started-linked-collection.json",
     f"{_API_NAME}-getting-started-test-collection.json",
+    f"{_API_NAME}-real-world-use-cases-collection.json",
 ]
 DEFAULT_COLLECTIONS = [os.path.join(GEN_DIR_ABS, b) for b in _COLLECTION_BASENAMES]
 
