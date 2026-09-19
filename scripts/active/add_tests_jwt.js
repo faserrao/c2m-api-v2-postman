@@ -5,7 +5,7 @@ const yaml = require('js-yaml');
 
 const args = process.argv.slice(2);
 if (args.length < 2) {
-  console.error("Usage: node scripts/add_tests_jwt.js <input_file> <output_file> [--allowed-codes \"200,400,401\"] [--auth-overlay <path>]");
+  console.error("Usage: node scripts/add_tests_jwt.js <input_file> <output_file> [--allowed-codes \"200,400,401\"] --auth-overlay <path>");
   process.exit(1);
 }
 
@@ -23,32 +23,38 @@ if (overlayIndex !== -1 && args[overlayIndex + 1]) {
   authOverlayPath = args[overlayIndex + 1];
 }
 
+// --auth-overlay is required: without it operationIds and schema names cannot be derived.
+if (!authOverlayPath) {
+  console.error("❌ --auth-overlay <path> is required. Pass the OpenAPI auth overlay (e.g. --auth-overlay openapi/overlays/auth.tokens.yaml).");
+  process.exit(1);
+}
+
 // Load auth overlay for spec-derived test assertions
 let authOverlay = null;
-if (authOverlayPath) {
-  try {
-    authOverlay = yaml.load(fs.readFileSync(authOverlayPath, 'utf-8'));
-    console.log(`ℹ️ Auth overlay: ${authOverlayPath}`);
-  } catch (err) {
-    console.warn(`⚠️ Auth overlay load failed — falling back to hardcoded fields: ${err.message}`);
-  }
+try {
+  authOverlay = yaml.load(fs.readFileSync(authOverlayPath, 'utf-8'));
+  console.log(`ℹ️ Auth overlay: ${authOverlayPath}`);
+} catch (err) {
+  console.error(`❌ Auth overlay load failed: ${err.message}`);
+  process.exit(1);
 }
 
 // Build "Response has required JWT fields" test from overlay schema.
-// Falls back to fallbackFields when no overlay is loaded, preserving existing behaviour.
+// Reads required[] from overlay.components.schemas[schemaName]; warns and falls back
+// to fallbackFields when the schema name isn't found (indicates overlay drift).
 function buildRequiredFieldsTest(schemaName, fallbackFields) {
   let fields = fallbackFields;
   let tokenTypeValue = 'Bearer';
-  if (authOverlay) {
-    const schemas = ((authOverlay.components || {}).schemas) || {};
-    const schema = schemas[schemaName];
-    if (schema && schema.required && schema.required.length > 0) {
-      fields = schema.required;
-    }
-    const tp = schema && schema.properties && schema.properties.token_type;
-    if (tp && tp.enum && tp.enum[0]) {
-      tokenTypeValue = tp.enum[0];
-    }
+  const schemas = ((authOverlay.components || {}).schemas) || {};
+  const schema = schemas[schemaName];
+  if (schema && schema.required && schema.required.length > 0) {
+    fields = schema.required;
+  } else {
+    console.warn(`⚠️ Schema '${schemaName}' not found in auth overlay — using hardcoded fallback fields. Update the overlay or check for schema rename.`);
+  }
+  const tp = schema && schema.properties && schema.properties.token_type;
+  if (tp && tp.enum && tp.enum[0]) {
+    tokenTypeValue = tp.enum[0];
   }
   const checks = fields.map(field =>
     field === 'token_type'
@@ -139,26 +145,9 @@ const _REVOKE_TESTS = [
 /**
  * Build the operationId → test-array map from the auth overlay.
  * Reads operationId and the 2xx success response schema name for each path.
- * Falls back to known static values if no overlay is loaded.
- * M4: schema names are read from overlay, not hardcoded.
- * M5: operationIds are read from overlay paths, not hardcoded.
+ * --auth-overlay is required (enforced at startup), so overlay is always present.
  */
 function buildJwtTests(overlay) {
-  if (!overlay) {
-    // Static fallback for runs without --auth-overlay
-    return {
-      'issueShortTermToken': [
-        buildRequiredFieldsTest('ShortTokenResponse', ['token_type', 'access_token', 'expires_in', 'expires_at', 'token_id']),
-        ..._SHORT_TOKEN_EXTRA_TESTS,
-      ],
-      'issueLongTermToken': [
-        buildRequiredFieldsTest('LongTokenResponse', ['token_type', 'access_token', 'expires_in', 'expires_at', 'token_id']),
-        ..._LONG_TOKEN_EXTRA_TESTS,
-      ],
-      'revokeToken': _REVOKE_TESTS,
-    };
-  }
-
   const result = {};
   const paths = overlay.paths || {};
 
