@@ -31,6 +31,12 @@ import argparse
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
 
+# Import structural annotation extractor from the translator so that
+# NAMED_WRAPPER_ONEOF_RULES is derived from the EBNF DD at runtime (M-C fix).
+_HERE = Path(__file__).parent
+sys.path.insert(0, str(_HERE.parent / "active"))
+from ebnf_to_openapi_dynamic_v3 import _extract_structural_annotations  # noqa: E402
+
 try:
     import yaml
 except ImportError:
@@ -73,17 +79,9 @@ SINGLE_FIELD_WRAPPER_RULES: frozenset = frozenset({
     "mergeByDocumentId",  # mergeByDocumentId = documentId ; → { documentId: integer }
 })
 
-# oneOf rules whose variants must be named-wrapper objects rather than bare $refs.
-# e.g. docSourceStandard → oneOf: [{ type:object, properties:{ requestIdSource:$ref } }]
-# Must stay in sync with _NAMED_WRAPPER_ONEOF_RULES in ebnf_to_openapi_dynamic_v3.py.
-NAMED_WRAPPER_ONEOF_RULES: frozenset = frozenset({
-    "docSourceStandard",
-    "docSourceZipFile",
-    "docSourceZipFileRef",
-    "zipDocumentSource",
-    "mergeDocumentRef",
-    "recipientAddressSource",
-})
+# NAMED_WRAPPER_ONEOF_RULES is now derived at runtime from @structural annotations
+# in the EBNF DD via _extract_structural_annotations() (imported above).
+# No longer a static frozenset — populated in main() and passed to check_named_wrapper_oneofs().
 
 # Rules only referenced inside multi-line block comments (Apple Pay /
 # Google Pay).  strip_block_comments() removes them from the parsed text, so
@@ -469,16 +467,18 @@ def check_wrapper_rules(
 def check_named_wrapper_oneofs(
     rules: Dict[str, str],
     all_schemas: dict,
+    named_wrapper_oneof_rules: frozenset,
 ) -> List[Finding]:
     """
-    Check 6: oneOf rules in NAMED_WRAPPER_ONEOF_RULES must emit each variant as a
+    Check 6: oneOf rules tagged @structural named_wrapper_oneof must emit each variant as a
     named-wrapper object { type: object, properties: { variantName: $ref }, required: [v] }
     rather than a bare $ref.  A bare $ref means the variant fields are inlined directly
     (no intermediate type-name key in the JSON body).
+    The rule set is derived at runtime from the EBNF DD — no hardcoded list.
     """
     findings: List[Finding] = []
 
-    for name in sorted(NAMED_WRAPPER_ONEOF_RULES):
+    for name in sorted(named_wrapper_oneof_rules):
         if name not in all_schemas:
             continue
 
@@ -590,6 +590,13 @@ def main() -> int:
     dd_text = Path(args.dd).read_text()
     rules = extract_rules(dd_text)
 
+    # Derive structural role sets from @structural annotations in the DD.
+    # Single source of truth: same function the translator uses at build time.
+    _structural = _extract_structural_annotations(dd_text)
+    named_wrapper_oneof_rules = frozenset(
+        name for name, roles in _structural.items() if 'named_wrapper_oneof' in roles
+    )
+
     # Skip rules we intentionally exclude
     rules = {
         name: body for name, body in rules.items()
@@ -623,7 +630,7 @@ def main() -> int:
         ("3. Object properties",          check_object_properties(rules, all_schemas, body_types)),
         ("4. Required fields",            check_required_fields(rules, all_schemas, body_types)),
         ("5. Wrapper rule structure",     check_wrapper_rules(rules, all_schemas, body_types)),
-        ("6. Named-wrapper oneOf rules",  check_named_wrapper_oneofs(rules, all_schemas)),
+        ("6. Named-wrapper oneOf rules",  check_named_wrapper_oneofs(rules, all_schemas, named_wrapper_oneof_rules)),
     ]
 
     for title, findings in check_list:
