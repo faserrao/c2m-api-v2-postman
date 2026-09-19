@@ -93,6 +93,9 @@ _ERROR_DB_TABLE            = "jobs"
 _ERROR_EXTERNAL_SERVICE    = "payment-gateway"
 _ERROR_AUTH_SCOPE_REQUIRED = "jobs:write"
 _ERROR_AUTH_SCOPE_PROVIDED = "jobs:read"
+# Fields that are mutually exclusive at submission time (jobTemplate picks a preset;
+# jobOptions provides individual overrides — only one may be sent per request).
+_MUTUAL_EXCLUSION_FIELDS = ["jobTemplate", "jobOptions"]
 
 
 def _load_error_code_messages() -> Dict[str, str]:
@@ -938,7 +941,7 @@ class EBNFToOpenAPITranslator:
                 "allowedValues": self._get_enum_values('documentClass') or ["letter", "postcard", "brochure", "flat"]
             },
             'MUTUAL_EXCLUSION_VIOLATION': {
-                "fields": ["jobTemplate", "jobOptions"],
+                "fields": _MUTUAL_EXCLUSION_FIELDS,
                 "issue": "only one may be provided"
             },
             'INVALID_FORMAT': {
