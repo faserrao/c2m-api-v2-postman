@@ -180,6 +180,84 @@ def validate_faker_hints_file(hints_path: Path, dd_rules: set, result: Validatio
         print(f"  ✓ All {len(hints)} derived faker_hints keys are valid DD rule names")
 
 
+def validate_template_values(template_path: Path, dd_rules: set, result: ValidationResult) -> None:
+    """Check every field key used under values: in each template example against the DD.
+
+    Mirrors validate_catalog_values() but reads from getting-started-template.yaml,
+    which uses the same examples[].values structure as the catalog.
+    """
+    template = _load_yaml(template_path)
+    file_label = template_path.name
+
+    all_value_keys: set = set()
+    for example in template.get('examples', []):
+        _collect_values_keys(example.get('values', {}), all_value_keys)
+
+    if not all_value_keys:
+        print(f"  ℹ  No values keys found in {file_label}")
+        return
+
+    print(f"  Checking {len(all_value_keys)} distinct values keys in {file_label}...")
+    bad = []
+    for key in sorted(all_value_keys):
+        if key in dd_rules:
+            continue
+        if key in _KNOWN_EXTRA_KEYS:
+            result.warn(file_label, key, "not a DD rule but in known-extras list — verify intentional")
+            continue
+        suggestions = _suggest(key, dd_rules)
+        if suggestions:
+            result.error(file_label, key, f"not a DD rule — did you mean: {', '.join(suggestions)}?")
+        else:
+            result.error(file_label, key, "not a DD rule — no close match found; key may be dead or misspelled")
+        bad.append(key)
+
+    if not bad:
+        print(f"  ✓ All {len(all_value_keys)} template values keys are valid DD rule names")
+
+
+def validate_template_select_fields(template_path: Path, spec_path: Path,
+                                    result: ValidationResult) -> None:
+    """V3: Verify every select: entry in getting-started-template.yaml names a real
+    oneOf field+variant in the spec.
+
+    Mirrors validate_catalog_select_fields() for the template. Template entries use the
+    same select: map structure; if a variant name drifts (e.g. after a spec refactor) the
+    generated Getting Started collections will silently materialise the wrong request body.
+    """
+    try:
+        from utilities.oneof_resolver import find_variant_by_discriminator_key
+    except ImportError as e:
+        result.warn(template_path.name, "select", f"Cannot import oneof_resolver — skipping V3 check: {e}")
+        return
+
+    import yaml
+    with open(spec_path) as f:
+        spec = yaml.safe_load(f)
+
+    template = _load_yaml(template_path)
+    file_label = template_path.name
+    total = 0
+    bad = []
+
+    print(f"  Checking select: fields in {file_label} against {spec_path.name}...")
+    for example in template.get('examples', []):
+        ex_name = example.get('name', '<unnamed>')
+        for field_name, variant_name in example.get('select', {}).items():
+            total += 1
+            schema_name, _ = find_variant_by_discriminator_key(spec, field_name, variant_name)
+            if schema_name is None:
+                msg = (f"variant '{variant_name}' not found in spec oneOf for field '{field_name}' "
+                       f"(example: '{ex_name}')")
+                result.error(file_label, f"select.{field_name}", msg)
+                bad.append(f"{field_name}: {variant_name}")
+
+    if not bad:
+        print(f"  ✓ All {total} template select: entries reference valid spec oneOf variants")
+    else:
+        print(f"  ✗ {len(bad)} invalid select: entry/entries found")
+
+
 def validate_catalog_jobtemplates(catalog_path: Path, result: ValidationResult) -> None:
     """V1: Report jobTemplate values found in catalog (informational — spec has no enum for this field).
 
@@ -313,6 +391,9 @@ def main():
     print(f"\n🔍 Checking curated-examples-catalog.yaml values:")
     validate_catalog_values(catalog_path, dd_rules, result)
 
+    print(f"\n🔍 Checking getting-started-template.yaml values:")
+    validate_template_values(template_path, dd_rules, result)
+
     print(f"\n🔍 Checking derived faker_hints.yaml (if present):")
     validate_faker_hints_file(hints_path, dd_rules, result)
 
@@ -322,6 +403,9 @@ def main():
     if spec_path.exists():
         print(f"\n🔍 Checking catalog select: entries against spec oneOf variants (V2):")
         validate_catalog_select_fields(catalog_path, spec_path, result)
+
+        print(f"\n🔍 Checking template select: entries against spec oneOf variants (V3):")
+        validate_template_select_fields(template_path, spec_path, result)
     else:
         print(f"\n⚠  Skipping select: validation — spec not found at {spec_path}")
         print(f"   (Run openapi-build first, or pass --spec <path>)")
