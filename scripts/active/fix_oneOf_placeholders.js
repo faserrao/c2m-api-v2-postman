@@ -87,6 +87,8 @@ function discoverOneOfFields(specPath) {
         // Build ph<val1|val2|...> placeholder map for jobOptions enum properties.
         // json-schema-faker picks a random concrete value for each enum-constrained
         // field; fix_oneOf only handles oneOf schemas so these slip through.
+        // Format contract: ph<val1|val2|...> — see addRandomDataToRaw.js (HC6) which
+        // resolves these to a concrete value, and diff_collections.py which recognises them.
         const enumPlaceholders = {};
         const joSchema = spec.components &&
                          spec.components.schemas &&
@@ -100,7 +102,15 @@ function discoverOneOfFields(specPath) {
             console.log(`Discovered ${Object.keys(enumPlaceholders).length} jobOptions enum placeholders`);
         }
 
-        return { oneOfFields, crossFieldRules, enumPlaceholders };
+        // HC3: derive job array field names from spec at runtime (type: array schemas
+        // whose names contain "Job") instead of a hardcoded list.
+        const jobArrayFields = Object.entries(
+            (spec.components && spec.components.schemas) || {}
+        ).filter(([name, schema]) => schema.type === 'array' && /Job/.test(name))
+         .map(([name]) => name);
+        console.log(`Discovered ${jobArrayFields.length} job array fields from spec: ${jobArrayFields.join(', ')}`);
+
+        return { oneOfFields, crossFieldRules, enumPlaceholders, jobArrayFields };
 
     } catch (error) {
         console.error(`Error reading OpenAPI spec: ${error.message}`);
@@ -185,9 +195,8 @@ function processObject(obj, oneOfFields, replacedFields, parentKey = '') {
     return result;
 }
 
-// Job array fields where openapi-to-postmanv2 generates 2 identical placeholder items.
-// Trim to 1 so the linked collection template has a single clean example item.
-const JOB_ARRAY_FIELDS = ['pdfSplitJobsNoAddress', 'pdfSplitJobsWithAddress', 'multiZipJobs', 'multiDocJobs'];
+// HC3: JOB_ARRAY_FIELDS is now derived from the spec inside discoverOneOfFields()
+// and threaded through to processRawBody via jobArrayFields. Removed hardcoded list.
 
 /**
  * Replace actual enum values in jobOptions with ph<val1|val2|...> placeholders.
@@ -224,7 +233,7 @@ function fixCrossFieldConstraints(bodyObj, rules) {
 /**
  * Process a raw body string (JSON in a string)
  */
-function processRawBody(rawStr, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders) {
+function processRawBody(rawStr, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders, jobArrayFields) {
     if (!rawStr || typeof rawStr !== 'string') {
         return rawStr;
     }
@@ -237,7 +246,7 @@ function processRawBody(rawStr, oneOfFields, replacedFields, crossFieldRules, en
         const processed = processObject(bodyObj, oneOfFields, replacedFields);
 
         // Trim job arrays to 1 example item (faker generates 2 identical items by default)
-        for (const field of JOB_ARRAY_FIELDS) {
+        for (const field of (jobArrayFields || [])) {
             if (Array.isArray(processed[field]) && processed[field].length > 1) {
                 processed[field] = processed[field].slice(0, 1);
             }
@@ -261,10 +270,10 @@ function processRawBody(rawStr, oneOfFields, replacedFields, crossFieldRules, en
 /**
  * Process a single collection item (request)
  */
-function processItem(item, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders) {
+function processItem(item, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders, jobArrayFields) {
     // Process request body
     if (item.request && item.request.body && item.request.body.raw) {
-        item.request.body.raw = processRawBody(item.request.body.raw, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders);
+        item.request.body.raw = processRawBody(item.request.body.raw, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders, jobArrayFields);
     }
 
     // Process response examples
@@ -272,19 +281,19 @@ function processItem(item, oneOfFields, replacedFields, crossFieldRules, enumPla
         item.response.forEach(response => {
             // Process response body
             if (response.body) {
-                response.body = processRawBody(response.body, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders);
+                response.body = processRawBody(response.body, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders, jobArrayFields);
             }
 
             // Process originalRequest in responses
             if (response.originalRequest && response.originalRequest.body && response.originalRequest.body.raw) {
-                response.originalRequest.body.raw = processRawBody(response.originalRequest.body.raw, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders);
+                response.originalRequest.body.raw = processRawBody(response.originalRequest.body.raw, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders, jobArrayFields);
             }
         });
     }
 
     // Recursively process sub-items (folders)
     if (item.item && Array.isArray(item.item)) {
-        item.item.forEach(subItem => processItem(subItem, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders));
+        item.item.forEach(subItem => processItem(subItem, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders, jobArrayFields));
     }
 }
 
@@ -295,8 +304,8 @@ function main() {
     const options = parseArgs();
 
     try {
-        // Step 1: Discover oneOf fields, cross-field constraints, and enum placeholders
-        const { oneOfFields, crossFieldRules, enumPlaceholders } = discoverOneOfFields(options.spec);
+        // Step 1: Discover oneOf fields, cross-field constraints, enum placeholders, and job array fields
+        const { oneOfFields, crossFieldRules, enumPlaceholders, jobArrayFields } = discoverOneOfFields(options.spec);
 
         if (oneOfFields.size === 0) {
             console.warn('Warning: No oneOf fields discovered in OpenAPI spec');
@@ -312,7 +321,7 @@ function main() {
         // Step 3: Process all items in the collection, tracking actual replacements
         const replacedFields = new Set();
         if (collection.item && Array.isArray(collection.item)) {
-            collection.item.forEach(item => processItem(item, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders));
+            collection.item.forEach(item => processItem(item, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders, jobArrayFields));
         }
 
         // Step 4: Write the output

@@ -5,12 +5,17 @@ const path = require('path');
 const yaml = require('js-yaml');
 
 // Parse command line arguments
-const args = process.argv.slice(2);
-const inputFile = args[0];
-const outputFile = args[1] || inputFile;
+const rawArgs = process.argv.slice(2);
+let authOverlayArg = null;
+const overlayIdx = rawArgs.indexOf('--auth-overlay');
+if (overlayIdx !== -1 && rawArgs[overlayIdx + 1]) {
+  authOverlayArg = rawArgs.splice(overlayIdx, 2)[1];
+}
+const inputFile = rawArgs[0];
+const outputFile = rawArgs[1] || inputFile;
 
 if (!inputFile) {
-  console.error('Usage: node add_auth_examples.js <input-collection.json> [output-collection.json]');
+  console.error('Usage: node add_auth_examples.js <input-collection.json> [output-collection.json] [--auth-overlay <path>]');
   process.exit(1);
 }
 
@@ -57,9 +62,9 @@ function loadAuthExamplesFromOverlay(overlayPath) {
   return examples;
 }
 
-// Load auth examples from the overlay (single source of truth)
-// Assumed layout: this script lives in scripts/active/; ../../ is the repo root.
-const overlayPath = path.resolve(__dirname, '../../openapi/overlays/auth.tokens.yaml');
+// Load auth examples from the overlay (single source of truth).
+// --auth-overlay overrides; fallback uses the assumed repo layout (scripts/active/ → ../../ = root).
+const overlayPath = authOverlayArg || path.resolve(__dirname, '../../openapi/overlays/auth.tokens.yaml');
 const authExamples = loadAuthExamplesFromOverlay(overlayPath);
 
 // Read the collection

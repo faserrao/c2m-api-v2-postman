@@ -1203,7 +1203,7 @@ postman-linked-collection-flatten:
 	@$(PYTHON) $(FIX_COLLECTION_URLS) $(POSTMAN_LINKED_COLLECTION_FLAT) $(POSTMAN_LINKED_COLLECTION_FLAT)
 	@echo "✅ URL raw fields fixed"
 	@echo "🔐 Adding auth examples to linked collection..."
-	@node scripts/active/add_auth_examples.js $(POSTMAN_LINKED_COLLECTION_FLAT) $(POSTMAN_LINKED_COLLECTION_FLAT) || echo "⚠️  Skipping auth examples"
+	@node scripts/active/add_auth_examples.js $(POSTMAN_LINKED_COLLECTION_FLAT) $(POSTMAN_LINKED_COLLECTION_FLAT) --auth-overlay "$(OPENAPI_AUTH_OVERLAY)" || echo "⚠️  Skipping auth examples"
 	@echo "✅ Auth examples added"
 	@echo "📝 Adding pre-request script to collection..."
 	@node scripts/active/add_pre_request_script.js $(POSTMAN_LINKED_COLLECTION_FLAT) postman/scripts/jwt-pre-request.js $(POSTMAN_LINKED_COLLECTION_FLAT)
@@ -1490,7 +1490,7 @@ postman-test-collection-add-auth-examples:
 		exit 0; \
 	fi
 	@if [ -f "$(SCRIPTS_DIR)/active/add_auth_examples.js" ]; then \
-		node $(SCRIPTS_DIR)/active/add_auth_examples.js $(POSTMAN_TEST_COLLECTION_FLAT) $(POSTMAN_TEST_COLLECTION_FLAT) || echo "⚠️  Failed to add auth examples"; \
+		node $(SCRIPTS_DIR)/active/add_auth_examples.js $(POSTMAN_TEST_COLLECTION_FLAT) $(POSTMAN_TEST_COLLECTION_FLAT) --auth-overlay "$(OPENAPI_AUTH_OVERLAY)" || echo "⚠️  Failed to add auth examples"; \
 		echo "✅ Auth examples added to test collection"; \
 	else \
 		echo "⚠️  Auth examples script not found"; \
