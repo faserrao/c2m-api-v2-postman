@@ -116,15 +116,24 @@ def has_placeholder(obj):
     return False
 
 
-_JOB_ARRAY_FIELDS = ("pdfSplitJobsWithAddress", "pdfSplitJobsNoAddress")
+def _job_array_fields(spec):
+    """Derive the set of split-job array field names from the spec schemas.
+    Mirrors the discoverJobArrayFields() logic in fix_oneOf_placeholders.js (HC3).
+    Falls back to the known pair if the spec has no schemas (e.g. test isolation)."""
+    schemas = spec.get("components", {}).get("schemas", {})
+    derived = [
+        name for name, schema in schemas.items()
+        if schema.get("type") == "array" and "SplitJobs" in name
+    ]
+    return derived if derived else ["pdfSplitJobsWithAddress", "pdfSplitJobsNoAddress"]
 
 
-def page_range_errors(body):
+def page_range_errors(body, spec):
     """V5: cross-field constraint — startPage must be < endPage for every job item.
     Enforces the DD rule: IF startPage > endPage THEN reject.
     Skips items that contain placeholder values (typed collection)."""
     errors = []
-    for field in _JOB_ARRAY_FIELDS:
+    for field in _job_array_fields(spec):
         jobs = body.get(field)
         if not isinstance(jobs, list):
             continue
@@ -340,7 +349,7 @@ def validate_collection(spec, collection, path_prefix, strict_unknown):
             continue
         rec["mode"] = "structure(placeholders)" if has_placeholder(body) else "structure(values)"
         errs = structural_errors(body, schema, spec, "body", strict_unknown)
-        errs += page_range_errors(body)
+        errs += page_range_errors(body, spec)
         if errs:
             rec["status"] = "FAIL"
             rec["errors"] = errs

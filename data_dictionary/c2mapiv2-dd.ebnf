@@ -6,7 +6,7 @@
    for the C2M Jobs submission endpoints:
 
      POST /static
-     POST /static/multi
+     POST /static/multi    (* PLANNED — not yet implemented; multiDocJobs/multiDocJobItem schemas are reserved *)
      POST /static/address-capture
      POST /mail-merge
      POST /batch/split
@@ -496,7 +496,8 @@ submitMultiDocMergeParams =
          THEN filename MUST exist inside the referenced zipDocumentId.
 
    jobTemplate scoping:
-     Same as /static/multi.
+     Same as POST /static — a top-level jobTemplate provides defaults for all jobs
+     in multiZipJobs, with each job item able to override it.
 *)
 
 submitMultiZipParams =
@@ -705,6 +706,8 @@ mergeByRequestId  = requestId + [ filename ] ;
 (*              JOB LISTS           *)
 (***********************************)
 
+(* PLANNED — reserved for POST /static/multi (not yet implemented).
+   multiDocJobs and multiDocJobItem schemas are generated but not wired to any endpoint path. *)
 multiDocJobs = { multiDocJobItem } ;
 
 multiDocJobItem =

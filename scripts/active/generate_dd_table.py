@@ -152,15 +152,15 @@ _DESC: dict[str, str] = {
     "addressListName": "Optional name for this address list record.",
     "addressListId":   "Integer ID of a previously stored recipient address list.",
     "addressId":       "Integer ID of a previously stored individual recipient address.",
-    # Job options fields
-    "documentClass":   "Document class. Legal values: letter, postcard, brochure, flat.",
-    "layout":          "Page layout for address placement. Legal values: address_on_first_page, address_on_back_page.",
-    "productionTime":  "Production time preference. Legal values: next_day, two_day, three_day, standard, same_day.",
-    "envelope":        "Envelope type. Legal values: standard, none, flat, double_window.",
-    "color":           "Color mode. Legal values: full_color, black_and_white.",
-    "paperType":       "Paper stock. Legal values: white, white_24, ivory, glossy.",
-    "printOption":     "Duplex setting. Legal values: double_sided, single_sided.",
-    "mailClass":       "USPS mail class. Legal values: first_class, standard, non_profit.",
+    # Job options fields — enum values are shown in the table's kind column (from EBNF)
+    "documentClass":   "Document class.",
+    "layout":          "Page layout for address placement.",
+    "productionTime":  "Production time preference.",
+    "envelope":        "Envelope type.",
+    "color":           "Color mode.",
+    "paperType":       "Paper stock.",
+    "printOption":     "Duplex setting.",
+    "mailClass":       "USPS mail class.",
     # Job lists / split jobs
     "pdfSplitJobsWithAddress":
         "List of page-range job items, each with its own inline recipient address.",
@@ -214,8 +214,7 @@ _DESC: dict[str, str] = {
         "ACH payment fields: routing number, bank account number, and check digit.",
     "creditAmount":
         "Account credit payment fields: monetary amount and ISO currency code.",
-    "cardType":
-        "Card brand. Accepted values: visa, mastercard, discover, americanExpress.",
+    "cardType":        "Card brand (enum values shown in kind column).",
     "cardNumber":    "Credit card number (PAN) as a string.",
     "expirationDate": "Card expiration date containing month and year.",
     "month":         "Expiration month as an integer (1–12).",
@@ -226,8 +225,7 @@ _DESC: dict[str, str] = {
     "checkDigit":    "ACH check digit.",
     "invoiceNumber": "Invoice reference number.",
     "amountDue":     "Amount due on the invoice.",
-    "currency":
-        "ISO 4217 currency code. Accepted values: USD, EUR, GBP, CAD, AUD.",
+    "currency":        "ISO 4217 currency code (enum values shown in kind column).",
     "amount":        "Monetary amount (numeric value).",
     # Success response
     "standardResponse":
@@ -1030,6 +1028,12 @@ def main() -> int:
             _ENDPOINT_MAP = derived
         else:
             print("⚠️  Spec-derived endpoint map is empty — using built-in _ENDPOINT_MAP", file=sys.stderr)
+    else:
+        print(
+            "⚠️  --spec not provided — using built-in _ENDPOINT_MAP which may be stale.\n"
+            "    Pass --spec $(C2MAPIV2_OPENAPI_SPEC) to derive operationId→path mapping from the spec.",
+            file=sys.stderr,
+        )
 
     out_dir.mkdir(parents=True, exist_ok=True)
 

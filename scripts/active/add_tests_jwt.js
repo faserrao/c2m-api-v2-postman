@@ -71,23 +71,26 @@ const standardTests = [
   `pm.test("Response time < 1s", function () { pm.expect(pm.response.responseTime).to.be.below(1000); });`
 ];
 
-// JWT-specific tests by endpoint
-const jwtTests = {
-  'issueShortTermToken': [
-    buildRequiredFieldsTest('ShortTokenResponse', ['token_type', 'access_token', 'expires_in', 'expires_at', 'token_id']),
-    `pm.test("Short token is short-lived (at most 1 hour)", function () {
-      // Validates the token is short-lived without pinning to an exact TTL.
-      // The auth overlay targets 900s (15 min); 3600s is the hard upper bound.
-      const SHORT_TOKEN_MAX_SECONDS = 3600;
+// Token-class-specific tests attached by response schema name (not operationId).
+// When the overlay maps an operationId to a Short/Long schema, these are appended.
+// SHORT_TOKEN_MAX_SECONDS: matches the auth service hard cap (auth overlay targets 900s).
+// LONG_TOKEN bounds: min 1 hour, max 90 days — update if auth service limits change.
+const _SHORT_TOKEN_MAX_SECONDS = 3600;
+const _LONG_TOKEN_MIN_SECONDS  = 3600;
+const _LONG_TOKEN_MAX_SECONDS  = 7776000;
+
+const _SHORT_TOKEN_EXTRA_TESTS = [
+  `pm.test("Short token is short-lived (at most 1 hour)", function () {
+      const SHORT_TOKEN_MAX_SECONDS = ${_SHORT_TOKEN_MAX_SECONDS};
       const jsonData = pm.response.json();
       pm.expect(jsonData.expires_in).to.be.a('number').and.above(0).and.at.most(SHORT_TOKEN_MAX_SECONDS);
     });`,
-    `pm.test("Token expiry is valid ISO date", function () {
+  `pm.test("Token expiry is valid ISO date", function () {
       const jsonData = pm.response.json();
       const expiryDate = new Date(jsonData.expires_at);
       pm.expect(expiryDate.toISOString()).to.equal(jsonData.expires_at);
     });`,
-    `pm.test("Save short-term token", function () {
+  `pm.test("Save short-term token", function () {
       if (pm.response.code === 201) {
         const jsonData = pm.response.json();
         pm.environment.set('shortTermToken', jsonData.access_token);
@@ -95,21 +98,21 @@ const jwtTests = {
         pm.environment.set('currentTokenId', jsonData.token_id);
       }
     });`
-  ],
-  'issueLongTermToken': [
-    buildRequiredFieldsTest('LongTokenResponse', ['token_type', 'access_token', 'expires_in', 'expires_at', 'token_id']),
-    `pm.test("Long token has reasonable expiry", function () {
+];
+
+const _LONG_TOKEN_EXTRA_TESTS = [
+  `pm.test("Long token has reasonable expiry", function () {
       const jsonData = pm.response.json();
-      const minExpiry = 3600; // 1 hour
-      const maxExpiry = 7776000; // 90 days
+      const minExpiry = ${_LONG_TOKEN_MIN_SECONDS}; // 1 hour
+      const maxExpiry = ${_LONG_TOKEN_MAX_SECONDS}; // 90 days
       pm.expect(jsonData.expires_in).to.be.at.least(minExpiry).and.at.most(maxExpiry);
     });`,
-    `pm.test("Token has correct scopes", function () {
+  `pm.test("Token has correct scopes", function () {
       const jsonData = pm.response.json();
       pm.expect(jsonData.scopes).to.be.an('array');
       pm.expect(jsonData.scopes.length).to.be.at.least(1);
     });`,
-    `pm.test("Save long-term token", function () {
+  `pm.test("Save long-term token", function () {
       if (pm.response.code === 201) {
         const jsonData = pm.response.json();
         pm.environment.set('longTermToken', jsonData.access_token);
@@ -117,21 +120,94 @@ const jwtTests = {
         pm.environment.set('longTokenExpiry', jsonData.expires_at);
       }
     });`
-  ],
-  'revokeToken': [
-    `pm.test("Successful revocation returns 204", function () {
+];
+
+const _REVOKE_TESTS = [
+  `pm.test("Successful revocation returns 204", function () {
       if (pm.response.code === 204) {
         pm.environment.unset('shortTermToken');
         pm.environment.unset('tokenExpiry');
         pm.environment.unset('currentTokenId');
       }
     });`,
-    `pm.test("Revocation is idempotent", function () {
+  `pm.test("Revocation is idempotent", function () {
       // 204 is expected for both first revocation and repeated attempts
       pm.expect([204, 404]).to.include(pm.response.code);
     });`
-  ]
-};
+];
+
+/**
+ * Build the operationId → test-array map from the auth overlay.
+ * Reads operationId and the 2xx success response schema name for each path.
+ * Falls back to known static values if no overlay is loaded.
+ * M4: schema names are read from overlay, not hardcoded.
+ * M5: operationIds are read from overlay paths, not hardcoded.
+ */
+function buildJwtTests(overlay) {
+  if (!overlay) {
+    // Static fallback for runs without --auth-overlay
+    return {
+      'issueShortTermToken': [
+        buildRequiredFieldsTest('ShortTokenResponse', ['token_type', 'access_token', 'expires_in', 'expires_at', 'token_id']),
+        ..._SHORT_TOKEN_EXTRA_TESTS,
+      ],
+      'issueLongTermToken': [
+        buildRequiredFieldsTest('LongTokenResponse', ['token_type', 'access_token', 'expires_in', 'expires_at', 'token_id']),
+        ..._LONG_TOKEN_EXTRA_TESTS,
+      ],
+      'revokeToken': _REVOKE_TESTS,
+    };
+  }
+
+  const result = {};
+  const paths = overlay.paths || {};
+
+  Object.values(paths).forEach(pathItem => {
+    Object.values(pathItem).forEach(operation => {
+      const operationId = operation.operationId;
+      if (!operationId) return;
+
+      // Find the 2xx success response schema $ref
+      let schemaName = null;
+      const responses = operation.responses || {};
+      for (const [status, resp] of Object.entries(responses)) {
+        if (parseInt(status, 10) >= 200 && parseInt(status, 10) < 300) {
+          const ref = (((resp.content || {})['application/json'] || {}).schema || {}).$ref;
+          if (ref) {
+            schemaName = ref.split('/').pop();
+            break;
+          }
+        }
+      }
+
+      if (!schemaName) {
+        // No success body (e.g. 204 revoke) — attach revoke tests
+        result[operationId] = _REVOKE_TESTS;
+        return;
+      }
+
+      const tests = [
+        buildRequiredFieldsTest(schemaName, ['token_type', 'access_token', 'expires_in', 'expires_at', 'token_id']),
+      ];
+      if (/short/i.test(schemaName)) tests.push(..._SHORT_TOKEN_EXTRA_TESTS);
+      if (/long/i.test(schemaName))  tests.push(..._LONG_TOKEN_EXTRA_TESTS);
+      result[operationId] = tests;
+    });
+  });
+
+  return result;
+}
+
+// JWT-specific tests by operationId — built from overlay when available (M4/M5)
+const jwtTests = buildJwtTests(authOverlay);
+
+// Derive operation groups from jwtTests for pre-request script generation.
+// Long-token operations are those whose test suite includes the max-expiry check.
+// All other operationIds in jwtTests are short-token or revoke operations.
+const _longTokenOpIds = Object.keys(jwtTests).filter(id =>
+  jwtTests[id].some(t => typeof t === 'string' && t.includes('LONG_TOKEN_MAX_SECONDS'))
+);
+const _shortOrRevokeOpIds = Object.keys(jwtTests).filter(id => !_longTokenOpIds.includes(id));
 
 // Auth error tests
 const authErrorTests = [
@@ -158,13 +234,13 @@ const authErrorTests = [
   });`
 ];
 
-// Pre-request script for JWT endpoints
+// Pre-request script for JWT endpoints — operationId lists are spec-derived (M5)
 const jwtPreRequestScript = `
 // Set required headers
 pm.request.headers.add({key: 'Content-Type', value: 'application/json'});
 
 // For long token endpoint, add X-Client-Id header
-if (pm.info.requestName === 'issueLongTermToken') {
+if (${JSON.stringify(_longTokenOpIds)}.includes(pm.info.requestName)) {
   const clientId = pm.environment.get('clientId');
   if (clientId) {
     pm.request.headers.add({key: 'X-Client-Id', value: clientId});
@@ -172,7 +248,7 @@ if (pm.info.requestName === 'issueLongTermToken') {
 }
 
 // For short token and revoke endpoints, add Authorization header
-if (['issueShortTermToken', 'revokeToken'].includes(pm.info.requestName)) {
+if (${JSON.stringify(_shortOrRevokeOpIds)}.includes(pm.info.requestName)) {
   const longToken = pm.environment.get('longTermToken');
   if (longToken) {
     pm.request.headers.add({key: 'Authorization', value: 'Bearer ' + longToken});
@@ -216,8 +292,8 @@ function addTestsToItem(item) {
       });
     }
 
-    // Add pre-request script for JWT endpoints
-    if (['issueShortTermToken', 'issueLongTermToken', 'revokeToken'].includes(operationId)) {
+    // Add pre-request script for JWT endpoints (all operationIds present in jwtTests)
+    if (Object.keys(jwtTests).includes(operationId)) {
       let preRequestEvent = item.event.find(e => e.listen === 'prerequest');
       if (!preRequestEvent) {
         preRequestEvent = { listen: 'prerequest', script: { type: 'text/javascript', exec: [] } };

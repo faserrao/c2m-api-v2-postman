@@ -31,7 +31,7 @@
     summary: "Invalid field format"
     errorMessage: "Field contains invalid format or value"
     errorCode: INVALID_FORMAT
-    errorDetails: '{"field": "postalCode", "provided": "1234", "expected": "5 or 9 digits"}'
+    errorDetails: '{"field": "zip", "provided": "1234", "expected": "5 or 9 digits"}'
 
 401:
   missing_token:
@@ -60,7 +60,7 @@
     summary: "Account suspended"
     errorMessage: "User account has been suspended"
     errorCode: ACCOUNT_SUSPENDED
-    errorDetails: '{"reason": "payment overdue", "contact": "support@click2mail.com"}'
+    errorDetails: '{"reason": "payment overdue", "contact": "{supportEmail}"}'
 
 404:
   resource_not_found:
@@ -79,7 +79,7 @@
     summary: "Validation failed"
     errorMessage: "Request validation failed for multiple fields"
     errorCode: INVALID_FORMAT
-    errorDetails: '{"errors": [{"field": "documentId", "issue": "not found"}, {"field": "recipientAddress.postalCode", "issue": "invalid format"}]}'
+    errorDetails: '{"errors": [{"field": "documentId", "issue": "not found"}, {"field": "recipientAddress.zip", "issue": "invalid format"}]}'
   invalid_enum_value:
     summary: "Invalid enum value"
     errorMessage: "Field contains a value not allowed by the enumeration"

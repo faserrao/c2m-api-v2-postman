@@ -302,8 +302,12 @@ def apply_template_to_request(template_example: Dict, linked_request: Dict, open
 
     return request
 
+_DEFAULT_POSTMAN_SCHEMA = "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+
+
 def generate_collection(template: Dict, linked_collection: Dict, openapi_spec: Dict,
-                        use_realistic_values: bool = False, faker_hints: dict = None) -> Dict:
+                        use_realistic_values: bool = False, faker_hints: dict = None,
+                        schema_url: str = _DEFAULT_POSTMAN_SCHEMA) -> Dict:
     """
     Generate a Postman collection from template.
 
@@ -334,7 +338,7 @@ def generate_collection(template: Dict, linked_collection: Dict, openapi_spec: D
         "info": {
             "name": collection_name,
             "description": collection_info.get("description", ""),
-            "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+            "schema": schema_url
         },
         "item": []
     }
@@ -536,6 +540,11 @@ def main():
         help="Path to derived config/faker_hints.yaml (generated from EBNF @hint annotations). "
              "Takes precedence over faker_hints section in the template."
     )
+    parser.add_argument(
+        "--schema-url",
+        default=_DEFAULT_POSTMAN_SCHEMA,
+        help="Postman collection schema URL (passed from Makefile POSTMAN_SCHEMA_V2)."
+    )
 
     args = parser.parse_args()
 
@@ -577,12 +586,14 @@ def main():
     # Generate linked collection (placeholders)
     print("Generating linked collection (placeholders)...", file=sys.stderr)
     linked_output = generate_collection(template, linked_collection, openapi_spec,
-                                        use_realistic_values=False, faker_hints=faker_hints)
+                                        use_realistic_values=False, faker_hints=faker_hints,
+                                        schema_url=args.schema_url)
 
     # Generate test collection (realistic values)
     print("Generating test collection (realistic values)...", file=sys.stderr)
     test_output = generate_collection(template, linked_collection, openapi_spec,
-                                      use_realistic_values=True, faker_hints=faker_hints)
+                                      use_realistic_values=True, faker_hints=faker_hints,
+                                      schema_url=args.schema_url)
 
     # Save outputs
     print(f"Writing linked collection to {args.output_linked}...", file=sys.stderr)

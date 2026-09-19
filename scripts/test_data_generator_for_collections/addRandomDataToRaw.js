@@ -92,6 +92,16 @@ function parseArgs() {
 let fakerHints = {};
 
 /**
+ * Generate a 6-character uppercase hex suffix for tracking IDs.
+ * Canonical format: TRK-YYYYMMDD-XXXXXX where XXXXXX is 6 hex chars.
+ * Matches the Python implementation in ebnf_to_openapi_dynamic_v3.py and
+ * add_response_examples.py.
+ */
+function hexSuffix() {
+    return Array.from({ length: 6 }, () => '0123456789ABCDEF'[Math.floor(Math.random() * 16)]).join('');
+}
+
+/**
  * OneOf fixtures for C2M API fields — named-wrapper format.
  * Each variant is wrapped in its type name as the top-level key,
  * matching the OpenAPI spec's named-wrapper oneOf structure.
@@ -162,7 +172,7 @@ let oneOfFixtures = {
         // Variant 2: invoicePayment
         {
             invoiceDetails: {
-                invoiceNumber: "INV-2026-001",
+                invoiceNumber: `INV-${new Date().getFullYear()}-001`,
                 amountDue: 99.99
             }
         },
@@ -244,23 +254,23 @@ let oneOfFixtures = {
             errorMessage: "Required field is missing from request body",
             errorCode: "MISSING_REQUIRED_FIELD",
             errorDetails: JSON.stringify({ field: "documentId", location: "requestBody" }),
-            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
+            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${hexSuffix()}`
         },
-        // Variant 2: ValidationError - Invalid OneOf
+        // Variant 2: ValidationError - Invalid OneOf (field name matches EBNF DD: docSourceAll)
         {
             errorType: "ValidationError",
             errorMessage: "Request contains invalid oneOf field structure",
             errorCode: "INVALID_ONEOF",
-            errorDetails: JSON.stringify({ field: "documentSourceIdentifier", issue: "must contain exactly one variant" }),
-            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
+            errorDetails: JSON.stringify({ field: "docSourceAll", issue: "must contain exactly one variant" }),
+            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${hexSuffix()}`
         },
-        // Variant 3: ValidationError - Invalid Format
+        // Variant 3: ValidationError - Invalid Format (field name matches EBNF DD: zip)
         {
             errorType: "ValidationError",
             errorMessage: "Field contains invalid format or value",
             errorCode: "INVALID_FORMAT",
-            errorDetails: JSON.stringify({ field: "postalCode", provided: "1234", expected: "5 or 9 digits" }),
-            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
+            errorDetails: JSON.stringify({ field: "zip", provided: "1234", expected: "5 or 9 digits" }),
+            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${hexSuffix()}`
         },
         // Variant 4: AuthenticationError - Missing Auth
         {
@@ -268,7 +278,7 @@ let oneOfFixtures = {
             errorMessage: "Authorization header is missing or invalid",
             errorCode: "MISSING_AUTH_HEADER",
             errorDetails: JSON.stringify({ expected: "Bearer <token>", received: "none" }),
-            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
+            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${hexSuffix()}`
         },
         // Variant 5: AuthenticationError - Expired Token
         {
@@ -276,7 +286,7 @@ let oneOfFixtures = {
             errorMessage: "Authentication token has expired",
             errorCode: "EXPIRED_TOKEN",
             errorDetails: JSON.stringify({ expiredAt: "2026-02-16T12:00:00Z", currentTime: "2026-02-16T15:30:00Z" }),
-            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
+            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${hexSuffix()}`
         },
         // Variant 6: AuthorizationError - Insufficient Permissions
         {
@@ -284,7 +294,7 @@ let oneOfFixtures = {
             errorMessage: "User does not have required permissions for this operation",
             errorCode: "INSUFFICIENT_PERMISSIONS",
             errorDetails: JSON.stringify({ required: "jobs:write", user: "read-only-user" }),
-            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
+            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${hexSuffix()}`
         },
         // Variant 7: ResourceNotFoundError - Job Not Found
         {
@@ -292,7 +302,7 @@ let oneOfFixtures = {
             errorMessage: "Requested job does not exist",
             errorCode: "JOB_NOT_FOUND",
             errorDetails: JSON.stringify({ resourceType: "job", jobId: "JOB-12345" }),
-            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
+            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${hexSuffix()}`
         },
         // Variant 8: ResourceNotFoundError - Resource Not Found
         {
@@ -300,9 +310,9 @@ let oneOfFixtures = {
             errorMessage: "Requested resource does not exist",
             errorCode: "RESOURCE_NOT_FOUND",
             errorDetails: JSON.stringify({ resourceType: "document", resourceId: "DOC-67890" }),
-            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
+            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${hexSuffix()}`
         },
-        // Variant 9: ValidationError - Multiple Field Errors
+        // Variant 9: ValidationError - Multiple Field Errors (field names match EBNF DD)
         {
             errorType: "ValidationError",
             errorMessage: "Request validation failed for multiple fields",
@@ -310,18 +320,18 @@ let oneOfFixtures = {
             errorDetails: JSON.stringify({
                 errors: [
                     { field: "documentId", issue: "not found in document library" },
-                    { field: "recipientAddress.postalCode", issue: "invalid format - must be 5 or 9 digits" }
+                    { field: "recipientAddress.zip", issue: "invalid format - must be 5 or 9 digits" }
                 ]
             }),
-            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
+            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${hexSuffix()}`
         },
         // Variant 10: ServerError - Internal Error
         {
             errorType: "ServerError",
             errorMessage: "An unexpected error occurred while processing the request",
             errorCode: "INTERNAL_SERVER_ERROR",
-            errorDetails: JSON.stringify({ timestamp: new Date().toISOString(), requestId: `req-${Math.random().toString(36).substr(2, 9)}` }),
-            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
+            errorDetails: JSON.stringify({ timestamp: new Date().toISOString(), requestId: `req-${hexSuffix()}${hexSuffix()}` }),
+            errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${hexSuffix()}`
         }
     ]
 };
@@ -696,6 +706,10 @@ function generateRandomValue(key, existingValue) {
     } else if (keyLower.includes('tags')) {
         return ['important', 'customer-docs'];
     } else if (keyLower === 'jobtemplate' || keyLower === 'job_template') {
+        // faker_hints.yaml (EBNF @hint annotation) should provide this value via the
+        // hint-lookup path above — this branch is a safety net for missing hint entries.
+        // If reached, add a @hint for jobTemplate in the EBNF DD.
+        console.warn('[addRandomDataToRaw] jobTemplate not in faker_hints — using hardcoded fallback; add @hint in EBNF DD');
         return 'standard_letter';
     } else if (keyLower.includes('template')) {
         return `template_${faker.string.alphanumeric(8)}`;

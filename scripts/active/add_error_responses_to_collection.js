@@ -51,7 +51,7 @@ let ERROR_CODE_METADATA = {};
  * When the same errorCode appears under multiple HTTP statuses the higher status wins
  * (e.g. INVALID_FORMAT appears at 400 and 422 — the 422 entry is used for the JS dict).
  */
-function loadErrorCodeMetadataFromYaml(yamlPath) {
+function loadErrorCodeMetadataFromYaml(yamlPath, supportEmail) {
   const content = fs.readFileSync(yamlPath, 'utf8');
   const raw = yaml.load(content);
   const metadata = {};
@@ -61,7 +61,8 @@ function loadErrorCodeMetadataFromYaml(yamlPath) {
       details = details
         .replace(/{timestamp}/g, _NOW_ISO)
         .replace(/{expired}/g, _EXPIRED_ISO)
-        .replace(/{requestId}/g, _REQUEST_ID);
+        .replace(/{requestId}/g, _REQUEST_ID)
+        .replace(/{supportEmail}/g, supportEmail || DEFAULT_SUPPORT_EMAIL);
       metadata[exData.errorCode] = {
         status: parseInt(httpStatus, 10),
         name: exData.summary,
@@ -88,26 +89,33 @@ function loadErrorTypesFromSpec(spec) {
 }
 
 /**
- * Derive the errorType for an error code using prefix/suffix convention.
- * Validated against validErrorTypes read from the spec's errorType enum.
+ * Build a direct errorCode → errorType lookup from the spec's x-http-error-map.
+ * The EBNF @http_error_map block is the authoritative source — this replaces the
+ * prior prefix/suffix pattern-matching heuristic (M6).
  *
- * Convention (applied in priority order):
- *   _NOT_FOUND suffix      → ResourceNotFoundError
- *   AUTH / TOKEN / EXPIRED → AuthenticationError
- *   INSUFFICIENT_ / ACCOUNT_ prefix → AuthorizationError
- *   RATE_LIMIT_*           → RateLimitError
- *   _ERROR suffix          → ServerError
- *   (default)              → ValidationError
+ * Returns a Map<string, string> so any code not present in the map is explicitly
+ * detectable rather than silently defaulting.
  */
-function deriveErrorType(errorCode, validErrorTypes) {
-  const pick = (name) => validErrorTypes.find(t => t === name) || validErrorTypes[0];
+function buildErrorTypeMap(spec) {
+  const httpErrorMap = (spec.info && spec.info['x-http-error-map']) || {};
+  const map = new Map();
+  Object.values(httpErrorMap).forEach(entry => {
+    const errorType = entry.errorType;
+    (entry.errorCodes || []).forEach(code => { map.set(code, errorType); });
+  });
+  return map;
+}
 
-  if (errorCode.endsWith('_NOT_FOUND')) return pick('ResourceNotFoundError');
-  if (errorCode === 'MISSING_AUTH_HEADER' || errorCode === 'INVALID_TOKEN' || errorCode === 'EXPIRED_TOKEN') return pick('AuthenticationError');
-  if (errorCode.startsWith('INSUFFICIENT_') || errorCode.startsWith('ACCOUNT_')) return pick('AuthorizationError');
-  if (errorCode.startsWith('RATE_LIMIT_') || errorCode === 'RATE_LIMIT_EXCEEDED') return pick('RateLimitError');
-  if (errorCode.endsWith('_ERROR')) return pick('ServerError');
-  return pick('ValidationError');
+/**
+ * Look up errorType for a given errorCode from the spec-derived map.
+ * Falls back to the first valid errorType if the code is not in the map
+ * (e.g. for stub entries auto-generated from codes with no hand-crafted metadata).
+ */
+function deriveErrorType(errorCode, validErrorTypes, errorTypeMap) {
+  if (errorTypeMap && errorTypeMap.has(errorCode)) {
+    return errorTypeMap.get(errorCode);
+  }
+  return validErrorTypes[0] || 'ValidationError';
 }
 
 /**
@@ -120,8 +128,10 @@ function loadErrorResponsesFromSpec(openapiSpecPath) {
   const specContent = fs.readFileSync(openapiSpecPath, 'utf8');
   const spec = yaml.load(specContent);
 
-  // Extract error types from spec (used to validate derived values)
+  // Extract error types from spec (used as fallback for codes absent from x-http-error-map)
   const validErrorTypes = loadErrorTypesFromSpec(spec);
+  // Build authoritative errorCode → errorType map from x-http-error-map (M6)
+  const errorTypeMap = buildErrorTypeMap(spec);
 
   // Extract error codes from errorCode enum in components/schemas
   let errorCodes = [];
@@ -166,11 +176,12 @@ function loadErrorResponsesFromSpec(openapiSpecPath) {
       errorResponsesByStatus[statusCode] = [];
     }
 
-    // Generate tracking ID
-    const trackingId = `TRK-${new Date().toISOString().split('T')[0].replace(/-/g, '')}-${generateUUID().split('-')[0].toUpperCase()}`;
+    // Generate tracking ID — 6 uppercase hex chars matches Python canonical format TRK-YYYYMMDD-XXXXXX
+    const hexSuffix = Array.from({ length: 6 }, () => '0123456789ABCDEF'[Math.floor(Math.random() * 16)]).join('');
+    const trackingId = `TRK-${new Date().toISOString().split('T')[0].replace(/-/g, '')}-${hexSuffix}`;
 
-    // Derive errorType from the error code using spec-validated prefix convention
-    const errorType = deriveErrorType(errorCode, validErrorTypes);
+    // Derive errorType from spec's x-http-error-map (authoritative) with fallback
+    const errorType = deriveErrorType(errorCode, validErrorTypes, errorTypeMap);
 
     // Create error response object
     errorResponsesByStatus[statusCode].push({
@@ -302,15 +313,9 @@ function main() {
   // If the script is ever moved, update the defaults below accordingly.
   const scriptDir = path.dirname(__filename);
 
-  // Load error code metadata from YAML (single source of truth with add_response_examples.py)
+  // Load error code metadata — {supportEmail} placeholder is resolved at load time (L8)
   const errYamlPath = path.resolve(scriptDir, '../../config/error-response-examples.yaml');
-  ERROR_CODE_METADATA = loadErrorCodeMetadataFromYaml(errYamlPath);
-
-  // Patch support email into ACCOUNT_SUSPENDED before building responses
-  if (ERROR_CODE_METADATA.ACCOUNT_SUSPENDED) {
-    ERROR_CODE_METADATA.ACCOUNT_SUSPENDED.details =
-      ERROR_CODE_METADATA.ACCOUNT_SUSPENDED.details.replace('support@click2mail.com', supportEmail);
-  }
+  ERROR_CODE_METADATA = loadErrorCodeMetadataFromYaml(errYamlPath, supportEmail);
 
   const [inputFile, outputFile] = positional;
 

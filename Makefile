@@ -1643,6 +1643,7 @@ postman-generate-getting-started-with-examples:
 	@$(VENV_PYTHON) scripts/utilities/generate_getting_started_collections.py \
 		--template config/getting-started-template.yaml \
 		--faker-hints config/faker_hints.yaml \
+		--schema-url $(POSTMAN_SCHEMA_V2) \
 		--output-linked $(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-linked-collection.json \
 		--output-test $(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-test-collection.json
 	@echo "✅ Getting Started collections generated (linked + test, template-based)"

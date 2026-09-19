@@ -14,6 +14,24 @@ OPENAPI_SPEC="${PROJECT_ROOT}/openapi/c2mapiv2-openapi-spec-final.yaml"
 SDK_BASE_DIR="${PROJECT_ROOT}/sdk"
 OPENAPI_GENERATOR_VERSION="latest"
 
+# Derive server URL from spec servers[0].url at runtime; fall back to known production URL.
+# This ensures SDK examples point to the canonical server declared in the spec.
+SERVER_URL="$(python3 -c "
+import sys, re
+try:
+    text = open('${OPENAPI_SPEC}').read()
+    m = re.search(r'servers:\s*\n\s*-\s*url:\s*(\S+)', text)
+    print(m.group(1).rstrip('/') if m else 'https://api.click2mail.com/v2')
+except Exception:
+    print('https://api.click2mail.com/v2')
+" 2>/dev/null || echo 'https://api.click2mail.com/v2')"
+
+# Derive bare hostname for Go SDK (configuration.Host takes host only, no scheme or path).
+# Strip scheme prefix and any /path suffix from SERVER_URL.
+SERVER_HOST="${SERVER_URL#https://}"
+SERVER_HOST="${SERVER_HOST#http://}"
+SERVER_HOST="${SERVER_HOST%%/*}"
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -896,7 +914,11 @@ EOF
             ;;
     esac
     
+    # Replace hardcoded base URL with the spec-derived SERVER_URL (L5)
+    # Also replace the bare hostname used by the Go SDK configuration.Host field.
     if [ -n "$example_file" ] && [ -f "$example_file" ]; then
+        sed -i.bak "s|https://api\.click2mail\.com/v2|${SERVER_URL}|g" "$example_file" && rm -f "${example_file}.bak"
+        sed -i.bak "s|configuration\.Host = \"api\.click2mail\.com\"|configuration.Host = \"${SERVER_HOST}\"|g" "$example_file" && rm -f "${example_file}.bak"
         print_success "Created JWT example: $example_file"
     fi
 }
