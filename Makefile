@@ -112,6 +112,7 @@ TEMPLATES_DIR                    := $(DOCS_DIR)/templates
 DD_EBNF_FILE                     := $(DATA_DICT_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_SC)-dd.ebnf
 REDOC_HTML_OUTPUT                := $(DOCS_DIR)/index.html
 DOCS_PID_FILE                    := $(DOCS_DIR)/http_pid.txt
+DOCS_PORT                        ?= 8080
 
 # ========================================================================
 # POSTMAN API CONFIGURATION
@@ -202,7 +203,7 @@ POSTMAN_MOCK_LINK_DEBUG_FILE     := $(POSTMAN_DIR)/postman-mock-link-debug.json
 POSTMAN_MOCK_UID                 := $(shell cat $(POSTMAN_MOCK_UID_FILE) 2>/dev/null || echo "")
 POSTMAN_MOCK_URL_FILE            := $(POSTMAN_DIR)/postman_mock_url.txt
 POSTMAN_MOCKS_URL                := $(POSTMAN_BASE_URL)/mocks
-POSTMAN_MOCK_URL                 := $(shell cat $(POSTMAN_MOCK_URL_FILE) 2>/dev/null || echo "https://mock.api")
+POSTMAN_MOCK_URL                 := $(shell cat $(POSTMAN_MOCK_URL_FILE) 2>/dev/null || (echo "❌ Mock server URL not found: run 'make postman-mock-create' first" >&2; echo "https://MISSING-MOCK-URL"))
 POSTMAN_MOCK_ID_FILE             := $(POSTMAN_DIR)/postman_mock_id.txt
 POSTMAN_MOCK_ID                  := $(shell cat $(POSTMAN_MOCK_ID_FILE) 2>/dev/null || echo "")
 
@@ -2068,8 +2069,8 @@ docs-build:
 .PHONY: docs-serve-bg
 docs-serve-bg:
 	@mkdir -p "$(DOCS_DIR)"
-	@nohup python3 -m http.server 8080 --directory "$(DOCS_DIR)" >/dev/null 2>&1 & echo $$! > "$(DOCS_PID_FILE)"
-	@echo "🌐 Docs served in background on http://localhost:8080 (PID: $$(cat $(DOCS_PID_FILE)))"
+	@nohup python3 -m http.server $(DOCS_PORT) --directory "$(DOCS_DIR)" >/dev/null 2>&1 & echo $$! > "$(DOCS_PID_FILE)"
+	@echo "🌐 Docs served in background on http://localhost:$(DOCS_PORT) (PID: $$(cat $(DOCS_PID_FILE)))"
 
 # Fix template banner if it disappears
 .PHONY: fix-template-banner
@@ -2090,8 +2091,8 @@ docs-stop:
 # Serve documentation (blocking)
 .PHONY: docs-serve
 docs-serve:
-	@echo "🌐 Serving API documentation locally on http://localhost:8080..."
-	@python3 -m http.server 8080 --directory $(DOCS_DIR)
+	@echo "🌐 Serving API documentation locally on http://localhost:$(DOCS_PORT)..."
+	@python3 -m http.server $(DOCS_PORT) --directory $(DOCS_DIR)
 
 # ========================================================================
 # POSTMAN API MANAGEMENT

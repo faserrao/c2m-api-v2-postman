@@ -13,6 +13,11 @@ import string
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
+# H3: Same format as _generate_tracking_id() in ebnf_to_openapi_dynamic_v3.py.
+# Update both if the format changes.
+_CONTENT_TYPE_JSON = "application/json"  # M5: shared constant, avoids raw string repetition
+
+
 def _generate_tracking_id():
     suffix = ''.join(random.choices('0123456789ABCDEF', k=6))
     return f"TRK-{datetime.now(timezone.utc).strftime('%Y%m%d')}-{suffix}"
@@ -223,7 +228,7 @@ def discover_job_response_schema_name(spec):
         content = (operation.get('responses', {})
                              .get('200', {})
                              .get('content', {})
-                             .get('application/json', {}))
+                             .get(_CONTENT_TYPE_JSON, {}))
         ref = content.get('schema', {}).get('$ref', '')
         if ref.startswith('#/components/schemas/'):
             return ref.split('/')[-1]
@@ -264,8 +269,8 @@ def add_response_examples(spec, error_examples=None):
                         # Add examples to 200 responses
                         if 'responses' in operation and '200' in operation['responses']:
                             response = operation['responses']['200']
-                            if 'content' in response and 'application/json' in response['content']:
-                                json_response = response['content']['application/json']
+                            if 'content' in response and _CONTENT_TYPE_JSON in response['content']:
+                                json_response = response['content'][_CONTENT_TYPE_JSON]
 
                                 # Add example if it references the discovered response schema
                                 if 'schema' in json_response and '$ref' in json_response['schema']:
@@ -293,8 +298,8 @@ def add_response_examples(spec, error_examples=None):
                                         for error_code in error_statuses:
                                             if error_code in operation['responses']:
                                                 error_response = operation['responses'][error_code]
-                                                if 'content' in error_response and 'application/json' in error_response['content']:
-                                                    error_json = error_response['content']['application/json']
+                                                if 'content' in error_response and _CONTENT_TYPE_JSON in error_response['content']:
+                                                    error_json = error_response['content'][_CONTENT_TYPE_JSON]
 
                                                     # Merge errorType from EBNF map into each example at injection time
                                                     if error_code in error_examples:

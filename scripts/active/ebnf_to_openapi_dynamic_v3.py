@@ -64,6 +64,72 @@ _DEFAULT_SUPPORT_EMAIL = "support@click2mail.com"
 _DEFAULT_API_TITLE    = "C2M API v2"
 _DEFAULT_API_VERSION  = "2.0.0"
 
+# ── H4: HTTP response description strings ────────────────────────────────
+# Centralised here so they can be updated without hunting through _generate_paths().
+_HTTP_STATUS_DESCRIPTIONS: Dict[str, str] = {
+    '200': "Success",
+    '400': "Bad Request - Invalid request parameters",
+    '401': "Unauthorized - Missing or invalid authentication",
+    '403': "Forbidden - Insufficient permissions",
+    '404': "Not Found - Resource not found",
+    '422': "Unprocessable Entity - Validation failed",
+    '429': "Too Many Requests - Rate limit exceeded",
+    '500': "Internal Server Error - Server encountered an error",
+}
+
+# ── M1: OpenAPI tag name / description ───────────────────────────────────
+_OPENAPI_TAG_NAME        = "jobs"
+_OPENAPI_TAG_DESCRIPTION = "Job submission endpoints"
+
+# ── M2: Security scheme name ──────────────────────────────────────────────
+_SECURITY_SCHEME_NAME = "bearerAuth"
+
+# ── M5: Shared media-type constant ───────────────────────────────────────
+_CONTENT_TYPE_JSON = "application/json"
+
+# ── H1: Operational constants used in error-detail examples ──────────────
+# These are intentional stable strings — not derivable from EBNF or OpenAPI spec.
+_ERROR_DB_TABLE            = "jobs"
+_ERROR_EXTERNAL_SERVICE    = "payment-gateway"
+_ERROR_AUTH_SCOPE_REQUIRED = "jobs:write"
+_ERROR_AUTH_SCOPE_PROVIDED = "jobs:read"
+
+
+def _load_error_code_messages() -> Dict[str, str]:
+    """H2: Load errorCode → errorMessage from error-response-examples.yaml.
+
+    Single source of truth shared with add_response_examples.py and
+    add_error_responses_to_collection.js.  Eliminates the hardcoded
+    status_to_messages dict that previously duplicated YAML content.
+    """
+    config = Path(__file__).parent.parent.parent / 'config' / 'error-response-examples.yaml'
+    try:
+        with open(config) as f:
+            raw = yaml.safe_load(f)
+        return {
+            ex['errorCode']: ex['errorMessage']
+            for status_examples in raw.values()
+            for ex in status_examples.values()
+            if isinstance(ex, dict) and 'errorCode' in ex
+        }
+    except (OSError, KeyError, TypeError):
+        return {}
+
+
+# Built once at import time — stable config file, no need to re-read per call.
+_ERROR_CODE_MESSAGES: Dict[str, str] = _load_error_code_messages()
+
+
+def _generate_tracking_id() -> str:
+    """H3: Generate a unique error tracking ID.
+
+    Format: TRK-{YYYYMMDD}-{6-char hex suffix}
+    Same format as _generate_tracking_id() in add_response_examples.py.
+    Update both if the format changes.
+    """
+    suffix = ''.join(random.choices('0123456789ABCDEF', k=6))
+    return f"TRK-{datetime.now(timezone.utc).strftime('%Y%m%d')}-{suffix}"
+
 # Structural role classifications for EBNF rules are declared via (* @structural role *)
 # annotations in the DD itself and loaded dynamically in parse_ebnf() below.
 # See _extract_structural_annotations() for the extraction logic.
@@ -488,22 +554,22 @@ class EBNFToOpenAPITranslator:
             ]),
             ("tags", [
                 {
-                    "name": "jobs",
-                    "description": "Job submission endpoints"
+                    "name": _OPENAPI_TAG_NAME,
+                    "description": _OPENAPI_TAG_DESCRIPTION,
                 }
             ]),
             ("components", OrderedDict([
                 ("schemas", schemas),
                 ("parameters", self._generate_parameters()),
                 ("securitySchemes", OrderedDict([
-                    ("bearerAuth", OrderedDict([
+                    (_SECURITY_SCHEME_NAME, OrderedDict([
                         ("type", "http"),
                         ("scheme", "bearer"),
                         ("bearerFormat", "JWT")
                     ]))
                 ]))
             ])),
-            ("security", [{"bearerAuth": []}]),
+            ("security", [{_SECURITY_SCHEME_NAME: []}]),
             ("paths", paths)
         ])
         
@@ -576,7 +642,7 @@ class EBNFToOpenAPITranslator:
             if endpoint.path not in paths:
                 paths[endpoint.path] = OrderedDict()
 
-            endpoint_tags = ["jobs"]
+            endpoint_tags = [_OPENAPI_TAG_NAME]
 
             operation = OrderedDict([
                 ("tags", endpoint_tags),
@@ -586,69 +652,69 @@ class EBNFToOpenAPITranslator:
                 ("requestBody", {
                     "required": True,
                     "content": {
-                        "application/json": {
+                        _CONTENT_TYPE_JSON: {
                             "schema": {"$ref": f"#/components/schemas/{endpoint.production_name}"}
                         }
                     }
                 }),
                 ("responses", OrderedDict([
                     ("200", {
-                        "description": "Success",
+                        "description": _HTTP_STATUS_DESCRIPTIONS['200'],
                         "content": {
-                            "application/json": {
+                            _CONTENT_TYPE_JSON: {
                                 "schema": {"$ref": "#/components/schemas/standardResponse"}
                             }
                         }
                     }),
                     ("400", {
-                        "description": "Bad Request - Invalid request parameters",
+                        "description": _HTTP_STATUS_DESCRIPTIONS['400'],
                         "content": {
-                            "application/json": {
+                            _CONTENT_TYPE_JSON: {
                                 "schema": {"$ref": "#/components/schemas/errorResponse"},
                                 "examples": self._generate_error_examples("400", endpoint)
                             }
                         }
                     }),
                     ("401", {
-                        "description": "Unauthorized - Missing or invalid authentication",
+                        "description": _HTTP_STATUS_DESCRIPTIONS['401'],
                         "content": {
-                            "application/json": {
+                            _CONTENT_TYPE_JSON: {
                                 "schema": {"$ref": "#/components/schemas/errorResponse"},
                                 "examples": self._generate_error_examples("401", endpoint)
                             }
                         }
                     }),
                     ("403", {
-                        "description": "Forbidden - Insufficient permissions",
+                        "description": _HTTP_STATUS_DESCRIPTIONS['403'],
                         "content": {
-                            "application/json": {
+                            _CONTENT_TYPE_JSON: {
                                 "schema": {"$ref": "#/components/schemas/errorResponse"},
                                 "examples": self._generate_error_examples("403", endpoint)
                             }
                         }
                     }),
                     ("404", {
-                        "description": "Not Found - Resource not found",
+                        "description": _HTTP_STATUS_DESCRIPTIONS['404'],
                         "content": {
-                            "application/json": {
+                            _CONTENT_TYPE_JSON: {
                                 "schema": {"$ref": "#/components/schemas/errorResponse"},
                                 "examples": self._generate_error_examples("404", endpoint)
                             }
                         }
                     }),
                     ("422", {
-                        "description": "Unprocessable Entity - Validation failed",
+                        "description": _HTTP_STATUS_DESCRIPTIONS['422'],
                         "content": {
-                            "application/json": {
+                            _CONTENT_TYPE_JSON: {
                                 "schema": {"$ref": "#/components/schemas/errorResponse"},
                                 "examples": self._generate_error_examples("422", endpoint)
                             }
                         }
                     }),
                     ("500", {
-                        "description": "Internal Server Error - Server encountered an error",
+                        "description": _HTTP_STATUS_DESCRIPTIONS['500'],
                         "content": {
-                            "application/json": {
+                            _CONTENT_TYPE_JSON: {
                                 "schema": {"$ref": "#/components/schemas/errorResponse"},
                                 "examples": self._generate_error_examples("500", endpoint)
                             }
@@ -708,38 +774,6 @@ class EBNFToOpenAPITranslator:
                 "Add it after the HTTP status aliases in data_dictionary/c2mapiv2-dd.ebnf."
             )
 
-        # Map HTTP status codes to descriptive messages
-        status_to_messages = {
-            '400': [
-                "Missing required field in request",
-                "Invalid oneOf field value",
-                "Malformed JSON in request body"
-            ],
-            '401': [
-                "Authorization header is missing or invalid",
-                "Authentication token is invalid",
-                "Authentication token has expired"
-            ],
-            '403': [
-                "Insufficient permissions to access this resource",
-                "Account has been suspended"
-            ],
-            '404': [
-                "Job not found",
-                "Requested resource does not exist"
-            ],
-            '422': [
-                "Invalid enum value provided",
-                "Mutually exclusive fields both present",
-                "Field format validation failed"
-            ],
-            '500': [
-                "Internal server error occurred",
-                "Database error occurred",
-                "External service error"
-            ]
-        }
-
         # Extract endpoint-specific field names for contextual error details
         field_names = self._extract_endpoint_field_names(endpoint)
 
@@ -748,13 +782,15 @@ class EBNFToOpenAPITranslator:
         map_entry = self.http_error_map.get(status_code, {})
         error_type = map_entry.get('errorType', 'ServerError')
         codes = map_entry.get('errorCodes', ['SERVER_ERROR'])
-        messages = status_to_messages.get(status_code, ['An error occurred'])
+
+        # H2: messages sourced from error-response-examples.yaml via _ERROR_CODE_MESSAGES
+        # (same YAML consumed by add_response_examples.py and the JS collection injector)
+        def _msg(code: str) -> str:
+            return _ERROR_CODE_MESSAGES.get(code, code.replace('_', ' ').capitalize())
 
         # Create one example per error code for this status
-        for idx, (code, message) in enumerate(zip(codes, messages)):
-            # Generate unique tracking ID
-            suffix = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
-            tracking_id = f"TRK-{datetime.now().strftime('%Y%m%d')}-{suffix}"
+        for idx, code in enumerate(codes):
+            tracking_id = _generate_tracking_id()  # H3: canonical format
 
             # Generate contextual error details
             details = self._generate_error_details(status_code, code, field_names)
@@ -764,7 +800,7 @@ class EBNFToOpenAPITranslator:
             examples[example_name] = {
                 "value": {
                     "errorType": error_type,
-                    "errorMessage": message,
+                    "errorMessage": _msg(code),
                     "errorCode": code,
                     "errorDetails": details,
                     "errorTrackingId": tracking_id
@@ -855,9 +891,8 @@ class EBNFToOpenAPITranslator:
         Unlike the YAML, it uses field_names.get() for spec-derived field names — do not
         replace with YAML loading, as that would lose the dynamic field-name resolution.
         """
-        # "operation"/"table" (DATABASE_ERROR), "service" (EXTERNAL_SERVICE_ERROR), and
-        # auth scope strings (INSUFFICIENT_PERMISSIONS) are internal constants —
-        # intentionally hardcoded, not derivable from EBNF or OpenAPI spec.
+        # H1: operational constants (_ERROR_DB_TABLE etc.) are declared at module level —
+        # not derivable from EBNF or spec, but now easy to find and update in one place.
         details_map = {
             'MISSING_REQUIRED_FIELD': {
                 "field": field_names.get('documentField', 'documentId'),
@@ -882,8 +917,8 @@ class EBNFToOpenAPITranslator:
                 "currentTime": datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
             },
             'INSUFFICIENT_PERMISSIONS': {
-                "required": "jobs:write",
-                "provided": "jobs:read"
+                "required": _ERROR_AUTH_SCOPE_REQUIRED,
+                "provided": _ERROR_AUTH_SCOPE_PROVIDED,
             },
             'ACCOUNT_SUSPENDED': {
                 "reason": "billing overdue",
@@ -923,10 +958,10 @@ class EBNFToOpenAPITranslator:
             },
             'DATABASE_ERROR': {
                 "operation": "insert",
-                "table": "jobs"
+                "table": _ERROR_DB_TABLE,
             },
             'EXTERNAL_SERVICE_ERROR': {
-                "service": "payment-gateway",
+                "service": _ERROR_EXTERNAL_SERVICE,
                 "status": "timeout"
             }
         }
@@ -1349,7 +1384,7 @@ class EBNFToOpenAPITranslator:
                 ("required", True),
                 ("schema", OrderedDict([
                     ("type", "string"),
-                    ("example", "application/json")
+                    ("example", _CONTENT_TYPE_JSON)
                 ]))
             ]))
         ])
