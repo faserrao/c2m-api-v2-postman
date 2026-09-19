@@ -84,7 +84,7 @@
     summary: "Invalid enum value"
     errorMessage: "Field contains a value not allowed by the enumeration"
     errorCode: INVALID_ENUM_VALUE
-    errorDetails: '{"field": "mailClass", "provided": "express", "allowed": ["first_class", "standard", "non_profit"]}'
+    errorDetails: '{"field": "mailClass", "provided": "express", "allowed": {mailClass_enum}}'
   mutual_exclusion:
     summary: "Mutually exclusive fields"
     errorMessage: "Request contains mutually exclusive fields"

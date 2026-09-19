@@ -5,6 +5,8 @@ Specifically targets StandardResponse to provide better mock data
 Adds both SUCCESS and ERROR response examples for mock server variety
 """
 
+import json
+import re
 import yaml
 import sys
 import copy
@@ -53,6 +55,30 @@ def _load_error_examples(examples_path):
                     'errorDetails': details
                 }
             }
+    return result
+
+
+def _resolve_enum_tokens(examples_dict: dict, spec: dict) -> dict:
+    """Replace {<field>_enum} tokens in errorDetails with spec-derived JSON arrays.
+
+    Token format: {<schemaName>_enum} — resolved to the JSON array of enum values
+    from spec.components.schemas.<schemaName>.enum.
+    Example: {mailClass_enum} → '["first_class","standard","non_profit"]'
+    Called after build_effective_error_examples() once the spec is in scope.
+    """
+    schemas = (spec.get('components') or {}).get('schemas', {})
+
+    def _replace(m):
+        field = m.group(1)
+        enum_values = schemas.get(field, {}).get('enum', [])
+        return json.dumps(enum_values) if enum_values else m.group(0)
+
+    result = copy.deepcopy(examples_dict)
+    for examples in result.values():
+        for ex_data in examples.values():
+            details = ex_data.get('value', {}).get('errorDetails', '')
+            if '{' in details:
+                ex_data['value']['errorDetails'] = re.sub(r'\{(\w+)_enum\}', _replace, details)
     return result
 
 
@@ -330,6 +356,8 @@ def main():
     print("\n🔍 Validating errorCode values against EBNF data dictionary...")
     validate_error_examples(spec, ERROR_EXAMPLES)
     effective_examples = build_effective_error_examples(spec, ERROR_EXAMPLES)
+    # Resolve {<field>_enum} tokens now that the spec is available
+    effective_examples = _resolve_enum_tokens(effective_examples, spec)
 
     # Add examples
     spec = add_response_examples(spec, effective_examples)

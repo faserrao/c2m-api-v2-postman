@@ -75,6 +75,28 @@ function loadErrorCodeMetadataFromYaml(yamlPath, supportEmail) {
 }
 
 /**
+ * Replace {<field>_enum} tokens in errorDetails strings with spec-derived JSON arrays.
+ * Token format: {<schemaName>_enum} → JSON.stringify(spec.components.schemas[schemaName].enum).
+ * Example: {mailClass_enum} → '["first_class","standard","non_profit"]'
+ * Called after the spec is loaded to resolve tokens left by loadErrorCodeMetadataFromYaml.
+ */
+function resolveEnumTokens(metadata, spec) {
+  const schemas = (spec && spec.components && spec.components.schemas) || {};
+  for (const entry of Object.values(metadata)) {
+    if (typeof entry.details === 'string' && entry.details.includes('{')) {
+      entry.details = entry.details.replace(/\{(\w+)_enum\}/g, (match, fieldName) => {
+        const schema = schemas[fieldName];
+        if (schema && Array.isArray(schema.enum) && schema.enum.length > 0) {
+          return JSON.stringify(schema.enum);
+        }
+        return match; // leave token unchanged if no enum found in spec
+      });
+    }
+  }
+  return metadata;
+}
+
+/**
  * Read the errorType enum from the OpenAPI spec.
  * Returns the array of valid errorType values, or a safe default if not found.
  */
@@ -324,6 +346,9 @@ function main() {
 
   // Load error responses from OpenAPI spec
   ERROR_RESPONSES = loadErrorResponsesFromSpec(openapiSpecPath);
+  // Resolve {field_enum} tokens now that the spec is available
+  const specForEnums = yaml.load(fs.readFileSync(openapiSpecPath, 'utf8'));
+  ERROR_CODE_METADATA = resolveEnumTokens(ERROR_CODE_METADATA, specForEnums);
 
   // Read input collection
   console.log(`Reading collection from: ${inputFile}`);
