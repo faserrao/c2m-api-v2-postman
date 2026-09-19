@@ -1,0 +1,49 @@
+# c2m_provider_aliases.yaml
+#
+# Manually maintained mapping of legacy / display strings to canonical jobOptions
+# enum values (as defined in the EBNF data dictionary).
+#
+# This file contains ONLY the _aliases blocks — human knowledge about what non-canonical
+# strings a provider or legacy system might send.  It is merged at build time with the
+# spec-derived canonical values to produce config/c2m_provider_mappings.yaml (DO NOT EDIT).
+#
+# When to update this file:
+#   - A provider starts sending a new display string or legacy alias
+#   - A legacy catalog entry uses a non-canonical form that needs normalisation
+#   - A human-readable label must be accepted in addition to the canonical snake_case value
+#
+# Do NOT add canonical values here — those come from the EBNF DD automatically.
+
+mailClass:
+  _aliases:
+    firstClass:    first_class
+    "First Class": first_class
+    "Standard":    standard
+
+color:
+  _aliases:
+    fullColor:       full_color
+    "Full Color":    full_color
+    "Black & White": black_and_white
+    grayscale:       black_and_white
+
+paperType:
+  _aliases:
+    "White 24#": white_24
+    "Glossy":    glossy
+
+printOption:
+  _aliases:
+    printing_one_side:   single_sided
+    printing_both_sides: double_sided
+    "Double Sided":      double_sided
+    "Single Sided":      single_sided
+
+envelope:
+  _aliases:
+    "#10 double window": double_window
+    windowed:            double_window
+
+layout:
+  _aliases:
+    address_on_top: address_on_first_page   # legacy name retired before GA

@@ -25,6 +25,7 @@ from ebnf_to_openapi_dynamic_v3 import EBNFToOpenAPITranslator
 
 EBNF_PATH = REPO_ROOT / "data_dictionary" / "c2mapiv2-dd.ebnf"
 PROVIDER_MAPPINGS_PATH = REPO_ROOT / "config" / "c2m_provider_mappings.yaml"
+PROVIDER_ALIASES_PATH  = REPO_ROOT / "config" / "c2m_provider_aliases.yaml"
 
 # ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -183,16 +184,35 @@ class TestDDConstraints(unittest.TestCase):
         self.assertIn("400", em)
         self.assertIn("500", em)
 
-    # ── 8. Provider mappings file ─────────────────────────────────────────────
+    # ── 8. Provider mappings (generated) + aliases (manually maintained) ─────────
+    # c2m_provider_mappings.yaml is a DO NOT EDIT derived artifact: canonical enum
+    # values come from the EBNF DD; _aliases are merged from c2m_provider_aliases.yaml.
+    # Edit c2m_provider_aliases.yaml and re-run make openapi-build to update mappings.
 
     @classmethod
     def _load_provider_mappings(cls):
         with open(PROVIDER_MAPPINGS_PATH) as f:
             return yaml.safe_load(f)
 
+    @classmethod
+    def _load_provider_aliases(cls):
+        with open(PROVIDER_ALIASES_PATH) as f:
+            return yaml.safe_load(f) or {}
+
     def test_provider_mappings_file_exists(self):
         self.assertTrue(PROVIDER_MAPPINGS_PATH.exists(),
-                        f"Missing: {PROVIDER_MAPPINGS_PATH}")
+                        f"Missing generated file: {PROVIDER_MAPPINGS_PATH} — run make openapi-build")
+
+    def test_provider_aliases_file_exists(self):
+        self.assertTrue(PROVIDER_ALIASES_PATH.exists(),
+                        f"Missing manually-maintained aliases file: {PROVIDER_ALIASES_PATH}")
+
+    def test_provider_mappings_is_generated(self):
+        """Generated file must carry the DO NOT EDIT header."""
+        header = PROVIDER_MAPPINGS_PATH.read_text(encoding="utf-8")[:200]
+        self.assertIn("DO NOT EDIT", header,
+                      "c2m_provider_mappings.yaml must carry DO NOT EDIT header — "
+                      "run make openapi-build to regenerate")
 
     def test_provider_mappings_covers_all_enum_fields(self):
         mappings = self._load_provider_mappings()
@@ -204,6 +224,7 @@ class TestDDConstraints(unittest.TestCase):
                               f"Provider mappings must cover field: {field}")
 
     def test_provider_mappings_canonical_values_match_ebnf(self):
+        """Every canonical key in the generated mappings must equal an EBNF enum value."""
         mappings = self._load_provider_mappings()
         for field in ("mailClass", "color", "paperType", "printOption",
                       "productionTime", "envelope", "documentClass", "layout"):
@@ -216,8 +237,28 @@ class TestDDConstraints(unittest.TestCase):
             with self.subTest(field=field):
                 missing = ebnf_enum - mapping_keys
                 self.assertEqual(missing, set(),
-                                 f"{field}: canonical values in EBNF not covered by "
-                                 f"provider mappings: {missing}")
+                                 f"{field}: EBNF enum values missing from generated mappings: {missing}")
+                extra = mapping_keys - ebnf_enum
+                self.assertEqual(extra, set(),
+                                 f"{field}: generated mappings contain non-EBNF values: {extra} "
+                                 f"— these should only appear as _aliases in c2m_provider_aliases.yaml")
+
+    def test_provider_aliases_values_are_canonical(self):
+        """Every alias target in the aliases file must be a valid EBNF enum value."""
+        aliases_file = self._load_provider_aliases()
+        for field, block in aliases_file.items():
+            if not isinstance(block, dict):
+                continue
+            alias_map = block.get("_aliases", {})
+            schema = self.schemas.get(field, {})
+            ebnf_enum = set(schema.get("enum", []))
+            if not ebnf_enum:
+                continue
+            for alias_str, target in alias_map.items():
+                with self.subTest(field=field, alias=alias_str):
+                    self.assertIn(target, ebnf_enum,
+                                  f"{field}: alias '{alias_str}' → '{target}' is not a valid "
+                                  f"EBNF canonical value. Valid: {sorted(ebnf_enum)}")
 
     def test_layout_alias_maps_to_canonical(self):
         mappings = self._load_provider_mappings()

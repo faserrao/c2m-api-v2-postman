@@ -801,8 +801,11 @@ generate-openapi-spec-from-ebnf-dd:
 	$(VENV_PYTHON) $(EBNF_TO_OPENAPI_SCRIPT) -o $(C2MAPIV2_OPENAPI_SPEC_BASE) $(DD_EBNF_FILE) \
 		--server-url "$(C2MAPIV2_API_URL)" \
 		--support-email "$(SUPPORT_EMAIL)" --api-title "$(API_TITLE)" --api-version "$(API_VERSION)" \
-		--faker-hints-output config/faker_hints.yaml
+		--faker-hints-output config/faker_hints.yaml \
+		--provider-mappings-output config/c2m_provider_mappings.yaml \
+		--provider-aliases config/c2m_provider_aliases.yaml
 	@echo "✅ Faker hints derived from DD @hint annotations → config/faker_hints.yaml"
+	@echo "✅ Provider mappings derived from DD enums + aliases → config/c2m_provider_mappings.yaml"
 	# --- Fix anonymous oneOf schemas to named schemas ---
 	@echo "🔧 Fixing anonymous oneOf schemas in OpenAPI spec..."
 	$(VENV_PYTHON) $(SCRIPTS_DIR)/active/fix_openapi_oneOf_schemas.py $(C2MAPIV2_OPENAPI_SPEC_BASE) $(C2MAPIV2_OPENAPI_SPEC_BASE)
