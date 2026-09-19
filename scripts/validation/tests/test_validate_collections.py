@@ -169,6 +169,27 @@ def test_synthetic_faults():
           any("missing required field 'pdfSplitJobsWithAddress'" in x for x in e),
           "/batch/split wrong names -> flags both missing required fields")
 
+    # 3i. V5 — cross-field page-range constraint
+    from validate_collections_against_spec import page_range_errors
+    # startPage > endPage must be caught
+    bad_range = {"pdfSplitJobsNoAddress": [{"startPage": 9, "endPage": 3}]}
+    e = page_range_errors(bad_range)
+    check(any("startPage (9) must be <= endPage (3)" in x for x in e),
+          "V5: startPage > endPage -> caught")
+    # startPage < 1 must be caught
+    bad_zero = {"pdfSplitJobsNoAddress": [{"startPage": 0, "endPage": 5}]}
+    e = page_range_errors(bad_zero)
+    check(any("must be >= 1" in x for x in e),
+          "V5: startPage = 0 -> caught")
+    # Placeholder values must be skipped (no false positives on typed collection)
+    ph_range = {"pdfSplitJobsNoAddress": [{"startPage": "<integer>", "endPage": "<integer>"}]}
+    check(page_range_errors(ph_range) == [],
+          "V5: placeholder startPage/endPage -> no false positives")
+    # Valid range must pass
+    ok_range = {"pdfSplitJobsNoAddress": [{"startPage": 3, "endPage": 9}]}
+    check(page_range_errors(ok_range) == [],
+          "V5: valid startPage < endPage -> no errors")
+
 
 def main():
     print("=" * 74)

@@ -116,6 +116,40 @@ def has_placeholder(obj):
     return False
 
 
+_JOB_ARRAY_FIELDS = ("pdfSplitJobsWithAddress", "pdfSplitJobsNoAddress")
+
+
+def page_range_errors(body):
+    """V5: cross-field constraint — startPage must be < endPage for every job item.
+    Enforces the DD rule: IF startPage > endPage THEN reject.
+    Skips items that contain placeholder values (typed collection)."""
+    errors = []
+    for field in _JOB_ARRAY_FIELDS:
+        jobs = body.get(field)
+        if not isinstance(jobs, list):
+            continue
+        for i, job in enumerate(jobs):
+            if not isinstance(job, dict):
+                continue
+            start = job.get("startPage")
+            end = job.get("endPage")
+            # Skip if either value is a placeholder
+            if PLACEHOLDER.search(str(start)) or PLACEHOLDER.search(str(end)):
+                continue
+            if not isinstance(start, int) or not isinstance(end, int):
+                continue
+            if start < 1:
+                errors.append(f"body.{field}[{i}].startPage: must be >= 1, got {start}")
+            if end < 1:
+                errors.append(f"body.{field}[{i}].endPage: must be >= 1, got {end}")
+            if isinstance(start, int) and isinstance(end, int) and start >= 1 and end >= 1:
+                if start > end:
+                    errors.append(
+                        f"body.{field}[{i}]: startPage ({start}) must be <= endPage ({end})"
+                    )
+    return errors
+
+
 def structural_errors(value, schema, spec, loc="body", strict_unknown=True):
     """
     Return a list of structural error strings for `value` against `schema`.
@@ -306,6 +340,7 @@ def validate_collection(spec, collection, path_prefix, strict_unknown):
             continue
         rec["mode"] = "structure(placeholders)" if has_placeholder(body) else "structure(values)"
         errs = structural_errors(body, schema, spec, "body", strict_unknown)
+        errs += page_range_errors(body)
         if errs:
             rec["status"] = "FAIL"
             rec["errors"] = errs

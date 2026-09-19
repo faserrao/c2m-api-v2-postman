@@ -197,6 +197,43 @@ def endpoint_schema(spec: Dict, path: str, method: str) -> Optional[Dict]:
 
 
 # --------------------------------------------------------------------------- #
+# Cross-field constraint checks                                               #
+# --------------------------------------------------------------------------- #
+_JOB_ARRAY_FIELDS = ("pdfSplitJobsWithAddress", "pdfSplitJobsNoAddress")
+
+
+def page_range_errors(body: Any) -> List[str]:
+    """V5: startPage must be <= endPage for every split-job item.
+    Enforces DD rule: IF startPage > endPage THEN reject.
+    Skips items that contain placeholder values."""
+    errors = []
+    if not isinstance(body, dict):
+        return errors
+    for field in _JOB_ARRAY_FIELDS:
+        jobs = body.get(field)
+        if not isinstance(jobs, list):
+            continue
+        for i, job in enumerate(jobs):
+            if not isinstance(job, dict):
+                continue
+            start = job.get("startPage")
+            end = job.get("endPage")
+            if is_placeholder(start) or is_placeholder(end):
+                continue
+            if not isinstance(start, int) or not isinstance(end, int):
+                continue
+            if start < 1:
+                errors.append(f"body.{field}[{i}].startPage: must be >= 1, got {start}")
+            if end < 1:
+                errors.append(f"body.{field}[{i}].endPage: must be >= 1, got {end}")
+            if start >= 1 and end >= 1 and start > end:
+                errors.append(
+                    f"body.{field}[{i}]: startPage ({start}) must be <= endPage ({end})"
+                )
+    return errors
+
+
+# --------------------------------------------------------------------------- #
 # Core validator                                                               #
 # --------------------------------------------------------------------------- #
 def validate_value(
@@ -370,6 +407,7 @@ def validate_collection(spec: Dict, collection: Dict, check_enums: bool = True) 
 
         alias_note = f" (aliased from {path})" if aliased else ""
         errs = validate_value(body, schema, spec, "body", check_enums=check_enums)
+        errs += page_range_errors(body)
         results.append({
             **req,
             "status": FAIL if errs else PASS,
