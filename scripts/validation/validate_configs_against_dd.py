@@ -471,6 +471,133 @@ def validate_error_response_codes(error_examples_path: Path, spec_path: Path,
         print(f"  ✗ {len(bad)} invalid errorCode value(s) found")
 
 
+# ── V8 check (require spec) ──────────────────────────────────────────────────
+
+def _collect_spec_disc_pairs(spec: dict) -> dict:
+    """Build parent_schema → set[disc_key] for all discriminated oneOf schemas.
+
+    A discriminator key is the sole required property in a oneOf branch
+    (the named-wrapper pattern used throughout the spec). Follows $ref and
+    array item chains one level so that array-of-oneOf schemas (e.g.
+    documentsToMerge → items → mergeDocumentRef) are attributed to the
+    array schema (and to any schema that $refs it).
+    """
+    schemas = (spec.get('components') or {}).get('schemas', {})
+
+    # Pass 1: schemas that directly own a oneOf
+    direct: dict = {}
+    for sname, schema in schemas.items():
+        s = schemas.get(schema.get('$ref', '').split('/')[-1], schema) if '$ref' in schema else schema
+        for branch in s.get('oneOf', []):
+            req = branch.get('required', [])
+            props = branch.get('properties', {})
+            if len(req) == 1 and req[0] in props:
+                direct.setdefault(sname, set()).add(req[0])
+
+    result: dict = {k: set(v) for k, v in direct.items()}
+
+    # Pass 2: array schemas whose items have oneOf
+    for sname, schema in schemas.items():
+        resolved = schemas.get(schema.get('$ref', '').split('/')[-1], schema) if '$ref' in schema else schema
+        if resolved.get('type') == 'array':
+            item_ref = resolved.get('items', {}).get('$ref', '')
+            if item_ref:
+                item_name = item_ref.split('/')[-1]
+                if item_name in direct:
+                    result.setdefault(sname, set()).update(direct[item_name])
+
+    # Pass 3: $ref schemas whose target is an array → propagate item disc_keys
+    for sname, schema in schemas.items():
+        if '$ref' in schema:
+            ref_name = schema['$ref'].split('/')[-1]
+            ref_schema = schemas.get(ref_name, {})
+            if ref_schema.get('type') == 'array':
+                item_ref = ref_schema.get('items', {}).get('$ref', '')
+                if item_ref:
+                    item_name = item_ref.split('/')[-1]
+                    if item_name in direct:
+                        result.setdefault(sname, set()).update(direct[item_name])
+
+    return result
+
+
+def _walk_disc_candidates(obj: object, pairs: set) -> None:
+    """Walk a values: block recursively, collecting (parent_key, disc_candidate) pairs.
+
+    A disc_candidate is any key whose value is a non-empty dict.  The caller
+    filters this set against all_disc_keys to discard regular nested fields.
+    """
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            if isinstance(v, dict):
+                for sk, sv in v.items():
+                    if isinstance(sv, dict) and sv:
+                        pairs.add((k, sk))
+                _walk_disc_candidates(v, pairs)
+            elif isinstance(v, list):
+                for item in v:
+                    if isinstance(item, dict):
+                        for sk, sv in item.items():
+                            if isinstance(sv, dict) and sv:
+                                pairs.add((k, sk))
+                        _walk_disc_candidates(item, pairs)
+    elif isinstance(obj, list):
+        for item in obj:
+            _walk_disc_candidates(item, pairs)
+
+
+def validate_template_inline_discriminators(template_path: Path, spec_path: Path,
+                                            result: ValidationResult) -> None:
+    """V8: Verify inline oneOf discriminator keys in template values: blocks are valid.
+
+    V3a checks that every key in values: blocks is a DD rule name — this catches
+    renames and removals. V8 adds context-aware validation: for each discriminator
+    key that IS still valid in the spec, verify it is used under a parent field that
+    actually has that discriminator in its oneOf schema (catching 'moved to wrong
+    schema' regressions that V3a cannot see).
+
+    Only keys that appear as current spec discriminators are checked; regular nested
+    field keys (e.g. recipientAddressSource inside a list item) are silently skipped.
+    """
+    import yaml
+    with open(spec_path) as f:
+        spec = yaml.safe_load(f)
+
+    valid_by_parent = _collect_spec_disc_pairs(spec)
+    all_disc_keys: set = set().union(*valid_by_parent.values()) if valid_by_parent else set()
+
+    template = _load_yaml(template_path)
+    file_label = template_path.name
+
+    candidate_pairs: set = set()
+    for example in template.get('examples', []):
+        _walk_disc_candidates(example.get('values', {}), candidate_pairs)
+
+    # Only check pairs where the candidate key is a current spec discriminator
+    to_check = [(p, d) for p, d in candidate_pairs if d in all_disc_keys]
+    if not to_check:
+        print(f"  ℹ  No inline discriminator keys found in {file_label} values: blocks")
+        return
+
+    print(f"  Checking {len(to_check)} inline discriminator key usage(s) in {file_label}...")
+    bad = []
+    for parent_key, disc_key in sorted(to_check):
+        valid_for_parent = disc_key in valid_by_parent.get(parent_key, set())
+        if not valid_for_parent:
+            valid_parents = sorted(
+                p for p, keys in valid_by_parent.items() if disc_key in keys
+            )
+            msg = (f"discriminator key '{disc_key}' is not valid under '{parent_key}' "
+                   f"in the spec. Valid parents: {valid_parents}")
+            result.error(file_label, f"values.{parent_key}.{disc_key}", msg)
+            bad.append(f"{parent_key}.{disc_key}")
+
+    if not bad:
+        print(f"  ✓ All {len(to_check)} inline discriminator key(s) are valid for their parent schema")
+    else:
+        print(f"  ✗ {len(bad)} discriminator key(s) used under wrong parent schema")
+
+
 # ── main ─────────────────────────────────────────────────────────────────────
 
 def _default_path(env_var: str, fallback: str) -> Path:
@@ -572,6 +699,9 @@ def main():
 
         print(f"\n🔍 Checking template example paths against spec operations (V7):")
         validate_example_paths(template_path, spec_path, result)
+
+        print(f"\n🔍 Checking template inline discriminator key contexts (V8):")
+        validate_template_inline_discriminators(template_path, spec_path, result)
     else:
         print(f"\n⚠  Skipping select: validation — spec not found at {spec_path}")
         print(f"   (Run openapi-build first, or pass --spec <path>)")

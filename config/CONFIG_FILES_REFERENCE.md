@@ -364,14 +364,7 @@ examples:
 | `path:` strings (`/static`, `/mail-merge`, etc.) | `path: /batch/split/address-capture` | V7 in `validate_configs_against_dd.py` — every path checked against spec operations at `make validate-configs` |
 | `select:` values (oneOf variant names) | `docSourceAll: requestIdSource` | V3 in `validate_configs_against_dd.py` — every select entry checked against spec oneOf at `make validate-configs` |
 | `values:` key names (DD rule names) | `pdfSplitJobsNoAddress`, `mergeDocumentSource` | V3a in `validate_configs_against_dd.py` |
-| Inline branch discriminator keys in `values:` | `mergeByRequestId:`, `docSourceZipFileRef:` | **No direct gate** — caught indirectly by conformance gate if generator produces wrong body |
-
-**Known remaining gap:** Inline oneOf branch discriminator keys nested inside `values:`
-(e.g. `mergeByRequestId`, `zipRequestIdOnly`, `docSourceZipFileRef`) are oneOf branch
-names from the spec. They are not explicitly validated by the config validator — they
-are covered only indirectly: if a branch name drifts, the generator will produce a body
-the conformance gate rejects. Adding explicit validation would require recursive oneOf
-resolution of the `values:` tree, which is complex. Tracked as a future improvement.
+| Inline branch discriminator keys in `values:` | `mergeByRequestId:`, `zipRequestIdOnly:` | V8 in `validate_configs_against_dd.py` — validates each discriminator key is used under a valid parent schema |
 
 ---
 
@@ -465,13 +458,9 @@ automated derivation complex. It will silently drift if the `mailClass` enum cha
 
 ---
 
-## Known Gaps (No Direct Validation Gate)
+## Known Gaps
 
-One remaining category of hardcoded DD-derived values has no explicit validation check:
-
-| File | Location | Issue | Indirect coverage |
-|---|---|---|---|
-| `getting-started-template.yaml` | Inline branch discriminator keys inside `values:` blocks (e.g. `mergeByRequestId:`, `zipRequestIdOnly:`, `docSourceZipFileRef:`) | These are oneOf branch names from the spec, used as nested object keys inside `values:`. Not validated by any config check. | Conformance gate: if a branch name drifts, the generator produces a body the conformance test rejects |
+No known remaining gaps. All hardcoded DD-derived values are validated at `make validate-configs` time by V1–V8. The conformance gate (`make validate-collections-conformance-gate-all`) provides a second backstop at collection-generation time.
 
 ---
 
