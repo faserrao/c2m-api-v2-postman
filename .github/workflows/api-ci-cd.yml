@@ -319,7 +319,7 @@ jobs:
       - name: Upload Validation Reports
         continue-on-error: true  # A storage-quota hit here must NOT skip the artifacts-repo push below
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v4
         with:
           name: validation-reports
           path: reports/**
@@ -419,7 +419,7 @@ jobs:
       # ---------- Upload artifacts ----------
       - name: Upload build artifacts
         continue-on-error: true  # Non-essential; a storage-quota hit must NOT fail the run or block Pages
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v4
         with:
           name: api-artifacts
           path: |
