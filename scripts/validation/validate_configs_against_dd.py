@@ -375,6 +375,48 @@ def validate_catalog_joboptions_enums(catalog_path: Path, spec_path: Path,
         print(f"  ✗ {len(bad)} invalid jobOptions enum value(s) found")
 
 
+def validate_example_paths(config_path: Path, spec_path: Path,
+                           result: ValidationResult) -> None:
+    """V7: Verify every example path in a config file exists as a spec operation.
+
+    Catches path drift when the DD renames or removes an endpoint but the
+    config file is not updated. Applies to both catalog and template.
+    """
+    import yaml
+    with open(spec_path) as f:
+        spec = yaml.safe_load(f)
+
+    spec_operations: set = set()
+    for path, path_item in (spec.get('paths') or {}).items():
+        for method in ('get', 'post', 'put', 'patch', 'delete', 'head', 'options'):
+            if method in (path_item or {}):
+                spec_operations.add((method.upper(), path))
+
+    config = _load_yaml(config_path)
+    file_label = config_path.name
+    total = 0
+    bad = []
+
+    print(f"  Checking example paths in {file_label} against {spec_path.name}...")
+    for example in config.get('examples', []):
+        ex_name = example.get('name', '<unnamed>')
+        method = (example.get('method') or 'POST').upper()
+        path = example.get('path')
+        if not path:
+            continue
+        total += 1
+        if (method, path) not in spec_operations:
+            msg = (f"'{method} {path}' does not exist in the spec "
+                   f"(example: '{ex_name}')")
+            result.error(file_label, "path", msg)
+            bad.append(f"{method} {path}")
+
+    if not bad:
+        print(f"  ✓ All {total} example path(s) exist in the spec")
+    else:
+        print(f"  ✗ {len(bad)} invalid path(s) found")
+
+
 def validate_error_response_codes(error_examples_path: Path, spec_path: Path,
                                   result: ValidationResult) -> None:
     """V6: Build-time check that all errorCode values in error-response-examples.yaml
@@ -524,6 +566,12 @@ def main():
 
         print(f"\n🔍 Checking error-response-examples.yaml errorCode values against spec (V6):")
         validate_error_response_codes(error_examples_path, spec_path, result)
+
+        print(f"\n🔍 Checking catalog example paths against spec operations (V7):")
+        validate_example_paths(catalog_path, spec_path, result)
+
+        print(f"\n🔍 Checking template example paths against spec operations (V7):")
+        validate_example_paths(template_path, spec_path, result)
     else:
         print(f"\n⚠  Skipping select: validation — spec not found at {spec_path}")
         print(f"   (Run openapi-build first, or pass --spec <path>)")

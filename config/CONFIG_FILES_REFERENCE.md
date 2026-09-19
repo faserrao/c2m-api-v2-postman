@@ -349,16 +349,29 @@ examples:
 ```
 
 **Key rules:**
-- All `values:` entries use type placeholders (`<String>`, `<Integer>`) — no hardcoded
-  enum values. The linked collection generator replaces these with faker_hints values;
-  the test collection generator uses `addRandomDataToRaw.js`.
+- All `values:` leaf entries use type placeholders (`<String>`, `<Integer>`) — no
+  hardcoded enum values. The linked collection generator replaces these with
+  faker_hints values; the test collection generator uses `addRandomDataToRaw.js`.
 - The `faker_hints:` section was removed from this file in September 2026; hints now
   live in the EBNF DD as `@hint` annotations and are derived into `faker_hints.yaml`.
 - The `groups:` list controls the Getting Started folder layout (separate from the
   `groups:` list in `curated-examples-catalog.yaml`).
 
-**Hardcoded values that must stay:** None. All values are type placeholders (`<String>`,
-`<Integer>`). This file contains no hardcoded DD enum values.
+**Hardcoded DD-derived values and their validation gates:**
+
+| Value category | Example | Validated by |
+|---|---|---|
+| `path:` strings (`/static`, `/mail-merge`, etc.) | `path: /batch/split/address-capture` | V7 in `validate_configs_against_dd.py` — every path checked against spec operations at `make validate-configs` |
+| `select:` values (oneOf variant names) | `docSourceAll: requestIdSource` | V3 in `validate_configs_against_dd.py` — every select entry checked against spec oneOf at `make validate-configs` |
+| `values:` key names (DD rule names) | `pdfSplitJobsNoAddress`, `mergeDocumentSource` | V3a in `validate_configs_against_dd.py` |
+| Inline branch discriminator keys in `values:` | `mergeByRequestId:`, `docSourceZipFileRef:` | **No direct gate** — caught indirectly by conformance gate if generator produces wrong body |
+
+**Known remaining gap:** Inline oneOf branch discriminator keys nested inside `values:`
+(e.g. `mergeByRequestId`, `zipRequestIdOnly`, `docSourceZipFileRef`) are oneOf branch
+names from the spec. They are not explicitly validated by the config validator — they
+are covered only indirectly: if a branch name drifts, the generator will produce a body
+the conformance gate rejects. Adding explicit validation would require recursive oneOf
+resolution of the `values:` tree, which is complex. Tracked as a future improvement.
 
 ---
 
@@ -447,20 +460,18 @@ automated derivation complex. It will silently drift if the `mailClass` enum cha
 | `c2m_provider_mappings.yaml` | **Generated** | No — DO NOT EDIT | EBNF DD enums + `c2m_provider_aliases.yaml` | `test_dd_constraints.py` (golden tests) |
 | `c2m_provider_aliases.yaml` | Manual | Yes | Human knowledge (legacy strings) | `test_dd_constraints.py` (alias targets must be valid DD values) |
 | `curated-examples-catalog.yaml` | Manual | Yes | Human-curated examples | `validate_configs_against_dd.py`, `validate_catalog_against_spec.py` |
-| `getting-started-template.yaml` | Manual | Yes | Human-curated structure | `validate_configs_against_dd.py` |
+| `getting-started-template.yaml` | Manual | Yes | Human-curated structure | `validate_configs_against_dd.py` (V3, V3a, V7) |
 | `error-response-examples.yaml` | Manual | Yes | Human-curated error scenarios | Runtime check in `add_response_examples.py` |
 
 ---
 
-## Known Gaps (No Validation Gate)
+## Known Gaps (No Direct Validation Gate)
 
-These are hardcoded DD values in manually-maintained files that have no automated check
-to catch drift if the DD changes:
+One remaining category of hardcoded DD-derived values has no explicit validation check:
 
-| File | Location | Issue |
-|---|---|---|
-| `curated-examples-catalog.yaml` | `jobOptions` block in "Using jobOptions Instead of Template" | 8 enum values (`documentClass`, `layout`, `productionTime`, `envelope`, `color`, `paperType`, `printOption`, `mailClass`) hardcoded without DD validation |
-| `error-response-examples.yaml` | 422 `invalid_enum_value.errorDetails` | `"allowed": ["first_class", "standard", "non_profit"]` hardcodes `mailClass` enum values in a JSON string |
+| File | Location | Issue | Indirect coverage |
+|---|---|---|---|
+| `getting-started-template.yaml` | Inline branch discriminator keys inside `values:` blocks (e.g. `mergeByRequestId:`, `zipRequestIdOnly:`, `docSourceZipFileRef:`) | These are oneOf branch names from the spec, used as nested object keys inside `values:`. Not validated by any config check. | Conformance gate: if a branch name drifts, the generator produces a body the conformance test rejects |
 
 ---
 
