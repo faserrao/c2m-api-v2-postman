@@ -195,6 +195,7 @@ POSTMAN_ENVIRONMENTS_URL         := $(POSTMAN_BASE_URL)/environments
 # ========================================================================
 #--- Postman Mock Variables ---
 POSTMAN_MOCK_NAME                := $(POSTMAN_API_NAME)MockServer
+POSTMAN_LINKED_MOCK_NAME         := Linked Mock Server
 POSTMAN_MOCK_PAYLOAD             := $(POSTMAN_DIR)/mock-payload.json
 POSTMAN_MOCK_DEBUG               := $(POSTMAN_DIR)/mock-debug.json
 POSTMAN_MOCK_VALIDATE            := $(POSTMAN_DIR)/mock-validate.json
@@ -1884,7 +1885,7 @@ update-mock-env:
 	@curl --silent --show-error --fail --location \
 		--request PUT "$(POSTMAN_MOCKS_URL)/$(POSTMAN_MOCK_ID)" \
 		$(POSTMAN_CURL_HEADERS_XC) \
-		--data-raw "$$(jq -n --arg coll "$$(cat $(POSTMAN_TEST_COLLECTION_UID_FILE))" --arg env "$(POSTMAN_ENV_UID)" '{ "mock": { "name": "C2mApiV2MockServer", "collection": $$coll, "environment": $$env, "description": "Mock server with TEST Collection (all endpoints).", "private": false } }')" \
+		--data-raw "$$(jq -n --arg name "$(POSTMAN_MOCK_NAME)" --arg coll "$$(cat $(POSTMAN_TEST_COLLECTION_UID_FILE))" --arg env "$(POSTMAN_ENV_UID)" '{ "mock": { "name": $$name, "collection": $$coll, "environment": $$env, "description": "Mock server with TEST Collection (all endpoints).", "private": false } }')" \
 		--output /dev/null \
 		&& echo "✅ Mock server environment updated." \
 		|| (echo "❌ Failed to update mock server. Check UID/ID values and API key." && exit 1)
@@ -2026,8 +2027,8 @@ postman-link-env-to-mock-server:
 	echo "📦 Linking Environment $$POSTMAN_ENV_UID with TEST Collection $$COLLECTION_UID (Mock $$POSTMAN_MOCK_UID)..."; \
 	curl --silent --location --request PUT "$(POSTMAN_MOCKS_URL)/$$POSTMAN_MOCK_UID" \
 		$(POSTMAN_CURL_HEADERS_XC) \
-		--data-raw "$$(jq -n --arg coll $$COLLECTION_UID --arg env $$POSTMAN_ENV_UID \
-			'{ mock: { name: "Linked Mock Server", collection: $$coll, environment: $$env, private: false } }')" \
+		--data-raw "$$(jq -n --arg name "$(POSTMAN_LINKED_MOCK_NAME)" --arg coll $$COLLECTION_UID --arg env $$POSTMAN_ENV_UID \
+			'{ mock: { name: $$name, collection: $$coll, environment: $$env, private: false } }')" \
 		-o "$$LINK_DEBUG"; \
 	if jq -e '.mock' "$$LINK_DEBUG" >/dev/null; then \
 		echo "✅ Environment linked to mock server successfully."; \

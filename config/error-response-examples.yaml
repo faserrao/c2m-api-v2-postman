@@ -10,6 +10,15 @@
 #   - errorTrackingId is NOT included here — generated dynamically per invocation
 #   - Use {timestamp} in errorDetails for current UTC time
 #   - Use {expired} in errorDetails for 1 hour ago (token-expiry context)
+#
+# Documented hardcoded values (intentionally stable — no spec source):
+#   - 400 missing_field: "documentId" — representative example field name (any valid DD field)
+#   - 403 insufficient_permissions: "jobs:write" — must match _ERROR_AUTH_SCOPE_REQUIRED
+#     constant in ebnf_to_openapi_dynamic_v3.py (currently "jobs:write")
+#   - 500 external_service_error: "address-validation" — must match _ERROR_EXTERNAL_SERVICE
+#     constant in ebnf_to_openapi_dynamic_v3.py (currently "address-validation")
+#   - 429 rate_limit_exceeded: "100 requests/minute" / 60 — rate-limit policy values;
+#     update here when the API rate limits change
 
 400:
   missing_field:

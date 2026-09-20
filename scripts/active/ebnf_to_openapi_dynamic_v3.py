@@ -99,7 +99,7 @@ _CONTENT_TYPE_JSON = "application/json"
 # ── H1: Operational constants used in error-detail examples ──────────────
 # These are intentional stable strings — not derivable from EBNF or OpenAPI spec.
 _ERROR_DB_TABLE            = "jobs"
-_ERROR_EXTERNAL_SERVICE    = "payment-gateway"
+_ERROR_EXTERNAL_SERVICE    = "address-validation"  # BUG fix: aligned with error-response-examples.yaml
 _ERROR_AUTH_SCOPE_REQUIRED = "jobs:write"
 _ERROR_AUTH_SCOPE_PROVIDED = "jobs:read"
 # H1: Fallback used when the @mutual_exclusion annotation is absent from the EBNF DD.

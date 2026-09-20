@@ -820,14 +820,16 @@ def _expand_to_leaves(
             )
 
 
-def build_endpoint_expanded_rows(rules: dict) -> dict:
+def build_endpoint_expanded_rows(rules: dict, endpoint_map: dict | None = None) -> dict:
     """
-    Return {endpoint_rule_name: [leaf_rows]} for every endpoint in _ENDPOINT_MAP.
+    Return {endpoint_rule_name: [leaf_rows]} for every endpoint in the given map.
 
     Each leaf row: {path, type, required, description}
+    Falls back to the module-level _ENDPOINT_MAP if endpoint_map is not provided.
     """
+    em = endpoint_map if endpoint_map is not None else _ENDPOINT_MAP
     result: dict = {}
-    for rule_name in _ENDPOINT_MAP:
+    for rule_name in em:
         if rule_name not in rules:
             continue
         rule = rules[rule_name]
@@ -845,8 +847,10 @@ def build_endpoint_expanded_rows(rules: dict) -> dict:
 # ---------------------------------------------------------------------------
 
 def write_endpoint_expanded_md(
-    endpoint_rows: dict, out_path: "Path", ebnf_path: "Path", api_title: str | None = None,
+    endpoint_rows: dict, out_path: "Path", ebnf_path: "Path",
+    endpoint_map: dict | None = None, api_title: str | None = None,
 ) -> None:
+    em = endpoint_map if endpoint_map is not None else _ENDPOINT_MAP
     _title = api_title or "C2M API v2"
     lines = [
         f"# {_title} — Endpoint Field Reference (Expanded to Primitives)",
@@ -864,10 +868,10 @@ def write_endpoint_expanded_md(
         "",
     ]
 
-    for rule_name in _ENDPOINT_MAP:
+    for rule_name in em:
         if rule_name not in endpoint_rows:
             continue
-        method, ep_path = _ENDPOINT_MAP[rule_name]
+        method, ep_path = em[rule_name]
         rows = endpoint_rows[rule_name]
 
         lines += [
@@ -898,13 +902,16 @@ def write_endpoint_expanded_md(
     print(f"  ✅ {out_path}")
 
 
-def write_endpoint_expanded_csv(endpoint_rows: dict, out_path: "Path") -> None:
+def write_endpoint_expanded_csv(
+    endpoint_rows: dict, out_path: "Path", endpoint_map: dict | None = None,
+) -> None:
+    em = endpoint_map if endpoint_map is not None else _ENDPOINT_MAP
     fieldnames = ["method", "endpoint", "field_path", "description", "type", "required"]
     with out_path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         for rule_name, rows in endpoint_rows.items():
-            method, ep_path = _ENDPOINT_MAP[rule_name]
+            method, ep_path = em[rule_name]
             for row in rows:
                 writer.writerow({
                     "method": method,
@@ -1031,7 +1038,9 @@ def main() -> int:
         print(f"❌ EBNF file not found: {ebnf_path}", file=sys.stderr)
         return 1
 
-    # Replace built-in _ENDPOINT_MAP with spec-derived version when --spec is given.
+    # Derive the effective endpoint map — spec-provided takes precedence over built-in.
+    # _category() and build_rows() still reference _ENDPOINT_MAP via the global; the
+    # explicit `endpoint_map` param threads it to the expanded-endpoint writers below.
     api_title: str | None = None
     global _ENDPOINT_MAP
     if args.spec:
@@ -1066,15 +1075,16 @@ def main() -> int:
     write_csv(rows, out_dir / "data-dictionary-table.csv")
 
     print(f"🔍 Expanding endpoints to primitive leaves...")
-    endpoint_rows = build_endpoint_expanded_rows(rules)
+    endpoint_rows = build_endpoint_expanded_rows(rules, endpoint_map=_ENDPOINT_MAP)
     total_leaf = sum(len(r) for r in endpoint_rows.values())
     print(f"   {len(endpoint_rows)} endpoints → {total_leaf} leaf-field rows.")
     write_endpoint_expanded_md(
         endpoint_rows, out_dir / "data-dictionary-endpoints-expanded.md", ebnf_path,
-        api_title=api_title,
+        endpoint_map=_ENDPOINT_MAP, api_title=api_title,
     )
     write_endpoint_expanded_csv(
         endpoint_rows, out_dir / "data-dictionary-endpoints-expanded.csv",
+        endpoint_map=_ENDPOINT_MAP,
     )
 
     return 0

@@ -4,6 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
 
+const CONTENT_TYPE_JSON = 'application/json';  // P4: shared constant, avoids raw string repetition
+
 // Parse command line arguments
 const rawArgs = process.argv.slice(2);
 let authOverlayArg = null;
@@ -95,7 +97,7 @@ function updateAuthEndpoints(items) {
         if (!contentTypeHeader) {
           item.request.header.push({
             key: 'Content-Type',
-            value: 'application/json'
+            value: CONTENT_TYPE_JSON
           });
         }
         // The security server requires X-Client-Id for the ClientKey scheme.

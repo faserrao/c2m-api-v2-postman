@@ -102,12 +102,20 @@ function discoverOneOfFields(specPath) {
             console.log(`Discovered ${Object.keys(enumPlaceholders).length} jobOptions enum placeholders`);
         }
 
-        // HC3: derive job array field names from spec at runtime (type: array schemas
-        // whose names contain "Job") instead of a hardcoded list.
-        const jobArrayFields = Object.entries(
-            (spec.components && spec.components.schemas) || {}
-        ).filter(([name, schema]) => schema.type === 'array' && /Job/.test(name))
-         .map(([name]) => name);
+        // HC3: derive job array field names from spec at runtime.
+        // Two cases:
+        //   1. Named-array schemas containing "Job" (e.g. pdfSplitJobsNoAddress)
+        //   2. $ref aliases to array schemas (e.g. mergeDocumentSource → documentsToMerge type:array)
+        const allSchemas = (spec.components && spec.components.schemas) || {};
+        const arraySchemaNames = new Set(
+            Object.entries(allSchemas).filter(([, s]) => s.type === 'array').map(([n]) => n)
+        );
+        const jobArrayFields = Object.entries(allSchemas)
+            .filter(([name, schema]) =>
+                (schema.type === 'array' && /Job/.test(name)) ||
+                (schema.$ref && arraySchemaNames.has((schema.$ref || '').split('/').pop()))
+            )
+            .map(([name]) => name);
         console.log(`Discovered ${jobArrayFields.length} job array fields from spec: ${jobArrayFields.join(', ')}`);
 
         return { oneOfFields, crossFieldRules, enumPlaceholders, jobArrayFields };
