@@ -191,20 +191,30 @@ def test_synthetic_faults():
     check(len(e) > 0,
           "/static with empty docSourceAll -> should flag error")
 
-    # 3k. Invalid enum value via K-V4 must be caught
-    bad_enum_body = {"docSourceAll": {"documentIdSource": {"documentId": 1}},
-                     "recipientAddressSource": {"singleAddress": clean_addr},
-                     "jobOptions": {"mailClass": "INVALID_VALUE"}}
-    e = errs_for("/static", bad_enum_body)
+    # 3k/3l. K-V4 enum checking — jobOptions requires all 8 fields per spec,
+    # so both tests use a complete jobOptions block to avoid required-field noise.
+    full_joboptions = {
+        "mailClass": "first_class",
+        "documentClass": "letter",
+        "color": "full_color",
+        "paperType": "white",
+        "printOption": "double_sided",
+        "envelope": "standard",
+        "layout": "address_on_first_page",
+        "productionTime": "next_day",
+    }
+    base_with_opts = {"docSourceAll": {"documentIdSource": {"documentId": 1}},
+                      "recipientAddressSource": {"singleAddress": clean_addr}}
+
+    # 3k. Invalid mailClass enum value must be caught by K-V4
+    bad_opts = dict(full_joboptions, mailClass="INVALID_VALUE")
+    e = errs_for("/static", dict(base_with_opts, jobOptions=bad_opts))
     check(any("mailClass" in x and "INVALID_VALUE" in x for x in e),
           "K-V4: invalid mailClass enum value -> flagged")
 
-    # 3l. Valid enum value must NOT be flagged by K-V4
-    good_enum_body = {"docSourceAll": {"documentIdSource": {"documentId": 1}},
-                      "recipientAddressSource": {"singleAddress": clean_addr},
-                      "jobOptions": {"mailClass": "first_class"}}
-    check(errs_for("/static", good_enum_body) == [],
-          "K-V4: valid mailClass enum value -> no errors")
+    # 3l. All valid enum values must NOT be flagged by K-V4
+    check(errs_for("/static", dict(base_with_opts, jobOptions=full_joboptions)) == [],
+          "K-V4: complete valid jobOptions -> no errors")
 
 
 def main():
