@@ -544,7 +544,7 @@ def build_rows(rules: dict) -> list[dict]:
     # Sort rules: endpoints first (in path order), then by category, then alphabetically
     endpoint_names = list(_ENDPOINT_MAP.keys())
     non_endpoint_names = sorted(
-        [n for n in rules if n not in _ENDPOINT_MAP and n not in _SKIP_RULES],
+        [n for n in rules if n not in _ENDPOINT_MAP and not re.match(r'^HTTP_\d{3}_', n)],
         key=lambda n: (_category(n, rules), n),
     )
     ordered = endpoint_names + non_endpoint_names
