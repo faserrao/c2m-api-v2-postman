@@ -346,7 +346,7 @@ OPENAPI_DIFF                     := npx openapi-diff
 #--- Postman Workspaces ---
 # Override via .env: SERRAO_WS=<uid>  C2M_WS=<uid>
 SERRAO_WS                        ?= d8a1f479-a2aa-4471-869e-b12feea0a98c
-C2M_WS                           ?= c740f0f4-0de2-4db3-8ab6-f8a0fa6fbeb1
+C2M_WS                           ?= e759a054-5dbc-4b8d-a77e-0c9e21cfb36f
 
 #--- Default workspace configuration ---
 # Read context from .git-context file (personal or click2mail)
