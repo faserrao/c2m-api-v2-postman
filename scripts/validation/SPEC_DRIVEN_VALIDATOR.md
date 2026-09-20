@@ -7,7 +7,7 @@ are hardcoded — expectations are read live from the spec, so changing the EBNF
 regenerating the spec automatically changes what the validator enforces.
 
 ## Files
-- `validate_collections_against_spec.py` — the validator (Phase 1: structural).
+- `validate_collections_against_spec.py` — the validator (structural + oneOf + scalar).
 - `tests/test_validate_collections.py` — the golden test suite that proves it.
 - `diff_collections.py` — before/after structural diff (companion acceptance check).
 
@@ -16,7 +16,7 @@ The validator and the diff answer different questions; use both:
 
 | Check | Question it answers | Covers |
 |---|---|---|
-| `validate_collections_against_spec.py` | Do the request bodies conform to the spec? | Top-level required/field-name (NOT oneOf interiors) |
+| `validate_collections_against_spec.py` | Do the request bodies conform to the spec? | Required fields, field names, oneOf branch selection, scalar type/enum |
 | `diff_collections.py` | What *changed* between two collections? | EVERY structural change incl. oneOf interiors + flattening |
 
 `diff_collections.py` is **structural, not value-level**: it compares the set of
@@ -35,7 +35,7 @@ $VENV scripts/validation/diff_collections.py \
 ```
 Report-only (exit 0). Read it and decide — this is the check that makes the
 merge's interior/flattening changes and example-preservation VISIBLE before
-anything is published, closing the validator's Phase-1 coverage gap.
+anything is published, closing the validator's structural-interior coverage gap.
 
 ## Run
 
@@ -57,43 +57,55 @@ $VENV scripts/validation/validate_collections_against_spec.py --json
 $VENV scripts/validation/validate_collections_against_spec.py --exit-status
 $VENV scripts/validation/validate_collections_against_spec.py --report reports/spec-conformance.md
 
-# Prove the validator itself (golden suite)
+# Prove the validator itself (golden suite — 28 assertions)
 $VENV scripts/validation/tests/test_validate_collections.py
 ```
 
-## What Phase 1 checks (structural, placeholder-safe)
-- required fields present (recursively, following `$ref`)
-- no unexpected fields (where `additionalProperties` is not allowed)
-- object/array shape
+## What the validator checks
 
-Scalar **type/enum/format** and **oneOf/anyOf branch selection** are intentionally
-NOT validated in Phase 1: reliable branch discrimination needs type/discriminator
-awareness, which collides with placeholder values (`<Integer>`) and produces false
-positives. Every known divergence (see the §5a table in
-`c2m-api-v2-manuals/audit-reports/DUAL_TEMPLATE_SYSTEM_FINDINGS_2026-08-30.md`) is a
-top-level required/field-name issue, all caught here. Deep type + discriminator-aware
-oneOf validation is a documented Phase 2 (`--deep`).
+### Structural (Phase 1)
+- Required fields present (recursively, following `$ref`)
+- No unexpected fields (where `additionalProperties` is not allowed)
+- Object/array shape
+
+### oneOf branch discrimination (V3)
+`_best_branch()` scores each oneOf/anyOf branch by counting how many of its `required`
+keys are present in the value, then recurses into the highest-scoring branch. Placeholder
+strings (`<...>`) skip the check entirely. This was added in commit `76a036f`.
+
+### Scalar type/enum checks (V4)
+`_type_matches()` checks JSON Schema type compatibility. After the structural and oneOf
+passes, scalar values are checked against `type` and `enum` constraints. Values matching
+`<[^>]+>` (placeholders) are skipped. This was added in commit `76a036f`.
 
 ## Why a golden test suite
 The legacy validator was hardcoded and silently drifted from the EBNF (it forbade a
 field the EBNF allows). To prevent that here, the validator is proven against inputs
 whose correct verdict is already known — **before** it is trusted to measure anything:
 
-1. **Positive controls** — System A (EBNF-driven Linked/Test) MUST pass with zero
+1. **Positive controls** — Linked/Test collections (EBNF-driven) MUST pass with zero
    failures (guards against false positives).
-2. **Negative controls / golden §5a** — System B (Getting Started) MUST fail on
-   exactly the documented divergent endpoints and pass the known-good ones
-   (guards against false negatives).
-3. **Synthetic faults** — hand-crafted bodies with known defects (wrong field name,
-   missing required, unexpected field) + known-clean bodies + placeholder bodies.
+2. **Negative controls** — synthetic bodies with known defects (wrong field name,
+   missing required, unexpected field, wrong enum value) MUST produce the expected
+   failures (guards against false negatives).
+3. **Placeholder bodies** — fields containing `<String>` / `<Integer>` MUST be skipped,
+   not flagged.
 
-Current state: **all golden assertions pass**, and the validator independently
-reproduces the §5a divergence table (System A clean; System B fails 9 examples across
-6 endpoints, `multi/zip` + the 8 conforming `single/doc` examples pass).
+Current golden suite state: **28/28 assertions pass** in CI.
 
-## Sequencing / CI
-Report-only today. It is NOT yet wired into `make`/CI as a gate. Do not gate before
-the dual-template merge — the Getting Started collections fail 6/8 endpoints now, so a
-gate would turn the build red. Sequence: (1) trust the validator [done], (2) use it as
-the merge acceptance test, (3) then add it to CI as a gate once System B is clean.
-Retire the legacy `c2m-api-v2-manuals/validate_collections.py` at that point.
+## CI gate status
+
+The validator is wired into CI in two places:
+
+1. **Per-build gate** (`validate-collections-conformance-gate`, commit `2a4bddc`):
+   Regenerates the Linked collection fresh into a temp dir, validates with
+   `--exit-status`, fails the build on any `FAIL > 0`. Runs before the Publish step.
+
+2. **All-4-collections gate** (`validate-collections-conformance-gate-all`, commit
+   `2a4bddc`): Validates all 4 canonical collections in `postman/generated/` with
+   `--exit-status`. Runs after `postman-build-golden-test-fixtures` in CI.
+
+Current conformance state (all 4 collections):
+- **Linked + Test:** `PASS=9 FAIL=0 SKIP=1` (SKIP=1 = `/auth/tokens/revoke`, no body — permanent)
+- **Getting Started (linked + test):** `PASS=17 FAIL=0 SKIP=0`
+- **Real-World:** `PASS=8 FAIL=0 SKIP=0`

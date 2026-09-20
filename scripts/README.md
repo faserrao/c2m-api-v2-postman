@@ -1,169 +1,124 @@
 # Scripts Directory
 
-This directory contains build automation, utility scripts, and tools for the C2M API project.
+Build automation, validation tooling, and utility scripts for the C2M API v2 project.
 
-## 🆕 REORGANIZED STRUCTURE (August 30, 2025)
-
-The scripts directory has been reorganized for better maintainability:
+## Directory Structure
 
 ```
 scripts/
-├── active/                     #  Scripts actively used by Makefile pipeline
-│   ├── ebnf_to_openapi_dynamic_v3.py
-│   ├── add_tests.js
-│   ├── fix_collection_urls_v2.py
-│   ├── validate_collection.js
-│   ├── add_tests_jwt.js
-│   └── fix-template-banner.sh
-├── utilities/                  #  Useful scripts for manual operations
-│   ├── prism_test.sh
-│   ├── generate-sdk.sh
-│   ├── deploy-docs.sh
-│   ├── git-pull-rebase.sh
-│   ├── git-push.sh
-│   ├── cleanup-scripts-directory.sh
-│   ├── cleanup-openapi-directory.sh
-│   ├── cleanup-docs-directory.sh
-│   ├── generate_test_data.py
-│   └── verify_urls.py
-├── archived/                   # 📦 Legacy/deprecated scripts (future use)
-├── python_env/                 # Python virtual environment configuration
-│   ├── requirements.txt       # Python dependencies for scripts
-│   └── e2o.venv/             # Virtual environment (git-ignored)
-├── jq/                        # JSON processing scripts
-│   ├── add_info.jq           # Add info section to OpenAPI
-│   ├── add_tags.jq           # Add tags to operations
-│   ├── auto_fix_collection.jq # Fix Postman collection URLs
-│   ├── env_template.jq       # Create environment template
-│   ├── extract_url.jq        # Extract URLs from collection
-│   ├── filter_api_url.jq     # Filter API URLs
-│   ├── fix_urls.jq           # Fix collection URLs
-│   ├── flatten_collection.jq  # Flatten nested collections
-│   ├── rename_apis.jq        # Rename API definitions
-│   ├── sanitize_collection.jq # Clean collection data
-│   └── verify_urls.jq        # Verify URL formatting
-├── makefile-scripts/          # Makefile support scripts
-│   ├── check_and_create_makefile_files.sh
-│   ├── fix-orchestrator-v2.sh
-│   └── normalize.sh
-├── test_data_generator_for_collections/  # Test data for collections
-├── test_data_generator_for_openapi_specs/ # Test data for OpenAPI
-└── various other utilities    # Additional helper scripts
+├── active/          # Scripts called directly by Makefile / CI pipeline
+├── utilities/       # Manual operations, one-off tools, diagnostic helpers
+├── validation/      # Collection and config validators, golden test suite
+├── test_data_generator_for_collections/  # Test data injection for Postman collections
+├── python_env/      # Python virtual environment (e2o.venv — git-ignored)
+├── jq/              # JQ scripts for JSON processing
+└── archive/         # Archived / superseded scripts (kept for reference)
+    └── scripts/most-recent/
 ```
 
-## Key Scripts
+---
 
-### Core Converters
+## `scripts/active/` — Pipeline scripts
 
-#### `ebnf_to_openapi_dynamic_v3.py`
-Converts EBNF data dictionary to OpenAPI specification.
-- **Usage**: `python ebnf_to_openapi_dynamic_v3.py -o output.yaml input.ebnf`
-- **Called by**: `make generate-openapi-spec-from-ebnf-dd`
+Called by Makefile targets or CI. Do not run manually unless you understand the full pipeline.
 
-### SDK and Documentation
+| Script | Purpose | Called by |
+|---|---|---|
+| `ebnf_to_openapi_dynamic_v3.py` | EBNF → OpenAPI spec; also emits `config/faker_hints.yaml` and `config/c2m_provider_mappings.yaml` as derived artifacts | `make openapi-build` |
+| `add_response_examples.py` | Injects success + error examples into the OpenAPI spec | `make openapi-build` |
+| `fix_oneOf_placeholders.js` | Resolves `<oneOf>` placeholders in generated Postman collections; discovers job array fields from spec | `make postman-linked-collection-fix-oneof` |
+| `add_auth_examples.js` | Injects auth request bodies from the OpenAPI auth overlay | `make postman-linked-collection-add-auth-examples` |
+| `add_error_responses_to_collection.js` | Injects error response examples into Postman collections | `make postman-linked-collection-add-error-responses` |
+| `add_tests_jwt.js` | Adds JWT/auth pre-request and test scripts; fields read from auth overlay | `make add-tests-to-test-collection` |
+| `add_tests.js` | Adds test scripts to job endpoints in Postman collections | `make add-tests-to-test-collection` |
+| `add_pre_request_script.js` | Injects pre-request auth script into collections | various Makefile targets |
+| `generate_curated_collections_v4.py` | Generates Real-World use-cases collection from `config/curated-examples-catalog.yaml` | `make postman-generate-real-world-collection` |
+| `generate_artifacts_index.py` | Generates `reports/artifacts-index.md` table linking all CI artifacts | `make generate-artifacts-index` |
+| `generate_dd_table.py` | Generates Data Dictionary CSV from EBNF; derives `_ENDPOINT_MAP` from the OpenAPI spec at runtime | `make generate-data-dictionary-table` |
+| `fix_collection_urls_v2.py` | Replaces hardcoded URLs with `{{baseUrl}}` placeholders | `make postman-fix-urls` |
+| `inject_documentation_link.js` | Injects GitHub Pages / Postman-native documentation links into collection descriptions | `make inject-documentation-link` |
+| `merge_openapi_overlays.py` | Merges OpenAPI overlay files (auth overlay, etc.) into base spec | `make openapi-build` |
+| `fix_openapi_oneOf_schemas.py` | Post-processes oneOf schemas in the generated spec | `make openapi-build` |
+| `validate_collection.js` | Validates Postman collection structure (Postman schema) | `make postman-test-collection-validate` |
+| `fix-template-banner.sh` | Fixes the Redoc template banner in generated docs | `make docs-build` |
+| `fetch_aws_credentials.sh` | Fetches temporary AWS credentials for upload steps | CI |
+| `generate_postman_env.sh` | Generates Postman environment JSON from config | `make postman-env-generate` |
 
-#### `generate-sdk.sh`
-Generates client SDKs in multiple languages using OpenAPI Generator.
-- **Usage**: `./generate-sdk.sh [language]` or interactive mode
-- **Languages**: python, javascript, typescript, java, go, ruby, php
-- **Called by**: `make generate-sdk`
+---
 
-#### `deploy-docs.sh`
-Deploys documentation to various hosting services.
-- **Targets**: GitHub Pages, AWS S3, Netlify, local preview
-- **Usage**: `./deploy-docs.sh [target]`
-- **Called by**: `make deploy-docs`
+## `scripts/utilities/` — Manual / diagnostic scripts
 
-### Testing
+Not called by the CI pipeline. Run manually for one-off operations or investigation.
 
-#### `prism_test.sh`
-Tests API endpoints using Prism mock server with Postman collection data.
-- **Usage**: `./prism_test.sh <endpoint> [--list|--select N]`
-- **Called by**: `make prism-test-endpoint`
+| Script | Purpose |
+|---|---|
+| `generate_getting_started_collections.py` | Generates Getting Started collections from `config/getting-started-template.yaml` + `config/curated-examples-catalog.yaml`; reads `config/faker_hints.yaml` for realistic values |
+| `oneof_resolver.py` | Shared oneOf variant resolver — no hardcoded schema maps; used by the Getting Started generator |
+| `generate-sdk-v2.sh` | Generates client SDKs in 11 languages using OpenAPI Generator |
+| `add-sdk-samples-to-spec.py` | Adds cURL/Python/JavaScript code samples to the OpenAPI spec |
+| `git-push.sh` | Context-aware push helper (routes to click2mail or origin based on `git ctx-push`) |
+| `set-context.sh` | Sets git push context (corporate/personal) |
+| `git-pull-rebase.sh` | Pull with rebase + autostash |
+| `deploy-docs.sh` | Deploys documentation to GitHub Pages or local preview |
+| `prism_test.sh` | Tests endpoints against a running Prism mock server |
+| `fix_document_source_identifier.py` | One-off migration helper for document source field renames |
+| `test_oneof_formats.sh` | Diagnostic: tests primitive vs tagged-union oneOf acceptance by Prism (investigation tool, not CI) |
+| `verify_mocks.py` | Diagnostic: verifies mock server responses against the spec. NOTE: does not work against this all-POST API — Prism returns 422 on empty bodies before schema validation runs. Kept as reference only. |
+| `extract_yaml_from_postman.py` | Extracts YAML structures from Postman collection exports |
+| `debug_v10_api.py` | Diagnostic for Postman API v10 response shapes |
 
-### Postman Collection Processing
+---
 
-#### `add_tests.js`
-Adds automated tests to Postman collections.
-- **Usage**: `node add_tests.js <collection.json>`
-- **Called by**: `make postman-collection-add-tests`
+## `scripts/validation/` — Validators and test suite
 
-#### `fix_collection_urls_v2.py`
-Fixes URLs in Postman collections to use {{baseUrl}} placeholders.
-- **Usage**: `python fix_collection_urls_v2.py <collection.json>`
-- **Called by**: `make postman-fix-urls`
+See [`scripts/validation/README.md`](validation/README.md) for full documentation.
 
-#### `validate_collection.js`
-Validates Postman collection structure.
-- **Usage**: `node validate_collection.js <collection.json>`
-- **Called by**: `make postman-test-collection-validate`
+| Script | Purpose | Run via |
+|---|---|---|
+| `validate_configs_against_dd.py` | **V1–V8 config validators** — checks all config files against the DD and spec | `make validate-configs` |
+| `validate_collections_against_spec.py` | Spec-driven collection conformance validator (V3/V4 aware) | `make validate-collections-conformance` |
+| `validate_all_collections_against_spec.py` | Batch runner for all 4 canonical collections | `make validate-collections-conformance-gate-all` |
+| `validate_catalog_against_spec.py` | Validates `curated-examples-catalog.yaml` `select:` entries against spec oneOf | `make validate-catalog-against-spec` |
+| `diff_collections.py` | Structural before/after collection diff; `--require-coverage` guards endpoint count | manual |
+| `generate_report.py` | Generates markdown conformance report | manual |
+| `ci_verify.sh` | CI orchestration script — calls `run_newman.sh` | CI |
+| `run_newman.sh` | Standardized Newman test runner with timestamped HTML/JSON reports | CI via `ci_verify.sh` |
+| `tests/` | Golden test suite — `test_dd_constraints.py` (28 tests) + `test_validate_collections.py` | `make validate-collections-conformance-test` |
 
-### Maintenance
+---
 
-#### `cleanup-*.sh`
-Directory cleanup scripts that move obsolete files to `possible-trash/`.
-- `cleanup-scripts-directory.sh` - Cleans this directory
-- `cleanup-openapi-directory.sh` - Cleans OpenAPI files
-- `cleanup-docs-directory.sh` - Cleans documentation files
-- **Called by**: `make cleanup-scripts`, etc.
+## `scripts/test_data_generator_for_collections/` — Test data injection
 
-### Git Helpers
+See [`README-addRandomDataToRaw.md`](test_data_generator_for_collections/README-addRandomDataToRaw.md).
 
-#### `git-pull-rebase.sh`
-Performs git pull with rebase and autostash.
-- **Usage**: `./git-pull-rebase.sh`
-- **Called by**: `make git-pull-rebase`
+| Script | Purpose |
+|---|---|
+| `addRandomDataToRaw.js` | Replaces `<String>`/`<Integer>`/`<Boolean>` placeholders in Postman collection request bodies with randomised Faker.js data; also resolves `ph<val1\|val2\|...>` enum placeholders using `faker_hints.yaml` |
 
-#### `git-push.sh`
-Quick add, commit, and push changes.
-- **Usage**: `./git-push.sh "commit message"`
-- **Called by**: `make git-save MSG="message"`
-
-## JQ Scripts
-
-The `jq/` subdirectory contains JSON processing scripts used throughout the build process:
-
-- **URL Processing**: `fix_urls.jq`, `extract_url.jq`, `verify_urls.jq`
-- **Collection Management**: `flatten_collection.jq`, `sanitize_collection.jq`
-- **OpenAPI Enhancement**: `add_info.jq`, `add_tags.jq`
-- **Environment Setup**: `env_template.jq`
+---
 
 ## Python Environment
 
-Scripts use a Python virtual environment located at `python_env/e2o.venv/`.
+Scripts use a Python virtual environment at `scripts/python_env/e2o.venv/`.
 
-To activate:
 ```bash
 source scripts/python_env/e2o.venv/bin/activate
+# or use the $VENV alias:
+VENV=scripts/python_env/e2o.venv/bin/python
+$VENV scripts/validation/validate_configs_against_dd.py
 ```
 
-Dependencies are in `python_env/requirements.txt`.
+Dependencies: `scripts/python_env/requirements.txt`
 
-## Adding New Scripts
+---
 
-1. Place script in appropriate location:
-   - Python converters: Root of scripts/
-   - JQ processors: scripts/jq/
-   - Makefile helpers: scripts/makefile-scripts/
+## Archived Scripts
 
-2. Make executable: `chmod +x script.sh`
+Scripts moved to `scripts/archive/scripts/most-recent/` are kept for reference but are no longer called by any pipeline step:
 
-3. Add to Makefile if needed
-
-4. Document purpose and usage in this README
-
-## Dependencies
-
-- Python 3.9+ (for Python scripts)
-- Node.js 16+ (for JavaScript scripts)
-- jq 1.6+ (for JSON processing)
-- bash 4+ (for shell scripts)
-- curl (for API calls)
-
-## Notes
-
-- All scripts should be idempotent
-- Use absolute paths or `$PROJECT_ROOT`
-- Follow existing naming conventions
-- Add error handling and validation
-- Test thoroughly before committing
+| Script | Superseded by |
+|---|---|
+| `add_auth_to_test_collection.js` | `add_pre_request_script.js` |
+| `generate-sdk.sh` | `generate-sdk-v2.sh` |
+| `generate_test_data.py` | `addRandomDataToRaw.js` + `faker_hints.yaml` |
+| `verify_urls.py` | `fix_collection_urls_v2.py` |

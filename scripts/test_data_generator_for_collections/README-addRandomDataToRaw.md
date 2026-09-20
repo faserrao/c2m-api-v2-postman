@@ -49,10 +49,28 @@ node addRandomDataToRaw.js --input collection.json --preview
 
 ## Placeholder Types
 
+### Standard placeholders
+
 - `<string>` - Generates contextual strings based on field name
 - `<number>` - Generates floating-point numbers
 - `<integer>` - Generates whole numbers
 - `<boolean>` - Generates true/false values
+
+### Enum placeholders (`ph<val1|val2|...>`)
+
+A special placeholder format used for fields that have a fixed set of valid values.
+Written by `fix_oneOf_placeholders.js` for `jobOptions` fields (e.g. `mailClass`,
+`documentClass`, `color`) when no faker_hints entry exists:
+
+```
+ph<letter|postcard|brochure|flat>
+```
+
+`addRandomDataToRaw.js` recognises this format in `shouldReplaceValue()` and resolves
+it in `generateRandomValue()`. For all current `jobOptions` fields the value comes from
+`faker_hints.yaml` (e.g. `mailClass → first_class`); the pipe-separated fallback handles
+future fields not yet annotated with `@hint` in the EBNF DD. The format contract between
+the two scripts is documented in both files.
 
 ## Context-Aware Generation
 
@@ -133,7 +151,7 @@ The script provides statistics showing:
 - Only processes `raw` body mode (JSON format)
 - Does not process `formdata`, `urlencoded`, or `graphql` modes
 - Requires valid JSON in raw bodies
-- Only replaces exact placeholders (`<string>`, `<number>`, `<integer>`, `<boolean>`)
+- Replaces standard placeholders (`<string>`, `<number>`, `<integer>`, `<boolean>`) and enum placeholders (`ph<val1|val2|...>`); other formats are left unchanged
 
 ## Future Enhancements
 
