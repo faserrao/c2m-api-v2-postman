@@ -13,6 +13,7 @@ on:
       - 'scripts/validation/**'         # Validation scripts
       - 'scripts/test_data_generator_for_collections/**'  # Test data generation
       - '.github/workflows/api-ci-cd.yml'  # Workflow changes
+      - '!**/*.md'                      # Docs live in c2m-api-v2-manuals, never trigger a build
   pull_request:
     branches: [ main ]
     paths:
@@ -24,6 +25,7 @@ on:
       - 'scripts/validation/**'         # Validation scripts
       - 'scripts/test_data_generator_for_collections/**'  # Test data generation
       - '.github/workflows/api-ci-cd.yml'  # Workflow changes
+      - '!**/*.md'                      # Docs live in c2m-api-v2-manuals, never trigger a build
   workflow_dispatch:
     inputs:
       publish_to_postman:
