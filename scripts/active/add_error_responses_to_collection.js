@@ -16,6 +16,7 @@ const yaml = require('js-yaml');
 
 // Single source of truth — override via --support-email CLI arg (passed by Makefile)
 const DEFAULT_SUPPORT_EMAIL = 'support@click2mail.com';
+const CONTENT_TYPE_JSON = 'application/json';  // L2: avoids raw string repetition
 
 // Computed once per invocation — ensures example values reflect the build date
 const _NOW_ISO = new Date().toISOString();
@@ -139,7 +140,7 @@ function deriveErrorType(errorCode, validErrorTypes, errorTypeMap) {
   if (errorTypeMap && errorTypeMap.has(errorCode)) {
     return errorTypeMap.get(errorCode);
   }
-  return validErrorTypes[0] || 'ValidationError';
+  return validErrorTypes[0];  // L1: no 'ValidationError' hardcode — validErrorTypes is spec-derived
 }
 
 /**
@@ -214,7 +215,7 @@ function loadErrorResponsesFromSpec(openapiSpecPath) {
       status: HTTP_STATUS_TEXT[metadata.status] || `HTTP ${metadata.status}`,
       code: metadata.status,
       _postman_previewlanguage: 'json',
-      header: [{ key: 'Content-Type', value: 'application/json' }],
+      header: [{ key: 'Content-Type', value: CONTENT_TYPE_JSON }],
       body: JSON.stringify({
         errorType: errorType,
         errorMessage: metadata.message,

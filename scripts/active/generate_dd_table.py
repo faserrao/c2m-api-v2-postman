@@ -27,6 +27,11 @@ except ImportError:
 # ---------------------------------------------------------------------------
 # Description catalog.  Every EBNF rule should have an entry here.
 # Rules without an entry fall back to a generated description.
+#
+# M3 (known gap): These descriptions are not in the EBNF DD — adding @doc
+# annotations to 152 EBNF rules is a large refactor deferred to a future session.
+# When that work is done, this dict can be replaced by reading annotations at
+# parse time (same pattern as @summary/@description for endpoint metadata).
 # ---------------------------------------------------------------------------
 _DESC: dict[str, str] = {
     # Endpoint request body shapes
@@ -509,18 +514,10 @@ _CATEGORY_ORDER = [
     "Alias",
 ]
 
-_SKIP_RULES = {
-    # HTTP alias shortcuts — not real API fields
-    "HTTP_400_BAD_REQUEST", "HTTP_401_UNAUTHORIZED", "HTTP_403_FORBIDDEN",
-    "HTTP_404_NOT_FOUND", "HTTP_422_UNPROCESSABLE_ENTITY",
-    "HTTP_500_INTERNAL_SERVER_ERROR",
-}
-
-
 def _category(name: str, rules: dict) -> str:
     if name in _ENDPOINT_MAP:
         return "Endpoint"
-    if name in _SKIP_RULES:
+    if re.match(r'^HTTP_\d{3}_', name):  # HTTP alias shortcuts — not real API fields
         return "__skip__"
     kind = rules[name]["kind"]
     if kind == "object":

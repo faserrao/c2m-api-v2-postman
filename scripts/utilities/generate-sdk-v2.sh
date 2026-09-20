@@ -92,46 +92,28 @@ get_generator_cmd() {
 }
 
 # Function to get language-specific parameters
+# M4: Reads generator_params from config/sdk-languages.yaml — single source of truth.
+# Adding a language: update sdk-languages.yaml only; no change needed here.
 get_generator_params() {
     local lang=$1
-    case $lang in
-        "python")
-            echo "python --package-name c2m_api"
-            ;;
-        "javascript")
-            echo "javascript --invoker-package c2m_api"
-            ;;
-        "typescript")
-            echo "typescript-axios --package-name c2m-api-ts"
-            ;;
-        "java")
-            echo "java --artifact-id c2m-api --group-id com.c2m --api-package com.c2m.api --model-package com.c2m.model"
-            ;;
-        "go")
-            echo "go --package-name c2mapi"
-            ;;
-        "ruby")
-            echo "ruby"
-            ;;
-        "php")
-            echo "php --invoker-package C2M\\Api"
-            ;;
-        "csharp")
-            echo "csharp --package-name C2M.Api"
-            ;;
-        "swift")
-            echo "swift5"
-            ;;
-        "kotlin")
-            echo "kotlin --package-name com.c2m.api"
-            ;;
-        "rust")
-            echo "rust --package-name c2m_api"
-            ;;
-        *)
-            return 1
-            ;;
-    esac
+    local sdk_languages_yaml="${PROJECT_ROOT}/config/sdk-languages.yaml"
+    python3 - "$lang" "$sdk_languages_yaml" <<'PYEOF'
+import sys
+lang, yaml_path = sys.argv[1], sys.argv[2]
+try:
+    import yaml
+    with open(yaml_path) as f:
+        config = yaml.safe_load(f)
+    for entry in config.get('languages', []):
+        if entry.get('slug') == lang:
+            params = entry.get('generator_params', '')
+            if params:
+                print(params)
+                sys.exit(0)
+    sys.exit(1)
+except Exception:
+    sys.exit(1)
+PYEOF
 }
 
 # Function to generate SDK
@@ -970,45 +952,61 @@ except Exception:
 }
 
 # Interactive mode
+# L4: Language list derived from config/sdk-languages.yaml — no duplicate definition.
 interactive_mode() {
     print_info "C2M API SDK Generator - Interactive Mode"
     echo ""
+
+    local sdk_languages_yaml="${PROJECT_ROOT}/config/sdk-languages.yaml"
+    local langs_str
+    langs_str=$(python3 - "$sdk_languages_yaml" <<'PYEOF'
+import sys
+yaml_path = sys.argv[1]
+try:
+    import yaml
+    with open(yaml_path) as f:
+        config = yaml.safe_load(f)
+    slugs = [e['slug'] for e in config.get('languages', []) if 'slug' in e]
+    print(' '.join(slugs))
+except Exception:
+    sys.exit(1)
+PYEOF
+)
+    if [ -z "$langs_str" ]; then
+        print_error "Could not read language list from $sdk_languages_yaml"
+        exit 1
+    fi
+
+    read -ra langs <<< "$langs_str"
+    local total="${#langs[@]}"
+    local all_opt=$((total + 1))
+
     echo "Available languages:"
-    echo "  1. python"
-    echo "  2. javascript"
-    echo "  3. typescript"
-    echo "  4. java"
-    echo "  5. go"
-    echo "  6. ruby"
-    echo "  7. php"
-    echo "  8. csharp"
-    echo "  9. swift"
-    echo " 10. kotlin"
-    echo " 11. rust"
-    echo " 12. ALL (generate for all languages)"
-    
-    local langs=("python" "javascript" "typescript" "java" "go" "ruby" "php" "csharp" "swift" "kotlin" "rust")
-    
+    for i in "${!langs[@]}"; do
+        printf "  %2d. %s\n" "$((i + 1))" "${langs[$i]}"
+    done
+    printf "  %2d. ALL (generate for all languages)\n" "$all_opt"
+
     echo ""
-    read -p "Select a language (1-12): " selection
-    
-    if [[ $selection -eq 12 ]]; then
+    read -p "Select a language (1-$all_opt): " selection
+
+    if [[ $selection -eq $all_opt ]]; then
         generate_all_sdks
         return
     fi
-    
-    if [[ $selection -lt 1 || $selection -gt 11 ]]; then
+
+    if [[ $selection -lt 1 || $selection -gt $total ]]; then
         print_error "Invalid selection"
         exit 1
     fi
-    
+
     local selected_lang="${langs[$((selection-1))]}"
     local default_dir="$SDK_BASE_DIR/$selected_lang"
-    
+
     echo ""
     read -p "Output directory [$default_dir]: " output_dir
     output_dir="${output_dir:-$default_dir}"
-    
+
     generate_sdk "$selected_lang" "$output_dir"
 }
 

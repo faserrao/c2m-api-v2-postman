@@ -340,6 +340,31 @@ def add_response_examples(spec, error_examples=None):
 
     return spec
 
+def _validate_success_response(spec: dict) -> None:
+    """M1: Assert _SUCCESS_RESPONSE keys match spec's job-response schema properties.
+
+    Prints a warning (does not exit) if keys diverge — surfacing drift between
+    the hardcoded dict and the EBNF-derived schema before it reaches the mock server.
+    """
+    schema_name = discover_job_response_schema_name(spec)
+    if not schema_name:
+        return
+    spec_props = set(
+        (spec.get('components', {}).get('schemas', {})
+             .get(schema_name, {}).get('properties', {}).keys())
+    )
+    dict_keys = set(_SUCCESS_RESPONSE.keys())
+    if spec_props and dict_keys != spec_props:
+        extra = dict_keys - spec_props
+        missing = spec_props - dict_keys
+        print(f"⚠️  WARNING: _SUCCESS_RESPONSE keys diverge from spec schema '{schema_name}.properties'")
+        if extra:
+            print(f"    Keys in dict but NOT in spec: {sorted(extra)}")
+        if missing:
+            print(f"    Keys in spec but NOT in dict: {sorted(missing)}")
+        print("    Update _SUCCESS_RESPONSE in add_response_examples.py to match the spec.")
+
+
 def main():
     if len(sys.argv) != 3:
         print("Usage: python add_response_examples.py <input.yaml> <output.yaml>")
@@ -351,6 +376,9 @@ def main():
     # Load the OpenAPI spec
     with open(input_file, 'r') as f:
         spec = yaml.safe_load(f)
+
+    # M1: Warn if _SUCCESS_RESPONSE dict has drifted from spec schema
+    _validate_success_response(spec)
 
     # Validate errorCode values against EBNF enum; auto-generate stubs for any uncovered codes
     print("\n🔍 Validating errorCode values against EBNF data dictionary...")

@@ -1019,6 +1019,16 @@ HTTP_500_INTERNAL_SERVER_ERROR = errorResponse ;
    @end_numeric_constraints *)
 
 (* ----------------------------------------------------------------
+   MUTUAL EXCLUSION
+   Fields that are mutually exclusive per request — only one may be
+   sent at a time.  Parsed by ebnf_to_openapi_dynamic_v3.py and
+   emitted as x-mutual-exclusion in the OpenAPI spec info block.
+   Format: comma-separated field names on a single line.
+   ----------------------------------------------------------------
+   @mutual_exclusion jobTemplate, jobOptions
+   @end_mutual_exclusion *)
+
+(* ----------------------------------------------------------------
    VALID COMBINATIONS
    Documents which combinations of jobOptions fields are valid
    together.  Parsed by ebnf_to_openapi_dynamic_v3.py and emitted

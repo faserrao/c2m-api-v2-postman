@@ -102,8 +102,9 @@ _ERROR_DB_TABLE            = "jobs"
 _ERROR_EXTERNAL_SERVICE    = "payment-gateway"
 _ERROR_AUTH_SCOPE_REQUIRED = "jobs:write"
 _ERROR_AUTH_SCOPE_PROVIDED = "jobs:read"
-# Fields that are mutually exclusive at submission time (jobTemplate picks a preset;
-# jobOptions provides individual overrides — only one may be sent per request).
+# H1: Fallback used when the @mutual_exclusion annotation is absent from the EBNF DD.
+# The authoritative source is the @mutual_exclusion block in data_dictionary/c2mapiv2-dd.ebnf;
+# the translator stores parsed values in self.mutual_exclusion_fields at parse time.
 _MUTUAL_EXCLUSION_FIELDS = ["jobTemplate", "jobOptions"]
 
 
@@ -282,6 +283,7 @@ class EBNFToOpenAPITranslator:
         self.http_error_map: Dict[str, Any] = {}  # Parsed from @http_error_map block in EBNF
         self.numeric_constraints: Dict[str, Dict[str, Any]] = {}  # Parsed from @numeric_constraints block
         self.valid_combinations: List[Dict[str, Any]] = []  # Parsed from @valid_combinations block
+        self.mutual_exclusion_fields: List[str] = list(_MUTUAL_EXCLUSION_FIELDS)  # Parsed from @mutual_exclusion
         # Structural role sets — populated by parse_ebnf() from @structural annotations in the DD
         self._single_field_wrapper_rules: frozenset = frozenset()
         self._named_wrapper_oneof_rules: frozenset = frozenset()
@@ -323,6 +325,9 @@ class EBNFToOpenAPITranslator:
         self.http_error_map = self._parse_http_error_map(content)
         self.numeric_constraints = self._parse_numeric_constraints(content)
         self.valid_combinations = self._parse_valid_combinations(content)
+        parsed_mutual = self._parse_mutual_exclusion(content)
+        if parsed_mutual:
+            self.mutual_exclusion_fields = parsed_mutual
 
         # Load structural role sets from @structural annotations in the DD
         structural = _extract_structural_annotations(content)
@@ -459,6 +464,18 @@ class EBNFToOpenAPITranslator:
                 })
         return result
 
+    def _parse_mutual_exclusion(self, content: str) -> List[str]:
+        """Parse @mutual_exclusion annotation from EBNF content.
+
+        Returns a list of field names that are mutually exclusive (only one per request).
+        Format in EBNF:  @mutual_exclusion field1, field2, ...
+        Returns empty list if the annotation is absent.
+        """
+        match = re.search(r'@mutual_exclusion\s+([^\n]+)', content)
+        if not match:
+            return []
+        return [f.strip() for f in match.group(1).split(',') if f.strip()]
+
     def _extract_endpoints(self, lines: List[str]) -> None:
         """Extract endpoint definitions from comments and their associated productions"""
         endpoint_pattern = r'Endpoint:\s*(GET|POST|PUT|DELETE|PATCH)\s+(/[\w/\-{}]+)'
@@ -554,6 +571,8 @@ class EBNFToOpenAPITranslator:
             info["x-numeric-constraints"] = self.numeric_constraints
         if self.valid_combinations:
             info["x-valid-combinations"] = self.valid_combinations
+        if self.mutual_exclusion_fields:
+            info["x-mutual-exclusion"] = self.mutual_exclusion_fields
 
         spec = OrderedDict([
             ("openapi", "3.0.3"),
@@ -935,11 +954,13 @@ class EBNFToOpenAPITranslator:
                 "contactSupport": self.support_email
             },
             'JOB_NOT_FOUND': {
-                "jobId": "JOB-12345"
+                # L5: date-stamped placeholder — same format as tracking IDs, no drift risk
+                "jobId": f"JOB-{datetime.now(timezone.utc).strftime('%Y%m%d')}-{''.join(random.choices('0123456789ABCDEF', k=4))}"
             },
             'RESOURCE_NOT_FOUND': {
                 "resourceType": "document",
-                "resourceId": "DOC-67890"
+                # L5: date-stamped placeholder — same format as tracking IDs, no drift risk
+                "resourceId": f"DOC-{datetime.now(timezone.utc).strftime('%Y%m%d')}-{''.join(random.choices('0123456789ABCDEF', k=4))}"
             },
             'INVALID_ENUM_VALUE': {
                 "field": field_names.get('documentField', 'documentType'),
@@ -948,7 +969,7 @@ class EBNFToOpenAPITranslator:
                 "allowedValues": self._get_enum_values('documentClass') or ["letter", "postcard", "brochure", "flat"]
             },
             'MUTUAL_EXCLUSION_VIOLATION': {
-                "fields": _MUTUAL_EXCLUSION_FIELDS,
+                "fields": self.mutual_exclusion_fields,  # H1: from @mutual_exclusion in EBNF DD
                 "issue": "only one may be provided"
             },
             'INVALID_FORMAT': {
@@ -1534,14 +1555,6 @@ def extract_faker_hints(ebnf_content: str) -> dict:
 
 # ──────────────────── Provider Mappings Generator ────────────────────
 
-# jobOptions fields whose canonical values live in the EBNF DD as string-literal
-# enums.  The translator reads them from the parsed spec to avoid duplication.
-_PROVIDER_MAPPING_FIELDS = [
-    "mailClass", "color", "paperType", "printOption",
-    "productionTime", "envelope", "documentClass", "layout",
-]
-
-
 def extract_provider_mappings(openapi_spec: dict, aliases_path: str | None = None) -> dict:
     """Build provider mappings dict from DD-derived enums + optional static aliases file.
 
@@ -1550,12 +1563,19 @@ def extract_provider_mappings(openapi_spec: dict, aliases_path: str | None = Non
     EBNF DD.  Only the _aliases blocks — legacy / display strings that map to canonical
     values — are read from the manually maintained aliases file.
 
+    H2: The field list is derived at runtime from jobOptions.properties — any field that
+    has an enum in the spec is a provider-mapping field. No hardcoded list needed.
+
     Args:
         openapi_spec: The fully generated OpenAPI spec dict (post-generate_openapi()).
         aliases_path: Optional path to config/c2m_provider_aliases.yaml.  When provided,
                       each field's _aliases block is merged into the output.
     """
     schemas = (openapi_spec.get('components') or {}).get('schemas') or {}
+
+    # H2: Derive field list from spec — jobOptions enum properties only
+    joboptions_props = schemas.get('jobOptions', {}).get('properties', {})
+    provider_mapping_fields = [f for f, s in joboptions_props.items() if s.get('enum')]
 
     aliases: dict = {}
     if aliases_path:
@@ -1569,7 +1589,7 @@ def extract_provider_mappings(openapi_spec: dict, aliases_path: str | None = Non
             print(f"Warning: could not read provider aliases from {aliases_path}: {e}", file=sys.stderr)
 
     mappings: dict = {}
-    for field in _PROVIDER_MAPPING_FIELDS:
+    for field in provider_mapping_fields:
         schema = schemas.get(field, {})
         enum_values: list = schema.get('enum', [])
         if not enum_values:

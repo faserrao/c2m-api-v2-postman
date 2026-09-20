@@ -7,14 +7,30 @@
 #     canonical_value: provider_literal  # canonical == provider for this API
 #     _aliases:
 #       legacy_string: canonical_value   # from c2m_provider_aliases.yaml
-mailClass:
-  first_class: first_class
-  standard: standard
-  non_profit: non_profit
+documentClass:
+  letter: letter
+  postcard: postcard
+  brochure: brochure
+  flat: flat
+layout:
+  address_on_first_page: address_on_first_page
+  address_on_back_page: address_on_back_page
   _aliases:
-    firstClass: first_class
-    First Class: first_class
-    Standard: standard
+    address_on_top: address_on_first_page
+productionTime:
+  next_day: next_day
+  two_day: two_day
+  three_day: three_day
+  standard: standard
+  same_day: same_day
+envelope:
+  standard: standard
+  none: none
+  flat: flat
+  double_window: double_window
+  _aliases:
+    '#10 double window': double_window
+    windowed: double_window
 color:
   full_color: full_color
   black_and_white: black_and_white
@@ -39,27 +55,11 @@ printOption:
     printing_both_sides: double_sided
     Double Sided: double_sided
     Single Sided: single_sided
-productionTime:
-  next_day: next_day
-  two_day: two_day
-  three_day: three_day
+mailClass:
+  first_class: first_class
   standard: standard
-  same_day: same_day
-envelope:
-  standard: standard
-  none: none
-  flat: flat
-  double_window: double_window
+  non_profit: non_profit
   _aliases:
-    '#10 double window': double_window
-    windowed: double_window
-documentClass:
-  letter: letter
-  postcard: postcard
-  brochure: brochure
-  flat: flat
-layout:
-  address_on_first_page: address_on_first_page
-  address_on_back_page: address_on_back_page
-  _aliases:
-    address_on_top: address_on_first_page
+    firstClass: first_class
+    First Class: first_class
+    Standard: standard

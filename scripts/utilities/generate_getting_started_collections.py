@@ -324,15 +324,19 @@ def generate_collection(template: Dict, linked_collection: Dict, openapi_spec: D
     if faker_hints is None:
         faker_hints = template.get('faker_hints', {})
 
+    # M5: Named suffix constants — keeps both collection types in sync; change here affects both
+    _SUFFIX_WITH_EXAMPLES = " - With Examples"
+    _SUFFIX_WITH_TYPES    = " - With Types"
+
     # Collection metadata
     collection_info = template.get("collection", {})
     collection_name = collection_info.get("name", "C2M API v2 - Getting Started")
 
     # Append suffix based on collection type
     if use_realistic_values:
-        collection_name += " - With Examples"
+        collection_name += _SUFFIX_WITH_EXAMPLES
     else:
-        collection_name += " - With Types"
+        collection_name += _SUFFIX_WITH_TYPES
 
     collection = {
         "info": {

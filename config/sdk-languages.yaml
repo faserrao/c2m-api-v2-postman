@@ -1,37 +1,51 @@
 # SDK generation language configuration.
 # Single source of truth for: scripts/utilities/generate-sdk-v2.sh + scripts/active/generate_artifacts_index.py
 # Add a new entry here to extend SDK generation and artifact index coverage simultaneously.
+#
+# generator_params: M4 — full openapi-generator CLI params string (generator name + any flags).
+# Change here propagates to both generate-sdk-v2.sh and the artifact index automatically.
 languages:
   - label: Python
     slug: python
     description: Python client library generated from the OpenAPI spec via OpenAPI Generator.
+    generator_params: "python --package-name c2m_api"
   - label: JavaScript
     slug: javascript
     description: JavaScript client library for browser and Node.js environments.
+    generator_params: "javascript --invoker-package c2m_api"
   - label: TypeScript
     slug: typescript
     description: TypeScript client library with full type definitions.
+    generator_params: "typescript-axios --package-name c2m-api-ts"
   - label: Java
     slug: java
     description: Java client library (Maven/Gradle compatible).
+    generator_params: "java --artifact-id c2m-api --group-id com.c2m --api-package com.c2m.api --model-package com.c2m.model"
   - label: Go
     slug: go
     description: Go client library generated from the OpenAPI spec.
+    generator_params: "go --package-name c2mapi"
   - label: Ruby
     slug: ruby
     description: Ruby gem generated from the OpenAPI spec.
+    generator_params: "ruby"
   - label: PHP
     slug: php
     description: PHP client library generated from the OpenAPI spec.
+    generator_params: "php --invoker-package C2M\\Api"
   - label: C#
     slug: csharp
     description: C# (.NET) client library generated from the OpenAPI spec.
+    generator_params: "csharp --package-name C2M.Api"
   - label: Swift
     slug: swift
     description: Swift client library for iOS/macOS applications.
+    generator_params: "swift5"
   - label: Kotlin
     slug: kotlin
     description: Kotlin client library for Android and JVM environments.
+    generator_params: "kotlin --package-name com.c2m.api"
   - label: Rust
     slug: rust
     description: Rust client library generated from the OpenAPI spec.
+    generator_params: "rust --package-name c2m_api"

@@ -300,8 +300,8 @@ function addTestsToItem(item) {
       });
     }
 
-    // Add auth error tests for auth endpoints
-    if (operationId.includes('Token')) {
+    // Add auth error tests for auth endpoints (same set as jwtTests keys)
+    if (Object.keys(jwtTests).includes(operationId)) {
       authErrorTests.forEach(test => {
         testEvent.script.exec.push(test);
       });
