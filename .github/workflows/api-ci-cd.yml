@@ -182,9 +182,9 @@ jobs:
           mkdir -p reports
           make validate-collections-conformance-test 2>&1 | tee reports/golden-tests.txt
 
-      - name: Gate — All 4 canonical collections conform to spec
+      - name: Gate — All 5 canonical collections conform to spec
         run: |
-          echo "🚦 Conformance gate: all 4 canonical collections must have FAIL=0."
+          echo "🚦 Conformance gate: all 5 canonical collections must have FAIL=0."
           mkdir -p reports
           make validate-collections-conformance-gate-all \
             CONFORMANCE_GATE_REPORT="--report reports/conformance-gate-all.md"

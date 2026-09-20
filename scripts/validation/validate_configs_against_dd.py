@@ -77,6 +77,25 @@ def _suggest(key: str, dd_rules: set, n: int = 3, cutoff: float = 0.6) -> list:
     return difflib.get_close_matches(key, dd_rules, n=n, cutoff=cutoff)
 
 
+# ── V-number registry ────────────────────────────────────────────────────────
+# Validators in THIS file use the prefix C-V (Config-Validator):
+#   C-V1  validate_catalog_jobtemplates        — informational jobTemplate inventory
+#   C-V2  validate_catalog_select_fields       — catalog select: vs spec oneOf variants
+#   C-V3a validate_template_values             — template values: keys vs DD rules
+#   C-V3b validate_template_select_fields      — template select: vs spec oneOf variants
+#   C-V5  validate_catalog_joboptions_enums    — catalog jobOptions values vs spec enums
+#   C-V6  validate_error_response_codes        — error-response-examples errorCode vs spec
+#   C-V7  validate_example_paths               — catalog + template path/method vs spec ops
+#   C-V8  validate_template_inline_discriminators — template values: discriminator keys vs spec
+#
+# Validators in validate_collections_against_spec.py use the prefix K-V (Collection-Validator):
+#   K-V3  _best_branch               — oneOf branch discrimination (collection bodies)
+#   K-V4  structural_errors (scalar) — scalar type/enum checks (collection bodies)
+#   K-V5  page_range_errors          — startPage ≤ endPage cross-field constraint
+#
+# C-V4 is intentionally absent — no config-file check occupies that slot.
+# ─────────────────────────────────────────────────────────────────────────────
+
 # ── validation logic ─────────────────────────────────────────────────────────
 
 class ValidationResult:
@@ -95,32 +114,10 @@ class ValidationResult:
         return len(self.errors) == 0
 
 
-def validate_faker_hints(template_path: Path, dd_rules: set, result: ValidationResult) -> None:
-    """Check every key in faker_hints: against the DD rule set."""
-    template = _load_yaml(template_path)
-    hints = template.get('faker_hints', {})
-    if not hints:
-        print(f"  ℹ  No faker_hints section found in {template_path.name}")
-        return
-
-    file_label = template_path.name
-    print(f"  Checking {len(hints)} faker_hints keys in {file_label}...")
-    bad = []
-    for key in sorted(hints):
-        if key in dd_rules:
-            continue
-        if key in _KNOWN_EXTRA_KEYS:
-            result.warn(file_label, key, f"not a DD rule but in known-extras list — verify intentional")
-            continue
-        suggestions = _suggest(key, dd_rules)
-        if suggestions:
-            result.error(file_label, key, f"not a DD rule — did you mean: {', '.join(suggestions)}?")
-        else:
-            result.error(file_label, key, "not a DD rule — no close match found; key may be dead or misspelled")
-        bad.append(key)
-
-    if not bad:
-        print(f"  ✓ All {len(hints)} faker_hints keys are valid DD rule names")
+# NOTE: validate_faker_hints() was removed. Since Sep 2026 the faker_hints:
+# section no longer exists in getting-started-template.yaml — it was migrated
+# to EBNF @hint annotations (derived into config/faker_hints.yaml). The
+# faker_hints.yaml file is checked by validate_faker_hints_file() instead.
 
 
 def validate_catalog_values(catalog_path: Path, dd_rules: set, result: ValidationResult) -> None:
@@ -347,6 +344,10 @@ def validate_catalog_joboptions_enums(catalog_path: Path, spec_path: Path,
         spec = yaml.safe_load(f)
     schemas = (spec.get('components') or {}).get('schemas', {})
     joboptions_enum_fields = _derive_joboptions_enum_fields(schemas)
+    # Use the same schema source as _derive_joboptions_enum_fields (jobOptions.properties)
+    # rather than top-level named schemas, so the two lookups never diverge if a field
+    # is replaced with a $ref.
+    joboptions_props = schemas.get('jobOptions', {}).get('properties', {})
 
     catalog = _load_yaml(catalog_path)
     file_label = catalog_path.name
@@ -361,7 +362,7 @@ def validate_catalog_joboptions_enums(catalog_path: Path, spec_path: Path,
             value = job_options.get(field)
             if value is None:
                 continue
-            enum_values = schemas.get(field, {}).get('enum', [])
+            enum_values = joboptions_props.get(field, {}).get('enum', [])
             if not enum_values:
                 continue
             total += 1
@@ -668,9 +669,6 @@ def main():
 
     result = ValidationResult()
 
-    print(f"\n🔍 Checking getting-started-template.yaml faker_hints:")
-    validate_faker_hints(template_path, dd_rules, result)
-
     print(f"\n🔍 Checking curated-examples-catalog.yaml values:")
     validate_catalog_values(catalog_path, dd_rules, result)
 
@@ -715,7 +713,7 @@ def main():
         for file, key, msg in result.warnings:
             print(f"   [{file}] {key}: {msg}")
 
-    if result.errors:
+    if not result.ok:
         print(f"\n❌ {len(result.errors)} error(s):")
         for file, key, msg in result.errors:
             print(f"   [{file}] {key}: {msg}")

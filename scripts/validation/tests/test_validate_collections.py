@@ -5,17 +5,11 @@ Golden test suite for validate_collections_against_spec.py.
 Proves the validator is trustworthy. Three test classes:
 
   1. Positive controls — the EBNF-driven Linked/Test collections (System A)
-     MUST pass with zero real failures. Guards against false positives.
+     MUST pass with zero failures. Guards against false positives.
 
-     Known spec gap (tracked separately): the EBNF allows `jobTemplate` on
-     pdfSplitJobsWithAddress items (EBNF line 741) but the translator omits it
-     from the generated schema. The validator therefore flags it as
-     "unexpected field 'jobTemplate'" — a false positive. This is filtered
-     from the failure count until the translator is fixed.
-
-  2. Negative controls — the Getting Started collections (System B) are now
-     CLEAN (field-name drift fixed in commit 14a60e9, Sep 2026). All endpoints
-     MUST pass with zero failures. The §5a divergence table is fully resolved.
+  2. Integration controls (expected: PASS) — the Getting Started collections
+     (System B) are now CLEAN (field-name drift fixed in commit 14a60e9,
+     Sep 2026). All endpoints MUST pass with zero failures.
 
      False-negative protection is covered by test 3 (synthetic fault injection)
      which uses hardcoded known-bad request bodies independent of live
@@ -68,40 +62,10 @@ def fail_counts_by_path(results):
     return out
 
 
-# Known spec gap: jobTemplate is EBNF-legal on pdfSplitJobsWithAddress items
-# (EBNF line 741) but the translator omits it from the generated schema. Filter
-# this false-positive until the translator is fixed (see workspace audit).
-_KNOWN_GAP_PATTERNS = ("unexpected field 'jobTemplate'",)
-
-
-def _is_known_gap(result):
-    return all(any(p in e for p in _KNOWN_GAP_PATTERNS) for e in result["errors"])
-
-
-# --------------------------------------------------------------------------- #
-# 1. Positive controls — System A must be clean                               #
-# --------------------------------------------------------------------------- #
-def test_positive_controls():
-    print("\n[1] Positive controls (System A, EBNF-driven) — expect ZERO real failures")
-    print("    (known gap: jobTemplate false-positive filtered — see translator TODO)")
-    for rel in ["c2mapiv2-linked-collection-flat.json",
-                "c2mapiv2-test-collection-flat.json"]:
-        res = V.validate_collection(SPEC, load_collection(rel), PREFIX, True)
-        real_failures = [r for r in res if r["status"] == "FAIL" and not _is_known_gap(r)]
-        nfail = len(real_failures)
-        check(nfail == 0, f"{rel}: {nfail} failures (expected 0)")
-
-
-# --------------------------------------------------------------------------- #
-# 2. Negative controls — Getting Started must be fully clean                  #
-# --------------------------------------------------------------------------- #
-# The §5a field-name drift was fixed in commit 14a60e9 (Sep 2026). All
-# Getting Started endpoints now match the spec. This test enforces that the
-# collections stay clean — any new failures indicate a regression.
-#
-# False-negative protection (validator CAN catch errors) is in test 3
-# (synthetic fault injection) which uses hardcoded known-bad request bodies.
-_ALL_JOB_PATHS = [
+# All known job + auth paths present in the spec (used by integration-control assertions).
+# Auth paths come from the final spec (after overlay merge).
+_ALL_SPEC_PATHS = [
+    # Job endpoints
     "/static",
     "/static/address-capture",
     "/batch/split",
@@ -109,18 +73,49 @@ _ALL_JOB_PATHS = [
     "/mail-merge",
     "/batch/zip",
     "/batch/zip/address-capture",
+    # Auth endpoints
+    "/auth/tokens/short",
+    "/auth/tokens/long",
+    "/auth/tokens/{tokenId}/revoke",
 ]
 
 
-def test_negative_controls():
-    print("\n[2] Negative controls (System B, Getting Started) — must be fully clean")
+# --------------------------------------------------------------------------- #
+# 1. Positive controls — System A must be clean                               #
+# --------------------------------------------------------------------------- #
+def test_positive_controls():
+    print("\n[1] Positive controls (System A, EBNF-driven) — expect ZERO failures")
+    for rel in ["c2mapiv2-linked-collection-flat.json",
+                "c2mapiv2-test-collection-flat.json"]:
+        res = V.validate_collection(SPEC, load_collection(rel), PREFIX, True)
+        real_failures = [r for r in res if r["status"] == "FAIL"]
+        nfail = len(real_failures)
+        check(nfail == 0, f"{rel}: {nfail} failures (expected 0)")
+
+
+# --------------------------------------------------------------------------- #
+# 2. Integration controls (expected: PASS) — Getting Started must be clean    #
+# --------------------------------------------------------------------------- #
+# The §5a field-name drift was fixed in commit 14a60e9 (Sep 2026). All
+# Getting Started endpoints now match the spec. This test enforces that the
+# collections stay clean — any new failures indicate a regression.
+#
+# False-negative protection (validator CAN catch errors) is in test 3
+# (synthetic fault injection) which uses hardcoded known-bad request bodies.
+def test_integration_controls():
+    print("\n[2] Integration controls (System B, Getting Started) — must be fully clean")
     print("    (false-negative coverage provided by test 3 synthetic fault injection)")
     for rel in ["c2mapiv2-getting-started-linked-collection.json",
                 "c2mapiv2-getting-started-test-collection.json"]:
         res = V.validate_collection(SPEC, load_collection(rel), PREFIX, True)
         fc = fail_counts_by_path(res)
         print(f"  {rel}")
-        for path in _ALL_JOB_PATHS:
+        for path in _ALL_SPEC_PATHS:
+            # SKIP paths have no request body (correct behaviour — not a failure)
+            path_results = [r for r in res if r["path"] == path]
+            skip_only = all(r["status"] == "SKIP" for r in path_results) if path_results else True
+            if skip_only:
+                continue
             check(fc.get(path, 0) == 0,
                   f"{path}: {fc.get(path,0)} failures (expected 0)")
 
@@ -190,13 +185,34 @@ def test_synthetic_faults():
     check(page_range_errors(ok_range, {}) == [],
           "V5: valid startPage < endPage -> no errors")
 
+    # 3j. Empty oneOf value must FAIL (not silently pass)
+    e = errs_for("/static", {"docSourceAll": {},
+                              "recipientAddressSource": {"singleAddress": clean_addr}})
+    check(len(e) > 0,
+          "/static with empty docSourceAll -> should flag error")
+
+    # 3k. Invalid enum value via K-V4 must be caught
+    bad_enum_body = {"docSourceAll": {"documentIdSource": {"documentId": 1}},
+                     "recipientAddressSource": {"singleAddress": clean_addr},
+                     "jobOptions": {"mailClass": "INVALID_VALUE"}}
+    e = errs_for("/static", bad_enum_body)
+    check(any("mailClass" in x and "INVALID_VALUE" in x for x in e),
+          "K-V4: invalid mailClass enum value -> flagged")
+
+    # 3l. Valid enum value must NOT be flagged by K-V4
+    good_enum_body = {"docSourceAll": {"documentIdSource": {"documentId": 1}},
+                      "recipientAddressSource": {"singleAddress": clean_addr},
+                      "jobOptions": {"mailClass": "first_class"}}
+    check(errs_for("/static", good_enum_body) == [],
+          "K-V4: valid mailClass enum value -> no errors")
+
 
 def main():
     print("=" * 74)
     print("GOLDEN TEST SUITE — validate_collections_against_spec.py")
     print("=" * 74)
     test_positive_controls()
-    test_negative_controls()
+    test_integration_controls()
     test_synthetic_faults()
     print("\n" + "=" * 74)
     if _failures:

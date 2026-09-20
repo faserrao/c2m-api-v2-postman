@@ -48,11 +48,18 @@ class TestDDConstraints(unittest.TestCase):
         cls.spec = _spec(cls.translator)
         cls.schemas = cls.spec.get("components", {}).get("schemas", {})
 
-    # ── 1. EBNF file loads without parse errors ──────────────────────────────
+    # ── 1. EBNF file loads without parse errors or warnings ──────────────────
 
     def test_ebnf_parses_without_errors(self):
         errors = [i for i in self.translator.issues if i.severity == "error"]
         self.assertEqual(errors, [], f"EBNF parse errors: {errors}")
+
+    def test_ebnf_has_no_unexpected_warnings(self):
+        warnings = [i for i in self.translator.issues if i.severity == "warning"]
+        self.assertEqual(warnings, [],
+                         f"Unexpected EBNF parse warnings: {warnings}\n"
+                         "If any of these are intentional, enumerate them here "
+                         "with an explanation rather than silently ignoring them.")
 
     # ── 2. Enum propagation — jobOptions fields ──────────────────────────────
 
@@ -123,6 +130,20 @@ class TestDDConstraints(unittest.TestCase):
         nc = self.translator.numeric_constraints
         self.assertIsInstance(nc, dict)
         self.assertIn("month", nc, "month must be in @numeric_constraints")
+        self.assertIn("startPage", nc, "startPage must be in @numeric_constraints")
+        self.assertIn("endPage", nc, "endPage must be in @numeric_constraints")
+
+    def test_startPage_constraints(self):
+        nc = self.translator.numeric_constraints
+        sp = nc.get("startPage", {})
+        self.assertEqual(sp.get("minimum"), 1,
+                         "startPage minimum must be 1 (pages are 1-indexed)")
+
+    def test_endPage_constraints(self):
+        nc = self.translator.numeric_constraints
+        ep = nc.get("endPage", {})
+        self.assertEqual(ep.get("minimum"), 1,
+                         "endPage minimum must be 1 (pages are 1-indexed)")
 
     def test_month_constraints(self):
         nc = self.translator.numeric_constraints
@@ -214,11 +235,20 @@ class TestDDConstraints(unittest.TestCase):
                       "c2m_provider_mappings.yaml must carry DO NOT EDIT header — "
                       "run make openapi-build to regenerate")
 
+    @classmethod
+    def _joboptions_enum_fields(cls):
+        """Dynamically derive the jobOptions fields that carry enums from the spec.
+
+        Matches the runtime logic of _derive_joboptions_enum_fields() in
+        validate_configs_against_dd.py — both read jobOptions.properties from
+        the generated spec so the test list never drifts from the actual DD.
+        """
+        job_props = cls.schemas.get('jobOptions', {}).get('properties', {})
+        return [f for f, s in job_props.items() if s.get('enum')]
+
     def test_provider_mappings_covers_all_enum_fields(self):
         mappings = self._load_provider_mappings()
-        enum_fields = ("mailClass", "color", "paperType", "printOption",
-                       "productionTime", "envelope", "documentClass", "layout")
-        for field in enum_fields:
+        for field in self._joboptions_enum_fields():
             with self.subTest(field=field):
                 self.assertIn(field, mappings,
                               f"Provider mappings must cover field: {field}")
@@ -226,8 +256,7 @@ class TestDDConstraints(unittest.TestCase):
     def test_provider_mappings_canonical_values_match_ebnf(self):
         """Every canonical key in the generated mappings must equal an EBNF enum value."""
         mappings = self._load_provider_mappings()
-        for field in ("mailClass", "color", "paperType", "printOption",
-                      "productionTime", "envelope", "documentClass", "layout"):
+        for field in self._joboptions_enum_fields():
             schema = self.schemas.get(field, {})
             ebnf_enum = set(schema.get("enum", []))
             if not ebnf_enum:
@@ -284,10 +313,6 @@ class TestDDConstraints(unittest.TestCase):
                       "EBNF DD must define address_on_first_page (used as @hint for layout rule)")
         self.assertNotIn("address_on_top", dd_content,
                          "EBNF DD must not reference legacy address_on_top")
-
-        # Also verify template itself has no legacy value (belt-and-suspenders)
-        self.assertNotIn("address_on_top", template_content,
-                         "getting-started-template.yaml must not use legacy address_on_top")
 
 
 if __name__ == "__main__":

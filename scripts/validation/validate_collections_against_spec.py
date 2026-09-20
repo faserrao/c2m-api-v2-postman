@@ -26,12 +26,20 @@ Usage:
       [--path-prefix /] \
       [--json] [--exit-status] [--report FILE]
 
-Defaults validate the four canonical collections against the FINAL spec
+Defaults validate the five canonical collections against the FINAL spec
 (source-of-truth contract). All job endpoints (/static, /batch/*, /mail-merge)
 and auth endpoints are validated. Report-only by default (exit 0); pass
 --exit-status to fail on any non-conformance (for CI gating). Do NOT point
 --spec at bundled.yaml — it flattens single-alias oneOf chains and misrepresents
 the contract.
+
+V-number registry for this file (prefix K-V = Collection-Validator):
+  K-V3  _best_branch()               — oneOf branch discrimination by required-key overlap
+  K-V4  structural_errors() scalars  — scalar type/enum checks; skips placeholder strings
+  K-V5  page_range_errors()          — startPage ≤ endPage cross-field constraint
+
+For C-V (Config-Validator) numbers see validate_configs_against_dd.py.
+C-V4 is intentionally absent in both files; K-V4 occupies that slot for collections.
 """
 
 import argparse
@@ -116,8 +124,12 @@ def has_placeholder(obj):
     return False
 
 
-def _job_array_fields(spec):
-    """Derive the set of split-job array field names from the spec schemas.
+def _split_job_array_fields(spec):
+    """Derive the set of PDF-split job array field names from the spec schemas.
+
+    These are the fields that carry startPage/endPage cross-field constraints.
+    The function is intentionally scoped to SplitJobs arrays; other job arrays
+    (multiDocJobs, multiZipJobs) do not carry page-range constraints.
     Mirrors the discoverJobArrayFields() logic in fix_oneOf_placeholders.js (HC3).
     Falls back to the known pair if the spec has no schemas (e.g. test isolation)."""
     schemas = spec.get("components", {}).get("schemas", {})
@@ -133,7 +145,7 @@ def page_range_errors(body, spec):
     Enforces the DD rule: IF startPage > endPage THEN reject.
     Skips items that contain placeholder values (typed collection)."""
     errors = []
-    for field in _job_array_fields(spec):
+    for field in _split_job_array_fields(spec):
         jobs = body.get(field)
         if not isinstance(jobs, list):
             continue
@@ -401,7 +413,13 @@ def main(argv=None):
     if args.report:
         _write_report(args.report, args.spec, summary, all_results)
 
-    total_fail = sum(v.get("fail", 0) for v in summary.values() if isinstance(v, dict))
+    # Count failures; treat a missing collection as 1 failure so a partially-built
+    # artifact set never passes the gate silently.
+    total_fail = sum(
+        v.get("fail", 0) if v.get("error") != "not found" else 1
+        for v in summary.values()
+        if isinstance(v, dict)
+    )
     if args.exit_status and total_fail:
         return 1
     return 0

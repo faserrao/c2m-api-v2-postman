@@ -197,6 +197,25 @@ class TestFindVariantByDiscriminatorKey(unittest.TestCase):
         )
         self.assertEqual(name, "recipientAddressByList")
 
+    def test_non_oneof_field_returns_none(self):
+        """A plain scalar/enum field (not oneOf) must return None — not raise or misidentify."""
+        # Add a plain enum field inline so this test has no dep on the real spec.
+        spec_with_enum = {
+            "components": {
+                "schemas": {
+                    "mailClass": {
+                        "type": "string",
+                        "enum": ["first_class", "standard", "non_profit"],
+                    }
+                }
+            }
+        }
+        name, schema = find_variant_by_discriminator_key(
+            spec_with_enum, "mailClass", "first_class"
+        )
+        self.assertIsNone(name,
+                          "find_variant_by_discriminator_key on a plain enum field must return None")
+
 
 class TestBuildVariantPlaceholderStructure(unittest.TestCase):
 
@@ -224,7 +243,9 @@ class TestWithRealSpec(unittest.TestCase):
     CI runs these against the spec it just built.
     """
 
-    SPEC_PATH = Path("openapi/c2mapiv2-openapi-spec-base.yaml")
+    # Resolved relative to this file — not CWD-relative (CWD-relative silently
+    # skips all tests when pytest is run from a directory other than the repo root).
+    SPEC_PATH = Path(__file__).resolve().parent.parent.parent.parent / "openapi" / "c2mapiv2-openapi-spec-base.yaml"
 
     @classmethod
     def setUpClass(cls):

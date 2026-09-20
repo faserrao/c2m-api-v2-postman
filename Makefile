@@ -308,6 +308,7 @@ PYTHON_ENV_DIR                   := $(SCRIPTS_DIR)/python_env
 VENV_DIR                         := $(PYTHON_ENV_DIR)/e2o.venv
 VENV_PIP                         := $(VENV_DIR)/bin/pip
 VENV_PYTHON                      := $(VENV_DIR)/bin/python
+VENV_PYTEST                      := $(VENV_DIR)/bin/pytest
 PYTHON3                          := python3
 
 # Allowed status codes for Newman and Postman test generation.
@@ -2863,8 +2864,8 @@ validate-collections-conformance: ## Validate generated collections conform to t
 .PHONY: validate-collections-conformance-test
 validate-collections-conformance-test: ## Run all validation golden tests (validator + resolver + DD constraints unit tests)
 	@C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" POSTMAN_GENERATED_DIR="$(POSTMAN_GENERATED_DIR)" C2MAPIV2_POSTMAN_API_NAME_KC="$(C2MAPIV2_POSTMAN_API_NAME_KC)" $(VENV_PYTHON) scripts/validation/tests/test_validate_collections.py && \
-	C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" $(VENV_PYTHON) scripts/validation/tests/test_oneof_resolver.py && \
-	$(VENV_PYTHON) -m pytest scripts/validation/tests/test_dd_constraints.py -v
+	C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" $(VENV_PYTEST) scripts/validation/tests/test_oneof_resolver.py -v && \
+	$(VENV_PYTEST) scripts/validation/tests/test_dd_constraints.py -v
 
 .PHONY: validate-collections-deep
 validate-collections-deep: ## Deep field audit of all *.json files in postman/generated (auto-discovers, exit 1 on errors)
@@ -2903,6 +2904,11 @@ validate-spec-against-dd-report: ## Same as validate-spec-against-dd but writes 
 		--report reports/spec-vs-dd-report.md
 
 .PHONY: validate-configs
+# NOTE: Uses C2MAPIV2_OPENAPI_SPEC_BASE (not SPEC_FINAL) intentionally.
+# config examples are job-only; the base spec is available before the auth
+# overlay is merged. Auth paths are absent from the base spec — if a config
+# example ever references an auth path, V7 will flag it (correct behaviour,
+# since config examples should not reference auth endpoints).
 validate-configs: ## Validate all config file field names against the EBNF Data Dictionary
 	@echo "🔍 Validating config files against DD rule names..."
 	@DD_EBNF_FILE="$(DD_EBNF_FILE)" \
@@ -2911,7 +2917,8 @@ validate-configs: ## Validate all config file field names against the EBNF Data 
 		--catalog config/curated-examples-catalog.yaml \
 		--template config/getting-started-template.yaml \
 		--faker-hints config/faker_hints.yaml \
-		--spec $(C2MAPIV2_OPENAPI_SPEC_BASE)
+		--spec $(C2MAPIV2_OPENAPI_SPEC_BASE) \
+		--error-examples config/error-response-examples.yaml
 
 .PHONY: validate-postman-against-dd
 validate-postman-against-dd: ## Detailed Postman-to-DD validator: enum values, field names, numeric ranges, cross-field constraints
