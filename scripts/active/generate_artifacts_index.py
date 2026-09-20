@@ -18,6 +18,12 @@ ${{ github.repository_owner }}.
 import argparse
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Optional
+
+try:
+    import yaml as _yaml
+except ImportError:
+    _yaml = None
 
 
 # ---------------------------------------------------------------------------
@@ -70,10 +76,44 @@ def _section(title: str, rows: list[tuple[str, str, str]], readme_url: str | Non
 # Main
 # ---------------------------------------------------------------------------
 
+_DEFAULT_SDK_LANGS = [
+    ("Python",     "python",     "Python client library generated from the OpenAPI spec via OpenAPI Generator."),
+    ("JavaScript", "javascript", "JavaScript client library for browser and Node.js environments."),
+    ("TypeScript", "typescript", "TypeScript client library with full type definitions."),
+    ("Java",       "java",       "Java client library generated from the OpenAPI spec."),
+    ("Go",         "go",         "Go client library generated from the OpenAPI spec."),
+    ("Ruby",       "ruby",       "Ruby gem generated from the OpenAPI spec."),
+    ("PHP",        "php",        "PHP client library generated from the OpenAPI spec."),
+    ("C#",         "csharp",     "C# / .NET client library generated from the OpenAPI spec."),
+    ("Swift",      "swift",      "Swift client library for iOS and macOS applications."),
+    ("Kotlin",     "kotlin",     "Kotlin client library generated from the OpenAPI spec."),
+    ("Rust",       "rust",       "Rust client library generated from the OpenAPI spec."),
+]
+
+
+def _load_sdk_langs(sdk_langs_path: Optional[str]) -> list:
+    """Load SDK language list from config/sdk-languages.yaml.  Falls back to
+    _DEFAULT_SDK_LANGS when the path is None, yaml is unavailable, or the file
+    cannot be read — so CI never fails silently due to a missing file.
+    """
+    if sdk_langs_path and _yaml is not None:
+        try:
+            with open(sdk_langs_path) as f:
+                data = _yaml.safe_load(f)
+            langs = (data or {}).get('languages', [])
+            if langs:
+                return [(e['label'], e['slug'], e['description']) for e in langs]
+        except Exception as exc:
+            import sys
+            print(f"⚠️  Could not load sdk-languages.yaml '{sdk_langs_path}': {exc} — using built-in list", file=sys.stderr)
+    return _DEFAULT_SDK_LANGS
+
+
 def generate(org: str, reports_dir: Path, output: Path,
              artifacts_repo: str = "c2m-api-v2-postman-artifacts",
              api_name: str = "c2mapiv2",
-             linked_collection_name: str = "C2M API Linked Collection") -> None:
+             linked_collection_name: str = "C2M API Linked Collection",
+             sdk_langs_path: Optional[str] = None) -> None:
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
     # Local URL helpers with artifacts_repo baked in
@@ -187,19 +227,7 @@ def generate(org: str, reports_dir: Path, output: Path,
     ]
 
     # --- SDKs — no top-level sdks/README.md; each language has its own ------
-    _SDK_LANGS = [
-        ("Python",     "python",     "Python client library generated from the OpenAPI spec via OpenAPI Generator."),
-        ("JavaScript", "javascript", "JavaScript client library for browser and Node.js environments."),
-        ("TypeScript", "typescript", "TypeScript client library with full type definitions."),
-        ("Java",       "java",       "Java client library generated from the OpenAPI spec."),
-        ("Go",         "go",         "Go client library generated from the OpenAPI spec."),
-        ("Ruby",       "ruby",       "Ruby gem generated from the OpenAPI spec."),
-        ("PHP",        "php",        "PHP client library generated from the OpenAPI spec."),
-        ("C#",         "csharp",     "C# / .NET client library generated from the OpenAPI spec."),
-        ("Swift",      "swift",      "Swift client library for iOS and macOS applications."),
-        ("Kotlin",     "kotlin",     "Kotlin client library generated from the OpenAPI spec."),
-        ("Rust",       "rust",       "Rust client library generated from the OpenAPI spec."),
-    ]
+    _SDK_LANGS = _load_sdk_langs(sdk_langs_path)
     sdk_rows = [
         (
             f"SDK — {label}",
@@ -334,6 +362,12 @@ def main() -> None:
         help="Display name for the linked collection row in the index table "
              "(Makefile: POSTMAN_LINKED_COLLECTION_NAME). Default: 'C2M API Linked Collection'",
     )
+    parser.add_argument(
+        "--sdk-langs",
+        default=None,
+        help="Path to config/sdk-languages.yaml (single source of truth for SDK language list). "
+             "Falls back to the built-in list when omitted.",
+    )
     args = parser.parse_args()
 
     generate(
@@ -343,6 +377,7 @@ def main() -> None:
         artifacts_repo=args.artifacts_repo,
         api_name=args.api_name,
         linked_collection_name=args.linked_collection_name,
+        sdk_langs_path=args.sdk_langs,
     )
 
 

@@ -22,7 +22,9 @@ const _NOW_ISO = new Date().toISOString();
 const _EXPIRED_ISO = new Date(Date.now() - 3600000).toISOString();
 const _REQUEST_ID = `req-${crypto.randomBytes(4).toString('hex')}`;
 
-// HTTP status text mapping (required by Postman mock server for x-mock-response-code matching)
+// HTTP status text mapping (required by Postman mock server for x-mock-response-code matching).
+// These are RFC 9110 reason phrases (short form), not prose descriptions.
+// Parallel to _HTTP_STATUS_DESCRIPTIONS in ebnf_to_openapi_dynamic_v3.py (different format/consumer).
 const HTTP_STATUS_TEXT = {
   400: 'Bad Request',
   401: 'Unauthorized',

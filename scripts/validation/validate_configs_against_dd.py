@@ -325,26 +325,28 @@ def validate_catalog_select_fields(catalog_path: Path, spec_path: Path,
 
 # ── V5/V6 checks (require spec) ──────────────────────────────────────────────
 
-# The 8 jobOptions fields that have enum constraints in the OpenAPI spec.
-# Must stay in sync with _PROVIDER_MAPPING_FIELDS in ebnf_to_openapi_dynamic_v3.py.
-_JOBOPTIONS_ENUM_FIELDS = [
-    "mailClass", "color", "paperType", "printOption",
-    "productionTime", "envelope", "documentClass", "layout",
-]
+def _derive_joboptions_enum_fields(schemas: dict) -> list:
+    """Return jobOptions field names that have enum constraints in the spec.
+
+    Derived at runtime from spec components.schemas so the list never drifts
+    from the EBNF DD.  No hardcoded field list required.
+    """
+    job_props = schemas.get('jobOptions', {}).get('properties', {})
+    return [f for f, s in job_props.items() if s.get('enum')]
 
 
 def validate_catalog_joboptions_enums(catalog_path: Path, spec_path: Path,
                                       result: ValidationResult) -> None:
     """V5: Verify jobOptions enum values in catalog examples are valid DD enum values.
 
-    The 8 jobOptions fields have enum constraints in the spec (derived from the DD).
-    Catches catalog entries that use non-existent or stale enum values before they
-    silently produce wrong bodies.
+    The jobOptions enum fields are derived from the spec at runtime — no hardcoded
+    list required; new fields added to the DD are automatically checked.
     """
     import yaml
     with open(spec_path) as f:
         spec = yaml.safe_load(f)
     schemas = (spec.get('components') or {}).get('schemas', {})
+    joboptions_enum_fields = _derive_joboptions_enum_fields(schemas)
 
     catalog = _load_yaml(catalog_path)
     file_label = catalog_path.name
@@ -355,7 +357,7 @@ def validate_catalog_joboptions_enums(catalog_path: Path, spec_path: Path,
     for example in catalog.get('examples', []):
         ex_name = example.get('name', '<unnamed>')
         job_options = (example.get('values') or {}).get('jobOptions') or {}
-        for field in _JOBOPTIONS_ENUM_FIELDS:
+        for field in joboptions_enum_fields:
             value = job_options.get(field)
             if value is None:
                 continue

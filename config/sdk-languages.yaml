@@ -1,0 +1,37 @@
+# SDK generation language configuration.
+# Single source of truth for: scripts/utilities/generate-sdk-v2.sh + scripts/active/generate_artifacts_index.py
+# Add a new entry here to extend SDK generation and artifact index coverage simultaneously.
+languages:
+  - label: Python
+    slug: python
+    description: Python client library generated from the OpenAPI spec via OpenAPI Generator.
+  - label: JavaScript
+    slug: javascript
+    description: JavaScript client library for browser and Node.js environments.
+  - label: TypeScript
+    slug: typescript
+    description: TypeScript client library with full type definitions.
+  - label: Java
+    slug: java
+    description: Java client library (Maven/Gradle compatible).
+  - label: Go
+    slug: go
+    description: Go client library generated from the OpenAPI spec.
+  - label: Ruby
+    slug: ruby
+    description: Ruby gem generated from the OpenAPI spec.
+  - label: PHP
+    slug: php
+    description: PHP client library generated from the OpenAPI spec.
+  - label: C#
+    slug: csharp
+    description: C# (.NET) client library generated from the OpenAPI spec.
+  - label: Swift
+    slug: swift
+    description: Swift client library for iOS/macOS applications.
+  - label: Kotlin
+    slug: kotlin
+    description: Kotlin client library for Android and JVM environments.
+  - label: Rust
+    slug: rust
+    description: Rust client library generated from the OpenAPI spec.

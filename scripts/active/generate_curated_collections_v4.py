@@ -40,8 +40,7 @@ fake = Faker()
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-# Keep in sync with _DEFAULT_API_TITLE in ebnf_to_openapi_dynamic_v3.py
-_API_TITLE = "C2M API v2"
+_API_TITLE = "C2M API v2"  # fallback; overridden at runtime via --api-title
 from utilities.oneof_resolver import find_variant_by_discriminator_key, build_variant_placeholder_structure
 
 
@@ -857,6 +856,11 @@ def main():
              'When provided, remaining <...> placeholder strings in example mode are '
              'replaced with realistic values instead of left as placeholders.'
     )
+    parser.add_argument(
+        '--api-title',
+        default=_API_TITLE,
+        help='API title used in generated collection names (default: "C2M API v2")'
+    )
 
     args = parser.parse_args()
 
@@ -874,12 +878,13 @@ def main():
     print(f"  Loaded {len(openapi_spec.get('components', {}).get('schemas', {}))} component schemas")
 
     # Generate collection
+    api_title = args.api_title
     tag_filter = args.tags
     if tag_filter:
-        collection_name = f"{_API_TITLE} - {' + '.join(tag_filter).title()}"
+        collection_name = f"{api_title} - {' + '.join(tag_filter).title()}"
         output_name = args.output_name or f"c2mapiv2-{'-'.join(tag_filter)}-collection"
     else:
-        collection_name = f"{_API_TITLE} - All Examples"
+        collection_name = f"{api_title} - All Examples"
         output_name = args.output_name or "c2mapiv2-all-examples-collection"
 
     faker_hints = {}

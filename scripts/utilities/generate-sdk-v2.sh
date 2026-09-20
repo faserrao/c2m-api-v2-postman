@@ -925,7 +925,23 @@ EOF
 
 # Generate SDKs for all supported languages
 generate_all_sdks() {
-    local languages=("python" "javascript" "typescript" "java" "go" "ruby" "php" "csharp" "swift" "kotlin" "rust")
+    # Read language slugs from config/sdk-languages.yaml (single source of truth).
+    # Falls back to the hardcoded list if the file or python3/yaml is unavailable.
+    local languages
+    IFS=$'\n' read -r -d '' -a languages < <(python3 -c "
+import sys
+try:
+    import yaml
+    data = yaml.safe_load(open('config/sdk-languages.yaml'))
+    for e in (data or {}).get('languages', []):
+        print(e['slug'])
+except Exception:
+    for s in ['python','javascript','typescript','java','go','ruby','php','csharp','swift','kotlin','rust']:
+        print(s)
+" 2>/dev/null) || true
+    if [[ ${#languages[@]} -eq 0 ]]; then
+        languages=("python" "javascript" "typescript" "java" "go" "ruby" "php" "csharp" "swift" "kotlin" "rust")
+    fi
     local success_count=0
     local failed_languages=()
     

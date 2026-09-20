@@ -198,6 +198,34 @@ const _longTokenOpIds = Object.keys(jwtTests).filter(id =>
 );
 const _shortOrRevokeOpIds = Object.keys(jwtTests).filter(id => !_longTokenOpIds.includes(id));
 
+/**
+ * Extract error code strings from overlay response examples for one or more
+ * response-key names (e.g. ['Error401', 'Error400']).  Returns [] when no
+ * overlay is available so the fallback arrays below remain in effect.
+ */
+function buildAuthErrorCodesFromOverlay(statusKeys, overlay) {
+  if (!overlay) return [];
+  const responses = ((overlay.components || {}).responses) || {};
+  const codes = [];
+  for (const key of statusKeys) {
+    const response = responses[key];
+    if (!response) continue;
+    const examples = (((response.content || {})['application/json'] || {}).examples) || {};
+    for (const ex of Object.values(examples)) {
+      const code = (ex.value || {}).code;
+      if (code && !codes.includes(code)) codes.push(code);
+    }
+  }
+  return codes;
+}
+
+// Auth error code arrays — derived from auth overlay at generation time; falls back
+// to known stable values so the tests remain valid even without an overlay file.
+const _codes401 = buildAuthErrorCodesFromOverlay(['Error401', 'Error400'], authOverlay);
+const _codes403 = buildAuthErrorCodesFromOverlay(['Error403'], authOverlay);
+const _fallback401 = ['invalid_token', 'invalid_grant'];
+const _fallback403 = ['insufficient_scope'];
+
 // Auth error tests
 const authErrorTests = [
   `pm.test("Error response has proper structure", function () {
@@ -210,15 +238,13 @@ const authErrorTests = [
   `pm.test("401 error indicates authentication issue", function () {
     if (pm.response.code === 401) {
       const jsonData = pm.response.json();
-      // Codes defined in auth.tokens.yaml Error401/Error400 responses
-      pm.expect(['invalid_token', 'invalid_grant']).to.include(jsonData.code);
+      pm.expect(${JSON.stringify(_codes401.length ? _codes401 : _fallback401)}).to.include(jsonData.code);
     }
   });`,
   `pm.test("403 error indicates authorization issue", function () {
     if (pm.response.code === 403) {
       const jsonData = pm.response.json();
-      // Code defined in auth.tokens.yaml Error403 response
-      pm.expect(['insufficient_scope']).to.include(jsonData.code);
+      pm.expect(${JSON.stringify(_codes403.length ? _codes403 : _fallback403)}).to.include(jsonData.code);
     }
   });`
 ];

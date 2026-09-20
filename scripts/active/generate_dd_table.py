@@ -278,6 +278,18 @@ PRIMITIVES = {"string", "integer", "id", "number", "boolean"}
 # Spec-derived helpers
 # ---------------------------------------------------------------------------
 
+def _read_spec_title(spec_path: str) -> str | None:
+    """Return the API title from the spec's info.title, or None on any error."""
+    if _yaml is None:
+        return None
+    try:
+        with open(spec_path) as f:
+            spec = _yaml.safe_load(f)
+        return (spec.get('info') or {}).get('title')
+    except Exception:
+        return None
+
+
 def _load_endpoint_map_from_spec(spec_path: str) -> dict:
     """Derive {rule_name: (method, path)} from OpenAPI spec operationId fields.
 
@@ -836,10 +848,11 @@ def build_endpoint_expanded_rows(rules: dict) -> dict:
 # ---------------------------------------------------------------------------
 
 def write_endpoint_expanded_md(
-    endpoint_rows: dict, out_path: "Path", ebnf_path: "Path"
+    endpoint_rows: dict, out_path: "Path", ebnf_path: "Path", api_title: str | None = None,
 ) -> None:
+    _title = api_title or "C2M API v2"
     lines = [
-        "# C2M API v2 — Endpoint Field Reference (Expanded to Primitives)",
+        f"# {_title} — Endpoint Field Reference (Expanded to Primitives)",
         "",
         f"*Generated from `{ebnf_path.name}`. "
         "Edit `data_dictionary/c2mapiv2-dd.ebnf` to change the source of truth.*",
@@ -915,9 +928,10 @@ def _md_row(cells: list[str]) -> str:
     return "| " + " | ".join(cells) + " |"
 
 
-def write_markdown(rows: list[dict], out_path: Path, ebnf_path: Path) -> None:
+def write_markdown(rows: list[dict], out_path: Path, ebnf_path: Path, api_title: str | None = None) -> None:
+    _title = api_title or "C2M API v2"
     lines = [
-        "# C2M API v2 — Data Dictionary",
+        f"# {_title} — Data Dictionary",
         "",
         f"*Generated from `{ebnf_path.name}`. "
         "Edit `data_dictionary/c2mapiv2-dd.ebnf` to change the source of truth.*",
@@ -1021,8 +1035,10 @@ def main() -> int:
         return 1
 
     # Replace built-in _ENDPOINT_MAP with spec-derived version when --spec is given.
+    api_title: str | None = None
     global _ENDPOINT_MAP
     if args.spec:
+        api_title = _read_spec_title(args.spec)
         derived = _load_endpoint_map_from_spec(args.spec)
         if derived:
             _ENDPOINT_MAP = derived
@@ -1049,7 +1065,7 @@ def main() -> int:
     print(f"   Built {len(rows)} table rows ({components} components, {elements} elements).")
 
     print(f"📝 Writing type-reference tables to {out_dir}/")
-    write_markdown(rows, out_dir / "data-dictionary-table.md", ebnf_path)
+    write_markdown(rows, out_dir / "data-dictionary-table.md", ebnf_path, api_title=api_title)
     write_csv(rows, out_dir / "data-dictionary-table.csv")
 
     print(f"🔍 Expanding endpoints to primitive leaves...")
@@ -1058,6 +1074,7 @@ def main() -> int:
     print(f"   {len(endpoint_rows)} endpoints → {total_leaf} leaf-field rows.")
     write_endpoint_expanded_md(
         endpoint_rows, out_dir / "data-dictionary-endpoints-expanded.md", ebnf_path,
+        api_title=api_title,
     )
     write_endpoint_expanded_csv(
         endpoint_rows, out_dir / "data-dictionary-endpoints-expanded.csv",

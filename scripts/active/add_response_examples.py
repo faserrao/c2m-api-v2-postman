@@ -19,6 +19,14 @@ from pathlib import Path
 # Update both if the format changes.
 _CONTENT_TYPE_JSON = "application/json"  # M5: shared constant, avoids raw string repetition
 
+# Canonical success response body used in both the schema-level 'example' and the
+# media-type-level 'examples.success' entry — single definition prevents drift.
+_SUCCESS_RESPONSE = {
+    'status': 'accepted',
+    'message': 'Your request has been queued',
+    'requestId': 123456,
+}
+
 
 def _generate_tracking_id():
     suffix = ''.join(random.choices('0123456789ABCDEF', k=6))
@@ -277,11 +285,7 @@ def add_response_examples(spec, error_examples=None):
         schemas = spec['components']['schemas']
 
         if response_schema_name and response_schema_name in schemas:
-            schemas[response_schema_name]['example'] = {
-                'status': 'accepted',
-                'message': 'Your request has been queued',
-                'requestId': 123456
-            }
+            schemas[response_schema_name]['example'] = _SUCCESS_RESPONSE
 
         # Don't add 'examples' to schema level - only 'example' is valid
         # Multiple examples should be added at the media type level, not schema level
@@ -308,11 +312,7 @@ def add_response_examples(spec, error_examples=None):
                                         json_response['examples'] = {
                                             'success': {
                                                 'summary': 'Request accepted and queued',
-                                                'value': {
-                                                    'status': 'accepted',
-                                                    'message': 'Your request has been queued',
-                                                    'requestId': 123456
-                                                }
+                                                'value': _SUCCESS_RESPONSE,
                                             }
                                         }
 

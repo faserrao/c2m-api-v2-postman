@@ -63,6 +63,15 @@ _DEFAULT_SERVER_URL   = "https://api.click2mail.com/v2"
 _DEFAULT_SUPPORT_EMAIL = "support@click2mail.com"
 _DEFAULT_API_TITLE    = "C2M API v2"
 _DEFAULT_API_VERSION  = "2.0.0"
+_DEFAULT_API_DESCRIPTION = "API for submitting mailing jobs with various document routing options"
+
+# ── Field-name heuristics ─────────────────────────────────────────────────
+# Keyword priority lists for locating doc/address symbols via graph traversal.
+_DOC_FIELD_KEYWORDS  = ['docSource', 'documentSource', 'document']
+_ADDR_FIELD_KEYWORDS = ['addressSource', 'recipientAddress', 'addressList', 'address']
+
+# ── JWT example token ─────────────────────────────────────────────────────
+_JWT_EXAMPLE_TOKEN = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 
 # ── H4: HTTP response description strings ────────────────────────────────
 # Centralised here so they can be updated without hunting through _generate_paths().
@@ -538,7 +547,7 @@ class EBNFToOpenAPITranslator:
         info = OrderedDict([
             ("title", self.api_title),
             ("version", self.api_version),
-            ("description", "API for submitting mailing jobs with various document routing options"),
+            ("description", _DEFAULT_API_DESCRIPTION),
             ("x-http-error-map", self.http_error_map),
         ])
         if self.numeric_constraints:
@@ -862,16 +871,14 @@ class EBNFToOpenAPITranslator:
 
         # Find document field: match by keyword, most-specific first so the
         # best match wins (e.g. 'docSource*' beats 'document*').
-        doc_keywords = ['docSource', 'documentSource', 'document']
-        for kw in doc_keywords:
+        for kw in _DOC_FIELD_KEYWORDS:
             match = next((s for s in all_symbols if kw.lower() in s.lower()), None)
             if match:
                 field_names['documentField'] = match
                 break
 
         # Find address field similarly.
-        addr_keywords = ['addressSource', 'recipientAddress', 'addressList', 'address']
-        for kw in addr_keywords:
+        for kw in _ADDR_FIELD_KEYWORDS:
             match = next((s for s in all_symbols if kw.lower() in s.lower()), None)
             if match:
                 field_names['addressField'] = match
@@ -1378,7 +1385,7 @@ class EBNFToOpenAPITranslator:
                 ("required", True),
                 ("schema", OrderedDict([
                     ("type", "string"),
-                    ("example", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
+                    ("example", _JWT_EXAMPLE_TOKEN)
                 ]))
             ])),
             ("Content-Type", OrderedDict([
