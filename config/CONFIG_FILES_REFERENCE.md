@@ -268,10 +268,10 @@ examples:
 | `filename: invoice_001.pdf`, `letter_001.pdf`, etc. | ZIP batch examples | Illustrative filenames specific to the business scenario. |
 | `mergeByDocumentId`, `mergeByRequestId` inline structures | Merge examples | These are oneOf branch structures that must be authored explicitly; the generator cannot infer which merge strategy to demonstrate. |
 
-**Known hardcoded DD enum values (pending fix):**
+**jobOptions enum values:**
 
-The "Using jobOptions Instead of Template" example (lines 423–431) contains 8 explicit
-`jobOptions` enum values that duplicate DD enum values:
+The "Using jobOptions Instead of Template" example contains 8 explicit `jobOptions`
+enum values:
 
 ```yaml
 jobOptions:
@@ -285,9 +285,10 @@ jobOptions:
   mailClass: first_class          # DD enum — matches faker_hints
 ```
 
-These are intentionally educational (showing real enum values to the user), but they
-have no validation gate against the DD and will silently drift if the DD enum changes.
-**No fix applied yet** — tracked as a future improvement.
+These are intentionally educational. They are validated at `make validate-configs` time
+by **V5** (`validate_catalog_joboptions_enums()` in `validate_configs_against_dd.py`),
+which checks every `jobOptions` field value in catalog examples against the spec enum.
+Drift from the DD will be caught at build time.
 
 ---
 
@@ -430,18 +431,24 @@ status code, each with a fixed `errorCode`, human-readable `errorMessage`, and a
 | `errorDetails:` JSON content | Human-authored contextual detail. Cannot be derived. |
 | `summary:` strings | Human-authored display name for each example. Cannot be derived. |
 
-**Known hardcoded DD enum value (no validation gate):**
+**`{mailClass_enum}` token (previously hardcoded):**
 
-In the 422 `invalid_enum_value` example, the `allowed` array inside the `errorDetails`
-JSON string hardcodes `mailClass` enum values from the DD:
+The 422 `invalid_enum_value` example previously hardcoded the `mailClass` enum in the
+`errorDetails` JSON string. This was replaced with a `{mailClass_enum}` token in
+commit `3eb49a9`:
 
 ```yaml
-errorDetails: '{"field": "mailClass", "provided": "express", "allowed": ["first_class", "standard", "non_profit"]}'
+errorDetails: '{"field": "mailClass", "provided": "express", "allowed": {mailClass_enum}}'
 ```
 
-This is illustrative content embedded inside a JSON string within YAML, which makes
-automated derivation complex. It will silently drift if the `mailClass` enum changes.
-**No fix applied yet** — tracked as a future improvement.
+The token is resolved at injection time by `_resolve_enum_tokens()` in
+`add_response_examples.py` and `resolveEnumTokens()` in
+`add_error_responses_to_collection.js`, both reading the enum from
+`spec.components.schemas.mailClass.enum`. If the `mailClass` enum changes in the EBNF
+DD, the injected value updates automatically on the next build.
+
+All `errorCode:` values in this file are also validated at `make validate-configs` time
+by **V6** (`validate_error_response_codes()` in `validate_configs_against_dd.py`).
 
 ---
 
@@ -452,9 +459,9 @@ automated derivation complex. It will silently drift if the `mailClass` enum cha
 | `faker_hints.yaml` | **Generated** | No — DO NOT EDIT | EBNF DD `@hint` annotations | `validate_configs_against_dd.py` (key names) |
 | `c2m_provider_mappings.yaml` | **Generated** | No — DO NOT EDIT | EBNF DD enums + `c2m_provider_aliases.yaml` | `test_dd_constraints.py` (golden tests) |
 | `c2m_provider_aliases.yaml` | Manual | Yes | Human knowledge (legacy strings) | `test_dd_constraints.py` (alias targets must be valid DD values) |
-| `curated-examples-catalog.yaml` | Manual | Yes | Human-curated examples | `validate_configs_against_dd.py`, `validate_catalog_against_spec.py` |
-| `getting-started-template.yaml` | Manual | Yes | Human-curated structure | `validate_configs_against_dd.py` (V3, V3a, V7) |
-| `error-response-examples.yaml` | Manual | Yes | Human-curated error scenarios | Runtime check in `add_response_examples.py` |
+| `curated-examples-catalog.yaml` | Manual | Yes | Human-curated examples | `validate_configs_against_dd.py` (V2, V5, V7); `validate_catalog_against_spec.py` |
+| `getting-started-template.yaml` | Manual | Yes | Human-curated structure | `validate_configs_against_dd.py` (V3a, V3b, V7, V8) |
+| `error-response-examples.yaml` | Manual | Yes | Human-curated error scenarios | `validate_configs_against_dd.py` (V6); runtime check in `add_response_examples.py` |
 
 ---
 
