@@ -24,7 +24,7 @@ _CONTENT_TYPE_JSON = "application/json"  # M5: shared constant, avoids raw strin
 _SUCCESS_RESPONSE = {
     'status': 'accepted',
     'message': 'Your request has been queued',
-    'requestId': 123456,
+    'requestId': 123456,  # G2: static example integer — not a DD enum; see DD: requestId = id ; (* @hint random_int 10000 99999 *)
 }
 
 

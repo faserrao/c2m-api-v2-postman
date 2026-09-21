@@ -727,11 +727,11 @@ function generateRandomValue(key, existingValue) {
     } else if (keyLower.includes('routing')) {
         return faker.finance.routingNumber();
     } else if (keyLower.includes('account')) {
-        return '1234567890';
+        return '1234567890';  // G3: matches faker_hints.yaml static value for accountNumber
     } else if (keyLower.includes('status')) {
-        return 'accepted';
+        return 'accepted';  // G3: matches _SUCCESS_RESPONSE.status in add_response_examples.py
     } else if (keyLower.includes('message')) {
-        return 'Your request has been queued';
+        return 'Your request has been queued';  // G3: matches _SUCCESS_RESPONSE.message in add_response_examples.py
     } else if (keyLower === 'jobid' || (keyLower.includes('job') && keyLower.includes('id'))) {
         return `job_${Date.now()}_${faker.string.alphanumeric(6)}`;
     } else if (keyLower === 'startpage') {

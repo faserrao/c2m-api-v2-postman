@@ -3,6 +3,9 @@
 const fs = require('fs');
 const yaml = require('js-yaml');
 
+// G1: Matches CONTENT_TYPE_JSON / _CONTENT_TYPE_JSON used in all other active pipeline scripts.
+const CONTENT_TYPE_JSON = 'application/json';
+
 const args = process.argv.slice(2);
 if (args.length < 2) {
   console.error("Usage: node scripts/add_tests_jwt.js <input_file> <output_file> [--allowed-codes \"200,400,401\"] --auth-overlay <path>");
@@ -161,7 +164,7 @@ function buildJwtTests(overlay) {
       const responses = operation.responses || {};
       for (const [status, resp] of Object.entries(responses)) {
         if (parseInt(status, 10) >= 200 && parseInt(status, 10) < 300) {
-          const ref = (((resp.content || {})['application/json'] || {}).schema || {}).$ref;
+          const ref = (((resp.content || {})[CONTENT_TYPE_JSON] || {}).schema || {}).$ref;
           if (ref) {
             schemaName = ref.split('/').pop();
             break;
@@ -210,7 +213,7 @@ function buildAuthErrorCodesFromOverlay(statusKeys, overlay) {
   for (const key of statusKeys) {
     const response = responses[key];
     if (!response) continue;
-    const examples = (((response.content || {})['application/json'] || {}).examples) || {};
+    const examples = (((response.content || {})[CONTENT_TYPE_JSON] || {}).examples) || {};
     for (const ex of Object.values(examples)) {
       const code = (ex.value || {}).code;
       if (code && !codes.includes(code)) codes.push(code);
