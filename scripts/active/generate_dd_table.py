@@ -25,16 +25,19 @@ except ImportError:
     _yaml = None
 
 # ---------------------------------------------------------------------------
-# Description catalog.  Every EBNF rule should have an entry here.
-# Rules without an entry fall back to a generated description.
+# Description fallback catalog.
+# Checked by _desc() only when no (* @doc *) annotation exists in the EBNF DD.
 #
-# M3 (known gap): These descriptions are not in the EBNF DD — adding @doc
-# annotations to 152 EBNF rules is a large refactor deferred to a future session.
-# When that work is done, this dict can be replaced by reading annotations at
-# parse time (same pattern as @summary/@description for endpoint metadata).
+# Contains ONLY entries for things that cannot carry @doc annotations:
+#   (a) Endpoint param rules — these have @summary in the EBNF; kept here for
+#       backwards compatibility in case parse_ebnf() is called before @doc extraction
+#   (b) Bare primitive type names (string, integer, etc.) — not defined as EBNF rules
+#   (c) Quoted-key payment variant discriminators ('"creditCard"' etc.) — not EBNF rules
+#
+# All other rules are now documented via (* @doc Text. *) annotations in the EBNF DD.
 # ---------------------------------------------------------------------------
 _DESC: dict[str, str] = {
-    # Endpoint request body shapes
+    # Endpoint request body shapes (have @summary in EBNF)
     "submitDocParams":
         "Request body for POST /static — submit a single document to one or more recipients.",
     "submitSinglePdfAddressCaptureParams":
@@ -55,206 +58,9 @@ _DESC: dict[str, str] = {
     "submitMultiZipAddressCaptureParams":
         "Request body for POST /batch/zip/address-capture — ZIP-based mailing batch with "
         "recipient addresses captured externally.",
-    # Core job fields
-    "jobTemplate":
-        "Saved job template name; pre-populates all print and mail options. "
-        "Mutually exclusive with jobOptions.",
-    "returnAddress":
-        "Optional sender return address printed on the mailpiece.",
-    "jobOptions":
-        "Explicit print and mail configuration options. Mutually exclusive with jobTemplate.",
-    "tags":
-        "Optional list of user-defined string tags for reporting and filtering.",
-    "tagsList":
-        "Array of user-defined string tags.",
-    # Document sources
-    "docSourceAll":
-        "Document source — accepts any supported variant: requestId, documentId, URL, "
-        "or zip-based (zipDocumentId or zipRequestId).",
-    "docSourceStandard":
-        "Document source — standard (non-zip) variants only: requestId, documentId, or URL.",
-    "docSourceZipFile":
-        "Document source — zip variants: a specific file within a stored ZIP "
-        "(zipDocumentId + filename) or uploaded ZIP (requestId + zipFilename + filename).",
-    "docSourceZipFileRef":
-        "Top-level ZIP archive reference for batch endpoints — identifies the archive itself, "
-        "not a file within it. No filename is required at this level.",
-    "zipDocumentSource":
-        "ZIP document source — either a stored zip archive (zipDocumentId) or an "
-        "uploaded zip archive (requestId).",
-    "documentIdSource":
-        "Source a document by its previously stored document ID.",
-    "requestIdSource":
-        "Source a document from a prior file upload by request ID. If the upload request "
-        "contained multiple files, filename is required to identify which one.",
-    "urlSource":
-        "Fetch the document from an external URL at submission time.",
-    "zipDocumentIdSource":
-        "Source a specific file within a stored ZIP archive — requires the archive ID "
-        "and the filename of the target file within the archive.",
-    "zipRequestIdSource":
-        "Source a specific file within an uploaded ZIP archive — requires the upload "
-        "request ID, the zip filename within that request, and the target filename in the zip.",
-    "zipDocumentIdOnly":
-        "Reference to a stored ZIP archive without a file selection — used at the "
-        "batch job top level where individual job items select their own filenames.",
-    "zipRequestIdOnly":
-        "Reference to an uploaded ZIP archive by request ID only — used at the batch "
-        "top level; individual job items carry the filename selection.",
-    "documentId":
-        "Integer ID of a previously stored or uploaded document.",
-    "requestId":
-        "Integer ID of a prior file upload request. Also returned in success responses.",
-    "filename":
-        "Filename of a specific file within an upload request or ZIP archive.",
-    "zipDocumentId":
-        "Integer ID of a previously stored ZIP archive.",
-    "zipFilename":
-        "Filename of the ZIP file within an upload request (distinguishes the zip from "
-        "other files uploaded in the same request).",
-    "url":
-        "URL from which the API will fetch the document at submission time.",
-    # Addresses
-    "address":
-        "Mailing address with required core fields (name, address1, city, state, zip, "
-        "country) and optional extended fields (company, address2, address3, foo1, foo2).",
-    "singleAddress":
-        "A single recipient mailing address (alias for address).",
-    "addressList":
-        "List of recipient mailing addresses — used for batch sends and mail merge.",
-    "recipientAddressSource":
-        "Recipient address specification — one of: inline single address (with optional "
-        "mapping), inline address list (with optional mapping), stored list ID, or stored "
-        "address ID.",
-    "recipientAddressBySingle":
-        "Inline single recipient address with an optional merge-field mapping ID.",
-    "recipientAddressByList":
-        "Inline list of recipient addresses with an optional merge-field mapping ID.",
-    "recipientAddressByListId":
-        "Reference to a previously stored recipient address list by its integer ID.",
-    "recipientAddressByAddressId":
-        "Reference to a previously stored individual recipient address by its integer ID.",
-    "firstName":      "Recipient's first name.",
-    "lastName":       "Recipient's last name.",
-    "company":        "Recipient's company or organisation name (optional).",
-    "address1":       "Primary street address line.",
-    "address2":       "Secondary address line (suite, apartment, floor, etc.).",
-    "address3":       "Tertiary address line.",
-    "city":           "City name.",
-    "state":          "Two-letter state or province abbreviation.",
-    "zip":            "ZIP or postal code.",
-    "country":        "Country code (e.g. USA).",
-    "foo1":
-        "User-defined merge variable 1 — forwarded to the address list merge mapping "
-        "for personalisation.",
-    "foo2":
-        "User-defined merge variable 2 — forwarded to the address list merge mapping "
-        "for personalisation.",
-    "mappingId":
-        "Integer ID of a merge-field mapping profile that associates address columns to "
-        "template variables. If omitted, the account default mapping is used.",
-    "addressName":     "Optional label for this recipient address record.",
-    "addressListName": "Optional name for this address list record.",
-    "addressListId":   "Integer ID of a previously stored recipient address list.",
-    "addressId":       "Integer ID of a previously stored individual recipient address.",
-    # Job options fields — enum values are shown in the table's kind column (from EBNF)
-    "documentClass":   "Document class.",
-    "layout":          "Page layout for address placement.",
-    "productionTime":  "Production time preference.",
-    "envelope":        "Envelope type.",
-    "color":           "Color mode.",
-    "paperType":       "Paper stock.",
-    "printOption":     "Duplex setting.",
-    "mailClass":       "USPS mail class.",
-    # Job lists / split jobs
-    "pdfSplitJobsWithAddress":
-        "List of page-range job items, each with its own inline recipient address.",
-    "pdfSplitJobsNoAddress":
-        "List of page-range job items without inline addresses — addresses are captured "
-        "externally (POST /batch/split/address-capture).",
-    "pdfSplitJobItemWithAddress":
-        "A single page-range job entry: page range (startPage, endPage) plus a recipient address.",
-    "pdfSplitJobItemNoAddress":
-        "A single page-range job entry: page range only (no address — used for address-capture endpoint).",
-    "startPage":
-        "First page of this job's page range, 1-indexed (inclusive).",
-    "endPage":
-        "Last page of this job's page range (inclusive). Must be ≥ startPage.",
-    "multiDocJobs":
-        "List of independent document-per-recipient jobs (each job has its own document source "
-        "and recipient address).",
-    "multiDocJobItem":
-        "A single independent document job entry within a multi-doc batch.",
-    "multiZipJobs":
-        "List of per-file job items extracted from a ZIP archive (POST /batch/zip).",
-    "multiZipJobItem":
-        "A single ZIP file job entry: optional job template, filename within the ZIP, "
-        "and recipient address.",
-    # Merge
-    "mergeDocumentSource":
-        "Container for the list of documents to merge (POST /mail-merge).",
-    "documentsToMerge":
-        "Ordered array of document references to merge into one output document. "
-        "Minimum two entries required.",
-    "mergeDocumentRef":
-        "A single document to include in the merge — either a stored document ID or "
-        "an upload request ID (with optional filename).",
-    "mergeByDocumentId":
-        "Merge a stored document identified by its document ID.",
-    "mergeByRequestId":
-        "Merge an uploaded document identified by its upload request ID, with an optional "
-        "filename when the request contains multiple files.",
-    # Payment
-    "paymentDetails":
-        "Payment method — one of: creditCard, invoice, ACH bank transfer, or account credit.",
-    "creditCardPayment":  "Credit card payment.",
-    "invoicePayment":     "Invoice payment — billed to an existing account invoice.",
-    "achPayment":         "ACH bank transfer payment.",
-    "userCreditPayment":  "Payment deducted from the account's prepaid credit balance.",
-    "creditCardDetails":
-        "Credit card payment fields: card type, card number, expiration date, and CVV.",
-    "invoiceDetails":
-        "Invoice payment fields: invoice number and amount due.",
-    "achDetails":
-        "ACH payment fields: routing number, bank account number, and check digit.",
-    "creditAmount":
-        "Account credit payment fields: monetary amount and ISO currency code.",
-    "cardType":        "Card brand (enum values shown in kind column).",
-    "cardNumber":    "Credit card number (PAN) as a string.",
-    "expirationDate": "Card expiration date containing month and year.",
-    "month":         "Expiration month as an integer (1–12).",
-    "year":          "Expiration year as a four-digit integer (e.g. 2027).",
-    "cvv":           "Card security code (CVV/CVC) as an integer.",
-    "routingNumber": "ABA bank routing number.",
-    "accountNumber": "Bank account number.",
-    "checkDigit":    "ACH check digit.",
-    "invoiceNumber": "Invoice reference number.",
-    "amountDue":     "Amount due on the invoice.",
-    "currency":        "ISO 4217 currency code (enum values shown in kind column).",
-    "amount":        "Monetary amount (numeric value).",
-    # Success response
-    "standardResponse":
-        "Success response returned for all successful job submissions.",
-    "status":
-        'Job status string (e.g. "accepted").',
-    "message":
-        "Human-readable confirmation message (e.g. \"Your request has been queued\").",
-    # Error response
-    "errorResponse":
-        "Error response structure returned for all API error conditions.",
-    "errorType":
-        "High-level error category string (ValidationError, AuthenticationError, etc.).",
-    "errorMessage":  "Human-readable error description.",
-    "errorCode":
-        "Machine-readable error code string (e.g. MISSING_REQUIRED_FIELD).",
-    "errorDetails":
-        "Optional JSON object with additional error context (free-form key/value pairs).",
-    "errorTrackingId":
-        "Optional support tracking identifier in the format TRK-YYYYMMDD-XXXXXX.",
-    # Primitive aliases
+    # Bare primitive type names (shown as array-item elements in the type-reference table)
     "id":            "Integer identifier — alias for integer, used for all ID fields.",
     "number":        "Numeric value (integer or decimal).",
-    # Bare primitive type names (shown as array-item elements in the type-reference table)
     "string":        "A plain text string value.",
     "integer":       "A whole-number integer value.",
     "boolean":       "A boolean true/false value.",
@@ -264,6 +70,10 @@ _DESC: dict[str, str] = {
     '"ach"':         "JSON property key identifying the ACH bank-transfer payment variant.",
     '"userCredit"':  "JSON property key identifying the account-credit payment variant.",
 }
+
+# Populated by parse_ebnf() from (* @doc Text. *) preceding-line annotations in the EBNF DD.
+# Checked first by _desc() before falling back to _DESC above.
+_DOC_ANNOTATIONS: dict[str, str] = {}
 
 # Which rules are the top-level endpoint param shapes and their endpoint path
 _ENDPOINT_MAP: dict[str, tuple[str, str]] = {
@@ -321,12 +131,12 @@ def _load_endpoint_map_from_spec(spec_path: str) -> dict:
 
 
 def _desc_completeness_check(rules: dict) -> None:
-    """Warn about DD rules that have no entry in the _DESC lookup table."""
-    missing = [name for name in rules if name not in _DESC]
+    """Warn about DD rules that have no @doc annotation or _DESC fallback entry."""
+    missing = [name for name in rules if name not in _DOC_ANNOTATIONS and name not in _DESC]
     if missing:
         print(
-            f"\n⚠️  {len(missing)} DD rules have no _DESC entry "
-            f"(add descriptions to improve table quality):",
+            f"\n⚠️  {len(missing)} DD rules have no @doc annotation "
+            f"(add (* @doc Description. *) in the EBNF DD to improve table quality):",
             file=sys.stderr,
         )
         for name in sorted(missing):
@@ -340,6 +150,25 @@ def _desc_completeness_check(rules: dict) -> None:
 def _strip_comments(text: str) -> str:
     """Remove all (* ... *) block comments (handles multi-line)."""
     return re.sub(r"\(\*.*?\*\)", "", text, flags=re.DOTALL)
+
+
+def _extract_doc_annotations(text: str) -> dict[str, str]:
+    """Pre-pass: extract (* @doc text *) annotations before comment stripping.
+
+    Annotation placement (preceding-line, same pattern as @summary/@description):
+        (* @doc Description text. *)
+        ruleName = ...
+    """
+    doc_map: dict[str, str] = {}
+    pattern = re.compile(
+        r'\(\*\s*@doc\s+(.*?)\s*\*\)\s*\n\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*=',
+        re.DOTALL,
+    )
+    for m in pattern.finditer(text):
+        doc_text = re.sub(r'\s+', ' ', m.group(1).strip())
+        rule_name = m.group(2)
+        doc_map[rule_name] = doc_text
+    return doc_map
 
 
 def _split_top_level(text: str, sep: str) -> list[str]:
@@ -433,7 +262,10 @@ def _parse_elements(rhs: str, kind: str) -> list[dict]:
 
 def parse_ebnf(path: Path) -> dict[str, dict]:
     """Parse EBNF file and return dict of {rule_name: rule_info}."""
+    global _DOC_ANNOTATIONS
     text = path.read_text(encoding="utf-8")
+    # Extract @doc annotations BEFORE stripping comments (which removes all (* ... *) blocks)
+    _DOC_ANNOTATIONS = _extract_doc_annotations(text)
     clean = _strip_comments(text)
     flat = re.sub(r"\s+", " ", clean).strip()
 
@@ -486,18 +318,30 @@ def _display_type(name: str, rules: dict, depth: int = 0) -> str:
 
 
 def _desc(name: str) -> str:
-    """Return a natural-language description for a rule or field name.
+    """Return a description for a rule or field name.
 
-    Strips trailing [] (array notation) before lookup so that 'tags[]'
+    Lookup order:
+      1. @doc annotation from the EBNF DD (populated by parse_ebnf)
+      2. _DESC fallback (endpoint params, quoted-key variants, primitives)
+      3. Generic fallback
+
+    Strips trailing [] array notation before each lookup so that 'tags[]'
     resolves to the description for 'tags'.
     """
-    # Direct hit
+    stripped = name.rstrip("]").rstrip("[").rstrip("]").rstrip("[")
+
+    # 1. EBNF @doc annotation (single source of truth for all regular rules)
+    if name in _DOC_ANNOTATIONS:
+        return _DOC_ANNOTATIONS[name]
+    if stripped != name and stripped in _DOC_ANNOTATIONS:
+        return _DOC_ANNOTATIONS[stripped]
+
+    # 2. Static fallback dict (endpoint params, primitives, quoted-key discriminators)
     if name in _DESC:
         return _DESC[name]
-    # Strip one or more trailing [] array suffixes (e.g. "tags[]" → "tags")
-    stripped = name.rstrip("]").rstrip("[").rstrip("]").rstrip("[")
     if stripped != name and stripped in _DESC:
         return _DESC[stripped]
+
     return f"See EBNF rule `{name}`."
 
 

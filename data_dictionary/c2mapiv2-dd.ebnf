@@ -564,8 +564,10 @@ submitMultiZipAddressCaptureParams =
 (*           CORE OBJECTS           *)
 (***********************************)
 
+(* @doc Saved job template name; pre-populates all print and mail options. Mutually exclusive with jobOptions. *)
 jobTemplate = string ; (* @hint static standard_letter *)
 
+(* @doc Optional sender return address printed on the mailpiece. *)
 returnAddress =
       firstName + lastName
     + [ company ]
@@ -573,6 +575,7 @@ returnAddress =
     + city + state + zip + country
     + [ address2 ] + [ address3 ] ;
 
+(* @doc Explicit print and mail configuration options. Mutually exclusive with jobTemplate. *)
 jobOptions =
       documentClass
     + layout
@@ -583,38 +586,61 @@ jobOptions =
     + printOption
     + mailClass ;
 
+(* @doc Document class determining the mailpiece format. *)
 documentClass  = "letter" | "postcard" | "brochure" | "flat" ; (* @hint static letter *)
+(* @doc Page layout controlling where the recipient address is printed. *)
 layout         = "address_on_first_page" | "address_on_back_page" ; (* @hint static address_on_first_page *)
+(* @doc Production time preference (next_day, two_day, etc.). *)
 productionTime = "next_day" | "two_day" | "three_day" | "standard" | "same_day" ; (* @hint static next_day *)
+(* @doc Envelope type used for the mailing. *)
 envelope       = "standard" | "none" | "flat" | "double_window" ; (* @hint static standard *)
+(* @doc Color mode for printing (full_color or black_and_white). *)
 color          = "full_color" | "black_and_white" ; (* @hint static full_color *)
+(* @doc Paper stock for printing. *)
 paperType      = "white" | "white_24" | "ivory" | "glossy" ; (* @hint static white *)
+(* @doc Duplex setting (double_sided or single_sided). *)
 printOption    = "double_sided" | "single_sided" ; (* @hint static double_sided *)
+(* @doc USPS mail class (first_class, standard, or non_profit). *)
 mailClass      = "first_class" | "standard" | "non_profit" ; (* @hint static first_class *)
 
+(* @doc Optional list of user-defined string tags for reporting and filtering. *)
 tags = tagsList ;
+(* @doc Array of user-defined string tags. *)
 tagsList = { string } ;
 
 (***********************************)
 (*          ADDRESS OBJECTS         *)
 (***********************************)
 
+(* @doc Recipient's first name. *)
 firstName = string ; (* @hint faker first_name *)
+(* @doc Recipient's last name. *)
 lastName  = string ; (* @hint faker last_name *)
+(* @doc Recipient's company or organisation name (optional). *)
 company   = string ; (* @hint faker company *)
 
+(* @doc Primary street address line. *)
 address1  = string ; (* @hint faker street_address *)
+(* @doc Secondary address line (suite, apartment, floor, etc.). *)
 address2  = string ; (* @hint static Suite 100 *)
+(* @doc Tertiary address line. *)
 address3  = string ; (* @hint static  *)
 
+(* @doc City name. *)
 city     = string ; (* @hint faker city *)
+(* @doc Two-letter state or province abbreviation. *)
 state    = string ; (* @hint faker state_abbr *)
+(* @doc ZIP or postal code. *)
 zip      = string ; (* @hint faker zipcode *)
+(* @doc Country code (e.g. USA). *)
 country  = string ; (* @hint static USA *)
 
+(* @doc User-defined merge variable 1 — forwarded to the address list merge mapping for personalisation. *)
 foo1 = string ; (* @hint static Custom Field 1 *)
+(* @doc User-defined merge variable 2 — forwarded to the address list merge mapping for personalisation. *)
 foo2 = string ; (* @hint static Custom Field 2 *)
 
+(* @doc Mailing address with required core fields (name, address1, city, state, zip, country) and optional extended fields (company, address2, address3, foo1, foo2). *)
 address =
       firstName + lastName
     + address1
@@ -622,56 +648,81 @@ address =
     + [ address2 ] + [ address3 ]
     + [ foo1 ] + [ foo2 ] ;
 
+(* @doc Recipient address specification — one of: inline single address (with optional mapping), inline address list (with optional mapping), stored list ID, or stored address ID. *)
 recipientAddressSource =
       singleAddress
     | recipientAddressByList
     | recipientAddressByAddressId
     | recipientAddressByListId ; (* @structural named_wrapper_oneof *)
 
+(* @doc A single recipient mailing address (alias for address). *)
 singleAddress = address ;
 
+(* @doc Inline list of recipient addresses with an optional merge-field mapping ID. *)
 recipientAddressByList =
     [ mappingId ] + addressList + [ addressListName ] ;
 
+(* @doc Reference to a previously stored recipient address list by its integer ID. *)
 recipientAddressByListId =
     addressListId ;
 
+(* @doc Reference to a previously stored individual recipient address by its integer ID. *)
 recipientAddressByAddressId =
     addressId ;
 
+(* @doc Integer ID of a merge-field mapping profile that associates address columns to template variables. If omitted, the account default mapping is used. *)
 mappingId = id ; (* @hint static 5001 *)
+(* @doc Optional label for this recipient address record. *)
 addressName = string ;
+(* @doc Optional name for this address list record. *)
 addressListName = string ; (* @hint static Marketing Campaign Q1 *)
+(* @doc Integer ID of a previously stored recipient address list. *)
 addressListId = id ; (* @hint static 1001 *)
+(* @doc Integer ID of a previously stored individual recipient address. *)
 addressId = id ;
 
+(* @doc List of recipient mailing addresses — used for batch sends and mail merge. *)
 addressList   = { address } ;
 
 (***********************************)
 (*        DOCUMENT SOURCE MODES     *)
 (***********************************)
 
+(* @doc Source a document by its previously stored document ID. *)
 documentIdSource = documentId ; (* @structural single_field_wrapper *)
+(* @doc Integer ID of a previously stored or uploaded document. *)
 documentId = id ; (* @hint random_int 10000 99999 *)
 
+(* @doc Source a document from a prior file upload by request ID. If the upload request contained multiple files, filename is required to identify which one. *)
 requestIdSource = requestId + [ filename ] ;
+(* @doc Integer ID of a prior file upload request. Also returned in success responses. *)
 requestId = id ; (* @hint random_int 10000 99999 *)
+(* @doc Filename of a specific file within an upload request or ZIP archive. *)
 filename = string ; (* @hint static document.pdf *)
 
+(* @doc Fetch the document from an external URL at submission time. *)
 urlSource = url ; (* @structural single_field_wrapper *)
+(* @doc URL from which the API will fetch the document at submission time. *)
 url = string ; (* @hint static https://example.com/documents/sample.pdf *)
 
+(* @doc Source a specific file within a stored ZIP archive — requires the archive ID and the filename of the target file within the archive. *)
 zipDocumentIdSource = zipDocumentId + filename ;
+(* @doc Integer ID of a previously stored ZIP archive. *)
 zipDocumentId = id ; (* @hint random_int 10000 99999 *)
 
 (* TO CHECK *)
+(* @doc Source a specific file within an uploaded ZIP archive — requires the upload request ID, the zip filename within that request, and the target filename in the zip. *)
 zipRequestIdSource = requestId + zipFilename + filename ;
+(* @doc Filename of the ZIP file within an upload request (distinguishes the zip from other files uploaded in the same request). *)
 zipFilename = string ; (* @hint static documents.zip *)
 
 (* Zip file reference without filename - for multi/zip top-level *)
+(* @doc Reference to a stored ZIP archive without a file selection — used at the batch job top level where individual job items select their own filenames. *)
 zipDocumentIdOnly = zipDocumentId ; (* @structural single_field_wrapper *)
+(* @doc Reference to an uploaded ZIP archive by request ID only — used at the batch top level; individual job items carry the filename selection. *)
 zipRequestIdOnly = requestId ; (* @structural single_field_wrapper *)
 
+(* @doc ZIP document source — either a stored zip archive (zipDocumentId) or an uploaded zip archive (requestId). *)
 zipDocumentSource =
       zipDocumentIdSource
     | zipRequestIdSource ; (* @structural named_wrapper_oneof *)
@@ -683,23 +734,32 @@ zipDocumentSource =
    - Zip-only behavior for /batch/zip is enforced indirectly via multiZipJobItem using docSourceZipFile.
 *)
 
+(* @doc Document source — standard (non-zip) variants only: requestId, documentId, or URL. *)
 docSourceStandard = documentIdSource | requestIdSource | urlSource ; (* @structural named_wrapper_oneof transparent_oneof_grouping *)
+(* @doc Document source — zip variants: a specific file within a stored ZIP (zipDocumentId + filename) or uploaded ZIP (requestId + zipFilename + filename). *)
 docSourceZipFile  = zipDocumentIdSource | zipRequestIdSource ; (* @structural named_wrapper_oneof transparent_oneof_grouping *)
+(* @doc Top-level ZIP archive reference for batch endpoints — identifies the archive itself, not a file within it. No filename is required at this level. *)
 docSourceZipFileRef = zipDocumentIdOnly | zipRequestIdOnly ;  (* For multi/zip top-level - zip reference without filename *) (* @structural named_wrapper_oneof *)
+(* @doc Document source — accepts any supported variant: requestId, documentId, URL, or zip-based (zipDocumentId or zipRequestId). *)
 docSourceAll      = docSourceStandard | docSourceZipFile ;
 
 (***********************************)
 (*           MERGE DOCUMENTS        *)
 (***********************************)
 
+(* @doc Ordered list of document references to merge into one output document (POST /mail-merge). *)
 mergeDocumentSource = documentsToMerge ;
+(* @doc Ordered array of document references to merge into one output document. Minimum two entries required. *)
 documentsToMerge = { mergeDocumentRef } ;
 
+(* @doc A single document to include in the merge — either a stored document ID or an upload request ID (with optional filename). *)
 mergeDocumentRef =
       mergeByDocumentId
     | mergeByRequestId ; (* @structural named_wrapper_oneof *)
 
+(* @doc Merge a stored document identified by its document ID. *)
 mergeByDocumentId = documentId ; (* @structural single_field_wrapper *)
+(* @doc Merge an uploaded document identified by its upload request ID, with an optional filename when the request contains multiple files. *)
 mergeByRequestId  = requestId + [ filename ] ;
 
 (***********************************)
@@ -708,20 +768,28 @@ mergeByRequestId  = requestId + [ filename ] ;
 
 (* PLANNED — reserved for POST /static/multi (not yet implemented).
    multiDocJobs and multiDocJobItem schemas are generated but not wired to any endpoint path. *)
+(* @doc List of independent document-per-recipient jobs (each job has its own document source and recipient address). *)
 multiDocJobs = { multiDocJobItem } ;
 
+(* @doc A single independent document job entry within a multi-doc batch. *)
 multiDocJobItem =
       [ jobTemplate ]
     + docSourceAll
     + recipientAddressSource ;
 
+(* @doc List of page-range job items, each with its own inline recipient address. *)
 pdfSplitJobsWithAddress = { pdfSplitJobItemWithAddress } ;
+(* @doc List of page-range job items without inline addresses — addresses are captured externally (POST /batch/split/address-capture). *)
 pdfSplitJobsNoAddress   = { pdfSplitJobItemNoAddress } ;
 
+(* @doc A single page-range job entry: page range (startPage, endPage) plus a recipient address. *)
 pdfSplitJobItemWithAddress = [ jobTemplate ] + startPage + endPage + recipientAddressSource ;
+(* @doc A single page-range job entry: page range only (no address — used for address-capture endpoint). *)
 pdfSplitJobItemNoAddress   = [ jobTemplate ] + startPage + endPage ;
 
+(* @doc First page of this job's page range, 1-indexed (inclusive). *)
 startPage = integer ; (* @hint random_int 1 5 *)
+(* @doc Last page of this job's page range (inclusive). Must be >= startPage. *)
 endPage   = integer ; (* @hint random_int 6 10 *)
 
 (* Zip-only jobs list:
@@ -730,19 +798,23 @@ endPage   = integer ; (* @hint random_int 6 10 *)
    - Each item specifies optional jobTemplate, filename (which file within zip), and recipient.
    - Each job is independent with its own template and recipient.
 *)
+(* @doc List of per-file job items extracted from a ZIP archive (POST /batch/zip). *)
 multiZipJobs = { multiZipJobItem } ;
+(* @doc A single ZIP file job entry: optional job template, filename within the ZIP, and recipient address. *)
 multiZipJobItem = [ jobTemplate ] + filename + recipientAddressSource ;
 
 (***********************************)
 (*           PRIMITIVE ALIASES      *)
 (***********************************)
 
+(* @doc Integer identifier — alias for integer, used for all ID fields. *)
 id = integer ;
 
 (********************************)
 (*          PAYMENT DETAILS       *)
 (********************************)
 
+(* @doc Payment method — one of: creditCard, invoice, ACH bank transfer, or account credit. *)
 paymentDetails =
       creditCardPayment
     | invoicePayment
@@ -752,18 +824,22 @@ paymentDetails =
 (*  | googlePayPayment  -- commented out for initial testing *)
     ;
 
+(* @doc Credit card payment variant. *)
 creditCardPayment =
       "creditCard"
     + creditCardDetails ;
 
+(* @doc Invoice payment — billed to an existing account invoice. *)
 invoicePayment =
       "invoice"
     + invoiceDetails ;
 
+(* @doc ACH bank transfer payment variant. *)
 achPayment =
       "ach"
     + achDetails ;
 
+(* @doc Payment deducted from the account's prepaid credit balance. *)
 userCreditPayment =
       "userCredit"
     + creditAmount ;
@@ -778,39 +854,56 @@ googlePayPayment =
     + googlePayDetails ;
 *)
 
+(* @doc Credit card payment fields: card type, card number, expiration date, and CVV. *)
 creditCardDetails =
       cardType
     + cardNumber
     + expirationDate
     + cvv ;
 
+(* @doc Invoice payment fields: invoice number and amount due. *)
 invoiceDetails =
       invoiceNumber
     + amountDue ;
 
+(* @doc ACH payment fields: routing number, bank account number, and check digit. *)
 achDetails =
       routingNumber
     + accountNumber
     + checkDigit ;
 
+(* @doc Account credit payment fields: monetary amount and ISO currency code. *)
 creditAmount =
       amount
     + currency ;
 
+(* @doc ISO 4217 currency code (USD, EUR, GBP, CAD, or AUD). *)
 currency = "USD" | "EUR" | "GBP" | "CAD" | "AUD" ;
+(* @doc Monetary amount as a numeric value. *)
 amount = number ;
 
+(* @doc Credit card number (PAN) as a string. *)
 cardNumber = string ; (* @hint static "4111111111111111" *)
+(* @doc Card expiration date containing month and year. *)
 expirationDate = month + year ;
+(* @doc Expiration month as an integer (1-12). *)
 month = integer ; (* @hint static 12 *)
+(* @doc Expiration year as a four-digit integer (e.g. 2029). *)
 year = integer ; (* @hint static 2029 *)
+(* @doc Card security code (CVV/CVC) as an integer. *)
 cvv = integer ; (* @hint static 123 *)
+(* @doc ABA bank routing number. *)
 routingNumber = string ; (* @hint aba_routing_number *)
+(* @doc Bank account number. *)
 accountNumber = string ; (* @hint static "1234567890" *)
+(* @doc ACH check digit. *)
 checkDigit = integer ;
+(* @doc Invoice reference number. *)
 invoiceNumber = string ;
+(* @doc Amount due on the invoice. *)
 amountDue = number ;
 
+(* @doc Card brand enum: visa, mastercard, discover, or americanExpress. *)
 cardType = "visa" | "mastercard" | "discover" | "americanExpress" ; (* @hint static visa *)
 
 (********************************)
@@ -928,9 +1021,12 @@ sortingCode = string ;
    ================================================================ *)
 
 (* Standard Success Response - returned for all successful job submissions *)
+(* @doc Success response returned for all successful job submissions. *)
 standardResponse = status + message + requestId ;
 
+(* @doc Job status string (e.g. "accepted"). *)
 status = string ;    (* e.g. "accepted" *)
+(* @doc Human-readable confirmation message (e.g. "Your request has been queued"). *)
 message = string ;   (* Human-readable confirmation, e.g. "Your request has been queued" *)
 
 (* ================================================================
@@ -938,6 +1034,7 @@ message = string ;   (* Human-readable confirmation, e.g. "Your request has been
    ================================================================ *)
 
 (* Standard Error Response - returned for all error conditions *)
+(* @doc Error response structure returned for all API error conditions. *)
 errorResponse =
       errorType
     + errorMessage
@@ -945,6 +1042,7 @@ errorResponse =
     + [ errorDetails ]
     + [ errorTrackingId ] ;
 
+(* @doc High-level error category string (ValidationError, AuthenticationError, etc.). *)
 errorType = "ValidationError"
           | "AuthenticationError"
           | "AuthorizationError"
@@ -952,8 +1050,10 @@ errorType = "ValidationError"
           | "RateLimitError"
           | "ServerError" ;
 
+(* @doc Human-readable error description. *)
 errorMessage = string ;  (* Human-readable error description *)
 
+(* @doc Machine-readable error code string (e.g. MISSING_REQUIRED_FIELD). *)
 errorCode = "MISSING_REQUIRED_FIELD"
           | "INVALID_ONEOF"
           | "INVALID_JSON"
@@ -972,8 +1072,10 @@ errorCode = "MISSING_REQUIRED_FIELD"
           | "EXTERNAL_SERVICE_ERROR"
           | "RATE_LIMIT_EXCEEDED" ;
 
+(* @doc Optional JSON object with additional error context (free-form key/value pairs). *)
 errorDetails = string ;  (* JSON object with error context - additionalProperties in OpenAPI *)
 
+(* @doc Optional support tracking identifier in the format TRK-YYYYMMDD-XXXXXX. *)
 errorTrackingId = string ;  (* Optional request ID for support tracking - format: TRK-YYYYMMDD-XXXXXX *)
 
 (* HTTP Error Response Aliases *)
