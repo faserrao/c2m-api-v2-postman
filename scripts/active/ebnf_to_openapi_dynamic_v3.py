@@ -107,6 +107,16 @@ _ERROR_AUTH_SCOPE_PROVIDED = "jobs:read"
 # the translator stores parsed values in self.mutual_exclusion_fields at parse time.
 _MUTUAL_EXCLUSION_FIELDS = ["jobTemplate", "jobOptions"]
 
+# ── D1: Response schema name constants ───────────────────────────────────
+# These are EBNF DD rule names (standardResponse, errorResponse) used as
+# OpenAPI component schema names.  Centralised here so a DD rule rename
+# surfaces a single change point rather than silent $ref breakage.
+_RESPONSE_SCHEMA_NAME = "standardResponse"
+_ERROR_SCHEMA_NAME    = "errorResponse"
+
+# ── F1: Address field name used in error-detail examples ─────────────────
+_ERROR_POSTAL_FIELD = "postalCode"
+
 
 def _load_error_code_messages() -> Dict[str, str]:
     """H2: Load errorCode → errorMessage from error-response-examples.yaml.
@@ -693,7 +703,7 @@ class EBNFToOpenAPITranslator:
                         "description": _HTTP_STATUS_DESCRIPTIONS['200'],
                         "content": {
                             _CONTENT_TYPE_JSON: {
-                                "schema": {"$ref": "#/components/schemas/standardResponse"}
+                                "schema": {"$ref": f"#/components/schemas/{_RESPONSE_SCHEMA_NAME}"}
                             }
                         }
                     }),
@@ -701,7 +711,7 @@ class EBNFToOpenAPITranslator:
                         "description": _HTTP_STATUS_DESCRIPTIONS['400'],
                         "content": {
                             _CONTENT_TYPE_JSON: {
-                                "schema": {"$ref": "#/components/schemas/errorResponse"},
+                                "schema": {"$ref": f"#/components/schemas/{_ERROR_SCHEMA_NAME}"},
                                 "examples": self._generate_error_examples("400", endpoint)
                             }
                         }
@@ -710,7 +720,7 @@ class EBNFToOpenAPITranslator:
                         "description": _HTTP_STATUS_DESCRIPTIONS['401'],
                         "content": {
                             _CONTENT_TYPE_JSON: {
-                                "schema": {"$ref": "#/components/schemas/errorResponse"},
+                                "schema": {"$ref": f"#/components/schemas/{_ERROR_SCHEMA_NAME}"},
                                 "examples": self._generate_error_examples("401", endpoint)
                             }
                         }
@@ -719,7 +729,7 @@ class EBNFToOpenAPITranslator:
                         "description": _HTTP_STATUS_DESCRIPTIONS['403'],
                         "content": {
                             _CONTENT_TYPE_JSON: {
-                                "schema": {"$ref": "#/components/schemas/errorResponse"},
+                                "schema": {"$ref": f"#/components/schemas/{_ERROR_SCHEMA_NAME}"},
                                 "examples": self._generate_error_examples("403", endpoint)
                             }
                         }
@@ -728,7 +738,7 @@ class EBNFToOpenAPITranslator:
                         "description": _HTTP_STATUS_DESCRIPTIONS['404'],
                         "content": {
                             _CONTENT_TYPE_JSON: {
-                                "schema": {"$ref": "#/components/schemas/errorResponse"},
+                                "schema": {"$ref": f"#/components/schemas/{_ERROR_SCHEMA_NAME}"},
                                 "examples": self._generate_error_examples("404", endpoint)
                             }
                         }
@@ -737,7 +747,7 @@ class EBNFToOpenAPITranslator:
                         "description": _HTTP_STATUS_DESCRIPTIONS['422'],
                         "content": {
                             _CONTENT_TYPE_JSON: {
-                                "schema": {"$ref": "#/components/schemas/errorResponse"},
+                                "schema": {"$ref": f"#/components/schemas/{_ERROR_SCHEMA_NAME}"},
                                 "examples": self._generate_error_examples("422", endpoint)
                             }
                         }
@@ -746,7 +756,7 @@ class EBNFToOpenAPITranslator:
                         "description": _HTTP_STATUS_DESCRIPTIONS['500'],
                         "content": {
                             _CONTENT_TYPE_JSON: {
-                                "schema": {"$ref": "#/components/schemas/errorResponse"},
+                                "schema": {"$ref": f"#/components/schemas/{_ERROR_SCHEMA_NAME}"},
                                 "examples": self._generate_error_examples("500", endpoint)
                             }
                         }
@@ -963,7 +973,7 @@ class EBNFToOpenAPITranslator:
                 "resourceId": f"DOC-{datetime.now(timezone.utc).strftime('%Y%m%d')}-{''.join(random.choices('0123456789ABCDEF', k=4))}"
             },
             'INVALID_ENUM_VALUE': {
-                "field": field_names.get('documentField', 'documentType'),
+                "field": field_names.get('documentField', 'documentClass'),  # F2: DD rule is documentClass
                 "value": "invalid_value",
                 # Derived from EBNF documentClass enum; fallback matches actual DD values.
                 "allowedValues": self._get_enum_values('documentClass') or ["letter", "postcard", "brochure", "flat"]
@@ -979,7 +989,7 @@ class EBNFToOpenAPITranslator:
                         "issue": "not found in document library"
                     },
                     {
-                        "field": f"{field_names.get('addressField', 'recipientAddress')}.postalCode",
+                        "field": f"{field_names.get('addressField', 'recipientAddress')}.{_ERROR_POSTAL_FIELD}",
                         "issue": "invalid format - must be 5 or 9 digits"
                     }
                 ]

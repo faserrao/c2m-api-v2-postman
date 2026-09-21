@@ -247,6 +247,11 @@ let oneOfFixtures = {
         ]
     ],
 
+    // A2: errorType values must stay in sync with the spec's errorType.enum.
+    // Canonical values: ValidationError, AuthenticationError, AuthorizationError,
+    // ResourceNotFoundError, ServerError (from EBNF DD errorType rule).
+    // This fixture block is intentionally excluded from spec-driven generation
+    // (errorResponse is not a oneOf variant schema — see loadOneOfFixturesFromSpec comment).
     errorResponse: [
         // Variant 1: ValidationError - Missing Field
         {
@@ -329,7 +334,7 @@ let oneOfFixtures = {
         {
             errorType: "ServerError",
             errorMessage: "An unexpected error occurred while processing the request",
-            errorCode: "INTERNAL_SERVER_ERROR",
+            errorCode: "SERVER_ERROR",  // A1: DD canonical code (was "INTERNAL_SERVER_ERROR")
             errorDetails: JSON.stringify({ timestamp: new Date().toISOString(), requestId: `req-${hexSuffix()}${hexSuffix()}` }),
             errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${hexSuffix()}`
         }

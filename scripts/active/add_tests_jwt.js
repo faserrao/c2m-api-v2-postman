@@ -223,6 +223,9 @@ function buildAuthErrorCodesFromOverlay(statusKeys, overlay) {
 // to known stable values so the tests remain valid even without an overlay file.
 const _codes401 = buildAuthErrorCodesFromOverlay(['Error401', 'Error400'], authOverlay);
 const _codes403 = buildAuthErrorCodesFromOverlay(['Error403'], authOverlay);
+// C2: These are OAuth2 RFC 6749/6750 error codes used in the auth overlay schema
+// (Cognito/OIDC responses), NOT EBNF DD errorCode enum values.  The DD errorCode
+// enum covers job-endpoint errors (MISSING_REQUIRED_FIELD, SERVER_ERROR, etc.).
 const _fallback401 = ['invalid_token', 'invalid_grant'];
 const _fallback403 = ['insufficient_scope'];
 
