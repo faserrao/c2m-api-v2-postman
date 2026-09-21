@@ -4,12 +4,21 @@ Add SDK code samples to OpenAPI specification for Redoc documentation.
 This script adds x-codeSamples to each endpoint with examples in multiple languages.
 """
 
+import argparse
 import yaml
 import json
 import sys
 from pathlib import Path
 
-# SDK Language configurations — must match the language list in generate-sdk-v2.sh
+# Redoc x-codeSamples lang identifier differs from slug for some entries.
+_SLUG_TO_REDOC_LANG: dict = {
+    'curl': 'bash',  # cURL displayed with bash syntax highlighting in Redoc
+}
+
+# SDK Language configurations — fallback when --sdk-langs is not provided.
+# Primary source of truth: config/sdk-languages.yaml (also drives generate-sdk-v2.sh
+# and generate_artifacts_index.py).  Update that file to add new SDK languages;
+# pass --sdk-langs to this script so the change propagates to Redoc x-codeSamples.
 SDK_LANGUAGES = {
     'curl':       {'label': 'cURL',       'lang': 'bash'},
     'python':     {'label': 'Python',     'lang': 'python'},
@@ -347,6 +356,30 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {{
     return sample
 
 
+def _load_sdk_langs(sdk_langs_path: str | None) -> dict:
+    """Load SDK language config from sdk-languages.yaml. Falls back to SDK_LANGUAGES.
+
+    curl is always prepended as the first entry (it is a code sample format, not a
+    generated SDK, so it is not listed in sdk-languages.yaml).
+    """
+    if sdk_langs_path:
+        try:
+            with open(sdk_langs_path) as f:
+                data = yaml.safe_load(f)
+            langs: dict = {'curl': {'label': 'cURL', 'lang': 'bash'}}
+            for entry in data.get('languages', []):
+                slug = entry['slug']
+                langs[slug] = {
+                    'label': entry['label'],
+                    'lang': _SLUG_TO_REDOC_LANG.get(slug, slug),
+                }
+            print(f"Loaded {len(langs)} SDK language(s) from {sdk_langs_path}")
+            return langs
+        except Exception as exc:
+            print(f"⚠️  Could not load sdk-languages.yaml '{sdk_langs_path}': {exc} — using built-in list", file=sys.stderr)
+    return SDK_LANGUAGES
+
+
 _GENERATOR_MAP = {
     'curl':       generate_curl_sample,
     'python':     generate_python_sample,
@@ -360,8 +393,9 @@ _GENERATOR_MAP = {
 }
 
 
-def add_code_samples_to_spec(input_file, output_file):
+def add_code_samples_to_spec(input_file, output_file, sdk_langs: dict | None = None):
     """Add x-codeSamples to each endpoint in the OpenAPI spec"""
+    langs = sdk_langs if sdk_langs is not None else SDK_LANGUAGES
 
     with open(input_file, 'r') as f:
         spec = yaml.safe_load(f)
@@ -382,7 +416,7 @@ def add_code_samples_to_spec(input_file, output_file):
                 request_body = operation.get('requestBody')
 
                 code_samples = []
-                for lang_key, lang_meta in SDK_LANGUAGES.items():
+                for lang_key, lang_meta in langs.items():
                     generator = _GENERATOR_MAP.get(lang_key)
                     if generator:
                         code_samples.append({
@@ -399,11 +433,17 @@ def add_code_samples_to_spec(input_file, output_file):
     print(f"✅ Added code samples to {output_file}")
 
 if __name__ == '__main__':
-    if len(sys.argv) < 3:
-        print("Usage: python add-sdk-samples-to-spec.py <input-spec> <output-spec>")
-        sys.exit(1)
-    
-    input_file = sys.argv[1]
-    output_file = sys.argv[2]
-    
-    add_code_samples_to_spec(input_file, output_file)
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('input_spec', help='Path to input OpenAPI YAML spec')
+    parser.add_argument('output_spec', help='Path to write output OpenAPI YAML spec')
+    parser.add_argument(
+        '--sdk-langs',
+        metavar='PATH',
+        default=None,
+        help='Path to config/sdk-languages.yaml (single source of truth for SDK language list). '
+             'If omitted, falls back to the built-in SDK_LANGUAGES dict.',
+    )
+    args = parser.parse_args()
+
+    sdk_langs = _load_sdk_langs(args.sdk_langs)
+    add_code_samples_to_spec(args.input_spec, args.output_spec, sdk_langs=sdk_langs)

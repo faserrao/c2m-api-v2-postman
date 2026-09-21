@@ -1176,9 +1176,9 @@ postman-api-full-publish:
 $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES): $(C2MAPIV2_OPENAPI_SPEC)
 	@echo "🔧 Adding SDK code samples to OpenAPI spec..."
 	@if command -v $(VENV_PYTHON) >/dev/null 2>&1; then \
-		$(VENV_PYTHON) $(SCRIPTS_DIR)/utilities/add-sdk-samples-to-spec.py $(C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES); \
+		$(VENV_PYTHON) $(SCRIPTS_DIR)/utilities/add-sdk-samples-to-spec.py $(C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES) --sdk-langs config/sdk-languages.yaml; \
 	else \
-		python3 $(SCRIPTS_DIR)/utilities/add-sdk-samples-to-spec.py $(C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES); \
+		python3 $(SCRIPTS_DIR)/utilities/add-sdk-samples-to-spec.py $(C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES) --sdk-langs config/sdk-languages.yaml; \
 	fi
 
 # Generate Postman collection from OpenAPI spec and add metadata
@@ -2046,9 +2046,9 @@ docs-build:
 	@echo "📚 Building API documentation with Redoc..."
 	@echo "🔧 Adding SDK code samples to OpenAPI spec..."
 	@if [ -f "$(VENV_PYTHON)" ]; then \
-		$(VENV_PYTHON) $(SCRIPTS_DIR)/utilities/add-sdk-samples-to-spec.py $(C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES); \
+		$(VENV_PYTHON) $(SCRIPTS_DIR)/utilities/add-sdk-samples-to-spec.py $(C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES) --sdk-langs config/sdk-languages.yaml; \
 	else \
-		python3 $(SCRIPTS_DIR)/utilities/add-sdk-samples-to-spec.py $(C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES); \
+		python3 $(SCRIPTS_DIR)/utilities/add-sdk-samples-to-spec.py $(C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES) --sdk-langs config/sdk-languages.yaml; \
 	fi
 	$(REDOCLY) build-docs $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES) -o $(REDOC_HTML_OUTPUT) -t $(DOCS_DIR)/custom-redoc-template.hbs
 	$(SWAGGER) bundle $(C2MAPIV2_OPENAPI_SPEC) --outfile $(OPENAPI_BUNDLED_FILE) --type yaml

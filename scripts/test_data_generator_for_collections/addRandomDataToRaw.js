@@ -298,7 +298,7 @@ let oneOfFixtures = {
             errorType: "AuthorizationError",
             errorMessage: "User does not have required permissions for this operation",
             errorCode: "INSUFFICIENT_PERMISSIONS",
-            errorDetails: JSON.stringify({ required: "jobs:write", user: "read-only-user" }),
+            errorDetails: JSON.stringify({ required: "jobs:write", user: "read-only-user" }),  // L-2: must match _ERROR_AUTH_SCOPE_REQUIRED in ebnf_to_openapi_dynamic_v3.py
             errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${hexSuffix()}`
         },
         // Variant 7: ResourceNotFoundError - Job Not Found
@@ -325,7 +325,7 @@ let oneOfFixtures = {
             errorDetails: JSON.stringify({
                 errors: [
                     { field: "documentId", issue: "not found in document library" },
-                    { field: "recipientAddress.zip", issue: "invalid format - must be 5 or 9 digits" }
+                    { field: "recipientAddressSource.zip", issue: "invalid format - must be 5 or 9 digits" }  // B-new-2: DD rule is recipientAddressSource
                 ]
             }),
             errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${hexSuffix()}`
@@ -715,7 +715,7 @@ function generateRandomValue(key, existingValue) {
         // hint-lookup path above — this branch is a safety net for missing hint entries.
         // If reached, add a @hint for jobTemplate in the EBNF DD.
         console.warn('[addRandomDataToRaw] jobTemplate not in faker_hints — using hardcoded fallback; add @hint in EBNF DD');
-        return 'standard_letter';
+        return 'standard_letter';  // L-3: must match `jobTemplate = ... ; (* @hint static standard_letter *)` in c2mapiv2-dd.ebnf
     } else if (keyLower.includes('template')) {
         return `template_${faker.string.alphanumeric(8)}`;
     } else if (keyLower.includes('year')) {

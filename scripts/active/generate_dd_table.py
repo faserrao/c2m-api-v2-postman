@@ -24,6 +24,11 @@ try:
 except ImportError:
     _yaml = None
 
+# L-1: Module-level constant so a title change only requires one edit here.
+# The same string lives as _DEFAULT_API_TITLE in ebnf_to_openapi_dynamic_v3.py;
+# kept separate because generate_dd_table.py has no import from that module.
+_DEFAULT_API_TITLE = "C2M API v2"
+
 # ---------------------------------------------------------------------------
 # Description fallback catalog.
 # Checked by _desc() only when no (* @doc *) annotation exists in the EBNF DD.
@@ -695,7 +700,7 @@ def write_endpoint_expanded_md(
     endpoint_map: dict | None = None, api_title: str | None = None,
 ) -> None:
     em = endpoint_map if endpoint_map is not None else _ENDPOINT_MAP
-    _title = api_title or "C2M API v2"
+    _title = api_title or _DEFAULT_API_TITLE
     lines = [
         f"# {_title} — Endpoint Field Reference (Expanded to Primitives)",
         "",
@@ -777,7 +782,7 @@ def _md_row(cells: list[str]) -> str:
 
 
 def write_markdown(rows: list[dict], out_path: Path, ebnf_path: Path, api_title: str | None = None) -> None:
-    _title = api_title or "C2M API v2"
+    _title = api_title or _DEFAULT_API_TITLE
     lines = [
         f"# {_title} — Data Dictionary",
         "",
