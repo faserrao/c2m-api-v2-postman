@@ -26,21 +26,30 @@ except ImportError:
     _yaml = None
 
 
+# J12: Module-level constant so artifact repo name is a single change point.
+# Must match ARTIFACTS_REPO_NAME in the Makefile / CI (passed as --artifacts-repo).
+_DEFAULT_ARTIFACTS_REPO = "c2m-api-v2-postman-artifacts"
+
+# J5: Must match API_TITLE in the Makefile and _DEFAULT_API_TITLE in
+# ebnf_to_openapi_dynamic_v3.py and generate_dd_table.py.
+_DEFAULT_API_TITLE = "C2M API v2"
+
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _repo_url(org: str, path: str, artifacts_repo: str = "c2m-api-v2-postman-artifacts") -> str:
+def _repo_url(org: str, path: str, artifacts_repo: str = _DEFAULT_ARTIFACTS_REPO) -> str:
     """GitHub blob URL for a file in the artifacts repo."""
     return f"https://github.com/{org}/{artifacts_repo}/blob/main/{path}"
 
 
-def _repo_tree_url(org: str, path: str, artifacts_repo: str = "c2m-api-v2-postman-artifacts") -> str:
+def _repo_tree_url(org: str, path: str, artifacts_repo: str = _DEFAULT_ARTIFACTS_REPO) -> str:
     """GitHub tree URL for a directory in the artifacts repo."""
     return f"https://github.com/{org}/{artifacts_repo}/tree/main/{path}"
 
 
-def _pages_url(org: str, path: str, artifacts_repo: str = "c2m-api-v2-postman-artifacts") -> str:
+def _pages_url(org: str, path: str, artifacts_repo: str = _DEFAULT_ARTIFACTS_REPO) -> str:
     """GitHub Pages URL (artifacts repo, docs/ served at root)."""
     return f"https://{org}.github.io/{artifacts_repo}/{path}"
 
@@ -110,7 +119,7 @@ def _load_sdk_langs(sdk_langs_path: Optional[str]) -> list:
 
 
 def generate(org: str, reports_dir: Path, output: Path,
-             artifacts_repo: str = "c2m-api-v2-postman-artifacts",
+             artifacts_repo: str = _DEFAULT_ARTIFACTS_REPO,
              api_name: str = "c2mapiv2",
              linked_collection_name: str = "C2M API Linked Collection",
              sdk_langs_path: Optional[str] = None) -> None:
@@ -305,7 +314,7 @@ def generate(org: str, reports_dir: Path, output: Path,
 
     # --- Assemble -----------------------------------------------------------
     lines = [
-        "# C2M API v2 — Artifacts Index",
+        f"# {_DEFAULT_API_TITLE} — Artifacts Index",
         "",
         f"_Generated: {now}_",
         "",
@@ -347,7 +356,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--artifacts-repo",
-        default="c2m-api-v2-postman-artifacts",
+        default=_DEFAULT_ARTIFACTS_REPO,
         help="Name of the GitHub artifacts repository (default: c2m-api-v2-postman-artifacts)",
     )
     parser.add_argument(

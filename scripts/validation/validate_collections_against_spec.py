@@ -48,6 +48,9 @@ import os
 import re
 import sys
 
+# J3: Matches _CONTENT_TYPE_JSON / CONTENT_TYPE_JSON used in all other pipeline scripts.
+CONTENT_TYPE_JSON = "application/json"
+
 REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 PLACEHOLDER = re.compile(r"<[^>]+>")
 
@@ -326,7 +329,7 @@ def request_body_schema(spec, path, method):
     if not op:
         return None
     try:
-        return op["requestBody"]["content"]["application/json"]["schema"]
+        return op["requestBody"]["content"][CONTENT_TYPE_JSON]["schema"]
     except KeyError:
         return None
 

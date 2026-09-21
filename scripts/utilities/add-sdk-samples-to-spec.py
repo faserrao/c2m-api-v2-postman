@@ -10,6 +10,10 @@ import json
 import sys
 from pathlib import Path
 
+# J2: Fallback server URL used when spec.servers is missing or empty.
+# Must match C2MAPIV2_API_URL in the Makefile (currently https://api.click2mail.com/v2).
+_FALLBACK_SERVER_URL = 'https://api.click2mail.com/v2'
+
 # Redoc x-codeSamples lang identifier differs from slug for some entries.
 _SLUG_TO_REDOC_LANG: dict = {
     'curl': 'bash',  # cURL displayed with bash syntax highlighting in Redoc
@@ -138,7 +142,7 @@ public class Example {
     public static void main(String[] args) {
         ApiClient defaultClient = Configuration.getDefaultApiClient();
         
-        // Configure Bearer token
+        // Configure Bearer token  // J1: "bearerAuth" must match _SECURITY_SCHEME_NAME in ebnf_to_openapi_dynamic_v3.py
         HttpBearerAuth bearer = (HttpBearerAuth) defaultClient.getAuthentication("bearerAuth");
         bearer.setBearerToken("<your-jwt-token>");
         
@@ -401,7 +405,7 @@ def add_code_samples_to_spec(input_file, output_file, sdk_langs: dict | None = N
         spec = yaml.safe_load(f)
 
     # Read server URL from spec so samples stay correct if the hostname ever changes.
-    server_url = spec.get('servers', [{}])[0].get('url', 'https://api.click2mail.com/v2').rstrip('/')
+    server_url = spec.get('servers', [{}])[0].get('url', _FALLBACK_SERVER_URL).rstrip('/')
 
     if 'paths' in spec:
         for path, path_item in spec['paths'].items():
