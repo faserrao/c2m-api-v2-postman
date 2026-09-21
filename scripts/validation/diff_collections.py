@@ -198,7 +198,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--before", required=True)
     ap.add_argument("--after", required=True)
-    ap.add_argument("--path-prefix", default="/jobs/submit")
+    ap.add_argument("--path-prefix", default="/")
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
 

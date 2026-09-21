@@ -54,6 +54,11 @@ CONTENT_TYPE_JSON = "application/json"
 REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 PLACEHOLDER = re.compile(r"<[^>]+>")
 
+# K4: DD rule names for the split-job array fields — used as the spec-derivation fallback.
+# Must match the rule names in data_dictionary/c2mapiv2-dd.ebnf and the schemas generated
+# by ebnf_to_openapi_dynamic_v3.py. Mirrors discoverJobArrayFields() in fix_oneOf_placeholders.js.
+_SPLIT_JOB_ARRAY_FIELDS_FALLBACK = ["pdfSplitJobsWithAddress", "pdfSplitJobsNoAddress"]
+
 # Path defaults are sourced from the SAME variables the Makefile defines
 # (passed through the environment), so paths are not duplicated between the
 # Makefile and this script. Run via `make validate-collections-conformance` and
@@ -140,7 +145,7 @@ def _split_job_array_fields(spec):
         name for name, schema in schemas.items()
         if schema.get("type") == "array" and "SplitJobs" in name
     ]
-    return derived if derived else ["pdfSplitJobsWithAddress", "pdfSplitJobsNoAddress"]
+    return derived if derived else _SPLIT_JOB_ARRAY_FIELDS_FALLBACK
 
 
 def page_range_errors(body, spec):

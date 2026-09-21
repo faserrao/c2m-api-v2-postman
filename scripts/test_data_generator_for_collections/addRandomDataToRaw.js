@@ -131,7 +131,7 @@ let oneOfFixtures = {
         // Variant 2: recipientAddressByList
         {
             recipientAddressByList: {
-                mappingId: 1,
+                mappingId: 5001,  // K3: matches faker_hints.yaml static value for mappingId
                 addressList: [
                     {
                         firstName: "Jane",

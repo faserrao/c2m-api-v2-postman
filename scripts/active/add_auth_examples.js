@@ -41,7 +41,7 @@ function loadAuthExamplesFromOverlay(overlayPath) {
     if (!operation || !operation.requestBody) continue;
 
     const jsonContent = operation.requestBody.content &&
-                        operation.requestBody.content['application/json'];
+                        operation.requestBody.content[CONTENT_TYPE_JSON];
     if (!jsonContent || !jsonContent.examples) continue;
 
     const firstExample = Object.values(jsonContent.examples)[0];

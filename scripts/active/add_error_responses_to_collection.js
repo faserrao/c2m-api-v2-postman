@@ -345,6 +345,7 @@ function main() {
   const [inputFile, outputFile] = positional;
 
   // --spec overrides the default; Makefile passes $(C2MAPIV2_OPENAPI_SPEC).
+  // K6: filename matches C2MAPIV2_OPENAPI_SPEC in the Makefile (same coupling as add_auth_examples.js:69).
   const openapiSpecPath = specArg || path.resolve(scriptDir, '../../openapi/c2mapiv2-openapi-spec-final.yaml');
 
   // Load error responses from OpenAPI spec

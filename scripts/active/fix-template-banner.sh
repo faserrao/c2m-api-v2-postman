@@ -8,10 +8,13 @@ DOCS_PORT="${DOCS_PORT:-8080}"
 
 echo "🔧 Fixing Template Banner Documentation..."
 
+# K7: Use Makefile variable so the filename stays in sync if the API name changes.
+SPEC_FILE="${C2MAPIV2_OPENAPI_SPEC:-openapi/c2mapiv2-openapi-spec-final.yaml}"
+
 # Step 1: Check if OpenAPI spec has JWT overlay (which breaks the banner)
-if grep -q "Auth Overlay" openapi/c2mapiv2-openapi-spec-final.yaml; then
+if grep -q "Auth Overlay" "$SPEC_FILE"; then
     echo "⚠️  Found JWT overlay in OpenAPI spec. Reverting to original..."
-    git checkout HEAD -- openapi/c2mapiv2-openapi-spec-final.yaml
+    git checkout HEAD -- "$SPEC_FILE"
     echo "✅ Reverted OpenAPI spec to original"
 fi
 
