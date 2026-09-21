@@ -19,6 +19,8 @@
 #     constant in ebnf_to_openapi_dynamic_v3.py (currently "address-validation")
 #   - 429 rate_limit_exceeded: "100 requests/minute" / 60 — rate-limit policy values;
 #     update here when the API rate limits change
+#   - 400 invalid_oneof: "docSourceAll" — DD rule name for top-level document source oneOf field
+#   - 422 validation_failed: "recipientAddressSource.zip" — DD rule name for recipient address
 
 400:
   missing_field:
@@ -30,7 +32,7 @@
     summary: "Invalid oneOf selection"
     errorMessage: "Request must match exactly one of the defined schemas"
     errorCode: INVALID_ONEOF
-    errorDetails: '{"field": "document", "issue": "matches multiple schemas or no schema"}'
+    errorDetails: '{"field": "docSourceAll", "issue": "matches multiple schemas or no schema"}'
   invalid_json:
     summary: "Invalid JSON"
     errorMessage: "Request body contains malformed JSON"
@@ -88,7 +90,7 @@
     summary: "Validation failed"
     errorMessage: "Request validation failed for multiple fields"
     errorCode: INVALID_FORMAT
-    errorDetails: '{"errors": [{"field": "documentId", "issue": "not found"}, {"field": "recipientAddress.zip", "issue": "invalid format"}]}'
+    errorDetails: '{"errors": [{"field": "documentId", "issue": "not found"}, {"field": "recipientAddressSource.zip", "issue": "invalid format"}]}'
   invalid_enum_value:
     summary: "Invalid enum value"
     errorMessage: "Field contains a value not allowed by the enumeration"

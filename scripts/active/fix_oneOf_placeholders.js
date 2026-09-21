@@ -84,11 +84,13 @@ function discoverOneOfFields(specPath) {
             console.log(`Loaded ${crossFieldRules.length} cross-field constraints from spec`);
         }
 
-        // Build ph<val1|val2|...> placeholder map for jobOptions enum properties.
+        // Build canonical-value map for jobOptions enum properties.
         // json-schema-faker picks a random concrete value for each enum-constrained
         // field; fix_oneOf only handles oneOf schemas so these slip through.
-        // Format contract: ph<val1|val2|...> — see addRandomDataToRaw.js (HC6) which
-        // resolves these to a concrete value, and diff_collections.py which recognises them.
+        // We write the first (canonical) enum value directly so both the linked
+        // and test collection paths get a valid concrete value.  The prior ph<> format
+        // is kept as a defensive fallback in addRandomDataToRaw.js (HC6) for
+        // manually-constructed collections but is no longer generated here.
         const enumPlaceholders = {};
         const joSchema = spec.components &&
                          spec.components.schemas &&
@@ -96,10 +98,10 @@ function discoverOneOfFields(specPath) {
         if (joSchema && joSchema.properties) {
             for (const [propName, propDef] of Object.entries(joSchema.properties)) {
                 if (Array.isArray(propDef.enum) && propDef.enum.length > 0) {
-                    enumPlaceholders[propName] = `ph<${propDef.enum.join('|')}>`;
+                    enumPlaceholders[propName] = propDef.enum[0];  // first = canonical value
                 }
             }
-            console.log(`Discovered ${Object.keys(enumPlaceholders).length} jobOptions enum placeholders`);
+            console.log(`Discovered ${Object.keys(enumPlaceholders).length} jobOptions enum canonical values`);
         }
 
         // HC3: derive job array field names from spec at runtime.
@@ -207,7 +209,9 @@ function processObject(obj, oneOfFields, replacedFields, parentKey = '') {
 // and threaded through to processRawBody via jobArrayFields. Removed hardcoded list.
 
 /**
- * Replace actual enum values in jobOptions with ph<val1|val2|...> placeholders.
+ * Normalise jobOptions enum fields to their canonical first value.
+ * json-schema-faker may produce any valid enum value; this step ensures the
+ * linked and test collection paths both carry the same canonical value.
  * Skips values already in placeholder notation (start with '<' or 'ph<').
  */
 function convertJobOptionsToPlaceholders(bodyObj, enumPlaceholders) {
@@ -263,7 +267,7 @@ function processRawBody(rawStr, oneOfFields, replacedFields, crossFieldRules, en
         // Enforce cross-field jobOptions constraints (rules from spec x-valid-combinations)
         fixCrossFieldConstraints(processed, crossFieldRules);
 
-        // Replace concrete enum values in jobOptions with ph<...> type placeholders
+        // Normalise jobOptions enum fields to canonical first value from spec
         convertJobOptionsToPlaceholders(processed, enumPlaceholders);
 
         // Convert back to formatted JSON string

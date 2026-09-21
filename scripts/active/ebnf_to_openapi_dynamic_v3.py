@@ -102,6 +102,9 @@ _ERROR_DB_TABLE            = "jobs"
 _ERROR_EXTERNAL_SERVICE    = "address-validation"  # BUG fix: aligned with error-response-examples.yaml
 _ERROR_AUTH_SCOPE_REQUIRED = "jobs:write"
 _ERROR_AUTH_SCOPE_PROVIDED = "jobs:read"
+# A-new-1: Build-failure guard only — primary path uses _get_enum_values('documentClass')
+# from the spec.  This list is unreachable in a normal build; a constant keeps it auditable.
+_ERROR_DOCUMENT_CLASS_FALLBACK = ["letter", "postcard", "brochure", "flat"]
 # H1: Fallback used when the @mutual_exclusion annotation is absent from the EBNF DD.
 # The authoritative source is the @mutual_exclusion block in data_dictionary/c2mapiv2-dd.ebnf;
 # the translator stores parsed values in self.mutual_exclusion_fields at parse time.
@@ -976,7 +979,7 @@ class EBNFToOpenAPITranslator:
                 "field": field_names.get('documentField', 'documentClass'),  # F2: DD rule is documentClass
                 "value": "invalid_value",
                 # Derived from EBNF documentClass enum; fallback matches actual DD values.
-                "allowedValues": self._get_enum_values('documentClass') or ["letter", "postcard", "brochure", "flat"]
+                "allowedValues": self._get_enum_values('documentClass') or _ERROR_DOCUMENT_CLASS_FALLBACK
             },
             'MUTUAL_EXCLUSION_VIOLATION': {
                 "fields": self.mutual_exclusion_fields,  # H1: from @mutual_exclusion in EBNF DD
