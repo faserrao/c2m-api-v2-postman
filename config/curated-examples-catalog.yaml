@@ -194,29 +194,30 @@ examples:
       docSourceZipFileRef: zipRequestIdOnly
       paymentDetails: ach
     values:
+      # intentional: 2-item array demonstrates multi-job ZIP batch payload
       multiZipJobs:
         - jobTemplate: standard_letter
           filename: invoice_001.pdf
           recipientAddressSource:
             singleAddress:
-              firstName: <String>
-              lastName: <String>
-              address1: <String>
-              city: <String>
-              state: <String>
-              zip: <String>
-              country: <String>
+              firstName: John
+              lastName: Smith
+              address1: 123 Main St
+              city: Austin
+              state: TX
+              zip: 78701
+              country: US
         - jobTemplate: standard_letter
           filename: invoice_002.pdf
           recipientAddressSource:
             singleAddress:
-              firstName: <String>
-              lastName: <String>
-              address1: <String>
-              city: <String>
-              state: <String>
-              zip: <String>
-              country: <String>
+              firstName: Jane
+              lastName: Doe
+              address1: 456 Oak Ave
+              city: Denver
+              state: CO
+              zip: 80202
+              country: US
       tags:
         - reseller
         - batch
@@ -350,13 +351,13 @@ examples:
           endPage: 3
           recipientAddressSource:
             singleAddress:
-              firstName: <String>
-              lastName: <String>
-              address1: <String>
-              city: <String>
-              state: <String>
-              zip: <String>
-              country: <String>
+              firstName: John
+              lastName: Smith
+              address1: 123 Main St
+              city: Austin
+              state: TX
+              zip: 78701
+              country: US
       tags:
         - bulk
         - split-pdf
@@ -488,13 +489,13 @@ examples:
     values:
       mappingId: 5001
       addressList:
-        - firstName: <String>
-          lastName: <String>
-          address1: <String>
-          city: <String>
-          state: <String>
-          zip: <String>
-          country: <String>
+        - firstName: John
+          lastName: Smith
+          address1: 123 Main St
+          city: Austin
+          state: TX
+          zip: 78701
+          country: US
       tags:
         - advanced
         - list-naming
@@ -531,29 +532,30 @@ examples:
       docSourceZipFileRef: zipDocumentIdOnly
       paymentDetails: invoice
     values:
+      # intentional: 2-item array demonstrates multi-job ZIP batch payload
       multiZipJobs:
         - jobTemplate: standard_letter
           filename: letter_001.pdf
           recipientAddressSource:
             singleAddress:
-              firstName: <String>
-              lastName: <String>
-              address1: <String>
-              city: <String>
-              state: <String>
-              zip: <String>
-              country: <String>
+              firstName: John
+              lastName: Smith
+              address1: 123 Main St
+              city: Austin
+              state: TX
+              zip: 78701
+              country: US
         - jobTemplate: standard_letter
           filename: letter_002.pdf
           recipientAddressSource:
             singleAddress:
-              firstName: <String>
-              lastName: <String>
-              address1: <String>
-              city: <String>
-              state: <String>
-              zip: <String>
-              country: <String>
+              firstName: Jane
+              lastName: Doe
+              address1: 456 Oak Ave
+              city: Denver
+              state: CO
+              zip: 80202
+              country: US
       tags:
         - advanced
         - zip

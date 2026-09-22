@@ -673,13 +673,13 @@ recipientAddressByAddressId =
 (* @doc Integer ID of a merge-field mapping profile that associates address columns to template variables. If omitted, the account default mapping is used. *)
 mappingId = id ; (* @hint static 5001 *)
 (* @doc Optional label for this recipient address record. *)
-addressName = string ;
+addressName = string ; (* @hint static Main Office *)
 (* @doc Optional name for this address list record. *)
 addressListName = string ; (* @hint static Marketing Campaign Q1 *)
 (* @doc Integer ID of a previously stored recipient address list. *)
 addressListId = id ; (* @hint static 1001 *)
 (* @doc Integer ID of a previously stored individual recipient address. *)
-addressId = id ;
+addressId = id ; (* @hint static 2001 *)
 
 (* @doc List of recipient mailing addresses — used for batch sends and mail merge. *)
 addressList   = { address } ;

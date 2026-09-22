@@ -2905,11 +2905,6 @@ validate-spec-against-dd-report: ## Same as validate-spec-against-dd but writes 
 		--report reports/spec-vs-dd-report.md
 
 .PHONY: validate-configs
-# NOTE: Uses C2MAPIV2_OPENAPI_SPEC_BASE (not SPEC_FINAL) intentionally.
-# config examples are job-only; the base spec is available before the auth
-# overlay is merged. Auth paths are absent from the base spec — if a config
-# example ever references an auth path, V7 will flag it (correct behaviour,
-# since config examples should not reference auth endpoints).
 validate-configs: ## Validate all config file field names against the EBNF Data Dictionary
 	@echo "🔍 Validating config files against DD rule names..."
 	@DD_EBNF_FILE="$(DD_EBNF_FILE)" \
@@ -2918,7 +2913,7 @@ validate-configs: ## Validate all config file field names against the EBNF Data 
 		--catalog config/curated-examples-catalog.yaml \
 		--template config/getting-started-template.yaml \
 		--faker-hints config/faker_hints.yaml \
-		--spec $(C2MAPIV2_OPENAPI_SPEC_BASE) \
+		--spec $(C2MAPIV2_OPENAPI_SPEC) \
 		--error-examples config/error-response-examples.yaml
 
 .PHONY: validate-postman-against-dd
