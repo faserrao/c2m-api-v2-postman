@@ -367,23 +367,37 @@ jobs:
             echo "  ⚠️  SDK directory not found (generation may have failed)"
           fi
 
-          echo "📊 Copying test reports..."
-          mkdir -p artifacts-repo/reports
-          cp -v reports/*.md  artifacts-repo/reports/ 2>/dev/null || echo "  ⚠️  No markdown reports to copy"
-          cp -v reports/*.csv  artifacts-repo/reports/ 2>/dev/null || echo "  ⚠️  No CSV reports to copy"
-          cp -v reports/*.json artifacts-repo/reports/ 2>/dev/null || echo "  ⚠️  No JSON reports to copy"
-          cp -v reports/*.html artifacts-repo/reports/ 2>/dev/null || echo "  ⚠️  No HTML reports to copy"
-          cp -v reports/*.txt  artifacts-repo/reports/ 2>/dev/null || echo "  ⚠️  No txt reports to copy"
-
           echo "📝 Generating artifacts README with organization..."
           sed "s|__GITHUB_ORG__|${{ github.repository_owner }}|g" ARTIFACTS_README.md.template > artifacts-repo/README.md
           echo "  ✅ README generated for organization: ${{ github.repository_owner }}"
 
           echo "✅ All artifacts copied successfully"
 
+      # ---------- Copy reports to artifacts repo (always, even on failed builds) ----------
+      # Separated from the main artifact copy so reports are updated regardless of
+      # whether the build succeeded. Old timestamped Newman/validation reports are wiped
+      # first so the directory never accumulates stale files across builds.
+      - name: Copy reports to artifacts repository
+        if: |
+          always() &&
+          github.ref == 'refs/heads/main' &&
+          (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+        run: |
+          echo "📊 Copying build reports to artifacts repository..."
+          # Wipe the entire reports directory first so old timestamped files don't accumulate
+          rm -rf artifacts-repo/reports
+          mkdir -p artifacts-repo/reports
+          cp -v reports/*.md   artifacts-repo/reports/ 2>/dev/null || echo "  ⚠️  No .md reports"
+          cp -v reports/*.csv  artifacts-repo/reports/ 2>/dev/null || echo "  ⚠️  No .csv reports"
+          cp -v reports/*.json artifacts-repo/reports/ 2>/dev/null || echo "  ⚠️  No .json reports"
+          cp -v reports/*.html artifacts-repo/reports/ 2>/dev/null || echo "  ⚠️  No .html reports"
+          cp -v reports/*.txt  artifacts-repo/reports/ 2>/dev/null || echo "  ⚠️  No .txt reports"
+          echo "  ✅ Reports directory refreshed (old timestamped files removed)"
+
       # ---------- Commit and push to artifacts repo ----------
       - name: Commit and push artifacts
         if: |
+          always() &&
           github.ref == 'refs/heads/main' &&
           (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         working-directory: artifacts-repo
@@ -403,12 +417,20 @@ jobs:
 
           # Build info commit message. Use only the SUBJECT line, and reference
           # the env var as a shell variable (safe — not re-parsed by the shell).
+          # Tag the commit with [FAILED] when the build didn't succeed so the
+          # artifacts repo history makes it clear which runs had failures.
           SRC_SUBJECT=$(printf '%s' "$SRC_COMMIT_MSG" | head -n1)
-          COMMIT_MSG="Build #${{ github.run_number }}: Update from ${SRC_SUBJECT}"
-          
+          BUILD_STATUS="${{ job.status }}"
+          if [ "$BUILD_STATUS" = "success" ]; then
+            COMMIT_MSG="Build #${{ github.run_number }}: Update from ${SRC_SUBJECT}"
+          else
+            COMMIT_MSG="Build #${{ github.run_number }} [FAILED]: Reports from ${SRC_SUBJECT}"
+          fi
+
           # Commit (don't fail if no changes)
           git commit -m "$COMMIT_MSG" \
             -m "Source commit: ${{ github.sha }}" \
+            -m "Build status: ${BUILD_STATUS}" \
             -m "Workflow: ${{ github.workflow }}" \
             -m "Triggered by: ${{ github.actor }}" || {
             echo "No changes to commit"
