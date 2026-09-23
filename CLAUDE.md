@@ -49,7 +49,7 @@ Four additional iterative audit passes fixing 14 items across 9 files (all LOW/M
 **Comprehensive system audit:** 181/187 checks pass; 6 warnings all documented intentional design decisions.
 
 **Open recommendations (none blocking):**
-1. Extend V8 to validate inline discriminator keys in template `values:` blocks against spec
+1. ~~Extend V8 to validate inline discriminator keys in template `values:` blocks against spec~~ **Done 2026-09-23** — V8 now covers both template (7 usages) and catalog (2 usages)
 2. Add `@hint` annotations for `addressId`/`addressName` in EBNF DD
 3. Add comment to real-world catalog for intentional 2-item `multiZipJobs`
 

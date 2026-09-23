@@ -8,7 +8,8 @@ misspelled DD rule names before they silently produce wrong output.
 
 Files checked:
   - config/curated-examples-catalog.yaml : values: keys in every example
-  - config/getting-started-template.yaml : faker_hints: keys
+  - config/getting-started-template.yaml : faker_hints: keys + values: keys
+  - V8 (inline discriminators) applied to BOTH config files
 
 Exit codes:
   0 — all clear (or only warnings)
@@ -549,9 +550,12 @@ def _walk_disc_candidates(obj: object, pairs: set) -> None:
             _walk_disc_candidates(item, pairs)
 
 
-def validate_template_inline_discriminators(template_path: Path, spec_path: Path,
+def validate_template_inline_discriminators(config_path: Path, spec_path: Path,
                                             result: ValidationResult) -> None:
-    """V8: Verify inline oneOf discriminator keys in template values: blocks are valid.
+    """V8: Verify inline oneOf discriminator keys in values: blocks are valid.
+
+    Works against both getting-started-template.yaml and curated-examples-catalog.yaml —
+    both use examples[].values: blocks with the same structure.
 
     V3a checks that every key in values: blocks is a DD rule name — this catches
     renames and removals. V8 adds context-aware validation: for each discriminator
@@ -569,11 +573,11 @@ def validate_template_inline_discriminators(template_path: Path, spec_path: Path
     valid_by_parent = _collect_spec_disc_pairs(spec)
     all_disc_keys: set = set().union(*valid_by_parent.values()) if valid_by_parent else set()
 
-    template = _load_yaml(template_path)
-    file_label = template_path.name
+    config = _load_yaml(config_path)
+    file_label = config_path.name
 
     candidate_pairs: set = set()
-    for example in template.get('examples', []):
+    for example in config.get('examples', []):
         _walk_disc_candidates(example.get('values', {}), candidate_pairs)
 
     # Only check pairs where the candidate key is a current spec discriminator
@@ -702,6 +706,9 @@ def main():
 
         print(f"\n🔍 Checking template inline discriminator key contexts (V8):")
         validate_template_inline_discriminators(template_path, spec_path, result)
+
+        print(f"\n🔍 Checking catalog inline discriminator key contexts (V8):")
+        validate_template_inline_discriminators(catalog_path, spec_path, result)
     else:
         print(f"\n⚠  Skipping select: validation — spec not found at {spec_path}")
         print(f"   (Run openapi-build first, or pass --spec <path>)")
