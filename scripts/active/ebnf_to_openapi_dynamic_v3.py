@@ -393,7 +393,15 @@ class EBNFToOpenAPITranslator:
                 severity="error",
                 message=f"Failed to parse EBNF: {str(e)}"
             ))
-    
+
+        # A constraint on a field the DD does not define is silently dropped otherwise.
+        if self.productions:
+            orphans = sorted(set(self.numeric_constraints) - set(self.productions))
+            if orphans:
+                raise RuntimeError(
+                    f"@numeric_constraints names field(s) not defined in the DD: {', '.join(orphans)}"
+                )
+
     def _parse_http_error_map(self, content: str) -> Dict[str, Any]:
         """Parse @http_error_map annotation block from EBNF content.
 
@@ -1226,6 +1234,9 @@ class EBNFToOpenAPITranslator:
                 schema["format"] = type_info.format
             if type_info.enum_values:
                 schema["enum"] = type_info.enum_values
+            # @numeric_constraints bounds must reach the inline property schemas that
+            # request bodies are validated against, not just the standalone schema.
+            schema.update(self.numeric_constraints.get(field_name, {}))
             return schema
 
         # For complex types (array, oneOf, object), use a reference

@@ -120,7 +120,13 @@ function discoverOneOfFields(specPath) {
             .map(([name]) => name);
         console.log(`Discovered ${jobArrayFields.length} job array fields from spec: ${jobArrayFields.join(', ')}`);
 
-        return { oneOfFields, crossFieldRules, enumPlaceholders, jobArrayFields };
+        // H2: mutually exclusive field groups from the DD @mutual_exclusion block
+        const mutualExclusionFields = (spec.info && spec.info['x-mutual-exclusion']) || [];
+        if (mutualExclusionFields.length > 1) {
+            console.log(`Loaded mutual exclusion group from spec: ${mutualExclusionFields.join(', ')}`);
+        }
+
+        return { oneOfFields, crossFieldRules, enumPlaceholders, jobArrayFields, mutualExclusionFields };
 
     } catch (error) {
         console.error(`Error reading OpenAPI spec: ${error.message}`);
@@ -243,9 +249,28 @@ function fixCrossFieldConstraints(bodyObj, rules) {
 }
 
 /**
+ * Enforce x-mutual-exclusion: at most one field of the group may appear in a body.
+ * Keeps `preferred` when present (otherwise the first group field present) and
+ * deletes the others. openapi-to-postmanv2 emits every optional field, so without
+ * this both jobTemplate and jobOptions reach the linked collection (H2, 2026-10-05).
+ */
+function enforceMutualExclusion(bodyObj, fields, preferred) {
+    if (!bodyObj || typeof bodyObj !== 'object' || !fields || fields.length < 2) return;
+    const present = fields.filter(f => Object.prototype.hasOwnProperty.call(bodyObj, f));
+    if (present.length < 2) return;
+    const keep = present.includes(preferred) ? preferred : present[0];
+    for (const f of present) {
+        if (f !== keep) delete bodyObj[f];
+    }
+}
+
+// Alternates which group field each request keeps, so the collection shows both shapes.
+let mutualExclusionCounter = 0;
+
+/**
  * Process a raw body string (JSON in a string)
  */
-function processRawBody(rawStr, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders, jobArrayFields) {
+function processRawBody(rawStr, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders, jobArrayFields, mutualExclusionFields, preferredField) {
     if (!rawStr || typeof rawStr !== 'string') {
         return rawStr;
     }
@@ -263,6 +288,9 @@ function processRawBody(rawStr, oneOfFields, replacedFields, crossFieldRules, en
                 processed[field] = processed[field].slice(0, 1);
             }
         }
+
+        // Enforce DD mutual exclusion before the jobOptions passes below
+        enforceMutualExclusion(processed, mutualExclusionFields, preferredField);
 
         // Enforce cross-field jobOptions constraints (rules from spec x-valid-combinations)
         fixCrossFieldConstraints(processed, crossFieldRules);
@@ -282,10 +310,18 @@ function processRawBody(rawStr, oneOfFields, replacedFields, crossFieldRules, en
 /**
  * Process a single collection item (request)
  */
-function processItem(item, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders, jobArrayFields) {
+function processItem(item, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders, jobArrayFields, mutualExclusionFields) {
+    // One choice per request, applied to its body and every saved example's originalRequest
+    let preferredField;
+    if (item.request && mutualExclusionFields && mutualExclusionFields.length > 1) {
+        preferredField = mutualExclusionFields[mutualExclusionCounter % mutualExclusionFields.length];
+        mutualExclusionCounter++;
+    }
+    const bodyArgs = [oneOfFields, replacedFields, crossFieldRules, enumPlaceholders, jobArrayFields, mutualExclusionFields, preferredField];
+
     // Process request body
     if (item.request && item.request.body && item.request.body.raw) {
-        item.request.body.raw = processRawBody(item.request.body.raw, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders, jobArrayFields);
+        item.request.body.raw = processRawBody(item.request.body.raw, ...bodyArgs);
     }
 
     // Process response examples
@@ -293,19 +329,19 @@ function processItem(item, oneOfFields, replacedFields, crossFieldRules, enumPla
         item.response.forEach(response => {
             // Process response body
             if (response.body) {
-                response.body = processRawBody(response.body, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders, jobArrayFields);
+                response.body = processRawBody(response.body, ...bodyArgs);
             }
 
             // Process originalRequest in responses
             if (response.originalRequest && response.originalRequest.body && response.originalRequest.body.raw) {
-                response.originalRequest.body.raw = processRawBody(response.originalRequest.body.raw, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders, jobArrayFields);
+                response.originalRequest.body.raw = processRawBody(response.originalRequest.body.raw, ...bodyArgs);
             }
         });
     }
 
     // Recursively process sub-items (folders)
     if (item.item && Array.isArray(item.item)) {
-        item.item.forEach(subItem => processItem(subItem, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders, jobArrayFields));
+        item.item.forEach(subItem => processItem(subItem, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders, jobArrayFields, mutualExclusionFields));
     }
 }
 
@@ -317,7 +353,7 @@ function main() {
 
     try {
         // Step 1: Discover oneOf fields, cross-field constraints, enum placeholders, and job array fields
-        const { oneOfFields, crossFieldRules, enumPlaceholders, jobArrayFields } = discoverOneOfFields(options.spec);
+        const { oneOfFields, crossFieldRules, enumPlaceholders, jobArrayFields, mutualExclusionFields } = discoverOneOfFields(options.spec);
 
         if (oneOfFields.size === 0) {
             console.warn('Warning: No oneOf fields discovered in OpenAPI spec');
@@ -333,7 +369,7 @@ function main() {
         // Step 3: Process all items in the collection, tracking actual replacements
         const replacedFields = new Set();
         if (collection.item && Array.isArray(collection.item)) {
-            collection.item.forEach(item => processItem(item, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders, jobArrayFields));
+            collection.item.forEach(item => processItem(item, oneOfFields, replacedFields, crossFieldRules, enumPlaceholders, jobArrayFields, mutualExclusionFields));
         }
 
         // Step 4: Write the output

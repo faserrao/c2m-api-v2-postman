@@ -157,10 +157,38 @@ class TestDDConstraints(unittest.TestCase):
         self.assertEqual(year.get("minimum"), 2000)
         self.assertEqual(year.get("maximum"), 2099)
 
-    def test_quantity_minimum(self):
+    def test_numeric_constraints_name_dd_rules(self):
+        orphans = set(self.translator.numeric_constraints) - set(self.translator.productions)
+        self.assertEqual(orphans, set(),
+                         f"@numeric_constraints names fields not defined in the DD: {orphans}")
+
+    def test_numeric_constraints_reach_request_properties(self):
+        """Every property schema named after a constrained field must carry the bounds.
+        The standalone component schema alone is not enough: request bodies are
+        validated against the inline property schemas (H1, 2026-10-05)."""
         nc = self.translator.numeric_constraints
-        qty = nc.get("quantity", {})
-        self.assertEqual(qty.get("minimum"), 1)
+        seen = {name: 0 for name in nc}
+        missing = []
+
+        def walk(node, path):
+            if isinstance(node, dict):
+                for key, prop in (node.get("properties") or {}).items():
+                    if key in nc and isinstance(prop, dict) and "$ref" not in prop:
+                        seen[key] += 1
+                        for kw, val in nc[key].items():
+                            if prop.get(kw) != val:
+                                missing.append(f"{path}.properties.{key}: {kw}={prop.get(kw)!r}, expected {val!r}")
+                for k, v in node.items():
+                    walk(v, f"{path}.{k}")
+            elif isinstance(node, list):
+                for v in node:
+                    walk(v, path)
+
+        walk(self.spec.get("components", {}).get("schemas", {}), "schemas")
+        walk(self.spec.get("paths", {}), "paths")
+        self.assertEqual(missing, [], "Numeric constraints missing on request properties:\n" + "\n".join(missing))
+        unused = [name for name, n in seen.items() if n == 0]
+        self.assertEqual(unused, [], f"Constrained fields never used as a request property: {unused}")
 
     def test_month_schema_has_constraints(self):
         schema = self.schemas.get("month", {})

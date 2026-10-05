@@ -783,26 +783,27 @@ function processBodyObject(obj, path = '') {
 let jobPatternCounter = 0;
 
 /**
- * Enforce mutual exclusion for jobTemplate and jobOptions
- * Business rule: Both are optional, but cannot coexist (API will reject)
- * Strategy: Alternate between template-based and options-based examples
+ * Mutually exclusive field group from the spec's x-mutual-exclusion (DD @mutual_exclusion).
+ * Populated in main() when --spec is passed. fix_oneOf_placeholders.js already enforces
+ * this on the shared raw collection; this is a safety net for collections that skip it.
+ */
+let mutualExclusionFields = [];
+
+/**
+ * Enforce mutual exclusion: at most one field of the group may appear in a body.
+ * Strategy: alternate which field is kept, so both shapes are exercised.
  */
 function enforceMutualExclusion(bodyObj) {
-    // Only apply if both fields exist
-    if (!bodyObj.hasOwnProperty('jobTemplate') || !bodyObj.hasOwnProperty('jobOptions')) {
-        return; // Nothing to do - only one or neither exists
+    const present = mutualExclusionFields.filter(f => Object.prototype.hasOwnProperty.call(bodyObj, f));
+    if (present.length < 2) {
+        return; // Nothing to do - at most one field of the group exists
     }
 
-    // Alternate between keeping template vs options
-    // Even requests: keep template, remove options
-    // Odd requests: keep options, remove template
-    if (jobPatternCounter % 2 === 0) {
-        delete bodyObj.jobOptions;
-        console.log('  [Mutual Exclusion] Keeping jobTemplate, removing jobOptions');
-    } else {
-        delete bodyObj.jobTemplate;
-        console.log('  [Mutual Exclusion] Keeping jobOptions, removing jobTemplate');
+    const keep = present[jobPatternCounter % present.length];
+    for (const f of present) {
+        if (f !== keep) delete bodyObj[f];
     }
+    console.log(`  [Mutual Exclusion] Keeping ${keep}, removing ${present.filter(f => f !== keep).join(', ')}`);
 
     jobPatternCounter++;
 }
@@ -886,6 +887,7 @@ function main() {
         if (options.spec) {
             const specContent = fs.readFileSync(options.spec, 'utf8');
             const spec = yaml.load(specContent);
+            mutualExclusionFields = (spec.info && spec.info['x-mutual-exclusion']) || [];
             const specFixtures = loadOneOfFixturesFromSpec(spec);
             Object.assign(oneOfFixtures, specFixtures);
             const variantCount = Object.values(specFixtures).reduce((s, v) => s + v.length, 0);

@@ -37,6 +37,7 @@ V-number registry for this file (prefix K-V = Collection-Validator):
   K-V3  _best_branch()               — oneOf branch discrimination by required-key overlap
   K-V4  structural_errors() scalars  — scalar type/enum checks; skips placeholder strings
   K-V5  page_range_errors()          — startPage ≤ endPage cross-field constraint
+  K-V6  mutual_exclusion_errors()    — at most one field of the DD @mutual_exclusion group
 
 For C-V (Config-Validator) numbers see validate_configs_against_dd.py.
 C-V4 is intentionally absent in both files; K-V4 occupies that slot for collections.
@@ -342,6 +343,18 @@ def request_body_schema(spec, path, method):
 # --------------------------------------------------------------------------- #
 # Main validation driver                                                      #
 # --------------------------------------------------------------------------- #
+def mutual_exclusion_errors(body, spec):
+    """K-V6: at most one field of the spec's x-mutual-exclusion group (DD
+    @mutual_exclusion, e.g. jobTemplate / jobOptions) may appear in a request body."""
+    fields = (spec.get("info") or {}).get("x-mutual-exclusion") or []
+    if not isinstance(body, dict) or len(fields) < 2:
+        return []
+    present = [f for f in fields if f in body]
+    if len(present) > 1:
+        return [f"body: mutually exclusive fields present together: {', '.join(present)}"]
+    return []
+
+
 def validate_collection(spec, collection, path_prefix, strict_unknown):
     results = []  # list of dicts: {path, name, mode, status, errors}
     for req in iter_requests(collection):
@@ -370,6 +383,7 @@ def validate_collection(spec, collection, path_prefix, strict_unknown):
         rec["mode"] = "structure(placeholders)" if has_placeholder(body) else "structure(values)"
         errs = structural_errors(body, schema, spec, "body", strict_unknown)
         errs += page_range_errors(body, spec)
+        errs += mutual_exclusion_errors(body, spec)
         if errs:
             rec["status"] = "FAIL"
             rec["errors"] = errs

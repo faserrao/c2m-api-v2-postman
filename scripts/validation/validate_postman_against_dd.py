@@ -13,7 +13,7 @@ Data Dictionary, adding four checks that no existing validator covers:
               DD enum literals in test collections. Catches "firstClass" vs
               "first_class" drift and invalid values that would be rejected by the API.
 
-  3. RANGE  — numeric fields with constraints (month 1–12, year 2000–2099, quantity ≥1)
+  3. RANGE  — numeric fields with constraints (month 1–12, year 2000–2099, startPage/endPage ≥1)
               are validated when real values are present. Loaded from x-numeric-constraints
               in the OpenAPI spec so the script stays in sync with the spec.
 

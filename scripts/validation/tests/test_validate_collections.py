@@ -185,6 +185,24 @@ def test_synthetic_faults():
     check(page_range_errors(ok_range, {}) == [],
           "V5: valid startPage < endPage -> no errors")
 
+    # 3i-b. K-V6 — DD @mutual_exclusion (read from the real spec's x-mutual-exclusion)
+    group = (SPEC.get("info") or {}).get("x-mutual-exclusion") or []
+    check(len(group) >= 2, "K-V6: spec declares an x-mutual-exclusion group")
+    both = {f: "<string>" for f in group}
+    check(any("mutually exclusive" in x for x in V.mutual_exclusion_errors(both, SPEC)),
+          "K-V6: all mutually exclusive fields together -> caught")
+    check(V.mutual_exclusion_errors({group[0]: "<string>"} if group else {}, SPEC) == [],
+          "K-V6: single field of the group -> no errors")
+    # Must be wired into validate_collection, not just defined
+    body = dict(clean_single, **both)
+    coll = {"item": [{"name": "K-V6", "request": {
+        "method": "POST", "url": {"path": ["static"]},
+        "body": {"mode": "raw", "raw": json.dumps(body)}}}]}
+    res = V.validate_collection(SPEC, coll, None, True)
+    check(res and res[0]["status"] == "FAIL" and
+          any("mutually exclusive" in x for x in res[0]["errors"]),
+          "K-V6: wired into validate_collection (/static with both) -> FAIL")
+
     # 3j. Empty oneOf value must FAIL (not silently pass)
     e = errs_for("/static", {"docSourceAll": {},
                               "recipientAddressSource": {"singleAddress": clean_addr}})
