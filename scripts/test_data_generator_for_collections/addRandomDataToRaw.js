@@ -298,7 +298,7 @@ let oneOfFixtures = {
             errorType: "AuthorizationError",
             errorMessage: "User does not have required permissions for this operation",
             errorCode: "INSUFFICIENT_PERMISSIONS",
-            errorDetails: JSON.stringify({ required: "jobs:write", user: "read-only-user" }),  // L-2: must match _ERROR_AUTH_SCOPE_REQUIRED in ebnf_to_openapi_dynamic_v3.py
+            errorDetails: JSON.stringify({ required: "jobs:submit", provided: "templates:read" }),  // L-2/H5: must match _ERROR_AUTH_SCOPE_REQUIRED/_PROVIDED in ebnf_to_openapi_dynamic_v3.py
             errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${hexSuffix()}`
         },
         // Variant 7: ResourceNotFoundError - Job Not Found

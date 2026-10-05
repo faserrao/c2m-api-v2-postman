@@ -13,8 +13,9 @@
 #
 # Documented hardcoded values (intentionally stable — no spec source):
 #   - 400 missing_field: "documentId" — representative example field name (any valid DD field)
-#   - 403 insufficient_permissions: "jobs:write" — must match _ERROR_AUTH_SCOPE_REQUIRED
-#     constant in ebnf_to_openapi_dynamic_v3.py (currently "jobs:write")
+#   - 403 insufficient_permissions: "jobs:submit" / "templates:read" — must match
+#     _ERROR_AUTH_SCOPE_REQUIRED/_PROVIDED in ebnf_to_openapi_dynamic_v3.py and be scopes
+#     the auth system issues (openapi/overlays/auth.tokens.yaml)
 #   - 500 external_service_error: "address-validation" — must match _ERROR_EXTERNAL_SERVICE
 #     constant in ebnf_to_openapi_dynamic_v3.py (currently "address-validation")
 #   - 429 rate_limit_exceeded: "100 requests/minute" / 60 — rate-limit policy values;
@@ -66,7 +67,7 @@
     summary: "Insufficient permissions"
     errorMessage: "User does not have required permissions for this operation"
     errorCode: INSUFFICIENT_PERMISSIONS
-    errorDetails: '{"required": "jobs:write", "user": "read-only-user"}'
+    errorDetails: '{"required": "jobs:submit", "provided": "templates:read"}'
   account_suspended:
     summary: "Account suspended"
     errorMessage: "User account has been suspended"

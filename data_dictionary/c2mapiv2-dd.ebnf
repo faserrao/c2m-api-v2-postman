@@ -1096,7 +1096,7 @@ HTTP_500_INTERNAL_SERVER_ERROR = errorResponse ;
    read this block at build time via the x-http-error-map spec extension.
    ----------------------------------------------------------------
    @http_error_map
-   400: errorType=ValidationError; errorCodes=MISSING_REQUIRED_FIELD,INVALID_ONEOF,INVALID_JSON
+   400: errorType=ValidationError; errorCodes=MISSING_REQUIRED_FIELD,INVALID_ONEOF,INVALID_JSON,INVALID_FORMAT
    401: errorType=AuthenticationError; errorCodes=MISSING_AUTH_HEADER,INVALID_TOKEN,EXPIRED_TOKEN
    403: errorType=AuthorizationError; errorCodes=INSUFFICIENT_PERMISSIONS,ACCOUNT_SUSPENDED
    404: errorType=ResourceNotFoundError; errorCodes=JOB_NOT_FOUND,RESOURCE_NOT_FOUND

@@ -424,7 +424,8 @@ def validate_example_paths(config_path: Path, spec_path: Path,
 def validate_error_response_codes(error_examples_path: Path, spec_path: Path,
                                   result: ValidationResult) -> None:
     """V6: Build-time check that all errorCode values in error-response-examples.yaml
-    match the EBNF DD errorCode enum.
+    match the EBNF DD errorCode enum, and that each code is filed under an HTTP status
+    the DD @http_error_map assigns it to (H3, 2026-10-05).
 
     The injection scripts validate this at runtime. This check catches drift earlier —
     at make validate-configs time, before the spec is injected into any collection.
@@ -453,6 +454,11 @@ def validate_error_response_codes(error_examples_path: Path, spec_path: Path,
     with open(error_examples_path) as f:
         raw = yaml.safe_load(f) or {}
 
+    error_map = (spec.get('info') or {}).get('x-http-error-map') or {}
+    if not error_map:
+        result.warn(error_examples_path.name, "errorCode",
+                    "x-http-error-map not in spec — skipping V6 status-placement check")
+
     file_label = error_examples_path.name
     total = 0
     bad = []
@@ -466,6 +472,14 @@ def validate_error_response_codes(error_examples_path: Path, spec_path: Path,
             if code not in error_code_enum:
                 msg = (f"'{code}' (HTTP {http_status} / '{ex_key}') is not in the DD "
                        f"errorCode enum. Valid: {sorted(error_code_enum)}")
+                result.error(file_label, "errorCode", msg)
+                bad.append(code)
+                continue
+            # The code must also be one the DD @http_error_map assigns to this status
+            mapped = (error_map.get(str(http_status)) or {}).get('errorCodes')
+            if error_map and code not in (mapped or []):
+                msg = (f"'{code}' is filed under HTTP {http_status} ('{ex_key}') but the DD "
+                       f"@http_error_map maps HTTP {http_status} to {mapped}")
                 result.error(file_label, "errorCode", msg)
                 bad.append(code)
 

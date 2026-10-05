@@ -14,6 +14,7 @@ Features:
 """
 
 import re
+from http import HTTPStatus
 import sys
 import json
 import random
@@ -100,8 +101,10 @@ _CONTENT_TYPE_JSON = "application/json"
 # These are intentional stable strings — not derivable from EBNF or OpenAPI spec.
 _ERROR_DB_TABLE            = "jobs"
 _ERROR_EXTERNAL_SERVICE    = "address-validation"  # BUG fix: aligned with error-response-examples.yaml
-_ERROR_AUTH_SCOPE_REQUIRED = "jobs:write"
-_ERROR_AUTH_SCOPE_PROVIDED = "jobs:read"
+# H5: scopes must be ones the auth system issues (openapi/overlays/auth.tokens.yaml,
+# postman/scripts/jwt-pre-request.js); enforced by test_dd_constraints.py.
+_ERROR_AUTH_SCOPE_REQUIRED = "jobs:submit"
+_ERROR_AUTH_SCOPE_PROVIDED = "templates:read"
 # A-new-1: Build-failure guard only — primary path uses _get_enum_values('documentClass')
 # from the spec.  This list is unreachable in a normal build; a constant keeps it auditable.
 _ERROR_DOCUMENT_CLASS_FALLBACK = ["letter", "postcard", "brochure", "flat"]
@@ -627,6 +630,35 @@ class EBNFToOpenAPITranslator:
         
         return spec
     
+    def _generate_responses(self, endpoint) -> OrderedDict:
+        """200 plus one error response per status in the DD @http_error_map (H4).
+
+        Statuses come from the DD, so a status added to the map (e.g. 429) is declared
+        on every job endpoint automatically.
+        """
+        responses = OrderedDict([
+            ("200", {
+                "description": _HTTP_STATUS_DESCRIPTIONS['200'],
+                "content": {
+                    _CONTENT_TYPE_JSON: {
+                        "schema": {"$ref": f"#/components/schemas/{_RESPONSE_SCHEMA_NAME}"}
+                    }
+                }
+            })
+        ])
+        for status in sorted(self.http_error_map):
+            description = _HTTP_STATUS_DESCRIPTIONS.get(status) or HTTPStatus(int(status)).phrase
+            responses[status] = {
+                "description": description,
+                "content": {
+                    _CONTENT_TYPE_JSON: {
+                        "schema": {"$ref": f"#/components/schemas/{_ERROR_SCHEMA_NAME}"},
+                        "examples": self._generate_error_examples(status, endpoint)
+                    }
+                }
+            }
+        return responses
+
     def _generate_all_schemas(self) -> OrderedDict:
         """Generate all schemas dynamically from EBNF productions"""
         schemas = OrderedDict()
@@ -709,70 +741,7 @@ class EBNFToOpenAPITranslator:
                         }
                     }
                 }),
-                ("responses", OrderedDict([
-                    ("200", {
-                        "description": _HTTP_STATUS_DESCRIPTIONS['200'],
-                        "content": {
-                            _CONTENT_TYPE_JSON: {
-                                "schema": {"$ref": f"#/components/schemas/{_RESPONSE_SCHEMA_NAME}"}
-                            }
-                        }
-                    }),
-                    ("400", {
-                        "description": _HTTP_STATUS_DESCRIPTIONS['400'],
-                        "content": {
-                            _CONTENT_TYPE_JSON: {
-                                "schema": {"$ref": f"#/components/schemas/{_ERROR_SCHEMA_NAME}"},
-                                "examples": self._generate_error_examples("400", endpoint)
-                            }
-                        }
-                    }),
-                    ("401", {
-                        "description": _HTTP_STATUS_DESCRIPTIONS['401'],
-                        "content": {
-                            _CONTENT_TYPE_JSON: {
-                                "schema": {"$ref": f"#/components/schemas/{_ERROR_SCHEMA_NAME}"},
-                                "examples": self._generate_error_examples("401", endpoint)
-                            }
-                        }
-                    }),
-                    ("403", {
-                        "description": _HTTP_STATUS_DESCRIPTIONS['403'],
-                        "content": {
-                            _CONTENT_TYPE_JSON: {
-                                "schema": {"$ref": f"#/components/schemas/{_ERROR_SCHEMA_NAME}"},
-                                "examples": self._generate_error_examples("403", endpoint)
-                            }
-                        }
-                    }),
-                    ("404", {
-                        "description": _HTTP_STATUS_DESCRIPTIONS['404'],
-                        "content": {
-                            _CONTENT_TYPE_JSON: {
-                                "schema": {"$ref": f"#/components/schemas/{_ERROR_SCHEMA_NAME}"},
-                                "examples": self._generate_error_examples("404", endpoint)
-                            }
-                        }
-                    }),
-                    ("422", {
-                        "description": _HTTP_STATUS_DESCRIPTIONS['422'],
-                        "content": {
-                            _CONTENT_TYPE_JSON: {
-                                "schema": {"$ref": f"#/components/schemas/{_ERROR_SCHEMA_NAME}"},
-                                "examples": self._generate_error_examples("422", endpoint)
-                            }
-                        }
-                    }),
-                    ("500", {
-                        "description": _HTTP_STATUS_DESCRIPTIONS['500'],
-                        "content": {
-                            _CONTENT_TYPE_JSON: {
-                                "schema": {"$ref": f"#/components/schemas/{_ERROR_SCHEMA_NAME}"},
-                                "examples": self._generate_error_examples("500", endpoint)
-                            }
-                        }
-                    })
-                ]))
+                ("responses", self._generate_responses(endpoint)),
             ])
             
             paths[endpoint.path][endpoint.method.lower()] = operation

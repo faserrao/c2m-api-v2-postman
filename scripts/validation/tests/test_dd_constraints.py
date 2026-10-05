@@ -233,6 +233,66 @@ class TestDDConstraints(unittest.TestCase):
         self.assertIn("400", em)
         self.assertIn("500", em)
 
+    def test_every_dd_error_status_declared_on_every_job_endpoint(self):
+        """H4: job-endpoint responses are driven by @http_error_map (incl. 429)."""
+        em = self.translator.http_error_map
+        missing = []
+        for ep in self.translator.endpoints:
+            op = self.spec["paths"][ep.path][ep.method.lower()]
+            for status in em:
+                if status not in op.get("responses", {}):
+                    missing.append(f"{ep.method} {ep.path}: {status}")
+        self.assertEqual(missing, [], "DD error statuses not declared on job endpoints")
+
+    def test_spec_error_examples_match_dd_map_per_status(self):
+        """H3: each status's examples carry exactly the codes (and type) the DD maps to it."""
+        em = self.translator.http_error_map
+        bad = []
+        for ep in self.translator.endpoints:
+            op = self.spec["paths"][ep.path][ep.method.lower()]
+            for status, entry in em.items():
+                content = op["responses"][status]["content"]["application/json"]
+                values = [ex["value"] for ex in content.get("examples", {}).values()]
+                codes = sorted(v["errorCode"] for v in values)
+                if codes != sorted(entry["errorCodes"]):
+                    bad.append(f"{ep.path} {status}: {codes} != {sorted(entry['errorCodes'])}")
+                bad += [f"{ep.path} {status}: errorType {v['errorType']}" for v in values
+                        if v["errorType"] != entry["errorType"]]
+        self.assertEqual(bad, [])
+
+    def test_error_example_scopes_are_issued_by_auth_system(self):
+        """H5: 403 example scopes must be scopes the auth system actually issues."""
+        import json as _json
+        import re as _re
+        overlay = yaml.safe_load((REPO_ROOT / "openapi" / "overlays" / "auth.tokens.yaml").read_text())
+        issued = set()
+
+        def collect(node):
+            if isinstance(node, dict):
+                for k, v in node.items():
+                    if k == "scopes":
+                        issued.update(v if isinstance(v, list) else (v or {}).keys())
+                    collect(v)
+            elif isinstance(node, list):
+                for v in node:
+                    collect(v)
+        collect(overlay)
+        self.assertTrue(issued, "no scopes found in the auth overlay")
+
+        import ebnf_to_openapi_dynamic_v3 as T
+        used = {"translator _ERROR_AUTH_SCOPE_REQUIRED": T._ERROR_AUTH_SCOPE_REQUIRED,
+                "translator _ERROR_AUTH_SCOPE_PROVIDED": T._ERROR_AUTH_SCOPE_PROVIDED}
+        examples = yaml.safe_load((REPO_ROOT / "config" / "error-response-examples.yaml").read_text())
+        for key, ex in (examples.get(403) or {}).items():
+            for k, v in _json.loads(ex.get("errorDetails", "{}")).items():
+                if k in ("required", "provided"):
+                    used[f"error-response-examples.yaml 403/{key}.{k}"] = v
+        js = (REPO_ROOT / "scripts" / "test_data_generator_for_collections" / "addRandomDataToRaw.js").read_text()
+        for k, v in _re.findall(r"\b(required|provided):\s*\"([a-z]+:[a-z]+)\"", js):
+            used[f"addRandomDataToRaw.js {k}"] = v
+        bad = {where: scope for where, scope in used.items() if scope not in issued}
+        self.assertEqual(bad, {}, f"Scopes not issued by the auth system {sorted(issued)}")
+
     # ── 8. Provider mappings (generated) + aliases (manually maintained) ─────────
     # c2m_provider_mappings.yaml is a DO NOT EDIT derived artifact: canonical enum
     # values come from the EBNF DD; _aliases are merged from c2m_provider_aliases.yaml.
