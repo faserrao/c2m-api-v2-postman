@@ -189,6 +189,21 @@ jobs:
           make validate-collections-conformance-gate-all \
             CONFORMANCE_GATE_REPORT="--report reports/conformance-gate-all.md"
 
+      - name: Gate — DD validators (spec vs DD, all 5 collections vs DD, catalog vs spec)
+        run: |
+          echo "🚦 DD gates: spec and all 5 canonical collections must match the EBNF DD."
+          mkdir -p reports
+          make validate-dd-gates \
+            DD_GATES_SPEC_REPORT="--report reports/spec-vs-dd-report.md" \
+            DD_GATES_POSTMAN_REPORT="--report reports/postman-vs-dd-report.md"
+
+      - name: Gate — Pipeline consistency (DD → spec → Postman, end to end)
+        run: |
+          echo "🚦 Consistency gate: response examples, error map, spec examples, cross-field rules."
+          mkdir -p reports
+          make validate-pipeline-consistency \
+            PIPELINE_CONSISTENCY_REPORT="--report reports/pipeline-consistency.md"
+
       - name: Lint OpenAPI Spec
         continue-on-error: true
         run: |

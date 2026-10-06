@@ -460,10 +460,10 @@ postman-create-linked-collection-legacy:
 .PHONY: postman-create-test-collection
 postman-create-test-collection:
 	$(MAKE) postman-test-collection-generate
-	$(MAKE) postman-test-collection-add-examples || echo "⚠️  Skipping examples (optional step)."
-	$(MAKE) postman-test-collection-add-error-responses || echo "⚠️  Skipping error responses (optional step)."
+	$(MAKE) postman-test-collection-add-examples
+	$(MAKE) postman-test-collection-add-error-responses
 	$(MAKE) postman-test-collection-merge-overrides
-	$(MAKE) postman-test-collection-add-tests || echo "⚠️  Skipping adding tests (optional step)."
+	$(MAKE) postman-test-collection-add-tests
 	$(MAKE) postman-auth-setup || echo "⚠️  Skipping auth setup (provider not available)."
 	$(MAKE) postman-test-collection-diff-tests
 	$(MAKE) postman-test-collection-auto-fix
@@ -473,16 +473,16 @@ postman-create-test-collection:
 	$(MAKE) fix-urls
 	$(MAKE) postman-test-collection-validate
 	$(MAKE) postman-test-collection-flatten-rename
-	$(MAKE) postman-test-collection-add-auth-examples || echo "⚠️  Skipping auth examples (optional step)."
+	$(MAKE) postman-test-collection-add-auth-examples
 	$(MAKE) postman-test-collection-upload
 
 # Legacy test collection workflow with post-process flattening
 .PHONY: postman-create-test-collection-legacy
 postman-create-test-collection-legacy:
 	$(MAKE) postman-test-collection-generate
-	$(MAKE) postman-test-collection-add-examples || echo "⚠️  Skipping examples (optional step)."
+	$(MAKE) postman-test-collection-add-examples
 	$(MAKE) postman-test-collection-merge-overrides
-	$(MAKE) postman-test-collection-add-tests || echo "⚠️  Skipping adding tests (optional step)."
+	$(MAKE) postman-test-collection-add-tests
 	$(MAKE) postman-test-collection-diff-tests
 	$(MAKE) postman-test-collection-auto-fix
 	$(MAKE) postman-test-collection-fix-v2
@@ -548,10 +548,10 @@ postman-instance-build-with-tests:
 	$(MAKE) postman-generate-getting-started-all
 	# Generate test collection (full pipeline but don't upload yet)
 	$(MAKE) postman-test-collection-generate
-	$(MAKE) postman-test-collection-add-examples || echo "⚠️  Skipping examples (optional step)."
-	$(MAKE) postman-test-collection-add-error-responses || echo "⚠️  Skipping error responses (optional step)."
+	$(MAKE) postman-test-collection-add-examples
+	$(MAKE) postman-test-collection-add-error-responses
 	$(MAKE) postman-test-collection-merge-overrides
-	$(MAKE) postman-test-collection-add-tests || echo "⚠️  Skipping adding tests (optional step)."
+	$(MAKE) postman-test-collection-add-tests
 	$(MAKE) postman-auth-setup || echo "⚠️  Skipping auth setup (provider not available)."
 	$(MAKE) postman-test-collection-diff-tests
 	$(MAKE) postman-test-collection-auto-fix
@@ -561,7 +561,7 @@ postman-instance-build-with-tests:
 	$(MAKE) fix-urls
 	$(MAKE) postman-test-collection-validate
 	$(MAKE) postman-test-collection-flatten-rename
-	$(MAKE) postman-test-collection-add-auth-examples || echo "⚠️  Skipping auth examples (optional step)."
+	$(MAKE) postman-test-collection-add-auth-examples
 	# Inject documentation links into all collections
 	$(MAKE) postman-inject-docs-link-all
 	# Upload all collections with documentation links
@@ -597,10 +597,10 @@ postman-instance-build-without-tests:
 	$(MAKE) postman-generate-getting-started-all
 	# Generate test collection (full pipeline but don't upload yet)
 	$(MAKE) postman-test-collection-generate
-	$(MAKE) postman-test-collection-add-examples || echo "⚠️  Skipping examples (optional step)."
-	$(MAKE) postman-test-collection-add-error-responses || echo "⚠️  Skipping error responses (optional step)."
+	$(MAKE) postman-test-collection-add-examples
+	$(MAKE) postman-test-collection-add-error-responses
 	$(MAKE) postman-test-collection-merge-overrides
-	$(MAKE) postman-test-collection-add-tests || echo "⚠️  Skipping adding tests (optional step)."
+	$(MAKE) postman-test-collection-add-tests
 	$(MAKE) postman-auth-setup || echo "⚠️  Skipping auth setup (provider not available)."
 	$(MAKE) postman-test-collection-diff-tests
 	$(MAKE) postman-test-collection-auto-fix
@@ -610,7 +610,7 @@ postman-instance-build-without-tests:
 	$(MAKE) fix-urls
 	$(MAKE) postman-test-collection-validate
 	$(MAKE) postman-test-collection-flatten-rename
-	$(MAKE) postman-test-collection-add-auth-examples || echo "⚠️  Skipping auth examples (optional step)."
+	$(MAKE) postman-test-collection-add-auth-examples
 	# Inject documentation links into all collections
 	$(MAKE) postman-inject-docs-link-all
 	# Upload all collections with documentation links
@@ -1213,7 +1213,7 @@ postman-linked-collection-flatten:
 	@$(PYTHON) $(FIX_COLLECTION_URLS) $(POSTMAN_LINKED_COLLECTION_FLAT) $(POSTMAN_LINKED_COLLECTION_FLAT)
 	@echo "✅ URL raw fields fixed"
 	@echo "🔐 Adding auth examples to linked collection..."
-	@node scripts/active/add_auth_examples.js $(POSTMAN_LINKED_COLLECTION_FLAT) $(POSTMAN_LINKED_COLLECTION_FLAT) --auth-overlay "$(OPENAPI_AUTH_OVERLAY)" || echo "⚠️  Skipping auth examples"
+	@node scripts/active/add_auth_examples.js $(POSTMAN_LINKED_COLLECTION_FLAT) $(POSTMAN_LINKED_COLLECTION_FLAT) --auth-overlay "$(OPENAPI_AUTH_OVERLAY)"
 	@echo "✅ Auth examples added"
 	@echo "📝 Adding pre-request script to collection..."
 	@node scripts/active/add_pre_request_script.js $(POSTMAN_LINKED_COLLECTION_FLAT) postman/scripts/jwt-pre-request.js $(POSTMAN_LINKED_COLLECTION_FLAT)
@@ -1500,7 +1500,7 @@ postman-test-collection-add-auth-examples:
 		exit 0; \
 	fi
 	@if [ -f "$(SCRIPTS_DIR)/active/add_auth_examples.js" ]; then \
-		node $(SCRIPTS_DIR)/active/add_auth_examples.js $(POSTMAN_TEST_COLLECTION_FLAT) $(POSTMAN_TEST_COLLECTION_FLAT) --auth-overlay "$(OPENAPI_AUTH_OVERLAY)" || echo "⚠️  Failed to add auth examples"; \
+		node $(SCRIPTS_DIR)/active/add_auth_examples.js $(POSTMAN_TEST_COLLECTION_FLAT) $(POSTMAN_TEST_COLLECTION_FLAT) --auth-overlay "$(OPENAPI_AUTH_OVERLAY)" && \
 		echo "✅ Auth examples added to test collection"; \
 	else \
 		echo "⚠️  Auth examples script not found"; \
@@ -2779,13 +2779,15 @@ postman-build-golden-test-fixtures: ## Build all collection files needed by the 
 	$(MAKE) postman-generate-getting-started-all
 	$(MAKE) postman-generate-use-case-collection
 	$(MAKE) postman-test-collection-generate
-	$(MAKE) postman-test-collection-add-examples || echo "⚠️  Skipping examples (optional)"
-	$(MAKE) postman-test-collection-add-error-responses || echo "⚠️  Skipping error responses (optional)"
+	$(MAKE) postman-test-collection-add-examples
+	$(MAKE) postman-test-collection-add-error-responses
 	$(MAKE) postman-test-collection-merge-overrides
-	$(MAKE) postman-test-collection-add-tests || echo "⚠️  Skipping adding tests (optional)"
+	$(MAKE) postman-test-collection-add-tests
 	$(MAKE) postman-test-collection-auto-fix
 	$(MAKE) postman-test-collection-fix-v2
 	$(MAKE) postman-test-collection-flatten-rename
+	# Same final step as the publish pipeline, so the gated fixtures match what is published
+	$(MAKE) postman-test-collection-add-auth-examples
 
 .PHONY: docs
 docs: docs-build ## Build API documentation [CI alias]
@@ -2866,7 +2868,8 @@ validate-collections-conformance: ## Validate generated collections conform to t
 validate-collections-conformance-test: ## Run all validation golden tests (validator + resolver + DD constraints unit tests)
 	@C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" POSTMAN_GENERATED_DIR="$(POSTMAN_GENERATED_DIR)" C2MAPIV2_POSTMAN_API_NAME_KC="$(C2MAPIV2_POSTMAN_API_NAME_KC)" $(VENV_PYTHON) scripts/validation/tests/test_validate_collections.py && \
 	C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" $(VENV_PYTEST) scripts/validation/tests/test_oneof_resolver.py -v && \
-	$(VENV_PYTEST) scripts/validation/tests/test_dd_constraints.py -v
+	$(VENV_PYTEST) scripts/validation/tests/test_dd_constraints.py -v && \
+	$(VENV_PYTEST) scripts/validation/tests/test_pipeline_consistency.py -v
 
 .PHONY: validate-collections-deep
 validate-collections-deep: ## Deep field audit of all *.json files in postman/generated (auto-discovers, exit 1 on errors)
@@ -2961,6 +2964,42 @@ validate-collections-conformance-gate-all: ## CI gate: fail if ANY of the 5 cano
 	$(VENV_PYTHON) scripts/validation/validate_collections_against_spec.py \
 		--path-prefix "/" --exit-status \
 		$(CONFORMANCE_GATE_REPORT)
+
+# The five collections published to Postman (all must stay consistent with the DD).
+CANONICAL_COLLECTIONS := $(POSTMAN_LINKED_COLLECTION_FLAT) $(POSTMAN_TEST_COLLECTION_FLAT) \
+	$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-linked-collection.json \
+	$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-test-collection.json \
+	$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-real-world-use-cases-collection.json
+
+# CI GATE: the DD validators that previously ran only locally (M2, 2026-10-05).
+# Needs the spec and postman/generated (run postman-build-golden-test-fixtures first).
+.PHONY: validate-dd-gates
+validate-dd-gates: ## CI gate: spec vs DD, all 5 collections vs DD, catalog select: keys vs spec (fail on any FAIL)
+	@echo "🔍 Spec faithfully represents the DD..."
+	@$(VENV_PYTHON) scripts/validation/validate_spec_against_dd.py \
+		--dd $(DD_EBNF_FILE) --spec $(C2MAPIV2_OPENAPI_SPEC) $(DD_GATES_SPEC_REPORT)
+	@echo "🔍 All 5 canonical collections vs DD (fields, enums, ranges, cross-field)..."
+	@$(VENV_PYTHON) scripts/validation/validate_postman_against_dd.py \
+		--dd $(DD_EBNF_FILE) --spec $(C2MAPIV2_OPENAPI_SPEC) \
+		--collections $(CANONICAL_COLLECTIONS) --exit-status $(DD_GATES_POSTMAN_REPORT)
+	@echo "🔍 Catalog select: keys vs spec..."
+	@$(VENV_PYTHON) scripts/validation/validate_catalog_against_spec.py \
+		--catalog config/curated-examples-catalog.yaml --spec $(C2MAPIV2_OPENAPI_SPEC) \
+		--linked $(POSTMAN_LINKED_COLLECTION_FLAT) --exit-status
+
+# CI GATE: end-to-end DD → spec → Postman consistency (response examples, error-map
+# consistency, spec examples, cross-field rules). Known-open findings are listed in
+# KNOWN_OPEN inside the script with their audit/decision IDs; everything else fails.
+.PHONY: validate-pipeline-consistency
+validate-pipeline-consistency: ## CI gate: DD → spec → Postman end-to-end consistency (fail on any non-allowlisted finding)
+	@DD_EBNF_FILE="$(DD_EBNF_FILE)" \
+	C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" \
+	C2MAPIV2_OPENAPI_SPEC_BASE="$(C2MAPIV2_OPENAPI_SPEC_BASE)" \
+	C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES="$(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES)" \
+	POSTMAN_GENERATED_DIR="$(POSTMAN_GENERATED_DIR)" \
+	C2MAPIV2_POSTMAN_API_NAME_KC="$(C2MAPIV2_POSTMAN_API_NAME_KC)" \
+	$(VENV_PYTHON) scripts/validation/validate_pipeline_consistency.py --exit-status \
+		$(PIPELINE_CONSISTENCY_REPORT)
 
 .PHONY: validate-collections-conformance-gate
 validate-collections-conformance-gate: ## CI gate: fail if the freshly-built Linked collection drifts from the OpenAPI spec
