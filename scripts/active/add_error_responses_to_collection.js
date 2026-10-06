@@ -49,10 +49,11 @@ let ERROR_CODE_METADATA = {};
 
 /**
  * Load ERROR_CODE_METADATA from config/error-response-examples.yaml.
- * Converts the YAML structure (keyed by HTTP status then example name) into a flat
- * dict keyed by errorCode, substituting {timestamp} and {expired} placeholders.
- * When the same errorCode appears under multiple HTTP statuses the higher status wins
- * (e.g. INVALID_FORMAT appears at 400 and 422 — the 422 entry is used for the JS dict).
+ * Returns a dict keyed by "<status>:<errorCode>" whose values are lists of examples,
+ * substituting {timestamp}, {expired}, {requestId} and {supportEmail} placeholders.
+ * Keyed by status AND code because the DD @http_error_map may list one code under
+ * several statuses (e.g. INVALID_FORMAT under 400 and 422). Keying by code alone made
+ * the later status overwrite the earlier one (N2, 2026-10-06).
  */
 function loadErrorCodeMetadataFromYaml(yamlPath, supportEmail) {
   const content = fs.readFileSync(yamlPath, 'utf8');
@@ -66,12 +67,13 @@ function loadErrorCodeMetadataFromYaml(yamlPath, supportEmail) {
         .replace(/{expired}/g, _EXPIRED_ISO)
         .replace(/{requestId}/g, _REQUEST_ID)
         .replace(/{supportEmail}/g, supportEmail || DEFAULT_SUPPORT_EMAIL);
-      metadata[exData.errorCode] = {
+      const key = `${parseInt(httpStatus, 10)}:${exData.errorCode}`;
+      (metadata[key] = metadata[key] || []).push({
         status: parseInt(httpStatus, 10),
         name: exData.summary,
         message: exData.errorMessage,
         details
-      };
+      });
     }
   }
   return metadata;
@@ -81,19 +83,23 @@ function loadErrorCodeMetadataFromYaml(yamlPath, supportEmail) {
  * Replace {<field>_enum} tokens in errorDetails strings with spec-derived JSON arrays.
  * Token format: {<schemaName>_enum} → JSON.stringify(spec.components.schemas[schemaName].enum).
  * Example: {mailClass_enum} → '["first_class","standard","non_profit"]'
- * Called after the spec is loaded to resolve tokens left by loadErrorCodeMetadataFromYaml.
+ * Must run BEFORE the error responses are built: they copy entry.details (N1, 2026-10-06).
+ * An unresolvable token is fatal — leaving it in place produces invalid JSON.
  */
 function resolveEnumTokens(metadata, spec) {
   const schemas = (spec && spec.components && spec.components.schemas) || {};
-  for (const entry of Object.values(metadata)) {
-    if (typeof entry.details === 'string' && entry.details.includes('{')) {
-      entry.details = entry.details.replace(/\{(\w+)_enum\}/g, (match, fieldName) => {
-        const schema = schemas[fieldName];
-        if (schema && Array.isArray(schema.enum) && schema.enum.length > 0) {
-          return JSON.stringify(schema.enum);
-        }
-        return match; // leave token unchanged if no enum found in spec
-      });
+  for (const entries of Object.values(metadata)) {
+    for (const entry of entries) {
+      if (typeof entry.details === 'string' && entry.details.includes('{')) {
+        entry.details = entry.details.replace(/\{(\w+)_enum\}/g, (match, fieldName) => {
+          const schema = schemas[fieldName];
+          if (schema && Array.isArray(schema.enum) && schema.enum.length > 0) {
+            return JSON.stringify(schema.enum);
+          }
+          console.error(`❌ Cannot resolve ${match}: no enum schema '${fieldName}' in the spec`);
+          process.exit(1);
+        });
+      }
     }
   }
   return metadata;
@@ -114,125 +120,80 @@ function loadErrorTypesFromSpec(spec) {
 }
 
 /**
- * Build a direct errorCode → errorType lookup from the spec's x-http-error-map.
- * The EBNF @http_error_map block is the authoritative source — this replaces the
- * prior prefix/suffix pattern-matching heuristic (M6).
- *
- * Returns a Map<string, string> so any code not present in the map is explicitly
- * detectable rather than silently defaulting.
+ * Build ERROR_RESPONSES (keyed by HTTP status) from the spec's x-http-error-map, which the
+ * translator emits from the DD @http_error_map block. One example per (status, errorCode)
+ * pair, so a code mapped to several statuses gets an example under each (N2). errorType
+ * comes from that status's map entry. Pairs with no YAML example get a minimal stub.
  */
-function buildErrorTypeMap(spec) {
+function buildErrorResponses(spec) {
   const httpErrorMap = (spec.info && spec.info['x-http-error-map']) || {};
-  const map = new Map();
-  Object.values(httpErrorMap).forEach(entry => {
-    const errorType = entry.errorType;
-    (entry.errorCodes || []).forEach(code => { map.set(code, errorType); });
-  });
-  return map;
-}
-
-/**
- * Look up errorType for a given errorCode from the spec-derived map.
- * Falls back to the first valid errorType if the code is not in the map
- * (e.g. for stub entries auto-generated from codes with no hand-crafted metadata).
- */
-function deriveErrorType(errorCode, validErrorTypes, errorTypeMap) {
-  if (errorTypeMap && errorTypeMap.has(errorCode)) {
-    return errorTypeMap.get(errorCode);
+  if (Object.keys(httpErrorMap).length === 0) {
+    console.error('❌ x-http-error-map not found in spec — cannot build error examples');
+    process.exit(1);
   }
-  return validErrorTypes[0];  // L1: no 'ValidationError' hardcode — validErrorTypes is spec-derived
-}
-
-/**
- * Load error codes from OpenAPI spec and generate ERROR_RESPONSES object
- */
-function loadErrorResponsesFromSpec(openapiSpecPath) {
-  console.log(`Loading error codes from OpenAPI spec: ${openapiSpecPath}`);
-
-  // Read and parse OpenAPI spec
-  const specContent = fs.readFileSync(openapiSpecPath, 'utf8');
-  const spec = yaml.load(specContent);
-
-  // Extract error types from spec (used as fallback for codes absent from x-http-error-map)
   const validErrorTypes = loadErrorTypesFromSpec(spec);
-  // Build authoritative errorCode → errorType map from x-http-error-map (M6)
-  const errorTypeMap = buildErrorTypeMap(spec);
 
-  // Extract error codes from errorCode enum in components/schemas
-  let errorCodes = [];
-  if (spec.components && spec.components.schemas && spec.components.schemas.errorCode) {
-    errorCodes = spec.components.schemas.errorCode.enum || [];
+  // YAML examples filed under a (status, code) pair the DD does not map would never be used
+  const mappedKeys = new Set();
+  Object.entries(httpErrorMap).forEach(([status, entry]) =>
+    (entry.errorCodes || []).forEach(code => mappedKeys.add(`${parseInt(status, 10)}:${code}`)));
+  const unmapped = Object.keys(ERROR_CODE_METADATA).filter(k => !mappedKeys.has(k));
+  if (unmapped.length > 0) {
+    console.error(`❌ error-response-examples.yaml has (status:code) pairs not in the DD @http_error_map: ${unmapped.join(', ')}`);
+    process.exit(1);
   }
 
-  if (errorCodes.length === 0) {
-    console.warn('⚠️  No error codes found in OpenAPI spec, using hardcoded metadata');
-    errorCodes = Object.keys(ERROR_CODE_METADATA);
-  }
-
-  console.log(`Found ${errorCodes.length} error codes in OpenAPI spec`);
-
-  // Build reverse map: errorCode → HTTP status, from x-http-error-map in the spec.
-  // Used to auto-stub any code not in ERROR_CODE_METADATA so nothing is silently dropped.
-  const httpErrorMap = (spec.info && spec.info['x-http-error-map']) || {};
-  const codeToStatus = {};
-  Object.entries(httpErrorMap).forEach(([status, entry]) => {
-    (entry.errorCodes || []).forEach(code => { codeToStatus[code] = parseInt(status, 10); });
-  });
-
-  // Group error codes by HTTP status
   const errorResponsesByStatus = {};
   const stubs = [];
-
-  errorCodes.forEach(errorCode => {
-    let metadata = ERROR_CODE_METADATA[errorCode];
-    if (!metadata) {
-      const status = codeToStatus[errorCode];
-      if (!status) {
-        console.warn(`⚠️  No metadata and no x-http-error-map entry for ${errorCode}, skipping`);
-        return;
+  Object.keys(httpErrorMap).sort().forEach(statusKey => {
+    const status = parseInt(statusKey, 10);
+    const { errorType, errorCodes = [] } = httpErrorMap[statusKey];
+    if (!validErrorTypes.includes(errorType)) {
+      console.error(`❌ x-http-error-map ${statusKey}: errorType '${errorType}' is not in the errorType enum`);
+      process.exit(1);
+    }
+    errorCodes.forEach(errorCode => {
+      let entries = ERROR_CODE_METADATA[`${status}:${errorCode}`];
+      if (!entries) {
+        const label = errorCode.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        entries = [{ status, name: label, message: label, details: '{}' }];
+        stubs.push(`  ${status}: ${errorCode}`);
       }
-      const label = errorCode.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-      metadata = { status, name: label, message: label, details: '{}' };
-      stubs.push(`  ${status}: ${errorCode}`);
-    }
-
-    const statusCode = metadata.status.toString();
-    if (!errorResponsesByStatus[statusCode]) {
-      errorResponsesByStatus[statusCode] = [];
-    }
-
-    // Generate tracking ID — 6 uppercase hex chars matches Python canonical format TRK-YYYYMMDD-XXXXXX
-    const hexSuffix = Array.from({ length: 6 }, () => '0123456789ABCDEF'[Math.floor(Math.random() * 16)]).join('');
-    const trackingId = `TRK-${new Date().toISOString().split('T')[0].replace(/-/g, '')}-${hexSuffix}`;
-
-    // Derive errorType from spec's x-http-error-map (authoritative) with fallback
-    const errorType = deriveErrorType(errorCode, validErrorTypes, errorTypeMap);
-
-    // Create error response object
-    errorResponsesByStatus[statusCode].push({
-      id: generateUUID(),
-      name: metadata.name,
-      status: HTTP_STATUS_TEXT[metadata.status] || `HTTP ${metadata.status}`,
-      code: metadata.status,
-      _postman_previewlanguage: 'json',
-      header: [{ key: 'Content-Type', value: CONTENT_TYPE_JSON }],
-      body: JSON.stringify({
-        errorType: errorType,
-        errorMessage: metadata.message,
-        errorCode: errorCode,
-        errorDetails: metadata.details,
-        errorTrackingId: trackingId
-      }, null, 2)
+      entries.forEach(metadata => {
+        try {
+          JSON.parse(metadata.details);
+        } catch (e) {
+          console.error(`❌ errorDetails for ${status} ${errorCode} is not valid JSON: ${metadata.details}`);
+          process.exit(1);
+        }
+        // Generate tracking ID — 6 uppercase hex chars matches Python canonical format TRK-YYYYMMDD-XXXXXX
+        const hexSuffix = Array.from({ length: 6 }, () => '0123456789ABCDEF'[Math.floor(Math.random() * 16)]).join('');
+        const trackingId = `TRK-${new Date().toISOString().split('T')[0].replace(/-/g, '')}-${hexSuffix}`;
+        (errorResponsesByStatus[statusKey] = errorResponsesByStatus[statusKey] || []).push({
+          id: generateUUID(),
+          name: metadata.name,
+          status: HTTP_STATUS_TEXT[status] || `HTTP ${status}`,
+          code: status,
+          _postman_previewlanguage: 'json',
+          header: [{ key: 'Content-Type', value: CONTENT_TYPE_JSON }],
+          body: JSON.stringify({
+            errorType: errorType,
+            errorMessage: metadata.message,
+            errorCode: errorCode,
+            errorDetails: metadata.details,
+            errorTrackingId: trackingId
+          }, null, 2)
+        });
+      });
     });
   });
 
   if (stubs.length > 0) {
-    console.log(`Auto-generated ${stubs.length} stub(s) for errorCodes not in ERROR_CODE_METADATA:`);
-    stubs.forEach(s => console.log(s));
+    console.log(`Auto-generated ${stubs.length} stub(s) for mapped (status, errorCode) pairs with no YAML example:`);
+    stubs.forEach(line => console.log(line));
   } else {
-    console.log('All EBNF errorCode values have hand-crafted metadata');
+    console.log('Every mapped (status, errorCode) pair has a hand-crafted example');
   }
-
   return errorResponsesByStatus;
 }
 
@@ -297,9 +258,9 @@ function processItems(items) {
         resp.originalRequest = originalRequest;
       });
 
-      // Add all error responses (400, 401, 403, 404, 422, 500)
-      Object.keys(ERROR_RESPONSES).forEach(errorCode => {
-        ERROR_RESPONSES[errorCode].forEach(errorResponse => {
+      // Add every error response for every status in the DD error map
+      Object.keys(ERROR_RESPONSES).forEach(status => {
+        ERROR_RESPONSES[status].forEach(errorResponse => {
           item.response.push({
             ...errorResponse,
             id: generateUUID(),
@@ -348,11 +309,11 @@ function main() {
   // K6: filename matches C2MAPIV2_OPENAPI_SPEC in the Makefile (same coupling as add_auth_examples.js:69).
   const openapiSpecPath = specArg || path.resolve(scriptDir, '../../openapi/c2mapiv2-openapi-spec-final.yaml');
 
-  // Load error responses from OpenAPI spec
-  ERROR_RESPONSES = loadErrorResponsesFromSpec(openapiSpecPath);
-  // Resolve {field_enum} tokens now that the spec is available
-  const specForEnums = yaml.load(fs.readFileSync(openapiSpecPath, 'utf8'));
-  ERROR_CODE_METADATA = resolveEnumTokens(ERROR_CODE_METADATA, specForEnums);
+  // Resolve {field_enum} tokens first, then build the responses from the resolved metadata (N1)
+  console.log(`Loading error map from OpenAPI spec: ${openapiSpecPath}`);
+  const spec = yaml.load(fs.readFileSync(openapiSpecPath, 'utf8'));
+  ERROR_CODE_METADATA = resolveEnumTokens(ERROR_CODE_METADATA, spec);
+  ERROR_RESPONSES = buildErrorResponses(spec);
 
   // Read input collection
   console.log(`Reading collection from: ${inputFile}`);

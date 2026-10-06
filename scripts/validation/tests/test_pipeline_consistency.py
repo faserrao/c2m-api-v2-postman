@@ -48,13 +48,19 @@ def request(body, responses=(), tests=None):
     return item
 
 
-def error_example(code, error_type, error_code, tracking="TRK-20260115-ABC123"):
+def error_example(code, error_type, error_code, tracking="TRK-20260115-ABC123", details="{}"):
     return {"name": f"{code} example", "code": int(code),
             "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": json.dumps({"errorType": error_type, "errorMessage": "m", "errorCode": error_code,
-                                "errorTrackingId": tracking}),
+                                "errorDetails": details, "errorTrackingId": tracking}),
             "originalRequest": {"method": "POST", "url": {"path": ["static"]},
                                 "body": {"mode": "raw", "raw": json.dumps(CLEAN_BODY)}}}
+
+
+def all_dd_error_examples():
+    """One correct saved example for every (status, errorCode) pair the DD maps."""
+    return [error_example(st, entry["errorType"], code)
+            for st, entry in SPEC["info"]["x-http-error-map"].items() for code in entry["errorCodes"]]
 
 
 def run_collection(items, typed=False):
@@ -72,10 +78,29 @@ def run_dd(specs):
 class TestCollectionChecks(unittest.TestCase):
 
     def test_clean_request_and_examples_have_no_findings(self):
-        good = [error_example("400", "ValidationError", "MISSING_REQUIRED_FIELD")]
         codes = ",".join(STATIC_CODES)
-        cats = run_collection([request(CLEAN_BODY, good, f"pm.expect([{codes}]).to.include(pm.response.code);")])
+        cats = run_collection([request(CLEAN_BODY, all_dd_error_examples(),
+                                       f"pm.expect([{codes}]).to.include(pm.response.code);")])
         self.assertEqual(cats - {"B-OPERATION-NOT-IN-COLLECTION"}, set())
+
+    def test_error_details_not_json(self):
+        examples = all_dd_error_examples()
+        examples[0] = error_example("400", "ValidationError", "MISSING_REQUIRED_FIELD", details='{"field": oops}')
+        self.assertIn("B-EXAMPLE-DETAILS-NOT-JSON", run_collection([request(CLEAN_BODY, examples)]))
+
+    def test_error_details_unresolved_token(self):
+        examples = all_dd_error_examples()
+        examples[0] = error_example("422", "ValidationError", "INVALID_ENUM_VALUE",
+                                    details='{"allowed": {mailClass_enum}}')
+        cats = run_collection([request(CLEAN_BODY, examples)])
+        self.assertIn("B-EXAMPLE-DETAILS-UNRESOLVED-TOKEN", cats)
+        self.assertIn("B-EXAMPLE-DETAILS-NOT-JSON", cats)
+
+    def test_error_example_coverage_per_status_and_code(self):
+        """N2: a code the DD maps under two statuses needs an example under each."""
+        examples = [e for e in all_dd_error_examples()
+                    if not (e["code"] == 400 and json.loads(e["body"])["errorCode"] == "INVALID_FORMAT")]
+        self.assertIn("B-EXAMPLE-ERROR-COVERAGE", run_collection([request(CLEAN_BODY, examples)]))
 
     def test_mutual_exclusion(self):
         body = dict(CLEAN_BODY, jobTemplate="t", jobOptions={})

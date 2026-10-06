@@ -45,6 +45,7 @@ CONTENT_TYPE_JSON = "application/json"
 PRIMITIVES = {"string": "string", "integer": "integer", "number": "number", "boolean": "boolean"}
 PLACEHOLDER = re.compile(r"^(<[^<>]+>|ph<.*>)$")
 TRACKING_ID = re.compile(r"^TRK-\d{8}-[0-9A-F]{6}$")
+UNRESOLVED_TOKEN = re.compile(r"\{[A-Za-z_]\w*\}")  # e.g. {mailClass_enum} left in a JSON string
 HINT_TYPES = {"faker", "static", "random_int"}
 
 # Collection label -> (file name suffix after "<api-name>-", typed?)
@@ -78,6 +79,8 @@ KNOWN_OPEN = {
     ("B-FILLER-VALUE", "*"): "L7 (example_ filler values)",
     ("B-EXAMPLE-BODY-SCHEMA", "Real-World"): "X2 (saved responses copied from typed Linked)",
     ("B-EXAMPLE-ERROR-MAP", "Linked"): "X1 (converter synthesises error examples)",
+    ("B-EXAMPLE-ERROR-COVERAGE", "Linked"): "X1 (converter writes one example per status, not per DD code)",
+    ("B-EXAMPLE-ERROR-COVERAGE", "Real-World"): "X1/X2 (saved responses copied from Linked)",
     ("B-EXAMPLE-ERROR-MAP", "Real-World"): "X1/X2 (copied from Linked)",
     ("B-EXAMPLE-ORIGINAL-REQUEST", "Real-World"): "X2 (typed originalRequest bodies)",
     ("B-EXAMPLE-ORIGINAL-REQUEST", "Linked"): "X9b (merge minimum in saved examples)",
@@ -508,6 +511,29 @@ def cross_field_errors(body, info):
     return out
 
 
+def details_problems(details):
+    """Problems with an errorDetails string: must be JSON with no unresolved {token}s."""
+    if not isinstance(details, str) or is_placeholder(details):
+        return []
+    out = []
+    if UNRESOLVED_TOKEN.search(details):
+        out.append(("UNRESOLVED-TOKEN", f"unresolved token {UNRESOLVED_TOKEN.search(details).group(0)}"))
+    try:
+        json.loads(details)
+    except json.JSONDecodeError:
+        out.append(("NOT-JSON", f"errorDetails is not valid JSON: {details[:80]!r}"))
+    return out
+
+
+def uses_dd_errors(op):
+    """True when the operation's error responses use the DD errorResponse schema (job endpoints)."""
+    for code, r in op.get("responses", {}).items():
+        ref = ((r.get("content") or {}).get(CONTENT_TYPE_JSON, {}).get("schema") or {}).get("$ref", "")
+        if not code.startswith("2") and ref.endswith("/errorResponse"):
+            return True
+    return False
+
+
 def iter_requests(collection, folder=()):
     for it in collection.get("item", []):
         if "item" in it:
@@ -586,6 +612,7 @@ def check_collection(label, collection, typed, spec, tools, F):
                     elif isinstance(v, str) and v.startswith("example_"):
                         F.add("B-FILLER-VALUE", label, f"{tag}: body{p_}={v!r}")
         # saved response examples
+        saved_pairs = set()
         for ex in it.get("response") or []:
             code, name = str(ex.get("code")), ex.get("name")
             where = f"{tag} / {name!r} ({code})"
@@ -610,6 +637,10 @@ def check_collection(label, collection, typed, spec, tools, F):
                 if (ec not in entry["errorCodes"] and not is_placeholder(ec)) or \
                         (et != entry["errorType"] and not is_placeholder(et)):
                     F.add("B-EXAMPLE-ERROR-MAP", label, f"{where}: {et}/{ec}")
+                if not is_placeholder(ec):
+                    saved_pairs.add((code, ec))
+                for kind, msg in details_problems(ex_body.get("errorDetails")):
+                    F.add(f"B-EXAMPLE-DETAILS-{kind}", label, f"{where}: {msg}")
                 tid = ex_body.get("errorTrackingId")
                 if isinstance(tid, str) and not is_placeholder(tid) and not TRACKING_ID.match(tid):
                     F.add("B-EXAMPLE-TRACKING-ID", label, f"{where}: {tid}")
@@ -632,6 +663,15 @@ def check_collection(label, collection, typed, spec, tools, F):
                     problems += [m for _c, m in cross_field_errors(orig_body, info)]
                     for msg in problems:
                         F.add("B-EXAMPLE-ORIGINAL-REQUEST", label, f"{where}: {msg}")
+        # Error-example coverage: when an operation carries DD-format error examples, every
+        # (status, errorCode) pair the DD maps for its declared statuses must be present (N2)
+        if saved_pairs and uses_dd_errors(op):
+            expected = {(st, c) for st, entry in error_map.items() if st in op.get("responses", {})
+                        for c in entry["errorCodes"]}
+            missing = sorted(expected - saved_pairs)
+            if missing:
+                F.add("B-EXAMPLE-ERROR-COVERAGE", label,
+                      f"{tag}: no saved example for {', '.join(f'{st} {c}' for st, c in missing)}")
         # Newman status assertions must match this operation's declared responses
         declared = set(op.get("responses", {}))
         for ev in it.get("event") or []:
@@ -669,6 +709,9 @@ def check_spec_examples(spec, dd, F):
                 for v in values:
                     for e in Draft7Validator(c["schema"], resolver=resolver).iter_errors(v):
                         F.add("C-RESPONSE-EXAMPLE-INVALID", "*", f"{m.upper()} {p} {code}: {e.message[:120]}")
+                    if isinstance(v, dict):
+                        for kind, msg in details_problems(v.get("errorDetails")):
+                            F.add(f"C-EXAMPLE-DETAILS-{kind}", "*", f"{m.upper()} {p} {code}: {msg}")
 
 
 # --------------------------------------------------------------------------- #
