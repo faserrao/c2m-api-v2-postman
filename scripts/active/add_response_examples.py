@@ -10,7 +10,7 @@ import re
 import yaml
 import sys
 import copy
-import random
+import hashlib
 import string
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
@@ -28,20 +28,28 @@ _SUCCESS_RESPONSE = {
 }
 
 
-def _generate_tracking_id():
-    suffix = ''.join(random.choices('0123456789ABCDEF', k=6))
-    return f"TRK-{datetime.now(timezone.utc).strftime('%Y%m%d')}-{suffix}"
+# M4: fixed reference time + seed-derived IDs so rebuilds are byte-identical.
+# Same constant and helpers in ebnf_to_openapi_dynamic_v3.py — update both together.
+_EXAMPLE_NOW = datetime(2026, 1, 15, 14, 30, tzinfo=timezone.utc)
+
+
+def _example_hex(seed, length):
+    return hashlib.sha256(seed.encode("utf-8")).hexdigest()[:length].upper()
+
+
+def _generate_tracking_id(seed):
+    return f"TRK-{_EXAMPLE_NOW.strftime('%Y%m%d')}-{_example_hex(seed, 6)}"
 
 
 def _load_error_examples(examples_path):
     """Load ERROR_EXAMPLES from config/error-response-examples.yaml.
 
     Converts the flat YAML structure into the OpenAPI examples dict format.
-    Substitutes {timestamp} with the current UTC time and {expired} with 1 hour ago.
+    Substitutes {timestamp} with the fixed example time and {expired} with 1 hour before it (M4).
     """
-    now = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
-    expired = (datetime.now(timezone.utc) - timedelta(hours=1)).strftime('%Y-%m-%dT%H:%M:%SZ')
-    request_id = f"req-{''.join(random.choices('0123456789abcdef', k=8))}"
+    now = _EXAMPLE_NOW.strftime('%Y-%m-%dT%H:%M:%SZ')
+    expired = (_EXAMPLE_NOW - timedelta(hours=1)).strftime('%Y-%m-%dT%H:%M:%SZ')
+    request_id = f"req-{_example_hex('requestId', 8).lower()}"
     with open(examples_path, 'r') as f:
         raw = yaml.safe_load(f)
     result = {}
@@ -231,7 +239,7 @@ def build_effective_error_examples(spec, error_examples):
     for http_status, examples in effective.items():
         for ex_key, ex_data in examples.items():
             val = dict(ex_data['value'])
-            val['errorTrackingId'] = _generate_tracking_id()
+            val['errorTrackingId'] = _generate_tracking_id(f"{http_status}:{ex_key}")
             effective[http_status][ex_key] = {**ex_data, 'value': val}
 
     return effective
@@ -245,27 +253,30 @@ def build_effective_error_examples(spec, error_examples):
 _EXAMPLES_CONFIG = Path(__file__).parent.parent.parent / 'config' / 'error-response-examples.yaml'
 ERROR_EXAMPLES = _load_error_examples(_EXAMPLES_CONFIG)
 
-def discover_job_response_schema_name(spec):
-    """
-    Discover the job response schema name dynamically from the spec.
+def _job_operations(spec):
+    """Yield (path, method, operation, schema_name) for every operation whose 200
+    response is a JSON $ref to a component schema (the job-submission endpoints).
 
-    Finds the first /jobs/ POST endpoint with a 200 response whose
-    application/json schema is a $ref, and returns the referenced schema name.
-    Returns None if not found.
+    Replaces a legacy '/jobs/' path filter that silently matched nothing after the
+    endpoints were renamed to /static, /batch/* and /mail-merge (X3, 2026-10-05).
     """
     for path, methods in spec.get('paths', {}).items():
-        if '/jobs/' not in path:
-            continue
-        operation = methods.get('post', {})
-        if not operation:
-            continue
-        content = (operation.get('responses', {})
-                             .get('200', {})
-                             .get('content', {})
-                             .get(_CONTENT_TYPE_JSON, {}))
-        ref = content.get('schema', {}).get('$ref', '')
-        if ref.startswith('#/components/schemas/'):
-            return ref.split('/')[-1]
+        for method, operation in methods.items():
+            if method not in ('post', 'get', 'put', 'delete') or not isinstance(operation, dict):
+                continue
+            content = (operation.get('responses', {})
+                                 .get('200', {})
+                                 .get('content', {})
+                                 .get(_CONTENT_TYPE_JSON, {}))
+            ref = content.get('schema', {}).get('$ref', '')
+            if ref.startswith('#/components/schemas/'):
+                yield path, method, operation, ref.split('/')[-1]
+
+
+def discover_job_response_schema_name(spec):
+    """Return the schema name referenced by the job endpoints' 200 responses, or None."""
+    for _path, _method, _operation, schema_name in _job_operations(spec):
+        return schema_name
     return None
 
 
@@ -290,54 +301,33 @@ def add_response_examples(spec, error_examples=None):
         # Don't add 'examples' to schema level - only 'example' is valid
         # Multiple examples should be added at the media type level, not schema level
 
-    # Add examples to all job endpoints
-    if 'paths' in spec:
-        for path, methods in spec['paths'].items():
-            if '/jobs/' in path:
-                for method, operation in methods.items():
-                    if method in ['post', 'get', 'put', 'delete']:
-                        # Add examples to 200 responses
-                        if 'responses' in operation and '200' in operation['responses']:
-                            response = operation['responses']['200']
-                            if 'content' in response and _CONTENT_TYPE_JSON in response['content']:
-                                json_response = response['content'][_CONTENT_TYPE_JSON]
-
-                                # Add example if it references the discovered response schema
-                                if 'schema' in json_response and '$ref' in json_response['schema']:
-                                    if response_schema_name and response_schema_name in json_response['schema']['$ref']:
-                                        # Create endpoint-specific example
-                                        endpoint_name = path.split('/')[-1].replace('-', '_')
-                                        
-                                        # Only add 'examples' (not 'example') to avoid validation issues
-                                        json_response['examples'] = {
-                                            'success': {
-                                                'summary': 'Request accepted and queued',
-                                                'value': _SUCCESS_RESPONSE,
-                                            }
-                                        }
-
-                                        # Add error examples to all error responses defined in x-http-error-map
-                                        error_statuses = (
-                                            http_error_map.keys() if http_error_map
-                                            else error_examples.keys()
-                                        )
-                                        for error_code in error_statuses:
-                                            if error_code in operation['responses']:
-                                                error_response = operation['responses'][error_code]
-                                                if 'content' in error_response and _CONTENT_TYPE_JSON in error_response['content']:
-                                                    error_json = error_response['content'][_CONTENT_TYPE_JSON]
-
-                                                    # Merge errorType from EBNF map into each example at injection time
-                                                    if error_code in error_examples:
-                                                        error_type = http_error_map.get(error_code, {}).get('errorType')
-                                                        examples = {}
-                                                        for ex_name, ex_data in error_examples[error_code].items():
-                                                            merged_value = ex_data['value']
-                                                            if error_type:
-                                                                merged_value = {'errorType': error_type, **merged_value}
-                                                            examples[ex_name] = {**ex_data, 'value': merged_value}
-                                                        error_json['examples'] = examples
-
+    # Add examples to all job endpoints. Success examples are always written; error
+    # examples only fill statuses that have none, so the translator's endpoint-specific
+    # error examples (ebnf_to_openapi_dynamic_v3.py) are kept as the spec-level source.
+    for _path, _method, operation, schema_name in _job_operations(spec):
+        if schema_name != response_schema_name:
+            continue
+        operation['responses']['200']['content'][_CONTENT_TYPE_JSON]['examples'] = {
+            'success': {
+                'summary': 'Request accepted and queued',
+                'value': _SUCCESS_RESPONSE,
+            }
+        }
+        error_statuses = http_error_map.keys() if http_error_map else error_examples.keys()
+        for error_code in error_statuses:
+            error_json = (operation['responses'].get(error_code, {})
+                          .get('content', {}).get(_CONTENT_TYPE_JSON))
+            if error_json is None or error_json.get('examples') or error_code not in error_examples:
+                continue
+            # Merge errorType from EBNF map into each example at injection time
+            error_type = http_error_map.get(error_code, {}).get('errorType')
+            examples = {}
+            for ex_name, ex_data in error_examples[error_code].items():
+                merged_value = ex_data['value']
+                if error_type:
+                    merged_value = {'errorType': error_type, **merged_value}
+                examples[ex_name] = {**ex_data, 'value': merged_value}
+            error_json['examples'] = examples
     return spec
 
 def _validate_success_response(spec: dict) -> None:
@@ -389,6 +379,17 @@ def main():
 
     # Add examples
     spec = add_response_examples(spec, effective_examples)
+
+    # No-op guard: a filter that matches nothing must fail the build, not pass silently
+    updated = sum(
+        1 for _p, _m, op, _s in _job_operations(spec)
+        if op['responses']['200']['content'][_CONTENT_TYPE_JSON].get('examples')
+    )
+    if updated == 0:
+        print("❌ ERROR: no job operations found (no 200 response with a component-schema $ref) "
+              "— no examples were added")
+        sys.exit(1)
+    print(f"✓ Success examples added to {updated} job operation(s)")
 
     # Save the updated spec
     with open(output_file, 'w') as f:

@@ -26,8 +26,11 @@ const testsToAdd = [
   `pm.test("Response time check (informational)", function () { const rt = pm.response.responseTime; console.log(\`⏱️  Response time: \${rt}ms \${rt > 1000 ? '(>1s - SLOW)' : '(OK)'}\`); });`
 ];
 
+let requestCount = 0;
+
 function addTestsToItem(item) {
   if (item.request) {
+    requestCount++;
     if (!item.event) item.event = [];
 
     let testEvent = item.event.find(e => e.listen === 'test');
@@ -75,6 +78,11 @@ function addTestsToCollection(inputPath, outputPath) {
 
   if (collection.item) {
     collection.item.forEach(item => addTestsToItem(item));
+  }
+  // No-op guard (2026-10-05): a step that changes nothing must fail the build, not pass silently.
+  if (requestCount === 0) {
+    console.error('❌ No requests found — no tests were added');
+    process.exit(1);
   }
 
   fs.writeFileSync(outputPath, JSON.stringify(collection, null, 2));

@@ -17,7 +17,7 @@ import re
 from http import HTTPStatus
 import sys
 import json
-import random
+import hashlib
 import string
 import yaml
 import textwrap
@@ -149,15 +149,25 @@ def _load_error_code_messages() -> Dict[str, str]:
 _ERROR_CODE_MESSAGES: Dict[str, str] = _load_error_code_messages()
 
 
-def _generate_tracking_id() -> str:
-    """H3: Generate a unique error tracking ID.
+# M4: spec examples use a fixed reference time and seed-derived IDs so that a rebuild
+# with no DD change produces a byte-identical spec (no example churn in diffs).
+# Same constant and helpers in add_response_examples.py — update both together.
+_EXAMPLE_NOW = datetime(2026, 1, 15, 14, 30, tzinfo=timezone.utc)
 
-    Format: TRK-{YYYYMMDD}-{6-char hex suffix}
+
+def _example_hex(seed: str, length: int) -> str:
+    """Deterministic uppercase hex suffix derived from seed."""
+    return hashlib.sha256(seed.encode("utf-8")).hexdigest()[:length].upper()
+
+
+def _generate_tracking_id(seed: str) -> str:
+    """H3/M4: Generate an example error tracking ID.
+
+    Format: TRK-{YYYYMMDD}-{6-char hex suffix}, derived from seed (deterministic).
     Same format as _generate_tracking_id() in add_response_examples.py.
     Update both if the format changes.
     """
-    suffix = ''.join(random.choices('0123456789ABCDEF', k=6))
-    return f"TRK-{datetime.now(timezone.utc).strftime('%Y%m%d')}-{suffix}"
+    return f"TRK-{_EXAMPLE_NOW.strftime('%Y%m%d')}-{_example_hex(seed, 6)}"
 
 # Structural role classifications for EBNF rules are declared via (* @structural role *)
 # annotations in the DD itself and loaded dynamically in parse_ebnf() below.
@@ -811,10 +821,11 @@ class EBNFToOpenAPITranslator:
 
         # Create one example per error code for this status
         for idx, code in enumerate(codes):
-            tracking_id = _generate_tracking_id()  # H3: canonical format
+            tracking_id = _generate_tracking_id(f"{endpoint.path}:{status_code}:{code}")  # H3/M4
 
             # Generate contextual error details
-            details = self._generate_error_details(status_code, code, field_names)
+            details = self._generate_error_details(status_code, code, field_names,
+                                                   seed=f"{endpoint.path}:{status_code}:{code}")
 
             # Create example
             example_name = f"example-{idx+1}"
@@ -901,7 +912,8 @@ class EBNFToOpenAPITranslator:
 
         return field_names
 
-    def _generate_error_details(self, status_code: str, error_code: str, field_names: Dict[str, str]) -> str:
+    def _generate_error_details(self, status_code: str, error_code: str, field_names: Dict[str, str],
+                                seed: str = "") -> str:
         """Generate contextual error details based on error type.
 
         NOTE: This dict is intentionally separate from config/error-response-examples.yaml.
@@ -932,8 +944,8 @@ class EBNFToOpenAPITranslator:
                 "issue": "token signature verification failed"
             },
             'EXPIRED_TOKEN': {
-                "expiresAt": (datetime.now(timezone.utc) - timedelta(hours=1)).strftime('%Y-%m-%dT%H:%M:%SZ'),
-                "currentTime": datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+                "expiresAt": (_EXAMPLE_NOW - timedelta(hours=1)).strftime('%Y-%m-%dT%H:%M:%SZ'),
+                "currentTime": _EXAMPLE_NOW.strftime('%Y-%m-%dT%H:%M:%SZ')
             },
             'INSUFFICIENT_PERMISSIONS': {
                 "required": _ERROR_AUTH_SCOPE_REQUIRED,
@@ -945,12 +957,12 @@ class EBNFToOpenAPITranslator:
             },
             'JOB_NOT_FOUND': {
                 # L5: date-stamped placeholder — same format as tracking IDs, no drift risk
-                "jobId": f"JOB-{datetime.now(timezone.utc).strftime('%Y%m%d')}-{''.join(random.choices('0123456789ABCDEF', k=4))}"
+                "jobId": f"JOB-{_EXAMPLE_NOW.strftime('%Y%m%d')}-{_example_hex(seed + ':job', 4)}"
             },
             'RESOURCE_NOT_FOUND': {
                 "resourceType": "document",
                 # L5: date-stamped placeholder — same format as tracking IDs, no drift risk
-                "resourceId": f"DOC-{datetime.now(timezone.utc).strftime('%Y%m%d')}-{''.join(random.choices('0123456789ABCDEF', k=4))}"
+                "resourceId": f"DOC-{_EXAMPLE_NOW.strftime('%Y%m%d')}-{_example_hex(seed + ':doc', 4)}"
             },
             'INVALID_ENUM_VALUE': {
                 "field": field_names.get('documentField', 'documentClass'),  # F2: DD rule is documentClass

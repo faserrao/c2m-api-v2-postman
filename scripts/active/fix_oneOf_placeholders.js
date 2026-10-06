@@ -355,8 +355,14 @@ function main() {
         // Step 1: Discover oneOf fields, cross-field constraints, enum placeholders, and job array fields
         const { oneOfFields, crossFieldRules, enumPlaceholders, jobArrayFields, mutualExclusionFields } = discoverOneOfFields(options.spec);
 
+        // No-op guard (2026-10-05): a step that changes nothing must fail the build, not pass silently.
         if (oneOfFields.size === 0) {
-            console.warn('Warning: No oneOf fields discovered in OpenAPI spec');
+            console.error('❌ No oneOf fields discovered in OpenAPI spec');
+            process.exit(1);
+        }
+        if (jobArrayFields.length === 0) {
+            console.error('❌ No job array fields discovered in OpenAPI spec (array schemas named *Job*)');
+            process.exit(1);
         }
 
         // Step 2: Read the collection

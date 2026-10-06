@@ -361,6 +361,11 @@ function main() {
   // Add error responses
   console.log('Adding error response examples...');
   const responseCount = processItems(collection.item || []);
+  // No-op guard (2026-10-05): a step that changes nothing must fail the build, not pass silently.
+  if (responseCount === 0) {
+    console.error('❌ No error response examples were added — no matching requests found');
+    process.exit(1);
+  }
 
   // Write output collection
   console.log(`Writing collection to: ${outputFile}`);

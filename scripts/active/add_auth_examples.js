@@ -111,6 +111,7 @@ function updateAuthEndpoints(items) {
           });
         }
         
+        updatedCount++;
         console.log(`✅ Updated request body for: ${requestName}`);
       }
     }
@@ -118,7 +119,13 @@ function updateAuthEndpoints(items) {
 }
 
 // Update the collection
+let updatedCount = 0;
 updateAuthEndpoints(collection.item || []);
+// No-op guard (2026-10-05): a step that changes nothing must fail the build, not pass silently.
+if (updatedCount === 0) {
+  console.error('❌ No auth endpoint requests were updated — none matched the auth overlay');
+  process.exit(1);
+}
 
 // Write the updated collection
 fs.writeFileSync(outputFile, JSON.stringify(collection, null, 2));

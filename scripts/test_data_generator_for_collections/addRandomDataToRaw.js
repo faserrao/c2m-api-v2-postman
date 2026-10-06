@@ -918,6 +918,11 @@ function main() {
         console.log(`- Modified requests: ${stats.modifiedRequests}`);
         console.log(`- Modified responses: ${stats.modifiedResponses}`);
         console.log(`- Modified original requests: ${stats.modifiedOriginalRequests}`);
+        // No-op guard (2026-10-05): a step that changes nothing must fail the build, not pass silently.
+        if (stats.modifiedRequests === 0) {
+            console.error('❌ No request bodies were modified');
+            process.exit(1);
+        }
 
         // Show oneOf replacement statistics
         if (Object.keys(stats.oneOfReplacements).length > 0) {

@@ -233,6 +233,14 @@ class TestDDConstraints(unittest.TestCase):
         self.assertIn("400", em)
         self.assertIn("500", em)
 
+    def test_spec_generation_is_repeatable(self):
+        """M4: two independent builds from the same DD produce an identical spec
+        (no random tracking IDs or wall-clock timestamps in examples)."""
+        import json as _json
+        first = _json.dumps(_spec(), sort_keys=True, default=str)
+        second = _json.dumps(_spec(), sort_keys=True, default=str)
+        self.assertEqual(first, second, "Spec output differs between two builds of the same DD")
+
     def test_every_dd_error_status_declared_on_every_job_endpoint(self):
         """H4: job-endpoint responses are driven by @http_error_map (incl. 429)."""
         em = self.translator.http_error_map
