@@ -18,7 +18,8 @@ See top-level `CLAUDE.md` (`C2M_API_v2/CLAUDE.md`) for full project context and 
 | `scripts/active/add_auth_examples.js` | Injects auth request examples |
 | `scripts/active/add_tests_jwt.js` | Adds JWT test scripts to test collection |
 | `scripts/validation/validate_configs_against_dd.py` | V1–V8 build-time config validators |
-| `scripts/validation/validate_collections_against_spec.py` | Spec-driven conformance gate |
+| `scripts/validation/validate_collections_against_spec.py` | Spec-driven conformance gate (K-V3…K-V6) |
+| `scripts/validation/validate_pipeline_consistency.py` | End-to-end DD → spec → Postman consistency gate (saved examples, error map, spec examples); `KNOWN_OPEN` table lists tracked open findings |
 
 ---
 
@@ -27,11 +28,34 @@ See top-level `CLAUDE.md` (`C2M_API_v2/CLAUDE.md`) for full project context and 
 - **Constants over inline strings**: every reused string literal (schema names, content types, field names, enum fallbacks) lives behind a module-level constant.
 - **`@doc` annotations**: rule descriptions live in `data_dictionary/c2mapiv2-dd.ebnf` as `(* @doc Description. *)` preceding-line annotations, read at parse time by `generate_dd_table.py`.
 - **`ph<>` format is defensive only**: `fix_oneOf_placeholders.js` now writes the first canonical enum value (`propDef.enum[0]`) directly for `jobOptions` fields. The `ph<val1|val2|...>` handler in `addRandomDataToRaw.js` is a fallback for manually-constructed collections only.
+- **Repeatable spec builds (M4)**: spec examples use `_EXAMPLE_NOW` and sha256-seeded IDs — two builds from the same DD are byte-identical. Never reintroduce `random`/`datetime.now()` into spec examples (`test_spec_generation_is_repeatable` fails).
+- **No silent no-ops**: pipeline scripts exit 1 when they process nothing; Makefile no longer masks guarded steps with `|| echo "Skipping"`.
+- **Error map is the authority**: job-endpoint responses and Postman error examples are built from the DD `@http_error_map` per `(status, errorCode)` pair.
 - **Derived artifacts**: `config/faker_hints.yaml`, `config/c2m_provider_mappings.yaml`, `openapi/c2mapiv2-openapi-spec-*.yaml` — all generated. Do not edit directly.
 
 ---
 
 # Recent Changes
+
+## 2026-10-02 → 2026-10-07 — DD→Spec→Postman audits, H1–H5 / M4 / X3 / N1 / N2 / N5 fixes, consistency gate
+
+**Commits:** `61bef3a`, `ecbdc95`, `5969464`, `d4f05d9`, `64cec53`, `4ee6f50` (all CI-green on click2mail + origin). Full detail: `c2m-api-v2-manuals/audit-reports/PIPELINE_CHANGES_2026-10-05.md`; findings and open decisions: `DD_SPEC_POSTMAN_CONSISTENCY_AUDIT_2026-10-05.md` and `..._REAUDIT_2026-10-05.md`.
+
+| ID | Change |
+|---|---|
+| H1 | `@numeric_constraints` applied to inline request properties (`_get_field_type()`); orphan constraints rejected; `quantity` removed from DD |
+| H2 | `fix_oneOf_placeholders.js` enforces spec `x-mutual-exclusion` (Linked sent jobTemplate+jobOptions on 6/9); K-V6 in conformance gate |
+| H3 | DD 400 error map += `INVALID_FORMAT` (decision: allow 400 and 422); V6 checks status placement |
+| H4 | `_generate_responses()` derives job responses from the DD map — 429 on all 7 job endpoints |
+| H5 | 403 examples use auth-system scopes `jobs:submit` / `templates:read`; unused `postman/custom/auth-*.json` deleted |
+| M4 | Deterministic spec examples (`_EXAMPLE_NOW`, seeded IDs) |
+| X3 | `add_response_examples.py` `/jobs/` filter (dead since rename) → `_job_operations()`; 200 examples restored |
+| guards | 6 scripts fail on zero work; 17 Makefile masks removed |
+| gate | `validate_pipeline_consistency.py` + `validate-dd-gates`; both in CI; fixture build ends with `postman-test-collection-add-auth-examples` (matches publish) |
+| N1/N2 | `add_error_responses_to_collection.js`: tokens resolved before building; examples keyed by (status, code) from the DD map — 18 pairs per job request |
+| N5 | Translator error examples name real body paths via `_find_body_path()` (`zip`, `jobOptions.documentClass`); `postalCode` removed |
+
+**Correction:** earlier finding M1 ("PRs not validated") was wrong — `api-ci-cd.yml` already runs every gate on `pull_request`.
 
 ## 2026-09-21 (Session 2) — Hardcoded-Values Audit Passes 3–6 + Comprehensive System Audit
 
@@ -99,18 +123,25 @@ Four additional iterative audit passes fixing 14 items across 9 files (all LOW/M
 # Validation Quick Reference
 
 ```bash
-make validate-configs                        # V1–V8 config validators
-make validate-collections-conformance-test  # Golden tests (31/31)
-make validate-collections-conformance-gate-all  # All 5 conformance gates
+make openapi-build && make postman-build-golden-test-fixtures   # build spec + all 5 collections (no API keys)
+make validate-configs                           # V1–V8 config validators
+make validate-collections-conformance-test      # Golden tests: validator script + resolver 20 + DD constraints 37 + consistency 24
+make validate-collections-conformance-gate-all  # All 5 collections conform to spec
+make validate-dd-gates                          # spec vs DD, all 5 collections vs DD, catalog vs spec
+make validate-pipeline-consistency              # end-to-end DD → spec → Postman gate
 ```
 
 Expected outputs (all clean):
 - `✅ All config field names are valid DD rule names`
-- `31 passed, 43 subtests passed`
+- `20 passed` / `37 passed, 43 subtests passed` / `24 passed`
 - `PASS=9 FAIL=0 SKIP=1` (linked/test), `PASS=17 FAIL=0` (GS), `PASS=8 FAIL=0` (real-world)
+- `✅ TOTAL — PASS=191 FAIL=0` (spec vs DD); `0 finding(s) across 5 collection(s)`
+- `ERROR categories: 0 · known-open WARN categories: 30`
 
 ---
 
 # Known Gaps
 
-None. All hardcoded DD-derived values are validated at `make validate-configs` time by V1–V8. V8 (`validate_template_inline_discriminators`) covers inline branch discriminator keys in template `values:` blocks (e.g. `mergeByRequestId:`, `docSourceZipFileRef:`). The conformance gate (`make validate-collections-conformance-gate-all`) provides a second backstop.
+Config field names: none — V1–V8 cover them.
+
+Open DD → spec → Postman findings are tracked in the `KNOWN_OPEN` table of `scripts/validation/validate_pipeline_consistency.py` (each entry cites its audit/decision ID; the gate flags entries that stop occurring). Main open items: X1/X2 (Linked/Real-World saved responses synthesised by the converter), X4 (`@doc` not emitted to spec), C1 (no request examples), N3/D9 (Getting Started collections have no saved responses), N4/N5/D10 (spec vs YAML error-example content), decisions D1–D8 (see the 2026-10-05 audit reports).
