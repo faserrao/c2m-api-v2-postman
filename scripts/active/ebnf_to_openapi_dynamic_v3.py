@@ -120,8 +120,12 @@ _MUTUAL_EXCLUSION_FIELDS = ["jobTemplate", "jobOptions"]
 _RESPONSE_SCHEMA_NAME = "standardResponse"
 _ERROR_SCHEMA_NAME    = "errorResponse"
 
-# ── F1: Address field name used in error-detail examples ─────────────────
-_ERROR_POSTAL_FIELD = "postalCode"
+# ── F1/N5: Fields named in INVALID_FORMAT / INVALID_ENUM_VALUE error-detail examples.
+# Both are DD rule names; the example uses the real body path to them, found in the
+# generated schema (see _find_body_path). "postalCode" was used before 2026-10-07 but
+# is not a DD field — the DD address field is zip.
+_ERROR_FORMAT_FIELD = "zip"
+_ERROR_ENUM_FIELD   = "documentClass"   # preferred; else the nearest enum field in the body
 
 
 def _load_error_code_messages() -> Dict[str, str]:
@@ -588,8 +592,9 @@ class EBNFToOpenAPITranslator:
         self.api_title = api_title
         self.api_version = api_version
 
-        # First, generate all schemas
+        # First, generate all schemas (kept so error examples can name real body paths)
         schemas = self._generate_all_schemas()
+        self._schemas = schemas
 
         # Generate paths based on endpoints
         paths = self._generate_paths()
@@ -876,7 +881,7 @@ class EBNFToOpenAPITranslator:
         elif t in ('optional', 'repeat'):
             self._collect_symbols_from_expression(expr.get('expression'), result)
 
-    def _extract_endpoint_field_names(self, endpoint: Endpoint) -> Dict[str, str]:
+    def _extract_endpoint_field_names(self, endpoint: Endpoint) -> Dict[str, Any]:
         """Extract relevant field names from endpoint's request body schema using EBNF graph traversal."""
         if not endpoint.production_name or endpoint.production_name not in self.productions:
             return {'field': 'unknownField', 'field1': 'unknownField1'}
@@ -910,7 +915,58 @@ class EBNFToOpenAPITranslator:
         if 'addressField' not in field_names:
             field_names['addressField'] = 'recipientAddress'
 
+        # N5: real body paths for the INVALID_FORMAT and INVALID_ENUM_VALUE examples,
+        # taken from the generated schema rather than keyword-matched symbol names.
+        # Prefer the recipient's address over returnAddress where the endpoint has one
+        found = self._find_body_path(endpoint.production_name, lambda name, _s: name == _ERROR_FORMAT_FIELD,
+                                     prefer='recipientAddressSource')
+        if found:
+            field_names['formatField'] = found[0]
+        found = (self._find_body_path(endpoint.production_name, lambda name, _s: name == _ERROR_ENUM_FIELD)
+                 or self._find_body_path(endpoint.production_name, lambda _n, sch: bool(sch.get('enum'))))
+        if found:
+            field_names['enumField'], field_names['enumValues'] = found[0], found[1].get('enum', [])
+
         return field_names
+
+    def _find_body_path(self, root_schema_name: str, match,
+                        prefer: Optional[str] = None) -> Optional[Tuple[str, Dict[str, Any]]]:
+        """Breadth-first search of the generated schema from an endpoint body; return
+        (dotted path, resolved schema) of the shallowest property for which
+        match(name, schema) is true — the shallowest one whose path contains `prefer`,
+        if any does. Arrays are written as [0]; oneOf branches add no segment of their
+        own (each branch object carries its own property key)."""
+        schemas = getattr(self, '_schemas', None) or {}
+
+        def resolve(sch):
+            seen = set()
+            while isinstance(sch, dict) and '$ref' in sch and sch['$ref'] not in seen:
+                seen.add(sch['$ref'])
+                sch = schemas.get(sch['$ref'].split('/')[-1], {})
+            return sch if isinstance(sch, dict) else {}
+
+        queue = [(resolve({'$ref': f'#/components/schemas/{root_schema_name}'}), '')]
+        visited = set()
+        fallback = None
+        while queue:
+            sch, path = queue.pop(0)
+            key = (id(sch), path)
+            if key in visited or path.count('.') > 10:
+                continue
+            visited.add(key)
+            for branch in sch.get('oneOf', []):
+                queue.append((resolve(branch), path))
+            for name, prop in (sch.get('properties') or {}).items():
+                child = resolve(prop)
+                child_path = f"{path}.{name}" if path else name
+                if match(name, child):
+                    if prefer is None or prefer in child_path:
+                        return child_path, child
+                    fallback = fallback or (child_path, child)
+                queue.append((child, child_path))
+            if 'items' in sch:
+                queue.append((resolve(sch['items']), f"{path}[0]"))
+        return fallback
 
     def _generate_error_details(self, status_code: str, error_code: str, field_names: Dict[str, str],
                                 seed: str = "") -> str:
@@ -965,10 +1021,11 @@ class EBNFToOpenAPITranslator:
                 "resourceId": f"DOC-{_EXAMPLE_NOW.strftime('%Y%m%d')}-{_example_hex(seed + ':doc', 4)}"
             },
             'INVALID_ENUM_VALUE': {
-                "field": field_names.get('documentField', 'documentClass'),  # F2: DD rule is documentClass
+                # N5: an enum field that exists in this endpoint's body, with its own values
+                "field": field_names.get('enumField', _ERROR_ENUM_FIELD),
                 "value": "invalid_value",
-                # Derived from EBNF documentClass enum; fallback matches actual DD values.
-                "allowedValues": self._get_enum_values('documentClass') or _ERROR_DOCUMENT_CLASS_FALLBACK
+                "allowedValues": (field_names.get('enumValues')
+                                  or self._get_enum_values(_ERROR_ENUM_FIELD) or _ERROR_DOCUMENT_CLASS_FALLBACK)
             },
             'MUTUAL_EXCLUSION_VIOLATION': {
                 "fields": self.mutual_exclusion_fields,  # H1: from @mutual_exclusion in EBNF DD
@@ -980,11 +1037,11 @@ class EBNFToOpenAPITranslator:
                         "field": field_names.get('documentField', 'documentId'),
                         "issue": "not found in document library"
                     },
-                    {
-                        "field": f"{field_names.get('addressField', 'recipientAddress')}.{_ERROR_POSTAL_FIELD}",
-                        "issue": "invalid format - must be 5 or 9 digits"
-                    }
-                ]
+                ] + ([{
+                    # N5: real body path to the DD zip field (e.g. recipientAddressSource.singleAddress.zip)
+                    "field": field_names['formatField'],
+                    "issue": "invalid format - must be 5 or 9 digits"
+                }] if field_names.get('formatField') else [])
             },
             'SERVER_ERROR': {
                 "message": "An unexpected error occurred"

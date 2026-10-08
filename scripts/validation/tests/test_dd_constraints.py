@@ -268,6 +268,53 @@ class TestDDConstraints(unittest.TestCase):
                         if v["errorType"] != entry["errorType"]]
         self.assertEqual(bad, [])
 
+    def test_error_example_fields_exist_in_endpoint_body(self):
+        """N5: every field an error example names must be a real path in that endpoint's
+        request body (arrays as [0]), and INVALID_ENUM_VALUE's allowedValues must be that
+        field's own enum. MUTUAL_EXCLUSION_VIOLATION is excluded: it names the DD
+        @mutual_exclusion group on every endpoint, including /batch/zip where the fields
+        do not exist — tracked as N5 / decision D10."""
+        import json as _json
+        schemas = self.spec["components"]["schemas"]
+
+        def resolve(s):
+            while isinstance(s, dict) and "$ref" in s:
+                s = schemas[s["$ref"].split("/")[-1]]
+            return s
+
+        def paths(s, prefix, acc, depth=0):
+            s = resolve(s)
+            if depth > 10 or not isinstance(s, dict):
+                return acc
+            for b in s.get("oneOf", []):
+                paths(b, prefix, acc, depth + 1)
+            for k, v in (s.get("properties") or {}).items():
+                p = f"{prefix}.{k}" if prefix else k
+                acc[p] = resolve(v)
+                paths(v, p, acc, depth + 1)
+            if "items" in s:
+                paths(s["items"], f"{prefix}[0]", acc, depth + 1)
+            return acc
+
+        bad = []
+        for ep in self.translator.endpoints:
+            op = self.spec["paths"][ep.path][ep.method.lower()]
+            body = paths(op["requestBody"]["content"]["application/json"]["schema"], "", {})
+            for status, resp in op["responses"].items():
+                for ex in resp.get("content", {}).get("application/json", {}).get("examples", {}).values():
+                    v = ex["value"]
+                    if v.get("errorCode") in (None, "MUTUAL_EXCLUSION_VIOLATION"):
+                        continue
+                    d = _json.loads(v.get("errorDetails") or "{}")
+                    refs = [d.get("field")] + [e.get("field") for e in d.get("errors", [])]
+                    for f in filter(None, refs):
+                        if f not in body:
+                            bad.append(f"{ep.path} {status} {v['errorCode']}: {f}")
+                    if v["errorCode"] == "INVALID_ENUM_VALUE" and d.get("field") in body:
+                        if d.get("allowedValues") != body[d["field"]].get("enum"):
+                            bad.append(f"{ep.path} {status}: allowedValues are not {d['field']}'s enum")
+        self.assertEqual(bad, [], "Error examples name fields that are not in the endpoint body")
+
     def test_error_example_scopes_are_issued_by_auth_system(self):
         """H5: 403 example scopes must be scopes the auth system actually issues."""
         import json as _json

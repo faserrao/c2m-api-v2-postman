@@ -81,6 +81,8 @@ KNOWN_OPEN = {
     ("B-EXAMPLE-ERROR-MAP", "Linked"): "X1 (converter synthesises error examples)",
     ("B-EXAMPLE-ERROR-COVERAGE", "Linked"): "X1 (converter writes one example per status, not per DD code)",
     ("B-EXAMPLE-ERROR-COVERAGE", "Real-World"): "X1/X2 (saved responses copied from Linked)",
+    ("B-EXAMPLE-FIELD-NOT-IN-BODY", "Test"): "N5 / decision D10 (static field names in error-response-examples.yaml)",
+    ("C-EXAMPLE-IMPOSSIBLE-ERROR", "*"): "N5 / decision D10 (mutual-exclusion example on /batch/zip)",
     ("B-EXAMPLE-ERROR-MAP", "Real-World"): "X1/X2 (copied from Linked)",
     ("B-EXAMPLE-ORIGINAL-REQUEST", "Real-World"): "X2 (typed originalRequest bodies)",
     ("B-EXAMPLE-ORIGINAL-REQUEST", "Linked"): "X9b (merge minimum in saved examples)",
@@ -157,6 +159,23 @@ class SpecTools:
             for r in self._relevant(err, typed):
                 out.add(f"{'/'.join(map(str, r.absolute_path)) or '<root>'}: {r.message[:160]}")
         return sorted(out)
+
+    def body_paths(self, schema, prefix="", acc=None, depth=0):
+        """Every property path reachable in a request body (arrays as [0], oneOf branches
+        contribute their own keys) — the form error examples use to name fields."""
+        acc = {} if acc is None else acc
+        s = self.deref(schema)
+        if depth > 10 or not isinstance(s, dict):
+            return acc
+        for b in s.get("oneOf", []) + s.get("anyOf", []):
+            self.body_paths(b, prefix, acc, depth + 1)
+        for k, v in (s.get("properties") or {}).items():
+            p = f"{prefix}.{k}" if prefix else k
+            acc[p] = self.deref(v)
+            self.body_paths(v, p, acc, depth + 1)
+        if "items" in s:
+            self.body_paths(s["items"], f"{prefix}[0]", acc, depth + 1)
+        return acc
 
     def unknown_fields(self, instance, schema, typed, path=""):
         """Keys the (selected) schema does not declare — the spec sets no additionalProperties."""
@@ -525,6 +544,30 @@ def details_problems(details):
     return out
 
 
+def error_field_refs(details):
+    """Field names an errorDetails JSON string refers to (field, fields[], errors[].field)."""
+    try:
+        d = json.loads(details) if isinstance(details, str) else None
+    except json.JSONDecodeError:
+        return []
+    if not isinstance(d, dict):
+        return []
+    refs = d.get("fields") if isinstance(d.get("fields"), list) else [d.get("field")]
+    refs += [e.get("field") for e in d.get("errors", []) if isinstance(e, dict)] if isinstance(d.get("errors"), list) else []
+    return [r for r in refs if isinstance(r, str)]
+
+
+def field_ref_problems(details, error_code, body_paths):
+    """(category suffix, message) for every referenced field that is not a body path.
+    A mutual-exclusion example naming fields the endpoint lacks is an impossible error."""
+    out = []
+    for f in error_field_refs(details):
+        if f not in body_paths:
+            kind = "IMPOSSIBLE-ERROR" if error_code == "MUTUAL_EXCLUSION_VIOLATION" else "FIELD-NOT-IN-BODY"
+            out.append((kind, f"{error_code}: field '{f}' is not in this endpoint's request body"))
+    return out
+
+
 def uses_dd_errors(op):
     """True when the operation's error responses use the DD errorResponse schema (job endpoints)."""
     for code, r in op.get("responses", {}).items():
@@ -641,6 +684,10 @@ def check_collection(label, collection, typed, spec, tools, F):
                     saved_pairs.add((code, ec))
                 for kind, msg in details_problems(ex_body.get("errorDetails")):
                     F.add(f"B-EXAMPLE-DETAILS-{kind}", label, f"{where}: {msg}")
+                if body_schema:
+                    for kind, msg in field_ref_problems(ex_body.get("errorDetails"), ec,
+                                                        tools.body_paths(body_schema)):
+                        F.add(f"B-EXAMPLE-{kind}", label, f"{where}: {msg}")
                 tid = ex_body.get("errorTrackingId")
                 if isinstance(tid, str) and not is_placeholder(tid) and not TRACKING_ID.match(tid):
                     F.add("B-EXAMPLE-TRACKING-ID", label, f"{where}: {tid}")
@@ -693,6 +740,7 @@ def check_collection(label, collection, typed, spec, tools, F):
 # --------------------------------------------------------------------------- #
 def check_spec_examples(spec, dd, F):
     resolver = RefResolver(base_uri="", referrer=spec)
+    tools = SpecTools(spec)
     dd_eps = {(e.method.lower(), e.path) for e in dd.t.endpoints}
     for p, o in spec["paths"].items():
         for m, op in o.items():
@@ -712,6 +760,10 @@ def check_spec_examples(spec, dd, F):
                     if isinstance(v, dict):
                         for kind, msg in details_problems(v.get("errorDetails")):
                             F.add(f"C-EXAMPLE-DETAILS-{kind}", "*", f"{m.upper()} {p} {code}: {msg}")
+                        if rb.get("schema"):
+                            for kind, msg in field_ref_problems(v.get("errorDetails"), v.get("errorCode"),
+                                                                tools.body_paths(rb["schema"])):
+                                F.add(f"C-EXAMPLE-{kind}", "*", f"{m.upper()} {p} {code}: {msg}")
 
 
 # --------------------------------------------------------------------------- #

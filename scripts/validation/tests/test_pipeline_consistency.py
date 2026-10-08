@@ -139,6 +139,28 @@ class TestCollectionChecks(unittest.TestCase):
         cats = run_collection([request(CLEAN_BODY, tests="pm.expect([200,201,204]).to.include(pm.response.code);")])
         self.assertIn("B-TEST-STATUS-ASSERTION", cats)
 
+    def test_error_example_field_not_in_body(self):
+        """N5: an error example must name a field that exists in the endpoint body."""
+        examples = all_dd_error_examples()
+        examples[0] = error_example("400", "ValidationError", "MISSING_REQUIRED_FIELD",
+                                    details='{"field": "bogusField"}')
+        self.assertIn("B-EXAMPLE-FIELD-NOT-IN-BODY", run_collection([request(CLEAN_BODY, examples)]))
+
+    def test_error_example_real_dotted_path_accepted(self):
+        examples = all_dd_error_examples()
+        examples[0] = error_example("400", "ValidationError", "INVALID_FORMAT",
+                                    details='{"errors": [{"field": "recipientAddressSource.singleAddress.zip"}]}')
+        cats = run_collection([request(CLEAN_BODY, examples)])
+        self.assertNotIn("B-EXAMPLE-FIELD-NOT-IN-BODY", cats)
+
+    def test_mutual_exclusion_example_where_fields_absent_is_impossible(self):
+        tools = V.SpecTools(SPEC)
+        zip_body = tools.body_paths(SPEC["paths"]["/batch/zip"]["post"]["requestBody"]["content"]
+                                    ["application/json"]["schema"])
+        problems = V.field_ref_problems('{"fields": ["jobTemplate", "jobOptions"]}',
+                                        "MUTUAL_EXCLUSION_VIOLATION", zip_body)
+        self.assertEqual({k for k, _ in problems}, {"IMPOSSIBLE-ERROR"})
+
     def test_merge_minimum(self):
         self.assertEqual(
             [c for c, _ in V.cross_field_errors({"mergeDocumentSource": [{}]}, SPEC["info"])], ["B-MERGE-MINIMUM"])
@@ -175,6 +197,16 @@ class TestSpecChecks(unittest.TestCase):
         F = V.Findings()
         V.check_spec_examples(spec, DD, F)
         self.assertIn(("C-RESPONSE-EXAMPLE-MISSING", "*"), F.items)
+
+    def test_spec_example_naming_non_body_field_is_flagged(self):
+        """N5: the pre-2026-10-07 'recipientAddressSource.postalCode' must be caught."""
+        spec = copy.deepcopy(SPECX)
+        for ex in spec["paths"]["/static"]["post"]["responses"]["400"]["content"]["application/json"]["examples"].values():
+            if ex["value"]["errorCode"] == "INVALID_FORMAT":
+                ex["value"]["errorDetails"] = '{"errors": [{"field": "recipientAddressSource.postalCode"}]}'
+        F = V.Findings()
+        V.check_spec_examples(spec, DD, F)
+        self.assertIn(("C-EXAMPLE-FIELD-NOT-IN-BODY", "*"), F.items)
 
     def test_known_open_entries_reference_a_tracking_id(self):
         for key, ref in V.KNOWN_OPEN.items():
