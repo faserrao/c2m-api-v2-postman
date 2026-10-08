@@ -44,7 +44,7 @@ function generateUUID() {
 }
 
 // Error code metadata — loaded from config/error-response-examples.yaml in main().
-// That file is the single source of truth shared with add_response_examples.py.
+// (D10 step 2 replaces this with the spec's examples, which come from the DD @error_examples block.)
 let ERROR_CODE_METADATA = {};
 
 /**

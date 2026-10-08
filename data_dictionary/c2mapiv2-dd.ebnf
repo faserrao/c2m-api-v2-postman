@@ -1025,9 +1025,9 @@ sortingCode = string ;
 standardResponse = status + message + requestId ;
 
 (* @doc Job status string (e.g. "accepted"). *)
-status = string ;    (* e.g. "accepted" *)
+status = string ; (* @hint static accepted *)
 (* @doc Human-readable confirmation message (e.g. "Your request has been queued"). *)
-message = string ;   (* Human-readable confirmation, e.g. "Your request has been queued" *)
+message = string ; (* @hint static Your request has been queued *)
 
 (* ================================================================
    ERROR RESPONSE SCHEMAS
@@ -1104,6 +1104,109 @@ HTTP_500_INTERNAL_SERVER_ERROR = errorResponse ;
    429: errorType=RateLimitError; errorCodes=RATE_LIMIT_EXCEEDED
    500: errorType=ServerError; errorCodes=SERVER_ERROR,DATABASE_ERROR,EXTERNAL_SERVICE_ERROR
    @end_http_error_map *)
+
+(* ----------------------------------------------------------------
+   ERROR EXAMPLES  (D10, 2026-10-08)
+   Single source of truth for the content of every error example — the
+   OpenAPI spec (Redoc) and every Postman collection are generated from
+   this block. Edit here, not in scripts or config files.
+
+   Format — one entry per error code, optionally prefixed by an HTTP status
+   when a code needs different content under different statuses
+   (a status-prefixed entry overrides the plain one for that status):
+
+     [STATUS] ERROR_CODE
+         summary: <short example name, shown in Redoc / Postman>
+         message: <errorMessage>
+         details: <errorDetails — one line of JSON>
+
+   Tokens in details are filled per endpoint by ebnf_to_openapi_dynamic_v3.py:
+     {documentField}  the endpoint's top-level document-source field
+     {formatField}    real body path to the zip field (recipient address preferred)
+     {enumField}      real body path to jobOptions.documentClass, else the nearest enum
+     {enumValues}     that field's allowed values (JSON array)
+     {mutualExclusionFields}  the mutual-exclusion group (JSON array) — only where
+                      the endpoint body has those fields; elsewhere the example is omitted
+     {jobId} {resourceId} {requestId}  example identifiers
+     {timestamp} {expired}            example time and one hour before it
+     {supportEmail}                   support contact address
+   An example whose tokens cannot be filled for an endpoint is omitted there,
+   because that error cannot occur on that endpoint.
+   ----------------------------------------------------------------
+   @error_examples
+   MISSING_REQUIRED_FIELD
+       summary: Missing required field
+       message: Required field is missing from request body
+       details: {"field": "{documentField}", "location": "requestBody"}
+   INVALID_ONEOF
+       summary: Invalid oneOf selection
+       message: Request must match exactly one of the defined schemas
+       details: {"field": "{documentField}", "issue": "exactly one variant must be provided"}
+   INVALID_JSON
+       summary: Invalid JSON
+       message: Request body contains malformed JSON
+       details: {"error": "Unexpected token at position 42", "line": 3}
+   400 INVALID_FORMAT
+       summary: Invalid field format
+       message: Field contains invalid format or value
+       details: {"field": "{formatField}", "provided": "1234", "expected": "5 or 9 digits"}
+   422 INVALID_FORMAT
+       summary: Validation failed
+       message: Request validation failed for multiple fields
+       details: {"errors": [{"field": "{documentField}", "issue": "not found in document library"}, {"field": "{formatField}", "issue": "invalid format - must be 5 or 9 digits"}]}
+   MISSING_AUTH_HEADER
+       summary: Missing authentication
+       message: Authorization header is missing or invalid
+       details: {"expected": "Bearer <token>", "received": "none"}
+   INVALID_TOKEN
+       summary: Invalid token
+       message: Authentication token is invalid or malformed
+       details: {"issue": "token signature verification failed"}
+   EXPIRED_TOKEN
+       summary: Expired token
+       message: Authentication token has expired
+       details: {"expiresAt": "{expired}", "currentTime": "{timestamp}"}
+   INSUFFICIENT_PERMISSIONS
+       summary: Insufficient permissions
+       message: User does not have required permissions for this operation
+       details: {"required": "jobs:submit", "provided": "templates:read"}
+   ACCOUNT_SUSPENDED
+       summary: Account suspended
+       message: User account has been suspended
+       details: {"reason": "billing overdue", "contactSupport": "{supportEmail}"}
+   JOB_NOT_FOUND
+       summary: Job not found
+       message: The specified job does not exist
+       details: {"resourceType": "job", "jobId": "{jobId}"}
+   RESOURCE_NOT_FOUND
+       summary: Resource not found
+       message: Requested resource does not exist
+       details: {"resourceType": "document", "resourceId": "{resourceId}"}
+   INVALID_ENUM_VALUE
+       summary: Invalid enum value
+       message: Field contains a value not allowed by the enumeration
+       details: {"field": "{enumField}", "value": "invalid_value", "allowedValues": {enumValues}}
+   MUTUAL_EXCLUSION_VIOLATION
+       summary: Mutually exclusive fields
+       message: Request contains mutually exclusive fields
+       details: {"fields": {mutualExclusionFields}, "issue": "only one may be provided"}
+   RATE_LIMIT_EXCEEDED
+       summary: Rate limit exceeded
+       message: Request rate limit exceeded — please slow down and retry
+       details: {"limit": "100 requests/minute", "retryAfterSeconds": 60}
+   SERVER_ERROR
+       summary: Internal server error
+       message: An unexpected error occurred while processing the request
+       details: {"timestamp": "{timestamp}", "requestId": "{requestId}"}
+   DATABASE_ERROR
+       summary: Database error
+       message: Database operation failed
+       details: {"operation": "insert", "table": "jobs", "error": "connection timeout"}
+   EXTERNAL_SERVICE_ERROR
+       summary: External service error
+       message: External service call failed
+       details: {"service": "address-validation", "error": "timeout after 30s"}
+   @end_error_examples *)
 
 (* ----------------------------------------------------------------
    NUMERIC CONSTRAINTS

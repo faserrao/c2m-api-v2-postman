@@ -253,27 +253,73 @@ class TestDDConstraints(unittest.TestCase):
         self.assertEqual(missing, [], "DD error statuses not declared on job endpoints")
 
     def test_spec_error_examples_match_dd_map_per_status(self):
-        """H3: each status's examples carry exactly the codes (and type) the DD maps to it."""
-        em = self.translator.http_error_map
+        """H3/D10: each status's examples carry the codes (and type) the DD maps to it.
+        A code may be absent only where its @error_examples tokens cannot be filled for
+        that endpoint — i.e. the error cannot occur there (e.g. mutual exclusion on /batch/zip)."""
+        t = self.translator
         bad = []
-        for ep in self.translator.endpoints:
+        for ep in t.endpoints:
             op = self.spec["paths"][ep.path][ep.method.lower()]
-            for status, entry in em.items():
+            field_names = t._extract_endpoint_field_names(ep)
+            for status, entry in t.http_error_map.items():
                 content = op["responses"][status]["content"]["application/json"]
                 values = [ex["value"] for ex in content.get("examples", {}).values()]
-                codes = sorted(v["errorCode"] for v in values)
-                if codes != sorted(entry["errorCodes"]):
-                    bad.append(f"{ep.path} {status}: {codes} != {sorted(entry['errorCodes'])}")
+                present = {v["errorCode"] for v in values}
+                bad += [f"{ep.path} {status}: unmapped code {c}" for c in present - set(entry["errorCodes"])]
+                for code in set(entry["errorCodes"]) - present:
+                    tmpl = t._error_example_entry(status, code)["details"]
+                    if t.render_error_details(tmpl, ep, field_names, "check") is not None:
+                        bad.append(f"{ep.path} {status}: {code} omitted although it applies")
                 bad += [f"{ep.path} {status}: errorType {v['errorType']}" for v in values
                         if v["errorType"] != entry["errorType"]]
         self.assertEqual(bad, [])
 
+    def test_error_example_omitted_where_impossible(self):
+        """D10/N5: /batch/zip has no top-level jobTemplate/jobOptions, so its 422 examples
+        must not include MUTUAL_EXCLUSION_VIOLATION; /static must."""
+        def codes(path):
+            ex = self.spec["paths"][path]["post"]["responses"]["422"]["content"]["application/json"]["examples"]
+            return {e["value"]["errorCode"] for e in ex.values()}
+        self.assertNotIn("MUTUAL_EXCLUSION_VIOLATION", codes("/batch/zip"))
+        self.assertIn("MUTUAL_EXCLUSION_VIOLATION", codes("/static"))
+
+    def test_error_examples_block_must_cover_error_map(self):
+        """D10: a mapped (status, code) without an @error_examples entry is a build error."""
+        text = EBNF_PATH.read_text(encoding="utf-8")
+        start = text.index("   DATABASE_ERROR\n")
+        end = text.index("   EXTERNAL_SERVICE_ERROR\n")
+        t = EBNFToOpenAPITranslator()
+        with self.assertRaises(RuntimeError):
+            t.parse_ebnf(text[:start] + text[end:])
+
+    def test_error_examples_unknown_token_is_build_error(self):
+        t = self.translator
+        ep = t.endpoints[0]
+        with self.assertRaises(RuntimeError):
+            t.render_error_details('{"field": "{notAToken}"}', ep, t._extract_endpoint_field_names(ep), "x")
+
+    def test_mutual_exclusion_fields_are_dd_rules(self):
+        """The mutual-exclusion group must be real DD rules (guards against the parser
+        reading prose that mentions the annotation, as happened once on 2026-10-08)."""
+        group = self.translator.mutual_exclusion_fields
+        self.assertGreaterEqual(len(group), 2)
+        self.assertEqual([f for f in group if f not in self.translator.productions], [])
+
+    def test_success_example_comes_from_dd_hints(self):
+        """D10: the 200 example is built from standardResponse's @hint values."""
+        hints = self.translator.faker_hints
+        for ep in self.translator.endpoints:
+            v = self.spec["paths"][ep.path][ep.method.lower()]["responses"]["200"]["content"][
+                "application/json"]["examples"]["success"]["value"]
+            self.assertEqual(v["status"], hints["status"]["value"])
+            self.assertEqual(v["message"], hints["message"]["value"])
+            self.assertTrue(hints["requestId"]["min"] <= v["requestId"] <= hints["requestId"]["max"])
+
     def test_error_example_fields_exist_in_endpoint_body(self):
         """N5: every field an error example names must be a real path in that endpoint's
         request body (arrays as [0]), and INVALID_ENUM_VALUE's allowedValues must be that
-        field's own enum. MUTUAL_EXCLUSION_VIOLATION is excluded: it names the DD
-        @mutual_exclusion group on every endpoint, including /batch/zip where the fields
-        do not exist — tracked as N5 / decision D10."""
+        field's own enum. Since D10 an example whose fields do not exist on an endpoint is
+        omitted there, so this covers MUTUAL_EXCLUSION_VIOLATION too."""
         import json as _json
         schemas = self.spec["components"]["schemas"]
 
@@ -303,10 +349,10 @@ class TestDDConstraints(unittest.TestCase):
             for status, resp in op["responses"].items():
                 for ex in resp.get("content", {}).get("application/json", {}).get("examples", {}).values():
                     v = ex["value"]
-                    if v.get("errorCode") in (None, "MUTUAL_EXCLUSION_VIOLATION"):
+                    if v.get("errorCode") is None:
                         continue
                     d = _json.loads(v.get("errorDetails") or "{}")
-                    refs = [d.get("field")] + [e.get("field") for e in d.get("errors", [])]
+                    refs = [d.get("field")] + list(d.get("fields") or []) + [e.get("field") for e in d.get("errors", [])]
                     for f in filter(None, refs):
                         if f not in body:
                             bad.append(f"{ep.path} {status} {v['errorCode']}: {f}")
@@ -334,9 +380,13 @@ class TestDDConstraints(unittest.TestCase):
         collect(overlay)
         self.assertTrue(issued, "no scopes found in the auth overlay")
 
-        import ebnf_to_openapi_dynamic_v3 as T
-        used = {"translator _ERROR_AUTH_SCOPE_REQUIRED": T._ERROR_AUTH_SCOPE_REQUIRED,
-                "translator _ERROR_AUTH_SCOPE_PROVIDED": T._ERROR_AUTH_SCOPE_PROVIDED}
+        used = {}
+        for (_status, code), entry in self.translator.error_examples.items():
+            if code == "INSUFFICIENT_PERMISSIONS":
+                for k, v in _json.loads(entry["details"]).items():
+                    if k in ("required", "provided"):
+                        used[f"DD @error_examples {code}.{k}"] = v
+        self.assertTrue(used, "INSUFFICIENT_PERMISSIONS example has no required/provided scopes")
         examples = yaml.safe_load((REPO_ROOT / "config" / "error-response-examples.yaml").read_text())
         for key, ex in (examples.get(403) or {}).items():
             for k, v in _json.loads(ex.get("errorDetails", "{}")).items():

@@ -94,8 +94,7 @@ let fakerHints = {};
 /**
  * Generate a 6-character uppercase hex suffix for tracking IDs.
  * Canonical format: TRK-YYYYMMDD-XXXXXX where XXXXXX is 6 hex chars.
- * Matches the Python implementation in ebnf_to_openapi_dynamic_v3.py and
- * add_response_examples.py.
+ * Matches the format of _generate_tracking_id() in ebnf_to_openapi_dynamic_v3.py.
  */
 function hexSuffix() {
     return Array.from({ length: 6 }, () => '0123456789ABCDEF'[Math.floor(Math.random() * 16)]).join('');
@@ -298,7 +297,7 @@ let oneOfFixtures = {
             errorType: "AuthorizationError",
             errorMessage: "User does not have required permissions for this operation",
             errorCode: "INSUFFICIENT_PERMISSIONS",
-            errorDetails: JSON.stringify({ required: "jobs:submit", provided: "templates:read" }),  // L-2/H5: must match _ERROR_AUTH_SCOPE_REQUIRED/_PROVIDED in ebnf_to_openapi_dynamic_v3.py
+            errorDetails: JSON.stringify({ required: "jobs:submit", provided: "templates:read" }),  // L-2/H5: must match INSUFFICIENT_PERMISSIONS in the DD @error_examples block
             errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${hexSuffix()}`
         },
         // Variant 7: ResourceNotFoundError - Job Not Found
@@ -729,9 +728,9 @@ function generateRandomValue(key, existingValue) {
     } else if (keyLower.includes('account')) {
         return '1234567890';  // G3: matches faker_hints.yaml static value for accountNumber
     } else if (keyLower.includes('status')) {
-        return 'accepted';  // G3: matches _SUCCESS_RESPONSE.status in add_response_examples.py
+        return 'accepted';  // G3: matches the DD @hint for status (standardResponse)
     } else if (keyLower.includes('message')) {
-        return 'Your request has been queued';  // G3: matches _SUCCESS_RESPONSE.message in add_response_examples.py
+        return 'Your request has been queued';  // G3: matches the DD @hint for message (standardResponse)
     } else if (keyLower === 'jobid' || (keyLower.includes('job') && keyLower.includes('id'))) {
         return `job_${Date.now()}_${faker.string.alphanumeric(6)}`;
     } else if (keyLower === 'startpage') {

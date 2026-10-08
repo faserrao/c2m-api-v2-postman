@@ -846,11 +846,8 @@ openapi-merge-overlays: $(C2MAPIV2_OPENAPI_SPEC_BASE) $(OPENAPI_AUTH_OVERLAY)
 	@echo "🔗 Merging auth overlay into generated OpenAPI..."
 	@$(VENV_PYTHON) scripts/active/merge_openapi_overlays.py \
 		$(C2MAPIV2_OPENAPI_SPEC_BASE) $(OPENAPI_AUTH_OVERLAY) $(C2MAPIV2_OPENAPI_SPEC)
-	# Add meaningful response examples
-	@echo "📝 Adding response examples to OpenAPI spec..."
-	@$(VENV_PYTHON) scripts/active/add_response_examples.py \
-		$(C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC)
-	@echo "✅ Response examples added"
+	# Success and error examples are written by the translator from the DD
+	# (@error_examples, standardResponse @hint values) — add_response_examples.py retired (D10)
 
 
 # ========================================================================

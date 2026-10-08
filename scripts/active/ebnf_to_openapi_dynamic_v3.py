@@ -22,7 +22,6 @@ import string
 import yaml
 import textwrap
 from datetime import datetime, timedelta, timezone
-from pathlib import Path
 from typing import Dict, List, Tuple, Set, Optional, Any, Union
 from dataclasses import dataclass, field
 from collections import OrderedDict, defaultdict
@@ -97,17 +96,10 @@ _SECURITY_SCHEME_NAME = "bearerAuth"
 # ── M5: Shared media-type constant ───────────────────────────────────────
 _CONTENT_TYPE_JSON = "application/json"
 
-# ── H1: Operational constants used in error-detail examples ──────────────
-# These are intentional stable strings — not derivable from EBNF or OpenAPI spec.
-_ERROR_DB_TABLE            = "jobs"
-_ERROR_EXTERNAL_SERVICE    = "address-validation"  # BUG fix: aligned with error-response-examples.yaml
-# H5: scopes must be ones the auth system issues (openapi/overlays/auth.tokens.yaml,
-# postman/scripts/jwt-pre-request.js); enforced by test_dd_constraints.py.
-_ERROR_AUTH_SCOPE_REQUIRED = "jobs:submit"
-_ERROR_AUTH_SCOPE_PROVIDED = "templates:read"
-# A-new-1: Build-failure guard only — primary path uses _get_enum_values('documentClass')
-# from the spec.  This list is unreachable in a normal build; a constant keeps it auditable.
-_ERROR_DOCUMENT_CLASS_FALLBACK = ["letter", "postcard", "brochure", "flat"]
+# ── D10: error-example content lives in the DD @error_examples block ──────
+# (the former hardcoded details dict and operational constants were removed 2026-10-08).
+_ERROR_EXAMPLE_TOKEN    = re.compile(r"\{([A-Za-z]\w*)\}")
+_SUCCESS_EXAMPLE_SUMMARY = "Request accepted and queued"
 # H1: Fallback used when the @mutual_exclusion annotation is absent from the EBNF DD.
 # The authoritative source is the @mutual_exclusion block in data_dictionary/c2mapiv2-dd.ebnf;
 # the translator stores parsed values in self.mutual_exclusion_fields at parse time.
@@ -127,35 +119,8 @@ _ERROR_SCHEMA_NAME    = "errorResponse"
 _ERROR_FORMAT_FIELD = "zip"
 _ERROR_ENUM_FIELD   = "documentClass"   # preferred; else the nearest enum field in the body
 
-
-def _load_error_code_messages() -> Dict[str, str]:
-    """H2: Load errorCode → errorMessage from error-response-examples.yaml.
-
-    Single source of truth shared with add_response_examples.py and
-    add_error_responses_to_collection.js.  Eliminates the hardcoded
-    status_to_messages dict that previously duplicated YAML content.
-    """
-    config = Path(__file__).parent.parent.parent / 'config' / 'error-response-examples.yaml'
-    try:
-        with open(config) as f:
-            raw = yaml.safe_load(f)
-        return {
-            ex['errorCode']: ex['errorMessage']
-            for status_examples in raw.values()
-            for ex in status_examples.values()
-            if isinstance(ex, dict) and 'errorCode' in ex
-        }
-    except (OSError, KeyError, TypeError):
-        return {}
-
-
-# Built once at import time — stable config file, no need to re-read per call.
-_ERROR_CODE_MESSAGES: Dict[str, str] = _load_error_code_messages()
-
-
 # M4: spec examples use a fixed reference time and seed-derived IDs so that a rebuild
 # with no DD change produces a byte-identical spec (no example churn in diffs).
-# Same constant and helpers in add_response_examples.py — update both together.
 _EXAMPLE_NOW = datetime(2026, 1, 15, 14, 30, tzinfo=timezone.utc)
 
 
@@ -168,8 +133,7 @@ def _generate_tracking_id(seed: str) -> str:
     """H3/M4: Generate an example error tracking ID.
 
     Format: TRK-{YYYYMMDD}-{6-char hex suffix}, derived from seed (deterministic).
-    Same format as _generate_tracking_id() in add_response_examples.py.
-    Update both if the format changes.
+    addRandomDataToRaw.js and add_error_responses_to_collection.js use the same format.
     """
     return f"TRK-{_EXAMPLE_NOW.strftime('%Y%m%d')}-{_example_hex(seed, 6)}"
 
@@ -358,6 +322,8 @@ class EBNFToOpenAPITranslator:
         parsed_mutual = self._parse_mutual_exclusion(content)
         if parsed_mutual:
             self.mutual_exclusion_fields = parsed_mutual
+        self.error_examples = self._parse_error_examples(content)
+        self.faker_hints = extract_faker_hints(content)
 
         # Load structural role sets from @structural annotations in the DD
         structural = _extract_structural_annotations(content)
@@ -411,6 +377,18 @@ class EBNFToOpenAPITranslator:
                 message=f"Failed to parse EBNF: {str(e)}"
             ))
 
+        # D10: every (status, code) the error map declares needs an example, and every
+        # example must belong to a mapped (status, code).
+        if self.http_error_map and self.error_examples:
+            mapped = {(st, c) for st, e in self.http_error_map.items() for c in e.get('errorCodes', [])}
+            missing = sorted(f"{st} {c}" for st, c in mapped if self._error_example_entry(st, c) is None)
+            stray = sorted(f"{st or '*'} {c}" for st, c in self.error_examples
+                           if not any(c == mc and (st is None or st == ms) for ms, mc in mapped))
+            if missing or stray:
+                raise RuntimeError(
+                    "@error_examples does not match @http_error_map — "
+                    f"missing: {', '.join(missing) or 'none'}; not mapped: {', '.join(stray) or 'none'}")
+
         # A constraint on a field the DD does not define is silently dropped otherwise.
         if self.productions:
             orphans = sorted(set(self.numeric_constraints) - set(self.productions))
@@ -437,6 +415,41 @@ class EBNFToOpenAPITranslator:
                 codes = [c.strip() for c in m.group(3).split(',')]
                 result[status] = {'errorType': error_type, 'errorCodes': codes}
         return result
+
+    def _parse_error_examples(self, content: str) -> Dict[Tuple[Optional[str], str], Dict[str, str]]:
+        """Parse the @error_examples block (D10) into {(status or None, errorCode): entry}.
+
+        Entry header: `[STATUS] ERROR_CODE`; indented `summary:`, `message:`, `details:` lines.
+        Returns {} if the block is absent (the http-error-map check then fails the build).
+        """
+        match = re.search(r'@error_examples\s*\n(.*?)@end_error_examples', content, re.DOTALL)
+        if not match:
+            return {}
+        result: Dict[Tuple[Optional[str], str], Dict[str, str]] = {}
+        current = None
+        for line in match.group(1).splitlines():
+            if not line.strip():
+                continue
+            header = re.match(r'^\s*(?:(\d{3})\s+)?([A-Z][A-Z0-9_]*)\s*$', line)
+            prop = re.match(r'^\s+(summary|message|details):\s*(.*?)\s*$', line)
+            if header:
+                key = (header.group(1), header.group(2))
+                if key in result:
+                    raise RuntimeError(f"@error_examples: duplicate entry {' '.join(filter(None, key))}")
+                current = result[key] = {}
+            elif prop and current is not None:
+                current[prop.group(1)] = prop.group(2)
+            else:
+                raise RuntimeError(f"@error_examples: cannot parse line: {line.strip()!r}")
+        for key, entry in result.items():
+            absent = [k for k in ('summary', 'message', 'details') if not entry.get(k)]
+            if absent:
+                raise RuntimeError(f"@error_examples {' '.join(filter(None, key))}: missing {', '.join(absent)}")
+        return result
+
+    def _error_example_entry(self, status: str, code: str) -> Optional[Dict[str, str]]:
+        """Status-specific entry if present, else the plain entry for the code."""
+        return self.error_examples.get((status, code)) or self.error_examples.get((None, code))
 
     def _parse_numeric_constraints(self, content: str) -> Dict[str, Dict[str, Any]]:
         """Parse @numeric_constraints annotation block from EBNF content.
@@ -509,7 +522,8 @@ class EBNFToOpenAPITranslator:
         Format in EBNF:  @mutual_exclusion field1, field2, ...
         Returns empty list if the annotation is absent.
         """
-        match = re.search(r'@mutual_exclusion\s+([^\n]+)', content)
+        # Anchored to the start of a line so prose that mentions the annotation is not read as it
+        match = re.search(r'^\s*@mutual_exclusion\s+([^\n]+)', content, re.MULTILINE)
         if not match:
             return []
         return [f.strip() for f in match.group(1).split(',') if f.strip()]
@@ -656,7 +670,9 @@ class EBNFToOpenAPITranslator:
                 "description": _HTTP_STATUS_DESCRIPTIONS['200'],
                 "content": {
                     _CONTENT_TYPE_JSON: {
-                        "schema": {"$ref": f"#/components/schemas/{_RESPONSE_SCHEMA_NAME}"}
+                        "schema": {"$ref": f"#/components/schemas/{_RESPONSE_SCHEMA_NAME}"},
+                        "examples": {"success": {"summary": _SUCCESS_EXAMPLE_SUMMARY,
+                                                 "value": self._success_example(endpoint)}}
                     }
                 }
             })
@@ -798,53 +814,87 @@ class EBNFToOpenAPITranslator:
         return f"API endpoint for {endpoint.production_name}"
 
     def _generate_error_examples(self, status_code: str, endpoint: Endpoint) -> Dict[str, Any]:
-        """Generate error response examples for a given HTTP status code.
+        """Error examples for one status on one endpoint, built from the DD (D10).
 
-        errorType and errorCodes are read from the @http_error_map block in the EBNF
-        (parsed into self.http_error_map). Edit that block in the data dictionary to
-        change which error variants are produced — no Python changes needed.
+        errorType/errorCodes come from @http_error_map; summary, message and details from
+        @error_examples, with tokens filled from this endpoint's real body. An example
+        whose tokens cannot be filled for this endpoint is omitted — that error cannot
+        occur here (e.g. mutual exclusion on an endpoint without those fields).
         """
         if not self.http_error_map:
             raise RuntimeError(
                 "@http_error_map block not found in EBNF data dictionary.\n"
                 "Add it after the HTTP status aliases in data_dictionary/c2mapiv2-dd.ebnf."
             )
-
-        # Extract endpoint-specific field names for contextual error details
         field_names = self._extract_endpoint_field_names(endpoint)
-
-        # Generate examples for this status code
-        examples = {}
         map_entry = self.http_error_map.get(status_code, {})
-        error_type = map_entry.get('errorType', 'ServerError')
-        codes = map_entry.get('errorCodes', ['SERVER_ERROR'])
-
-        # H2: messages sourced from error-response-examples.yaml via _ERROR_CODE_MESSAGES
-        # (same YAML consumed by add_response_examples.py and the JS collection injector)
-        def _msg(code: str) -> str:
-            return _ERROR_CODE_MESSAGES.get(code, code.replace('_', ' ').capitalize())
-
-        # Create one example per error code for this status
-        for idx, code in enumerate(codes):
-            tracking_id = _generate_tracking_id(f"{endpoint.path}:{status_code}:{code}")  # H3/M4
-
-            # Generate contextual error details
-            details = self._generate_error_details(status_code, code, field_names,
-                                                   seed=f"{endpoint.path}:{status_code}:{code}")
-
-            # Create example
-            example_name = f"example-{idx+1}"
-            examples[example_name] = {
+        examples = {}
+        for code in map_entry.get('errorCodes', []):
+            entry = self._error_example_entry(status_code, code)
+            seed = f"{endpoint.path}:{status_code}:{code}"
+            details = self.render_error_details(entry['details'], endpoint, field_names, seed)
+            if details is None:
+                continue
+            examples[code.lower().replace('_', '-')] = {
+                "summary": entry['summary'],
                 "value": {
-                    "errorType": error_type,
-                    "errorMessage": _msg(code),
+                    "errorType": map_entry['errorType'],
+                    "errorMessage": entry['message'],
                     "errorCode": code,
                     "errorDetails": details,
-                    "errorTrackingId": tracking_id
+                    "errorTrackingId": _generate_tracking_id(seed),  # H3/M4
                 }
             }
-
         return examples
+
+    def render_error_details(self, template: str, endpoint: Endpoint,
+                             field_names: Dict[str, Any], seed: str) -> Optional[str]:
+        """Fill @error_examples tokens for one endpoint. Returns None when a token has no
+        value on this endpoint (the error cannot occur there). Unknown tokens and results
+        that are not valid JSON are build errors."""
+        body = (getattr(self, '_schemas', {}) or {}).get(endpoint.production_name, {})
+        top_level = set((body.get('properties') or {}).keys())
+        group = self.mutual_exclusion_fields
+        values = {
+            'documentField': field_names.get('documentField') if field_names.get('documentField') in top_level else None,
+            'formatField': field_names.get('formatField'),
+            'enumField': field_names.get('enumField'),
+            'enumValues': json.dumps(field_names['enumValues']) if field_names.get('enumValues') else None,
+            'mutualExclusionFields': json.dumps(group) if group and all(f in top_level for f in group) else None,
+            'jobId': f"JOB-{_EXAMPLE_NOW.strftime('%Y%m%d')}-{_example_hex(seed + ':job', 4)}",
+            'resourceId': f"DOC-{_EXAMPLE_NOW.strftime('%Y%m%d')}-{_example_hex(seed + ':doc', 4)}",
+            'requestId': f"req-{_example_hex(seed + ':req', 8).lower()}",
+            'timestamp': _EXAMPLE_NOW.strftime('%Y-%m-%dT%H:%M:%SZ'),
+            'expired': (_EXAMPLE_NOW - timedelta(hours=1)).strftime('%Y-%m-%dT%H:%M:%SZ'),
+            'supportEmail': self.support_email,
+        }
+        unknown = sorted(set(_ERROR_EXAMPLE_TOKEN.findall(template)) - set(values))
+        if unknown:
+            raise RuntimeError(f"@error_examples: unknown token(s) {unknown} in: {template}")
+        if any(values[t] is None for t in _ERROR_EXAMPLE_TOKEN.findall(template)):
+            return None
+        rendered = _ERROR_EXAMPLE_TOKEN.sub(lambda m: str(values[m.group(1)]), template)
+        try:
+            return json.dumps(json.loads(rendered))
+        except json.JSONDecodeError as e:
+            raise RuntimeError(f"@error_examples: details are not valid JSON after filling tokens: {rendered}") from e
+
+    def _success_example(self, endpoint: Endpoint) -> Dict[str, Any]:
+        """Success (200) example built from the DD @hint values of standardResponse's fields."""
+        schema = (getattr(self, '_schemas', {}) or {}).get(_RESPONSE_SCHEMA_NAME, {})
+        value = {}
+        for name in (schema.get('properties') or {}):
+            hint = self.faker_hints.get(name)
+            if not hint:
+                raise RuntimeError(f"{_RESPONSE_SCHEMA_NAME}.{name} has no @hint in the DD — needed for the success example")
+            if hint['type'] == 'static':
+                value[name] = hint['value']
+            elif hint['type'] == 'random_int':
+                span = hint['max'] - hint['min'] + 1
+                value[name] = hint['min'] + int(_example_hex(f"{endpoint.path}:{name}", 8), 16) % span
+            else:
+                raise RuntimeError(f"{_RESPONSE_SCHEMA_NAME}.{name}: @hint type '{hint['type']}' cannot give a fixed example")
+        return value
 
     def _get_enum_values(self, production_name: str) -> List[str]:
         """Extract enum values from an EBNF alternation production"""
@@ -967,97 +1017,6 @@ class EBNFToOpenAPITranslator:
             if 'items' in sch:
                 queue.append((resolve(sch['items']), f"{path}[0]"))
         return fallback
-
-    def _generate_error_details(self, status_code: str, error_code: str, field_names: Dict[str, str],
-                                seed: str = "") -> str:
-        """Generate contextual error details based on error type.
-
-        NOTE: This dict is intentionally separate from config/error-response-examples.yaml.
-        That YAML drives Postman collection and Newman test examples.
-        This dict drives OpenAPI spec-level examples (rendered in Redoc/Swagger UI).
-        Unlike the YAML, it uses field_names.get() for spec-derived field names — do not
-        replace with YAML loading, as that would lose the dynamic field-name resolution.
-        """
-        # H1: operational constants (_ERROR_DB_TABLE etc.) are declared at module level —
-        # not derivable from EBNF or spec, but now easy to find and update in one place.
-        details_map = {
-            'MISSING_REQUIRED_FIELD': {
-                "field": field_names.get('documentField', 'documentId'),
-                "location": "requestBody"
-            },
-            'INVALID_ONEOF': {
-                "field": field_names.get('documentField', 'docSourceAll'),
-                "issue": "exactly one variant must be provided"
-            },
-            'INVALID_JSON': {
-                "error": "unexpected token at position 42"
-            },
-            'MISSING_AUTH_HEADER': {
-                "expected": "Bearer <token>",
-                "received": "none"
-            },
-            'INVALID_TOKEN': {
-                "issue": "token signature verification failed"
-            },
-            'EXPIRED_TOKEN': {
-                "expiresAt": (_EXAMPLE_NOW - timedelta(hours=1)).strftime('%Y-%m-%dT%H:%M:%SZ'),
-                "currentTime": _EXAMPLE_NOW.strftime('%Y-%m-%dT%H:%M:%SZ')
-            },
-            'INSUFFICIENT_PERMISSIONS': {
-                "required": _ERROR_AUTH_SCOPE_REQUIRED,
-                "provided": _ERROR_AUTH_SCOPE_PROVIDED,
-            },
-            'ACCOUNT_SUSPENDED': {
-                "reason": "billing overdue",
-                "contactSupport": self.support_email
-            },
-            'JOB_NOT_FOUND': {
-                # L5: date-stamped placeholder — same format as tracking IDs, no drift risk
-                "jobId": f"JOB-{_EXAMPLE_NOW.strftime('%Y%m%d')}-{_example_hex(seed + ':job', 4)}"
-            },
-            'RESOURCE_NOT_FOUND': {
-                "resourceType": "document",
-                # L5: date-stamped placeholder — same format as tracking IDs, no drift risk
-                "resourceId": f"DOC-{_EXAMPLE_NOW.strftime('%Y%m%d')}-{_example_hex(seed + ':doc', 4)}"
-            },
-            'INVALID_ENUM_VALUE': {
-                # N5: an enum field that exists in this endpoint's body, with its own values
-                "field": field_names.get('enumField', _ERROR_ENUM_FIELD),
-                "value": "invalid_value",
-                "allowedValues": (field_names.get('enumValues')
-                                  or self._get_enum_values(_ERROR_ENUM_FIELD) or _ERROR_DOCUMENT_CLASS_FALLBACK)
-            },
-            'MUTUAL_EXCLUSION_VIOLATION': {
-                "fields": self.mutual_exclusion_fields,  # H1: from @mutual_exclusion in EBNF DD
-                "issue": "only one may be provided"
-            },
-            'INVALID_FORMAT': {
-                "errors": [
-                    {
-                        "field": field_names.get('documentField', 'documentId'),
-                        "issue": "not found in document library"
-                    },
-                ] + ([{
-                    # N5: real body path to the DD zip field (e.g. recipientAddressSource.singleAddress.zip)
-                    "field": field_names['formatField'],
-                    "issue": "invalid format - must be 5 or 9 digits"
-                }] if field_names.get('formatField') else [])
-            },
-            'SERVER_ERROR': {
-                "message": "An unexpected error occurred"
-            },
-            'DATABASE_ERROR': {
-                "operation": "insert",
-                "table": _ERROR_DB_TABLE,
-            },
-            'EXTERNAL_SERVICE_ERROR': {
-                "service": _ERROR_EXTERNAL_SERVICE,
-                "status": "timeout"
-            }
-        }
-
-        details = details_map.get(error_code, {"message": "An error occurred"})
-        return json.dumps(details)
 
     def _generate_schema_from_production(self, production_name: str) -> Dict[str, Any]:
         """Generate schema from EBNF production"""

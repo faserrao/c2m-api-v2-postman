@@ -82,7 +82,6 @@ KNOWN_OPEN = {
     ("B-EXAMPLE-ERROR-COVERAGE", "Linked"): "X1 (converter writes one example per status, not per DD code)",
     ("B-EXAMPLE-ERROR-COVERAGE", "Real-World"): "X1/X2 (saved responses copied from Linked)",
     ("B-EXAMPLE-FIELD-NOT-IN-BODY", "Test"): "N5 / decision D10 (static field names in error-response-examples.yaml)",
-    ("C-EXAMPLE-IMPOSSIBLE-ERROR", "*"): "N5 / decision D10 (mutual-exclusion example on /batch/zip)",
     ("B-EXAMPLE-ERROR-MAP", "Real-World"): "X1/X2 (copied from Linked)",
     ("B-EXAMPLE-ORIGINAL-REQUEST", "Real-World"): "X2 (typed originalRequest bodies)",
     ("B-EXAMPLE-ORIGINAL-REQUEST", "Linked"): "X9b (merge minimum in saved examples)",
