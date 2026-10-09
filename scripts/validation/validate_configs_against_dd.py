@@ -85,7 +85,8 @@ def _suggest(key: str, dd_rules: set, n: int = 3, cutoff: float = 0.6) -> list:
 #   C-V3a validate_template_values             — template values: keys vs DD rules
 #   C-V3b validate_template_select_fields      — template select: vs spec oneOf variants
 #   C-V5  validate_catalog_joboptions_enums    — catalog jobOptions values vs spec enums
-#   C-V6  validate_error_response_codes        — error-response-examples errorCode vs spec
+#   C-V6  (retired 2026-10-08) error-response-examples.yaml is gone; the translator now
+#         rejects any @error_examples entry that does not match @http_error_map (D10)
 #   C-V7  validate_example_paths               — catalog + template path/method vs spec ops
 #   C-V8  validate_template_inline_discriminators — template values: discriminator keys vs spec
 #
@@ -421,76 +422,6 @@ def validate_example_paths(config_path: Path, spec_path: Path,
         print(f"  ✗ {len(bad)} invalid path(s) found")
 
 
-def validate_error_response_codes(error_examples_path: Path, spec_path: Path,
-                                  result: ValidationResult) -> None:
-    """V6: Build-time check that all errorCode values in error-response-examples.yaml
-    match the EBNF DD errorCode enum, and that each code is filed under an HTTP status
-    the DD @http_error_map assigns it to (H3, 2026-10-05).
-
-    The injection scripts validate this at runtime. This check catches drift earlier —
-    at make validate-configs time, before the spec is injected into any collection.
-    """
-    import yaml
-
-    if not error_examples_path.exists():
-        result.warn(error_examples_path.name, "file",
-                    f"Not found — skipping V6 check: {error_examples_path}")
-        return
-
-    with open(spec_path) as f:
-        spec = yaml.safe_load(f)
-
-    error_code_enum = set(
-        (spec.get('components') or {})
-        .get('schemas', {})
-        .get('errorCode', {})
-        .get('enum', [])
-    )
-    if not error_code_enum:
-        result.warn(error_examples_path.name, "errorCode",
-                    "Could not read errorCode enum from spec — skipping V6 check")
-        return
-
-    with open(error_examples_path) as f:
-        raw = yaml.safe_load(f) or {}
-
-    error_map = (spec.get('info') or {}).get('x-http-error-map') or {}
-    if not error_map:
-        result.warn(error_examples_path.name, "errorCode",
-                    "x-http-error-map not in spec — skipping V6 status-placement check")
-
-    file_label = error_examples_path.name
-    total = 0
-    bad = []
-    print(f"  Checking errorCode values in {file_label} against spec errorCode enum...")
-    for http_status, examples in raw.items():
-        for ex_key, ex_data in (examples or {}).items():
-            code = ex_data.get('errorCode')
-            if code is None:
-                continue
-            total += 1
-            if code not in error_code_enum:
-                msg = (f"'{code}' (HTTP {http_status} / '{ex_key}') is not in the DD "
-                       f"errorCode enum. Valid: {sorted(error_code_enum)}")
-                result.error(file_label, "errorCode", msg)
-                bad.append(code)
-                continue
-            # The code must also be one the DD @http_error_map assigns to this status
-            mapped = (error_map.get(str(http_status)) or {}).get('errorCodes')
-            if error_map and code not in (mapped or []):
-                msg = (f"'{code}' is filed under HTTP {http_status} ('{ex_key}') but the DD "
-                       f"@http_error_map maps HTTP {http_status} to {mapped}")
-                result.error(file_label, "errorCode", msg)
-                bad.append(code)
-
-    if not bad:
-        print(f"  ✓ All {total} errorCode value(s) match the DD enum")
-    else:
-        print(f"  ✗ {len(bad)} invalid errorCode value(s) found")
-
-
-# ── V8 check (require spec) ──────────────────────────────────────────────────
-
 def _collect_spec_disc_pairs(spec: dict) -> dict:
     """Build parent_schema → set[disc_key] for all discriminated oneOf schemas.
 
@@ -657,11 +588,6 @@ def main():
         help="Path to OpenAPI spec (for select: variant validation)",
     )
     parser.add_argument(
-        "--error-examples",
-        default=str(_REPO_ROOT / "config" / "error-response-examples.yaml"),
-        help="Path to error-response-examples.yaml (for V6 errorCode validation)",
-    )
-    parser.add_argument(
         "--strict",
         action="store_true",
         help="Treat warnings as errors",
@@ -673,7 +599,6 @@ def main():
     template_path = Path(args.template)
     hints_path = Path(args.faker_hints)
     spec_path = Path(args.spec)
-    error_examples_path = Path(args.error_examples)
 
     # Validate required files exist
     for p in (dd_path, catalog_path, template_path):
@@ -708,9 +633,6 @@ def main():
 
         print(f"\n🔍 Checking catalog jobOptions enum values against spec (V5):")
         validate_catalog_joboptions_enums(catalog_path, spec_path, result)
-
-        print(f"\n🔍 Checking error-response-examples.yaml errorCode values against spec (V6):")
-        validate_error_response_codes(error_examples_path, spec_path, result)
 
         print(f"\n🔍 Checking catalog example paths against spec operations (V7):")
         validate_example_paths(catalog_path, spec_path, result)

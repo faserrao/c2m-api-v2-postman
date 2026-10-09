@@ -387,11 +387,6 @@ class TestDDConstraints(unittest.TestCase):
                     if k in ("required", "provided"):
                         used[f"DD @error_examples {code}.{k}"] = v
         self.assertTrue(used, "INSUFFICIENT_PERMISSIONS example has no required/provided scopes")
-        examples = yaml.safe_load((REPO_ROOT / "config" / "error-response-examples.yaml").read_text())
-        for key, ex in (examples.get(403) or {}).items():
-            for k, v in _json.loads(ex.get("errorDetails", "{}")).items():
-                if k in ("required", "provided"):
-                    used[f"error-response-examples.yaml 403/{key}.{k}"] = v
         js = (REPO_ROOT / "scripts" / "test_data_generator_for_collections" / "addRandomDataToRaw.js").read_text()
         for k, v in _re.findall(r"\b(required|provided):\s*\"([a-z]+:[a-z]+)\"", js):
             used[f"addRandomDataToRaw.js {k}"] = v

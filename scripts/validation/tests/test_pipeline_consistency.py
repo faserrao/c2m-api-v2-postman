@@ -58,9 +58,17 @@ def error_example(code, error_type, error_code, tracking="TRK-20260115-ABC123", 
 
 
 def all_dd_error_examples():
-    """One correct saved example for every (status, errorCode) pair the DD maps."""
-    return [error_example(st, entry["errorType"], code)
-            for st, entry in SPEC["info"]["x-http-error-map"].items() for code in entry["errorCodes"]]
+    """Saved responses exactly as the spec declares them for POST /static (D10: the spec's
+    examples, generated from the DD, are what every collection must carry)."""
+    out = []
+    for st, r in SPEC["paths"]["/static"]["post"]["responses"].items():
+        for ex in r["content"]["application/json"].get("examples", {}).values():
+            out.append({"name": ex.get("summary", st), "code": int(st),
+                        "header": [{"key": "Content-Type", "value": "application/json"}],
+                        "body": json.dumps(ex["value"]),
+                        "originalRequest": {"method": "POST", "url": {"path": ["static"]},
+                                            "body": {"mode": "raw", "raw": json.dumps(CLEAN_BODY)}}})
+    return out
 
 
 def run_collection(items, typed=False):
@@ -95,6 +103,16 @@ class TestCollectionChecks(unittest.TestCase):
         cats = run_collection([request(CLEAN_BODY, examples)])
         self.assertIn("B-EXAMPLE-DETAILS-UNRESOLVED-TOKEN", cats)
         self.assertIn("B-EXAMPLE-DETAILS-NOT-JSON", cats)
+
+    def test_saved_example_differs_from_spec(self):
+        """D10/N4: a saved response must equal the spec example for its status and code."""
+        examples = all_dd_error_examples()
+        for e in examples:
+            body = json.loads(e["body"])
+            if body.get("errorCode") == "INVALID_TOKEN":
+                body["errorDetails"] = '{"reason": "invalid signature"}'
+                e["body"] = json.dumps(body)
+        self.assertIn("B-EXAMPLE-DIFFERS-FROM-SPEC", run_collection([request(CLEAN_BODY, examples)]))
 
     def test_error_example_coverage_per_status_and_code(self):
         """N2: a code the DD maps under two statuses needs an example under each."""

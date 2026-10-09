@@ -81,7 +81,8 @@ KNOWN_OPEN = {
     ("B-EXAMPLE-ERROR-MAP", "Linked"): "X1 (converter synthesises error examples)",
     ("B-EXAMPLE-ERROR-COVERAGE", "Linked"): "X1 (converter writes one example per status, not per DD code)",
     ("B-EXAMPLE-ERROR-COVERAGE", "Real-World"): "X1/X2 (saved responses copied from Linked)",
-    ("B-EXAMPLE-FIELD-NOT-IN-BODY", "Test"): "N5 / decision D10 (static field names in error-response-examples.yaml)",
+    ("B-EXAMPLE-DIFFERS-FROM-SPEC", "Linked"): "X1 (converter synthesises saved responses; D10 step 3)",
+    ("B-EXAMPLE-DIFFERS-FROM-SPEC", "Real-World"): "X1/X2 (saved responses copied from Linked; D10 step 3)",
     ("B-EXAMPLE-ERROR-MAP", "Real-World"): "X1/X2 (copied from Linked)",
     ("B-EXAMPLE-ORIGINAL-REQUEST", "Real-World"): "X2 (typed originalRequest bodies)",
     ("B-EXAMPLE-ORIGINAL-REQUEST", "Linked"): "X9b (merge minimum in saved examples)",
@@ -567,6 +568,18 @@ def field_ref_problems(details, error_code, body_paths):
     return out
 
 
+def spec_examples(op):
+    """{(status, errorCode or "<success>"): example value} for one spec operation."""
+    out = {}
+    for status, r in (op.get("responses") or {}).items():
+        media = ((r.get("content") or {}).get(CONTENT_TYPE_JSON) or {})
+        for ex in (media.get("examples") or {}).values():
+            v = ex.get("value")
+            key = v.get("errorCode") if isinstance(v, dict) and "errorCode" in v else "<success>"
+            out[(status, key)] = v
+    return out
+
+
 def uses_dd_errors(op):
     """True when the operation's error responses use the DD errorResponse schema (job endpoints)."""
     for code, r in op.get("responses", {}).items():
@@ -690,6 +703,14 @@ def check_collection(label, collection, typed, spec, tools, F):
                 tid = ex_body.get("errorTrackingId")
                 if isinstance(tid, str) and not is_placeholder(tid) and not TRACKING_ID.match(tid):
                     F.add("B-EXAMPLE-TRACKING-ID", label, f"{where}: {tid}")
+            # D10: a saved response must be exactly the spec's example for that status/code
+            if isinstance(ex_body, dict) and resp is not None and uses_dd_errors(op):
+                key = (code, ex_body.get("errorCode", "<success>"))
+                expected_body = spec_examples(op).get(key)
+                if expected_body is not None and ex_body != expected_body:
+                    diff = sorted(k for k in set(ex_body) | set(expected_body)
+                                  if ex_body.get(k) != expected_body.get(k))
+                    F.add("B-EXAMPLE-DIFFERS-FROM-SPEC", label, f"{where}: differs from the spec example in {diff}")
             if not typed and ex_body is not None:
                 for p_, v in leaf_values(ex_body):
                     if is_placeholder(v):
@@ -710,10 +731,10 @@ def check_collection(label, collection, typed, spec, tools, F):
                     for msg in problems:
                         F.add("B-EXAMPLE-ORIGINAL-REQUEST", label, f"{where}: {msg}")
         # Error-example coverage: when an operation carries DD-format error examples, every
-        # (status, errorCode) pair the DD maps for its declared statuses must be present (N2)
+        # error example the spec declares for it must be present (N2; since D10 the spec omits
+        # examples that cannot occur on an endpoint, so the spec — not the raw map — is the target)
         if saved_pairs and uses_dd_errors(op):
-            expected = {(st, c) for st, entry in error_map.items() if st in op.get("responses", {})
-                        for c in entry["errorCodes"]}
+            expected = {k for k in spec_examples(op) if k[1] != "<success>"}
             missing = sorted(expected - saved_pairs)
             if missing:
                 F.add("B-EXAMPLE-ERROR-COVERAGE", label,

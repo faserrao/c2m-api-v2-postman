@@ -1329,7 +1329,7 @@ postman-test-collection-add-error-responses:
 		echo "❌ Collection $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES) not found. Run postman-test-collection-add-examples first."; \
 		exit 1; \
 	fi
-	node scripts/active/add_error_responses_to_collection.js $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES) $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES) --support-email "$(SUPPORT_EMAIL)" --spec $(C2MAPIV2_OPENAPI_SPEC)
+	node scripts/active/add_error_responses_to_collection.js $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES) $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES) --spec $(C2MAPIV2_OPENAPI_SPEC)
 	@echo "✅ Error responses added to $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES)"
 	@echo " "
 	@echo " "
@@ -2913,8 +2913,7 @@ validate-configs: ## Validate all config file field names against the EBNF Data 
 		--catalog config/curated-examples-catalog.yaml \
 		--template config/getting-started-template.yaml \
 		--faker-hints config/faker_hints.yaml \
-		--spec $(C2MAPIV2_OPENAPI_SPEC) \
-		--error-examples config/error-response-examples.yaml
+		--spec $(C2MAPIV2_OPENAPI_SPEC)
 
 .PHONY: validate-postman-against-dd
 validate-postman-against-dd: ## Detailed Postman-to-DD validator: enum values, field names, numeric ranges, cross-field constraints
