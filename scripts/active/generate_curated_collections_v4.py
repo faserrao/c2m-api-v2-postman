@@ -265,6 +265,9 @@ def schema_to_example(schema):
     elif schema_type == 'string':
         # Check if enum
         if 'enum' in schema:
+            # A single-value enum is a fixed value (e.g. a paymentType tag, D1), not a choice
+            if len(schema['enum']) == 1:
+                return schema['enum'][0]
             return "<enum>"
         return "<string>"
 

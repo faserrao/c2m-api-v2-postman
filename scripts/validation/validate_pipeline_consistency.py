@@ -60,7 +60,6 @@ COLLECTIONS = {
 # (category, scope) -> tracking reference. scope is a collection label, or "*" for any.
 # Categories not listed here are ERRORs. Remove an entry as soon as its fix lands.
 KNOWN_OPEN = {
-    ("A-TAG-LITERAL-DROPPED", "*"): "X5 / decision D1 (payment type tags)",
     ("A-UNREACHABLE-RULE", "*"): "X6 / D2 (addressName orphan); multiDocJobs reserved for /static/multi; HTTP_* aliases",
     ("A-PRIMER-ENDPOINT-UNDEFINED", "*"): "/static/multi is PLANNED in the DD primer",
     ("A-VALID-COMBINATION-NOOP", "*"): "X11 / decision D5 (envelope=none rule)",
@@ -264,7 +263,13 @@ class DDModel:
             if all(c["type"] == "literal" for c in e["choices"]):
                 return {"type": "string", "enum": [c["value"] for c in e["choices"]]}
             if all(c["type"] == "symbol" for c in e["choices"]):
-                return {"oneOf": self.branches(name)}
+                expected = {"oneOf": self.branches(name)}
+                prop = self.t._discriminated_oneofs.get(name)
+                if prop:  # D1: OpenAPI discriminator from the DD branch literals
+                    expected["discriminator"] = {"propertyName": prop, "mapping": {
+                        value: f"#/components/schemas/{branch}"
+                        for branch, (p, value) in self.t._tagged_branches.items() if p == prop}}
+                return expected
             return {"_unsupported": "mixed alternation"}
         if ty == "symbol":
             tgt = e["name"]
@@ -290,6 +295,11 @@ class DDModel:
                     req.append(it["name"])
                 elif it["type"] == "optional" and it["expression"]["type"] == "symbol":
                     props[it["expression"]["name"]] = self.field_schema(it["expression"]["name"])
+                elif it["type"] == "literal" and name in self.t._tagged_branches:
+                    # D1: the branch's type literal is a required tag property fixed to it
+                    prop, value = self.t._tagged_branches[name]
+                    props[prop] = {"type": "string", "enum": [value]}
+                    req.append(prop)
                 elif it["type"] == "literal":
                     lits.append(it["value"])
                 else:

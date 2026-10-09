@@ -64,6 +64,14 @@ def _search_oneof(
     if depth > max_depth:
         return None, None
 
+    # D1: an OpenAPI discriminator mapping names the variant directly
+    # (e.g. paymentDetails: creditCard -> #/components/schemas/creditCardPayment).
+    mapped = ((schema.get('discriminator') or {}).get('mapping') or {}).get(discriminator_key)
+    if mapped and mapped.startswith('#/components/schemas/'):
+        name = mapped.split('/')[-1]
+        if name in schemas:
+            return name, schemas[name]
+
     oneof = schema.get('oneOf', [])
     for option in oneof:
         ref = option.get('$ref')
@@ -185,6 +193,9 @@ def _schema_to_placeholder(
 
     elif schema_type == 'string':
         if 'enum' in schema:
+            # A single-value enum is a fixed value (e.g. a paymentType tag, D1), not a choice
+            if len(schema['enum']) == 1:
+                return schema['enum'][0]
             return f"<{'|'.join(schema['enum'])}>"
         return "<String>"
 

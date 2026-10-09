@@ -333,6 +333,13 @@ class EBNFToOpenAPITranslator:
         self._named_wrapper_oneof_rules = frozenset(
             name for name, roles in structural.items() if 'named_wrapper_oneof' in roles
         )
+        # D1: `(* @structural discriminated_oneof <property> *)` on a oneOf rule — each
+        # branch's leading literal becomes a required <property> fixed to that value.
+        self._discriminated_oneofs: Dict[str, str] = {
+            m.group(1): m.group(2) for m in re.finditer(
+                r'^([a-zA-Z]\w*)\s*=[^;]*;\s*\(\*\s*@structural\s+discriminated_oneof\s+(\w+)\s*\*\)',
+                content, re.MULTILINE | re.DOTALL)
+        }
         self._transparent_oneof_groupings = frozenset(
             name for name, roles in structural.items() if 'transparent_oneof_grouping' in roles
         )
@@ -388,6 +395,25 @@ class EBNFToOpenAPITranslator:
                 raise RuntimeError(
                     "@error_examples does not match @http_error_map — "
                     f"missing: {', '.join(missing) or 'none'}; not mapped: {', '.join(stray) or 'none'}")
+
+        # D1: validate discriminated oneOfs and map each branch to its tag property/value
+        self._tagged_branches: Dict[str, Tuple[str, str]] = {}
+        for parent, prop in self._discriminated_oneofs.items():
+            allowed = self._get_enum_values(prop)
+            if not allowed:
+                raise RuntimeError(f"{parent}: discriminator property '{prop}' must be a DD enum rule")
+            choices = (self.productions.get(parent).expression or {}).get('choices', []) if parent in self.productions else []
+            used = []
+            for choice in choices:
+                branch = choice.get('name')
+                items = (self.productions.get(branch).expression or {}).get('items', []) if branch in self.productions else []
+                literal = next((i.get('value') for i in items if i.get('type') == 'literal'), None)
+                if literal not in allowed:
+                    raise RuntimeError(f"{parent}: branch {branch} must start with one of {allowed}, found {literal!r}")
+                self._tagged_branches[branch] = (prop, literal)
+                used.append(literal)
+            if sorted(used) != sorted(allowed):
+                raise RuntimeError(f"{parent}: {prop} values {allowed} and branch tags {used} differ")
 
         # A constraint on a field the DD does not define is silently dropped otherwise.
         if self.productions:
@@ -729,6 +755,15 @@ class EBNFToOpenAPITranslator:
 
         # Add any generated named schemas from concatenation structures
         schemas.update(self.generated_schemas)
+
+        # D1: OpenAPI discriminator on each discriminated oneOf
+        for parent, prop in getattr(self, '_discriminated_oneofs', {}).items():
+            if parent in schemas:
+                schemas[parent]['discriminator'] = {
+                    "propertyName": prop,
+                    "mapping": {value: f"#/components/schemas/{branch}"
+                                for branch, (p, value) in self._tagged_branches.items() if p == prop},
+                }
         
         return schemas
     
@@ -975,7 +1010,11 @@ class EBNFToOpenAPITranslator:
         found = (self._find_body_path(endpoint.production_name, lambda name, _s: name == _ERROR_ENUM_FIELD)
                  or self._find_body_path(endpoint.production_name, lambda _n, sch: bool(sch.get('enum'))))
         if found:
-            field_names['enumField'], field_names['enumValues'] = found[0], found[1].get('enum', [])
+            # A DD enum rule's own values (a discriminator tag's schema in one variant is
+            # fixed to a single value, e.g. paymentType: ["creditCard"])
+            leaf = found[0].split('.')[-1].split('[')[0]
+            field_names['enumField'] = found[0]
+            field_names['enumValues'] = self._get_enum_values(leaf) or found[1].get('enum', [])
 
         return field_names
 
@@ -1044,8 +1083,14 @@ class EBNFToOpenAPITranslator:
                 for item in items:
                     if isinstance(item, dict):
                         item_type = item.get('type')
-                        
-                        if item_type == 'symbol':
+
+                        if item_type == 'literal' and context in getattr(self, '_tagged_branches', {}):
+                            # D1: the branch's type literal becomes a required tag property
+                            prop, value = self._tagged_branches[context]
+                            schema['properties'][prop] = {"type": "string", "enum": [value]}
+                            schema['required'].append(prop)
+
+                        elif item_type == 'symbol':
                             prop_name = item.get('name')
                             if prop_name:
                                 # Always use direct type for properties, not refs

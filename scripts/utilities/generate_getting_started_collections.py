@@ -160,6 +160,9 @@ def build_structure_from_schema(schema: Dict, openapi_spec: Dict) -> Any:
 
     # Handle primitives - always return placeholders
     elif schema_type == 'string':
+        # A single-value enum is a fixed value (e.g. a paymentType tag, D1), not a choice
+        if len(schema.get('enum') or []) == 1:
+            return schema['enum'][0]
         return "<String>"
 
     elif schema_type == 'integer':

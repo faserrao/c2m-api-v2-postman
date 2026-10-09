@@ -191,6 +191,16 @@ class TestCollectionChecks(unittest.TestCase):
                           "body": json.dumps({"code": "invalid_request", "message": "Bad request"})}]}
         self.assertNotIn("B-EXAMPLE-ERROR-MAP", run_collection([item]))
 
+    def test_payment_type_must_match_details(self):
+        """D1: paymentType must name the details object sent with it."""
+        good = dict(CLEAN_BODY, paymentDetails={"paymentType": "invoice",
+                                               "invoiceDetails": {"invoiceNumber": "INV-1", "amountDue": 10}})
+        bad = dict(CLEAN_BODY, paymentDetails={"paymentType": "invoice",
+                                              "creditCardDetails": {"cardType": "visa", "cardNumber": "4111",
+                                                                    "expirationDate": {"month": 1, "year": 2030}, "cvv": 123}})
+        self.assertNotIn("B-BODY-SCHEMA", run_collection([request(good)]))
+        self.assertIn("B-BODY-SCHEMA", run_collection([request(bad)]))
+
     def test_merge_minimum(self):
         self.assertEqual(
             [c for c, _ in V.cross_field_errors({"mergeDocumentSource": [{}]}, SPEC["info"])], ["B-MERGE-MINIMUM"])

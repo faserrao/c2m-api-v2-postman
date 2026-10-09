@@ -357,9 +357,31 @@ class TestDDConstraints(unittest.TestCase):
                         if f not in body:
                             bad.append(f"{ep.path} {status} {v['errorCode']}: {f}")
                     if v["errorCode"] == "INVALID_ENUM_VALUE" and d.get("field") in body:
-                        if d.get("allowedValues") != body[d["field"]].get("enum"):
+                        leaf = d["field"].split(".")[-1].split("[")[0]
+                        expected = self.translator._get_enum_values(leaf) or body[d["field"]].get("enum")
+                        if d.get("allowedValues") != expected:
                             bad.append(f"{ep.path} {status}: allowedValues are not {d['field']}'s enum")
         self.assertEqual(bad, [], "Error examples name fields that are not in the endpoint body")
+
+    def test_payment_variants_require_their_payment_type(self):
+        """D1: each payment variant requires paymentType fixed to its own DD literal, and
+        paymentDetails carries an OpenAPI discriminator mapping those values."""
+        schemas = self.schemas
+        disc = schemas["paymentDetails"].get("discriminator", {})
+        self.assertEqual(disc.get("propertyName"), "paymentType")
+        allowed = self.translator._get_enum_values("paymentType")
+        self.assertEqual(sorted(disc.get("mapping", {})), sorted(allowed))
+        for value, ref in disc["mapping"].items():
+            variant = schemas[ref.split("/")[-1]]
+            self.assertEqual(variant["properties"]["paymentType"], {"type": "string", "enum": [value]})
+            self.assertEqual(variant["required"][0], "paymentType")
+
+    def test_payment_branch_tag_must_be_a_payment_type(self):
+        """D1: a branch whose leading literal is not a paymentType value is a build error."""
+        text = EBNF_PATH.read_text(encoding="utf-8").replace('"ach"\n    + achDetails', '"bankTransfer"\n    + achDetails')
+        self.assertIn('"bankTransfer"', text)
+        with self.assertRaises(RuntimeError):
+            EBNFToOpenAPITranslator().parse_ebnf(text)
 
     def test_error_example_scopes_are_issued_by_auth_system(self):
         """H5: 403 example scopes must be scopes the auth system actually issues."""

@@ -774,33 +774,67 @@ components:
       - $ref: '#/components/schemas/invoicePayment'
       - $ref: '#/components/schemas/achPayment'
       - $ref: '#/components/schemas/userCreditPayment'
+      discriminator:
+        propertyName: paymentType
+        mapping:
+          creditCard: '#/components/schemas/creditCardPayment'
+          invoice: '#/components/schemas/invoicePayment'
+          ach: '#/components/schemas/achPayment'
+          userCredit: '#/components/schemas/userCreditPayment'
+    paymentType:
+      type: string
+      enum:
+      - creditCard
+      - invoice
+      - ach
+      - userCredit
     creditCardPayment:
       type: object
       properties:
+        paymentType:
+          type: string
+          enum:
+          - creditCard
         creditCardDetails:
           $ref: '#/components/schemas/creditCardDetails'
       required:
+      - paymentType
       - creditCardDetails
     invoicePayment:
       type: object
       properties:
+        paymentType:
+          type: string
+          enum:
+          - invoice
         invoiceDetails:
           $ref: '#/components/schemas/invoiceDetails'
       required:
+      - paymentType
       - invoiceDetails
     achPayment:
       type: object
       properties:
+        paymentType:
+          type: string
+          enum:
+          - ach
         achDetails:
           $ref: '#/components/schemas/achDetails'
       required:
+      - paymentType
       - achDetails
     userCreditPayment:
       type: object
       properties:
+        paymentType:
+          type: string
+          enum:
+          - userCredit
         creditAmount:
           $ref: '#/components/schemas/creditAmount'
       required:
+      - paymentType
       - creditAmount
     creditCardDetails:
       type: object
@@ -2294,7 +2328,7 @@ paths:
                     errorType: ValidationError
                     errorMessage: Field contains a value not allowed by the enumeration
                     errorCode: INVALID_ENUM_VALUE
-                    errorDetails: '{"field": "paymentDetails.creditCardDetails.cardType", "value": "invalid_value", "allowedValues": ["visa", "mastercard", "discover", "americanExpress"]}'
+                    errorDetails: '{"field": "paymentDetails.paymentType", "value": "invalid_value", "allowedValues": ["creditCard", "invoice", "ach", "userCredit"]}'
                     errorTrackingId: TRK-20260115-34E184
                 invalid-format:
                   summary: Validation failed

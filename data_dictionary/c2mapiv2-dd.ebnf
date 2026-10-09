@@ -814,7 +814,7 @@ id = integer ;
 (*          PAYMENT DETAILS       *)
 (********************************)
 
-(* @doc Payment method — one of: creditCard, invoice, ACH bank transfer, or account credit. *)
+(* @doc Payment method — one of: creditCard, invoice, ACH bank transfer, or account credit. The paymentType field names the method; the matching details object carries its data. *)
 paymentDetails =
       creditCardPayment
     | invoicePayment
@@ -822,7 +822,15 @@ paymentDetails =
     | userCreditPayment
 (*  | applePayPayment   -- commented out for initial testing *)
 (*  | googlePayPayment  -- commented out for initial testing *)
-    ;
+    ; (* @structural discriminated_oneof paymentType *)
+
+(* D1 (2026-10-09): explicit payment type. Each payment variant below starts with its
+   type literal (e.g. "creditCard"); the translator emits it as a required paymentType
+   property fixed to that value, plus an OpenAPI discriminator on paymentDetails.
+   No @hint on paymentType: each variant fixes its own value, and a name-based hint
+   would give every variant the same one. *)
+(* @doc Payment method type; must match the details object sent (creditCard → creditCardDetails, invoice → invoiceDetails, ach → achDetails, userCredit → creditAmount). *)
+paymentType = "creditCard" | "invoice" | "ach" | "userCredit" ;
 
 (* @doc Credit card payment variant. *)
 creditCardPayment =

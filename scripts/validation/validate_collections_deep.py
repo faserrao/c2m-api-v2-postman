@@ -120,7 +120,11 @@ def audit_value(schemas, val, schema, path, issues, depth=0):
     if 'oneOf' in schema and isinstance(val, dict):
         valid_wrappers = oneof_wrapper_keys(schemas, schema)
         if valid_wrappers:
-            val_keys = set(val.keys())
+            # D1: a discriminated oneOf carries its tag property (e.g. paymentType)
+            # alongside the variant's details object; the tag is not a wrapper key.
+            tag = (schema.get('discriminator') or {}).get('propertyName')
+            val_keys = set(val.keys()) - ({tag} if tag else set())
+            valid_wrappers = valid_wrappers - ({tag} if tag else set())
             matching = val_keys & valid_wrappers
             bad_keys = val_keys - valid_wrappers
             if not matching:
