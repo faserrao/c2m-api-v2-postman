@@ -2873,7 +2873,8 @@ validate-collections-conformance-test: ## Run all validation golden tests (valid
 	@C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" POSTMAN_GENERATED_DIR="$(POSTMAN_GENERATED_DIR)" C2MAPIV2_POSTMAN_API_NAME_KC="$(C2MAPIV2_POSTMAN_API_NAME_KC)" $(VENV_PYTHON) scripts/validation/tests/test_validate_collections.py && \
 	C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" $(VENV_PYTEST) scripts/validation/tests/test_oneof_resolver.py -v && \
 	$(VENV_PYTEST) scripts/validation/tests/test_dd_constraints.py -v && \
-	$(VENV_PYTEST) scripts/validation/tests/test_pipeline_consistency.py -v
+	$(VENV_PYTEST) scripts/validation/tests/test_pipeline_consistency.py -v && \
+	$(VENV_PYTEST) scripts/validation/tests/test_migration_validator.py -v
 
 .PHONY: validate-collections-deep
 validate-collections-deep: ## Deep field audit of all *.json files in postman/generated (auto-discovers, exit 1 on errors)
@@ -2989,6 +2990,31 @@ validate-dd-gates: ## CI gate: spec vs DD, all 5 collections vs DD, catalog sele
 	@$(VENV_PYTHON) scripts/validation/validate_catalog_against_spec.py \
 		--catalog config/curated-examples-catalog.yaml --spec $(C2MAPIV2_OPENAPI_SPEC) \
 		--linked $(POSTMAN_LINKED_COLLECTION_FLAT) --exit-status
+
+# MIGRATION CHECKS (validate_migration.py): prove a planned change was applied completely
+# and nothing else changed. Take the snapshot BEFORE the change, on a fresh build:
+#   make openapi-build postman-build-golden-test-fixtures migration-snapshot MIGRATION=<name>
+# then, after the change and a fresh build:
+#   make validate-migration MIGRATION=<name>
+MIGRATION_DIR      := scripts/validation/migrations
+MIGRATION_BASELINE  = $(MIGRATION_DIR)/$(MIGRATION).baseline.json
+MIGRATION_ENV       = DD_EBNF_FILE="$(DD_EBNF_FILE)" C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" \
+                      POSTMAN_GENERATED_DIR="$(POSTMAN_GENERATED_DIR)" C2MAPIV2_POSTMAN_API_NAME_KC="$(C2MAPIV2_POSTMAN_API_NAME_KC)"
+
+.PHONY: migration-snapshot
+migration-snapshot: ## Record the system state before a migration (MIGRATION=<name>)
+	@test -n "$(MIGRATION)" || { echo "❌ set MIGRATION=<name>"; exit 1; }
+	@$(MIGRATION_ENV) $(VENV_PYTHON) scripts/validation/validate_migration.py snapshot --out $(MIGRATION_BASELINE)
+
+.PHONY: validate-migration
+validate-migration: ## Check a migration against its baseline: complete, nothing lost, nothing else changed (MIGRATION=<name>)
+	@test -n "$(MIGRATION)" || { echo "❌ set MIGRATION=<name>"; exit 1; }
+	@$(MIGRATION_ENV) $(VENV_PYTHON) scripts/validation/validate_migration.py compare \
+		--baseline $(MIGRATION_BASELINE) --migration $(MIGRATION_DIR)/$(MIGRATION).yaml --exit-status $(MIGRATION_REPORT)
+
+.PHONY: validate-migration-retired
+validate-migration-retired: ## Retired names of a migration must not appear anywhere (MIGRATION=<name>)
+	@$(VENV_PYTHON) scripts/validation/validate_migration.py retired --migration $(MIGRATION_DIR)/$(MIGRATION).yaml --exit-status
 
 # CI GATE: end-to-end DD → spec → Postman consistency (response examples, error-map
 # consistency, spec examples, cross-field rules). Known-open findings are listed in

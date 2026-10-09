@@ -1,0 +1,32 @@
+# Migration D2 (decided 2026-10-08): remove singleAddress — inline recipients are always a list.
+# Verified with: make validate-migration MIGRATION=D2_remove_singleAddress
+# Baseline:      scripts/validation/migrations/D2_remove_singleAddress.baseline.json (pre-D2 state)
+#
+# Everything not declared here must be byte-for-byte unchanged (apart from randomly
+# generated test data, compared by path only — see validate_migration.py).
+name: D2 — remove singleAddress (inline recipients always a list)
+
+# A single inline address becomes a one-entry recipientAddressByList.
+path_rewrites:
+  - from: "recipientAddressSource.singleAddress."
+    to:   "recipientAddressSource.recipientAddressByList.addressList[0]."
+
+select_rewrites:
+  recipientAddressSource:
+    singleAddress: recipientAddressByList
+
+rules:
+  removed: [singleAddress, addressName]   # addressName: orphan rule (X6)
+  changed: [recipientAddressSource]
+
+schemas:
+  removed: [singleAddress, addressName]
+  changed: [recipientAddressSource]
+
+# Intentionally empty: a converted single address must carry exactly the same fields.
+# If the generators add list-level fields (mappingId, addressListName), the check will
+# report them and they must be either prevented or explicitly accepted here.
+allowed_added_paths: []
+allowed_removed_paths: []
+
+retired_names: [singleAddress, addressName]
