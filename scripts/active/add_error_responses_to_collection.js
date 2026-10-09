@@ -2,9 +2,10 @@
 /**
  * add_error_responses_to_collection.js
  *
- * Replaces the saved responses of every job request in a Postman collection with the
+ * Replaces the saved responses of every request in a Postman collection with the
  * examples the OpenAPI spec declares for that operation — the success (2xx) example and
- * every error example. The spec's examples are generated from the DD (@error_examples
+ * every error example; a declared status with no response body (e.g. 204) gets an
+ * empty-body saved response. Used for the Test, Linked and Real-World collections. The spec's examples are generated from the DD (@error_examples
  * block and standardResponse @hint values), so Postman shows exactly what Redoc shows
  * (D10, 2026-10-08). config/error-response-examples.yaml is retired.
  *
@@ -40,16 +41,43 @@ function specPathOf(request) {
 }
 
 /**
+ * Follow a local $ref (e.g. #/components/responses/Error400) to its target.
+ */
+function resolveRef(spec, node) {
+  let current = node;
+  const seen = new Set();
+  while (current && current.$ref && !seen.has(current.$ref)) {
+    seen.add(current.$ref);
+    current = current.$ref.replace(/^#\//, '').split('/').reduce((acc, part) => (acc || {})[part], spec);
+  }
+  return current || {};
+}
+
+/**
  * Saved responses for one spec operation: one per example the spec declares, in status
  * order (lowest first, so a mock server returns the success example by default).
+ * A declared status with no response body (e.g. 204) gets an empty-body saved response,
+ * so it is not silently dropped.
  */
-function savedResponsesFor(operation) {
+function savedResponsesFor(spec, operation) {
   const saved = [];
   const statuses = Object.keys(operation.responses || {}).sort();
   for (const status of statuses) {
-    const response = operation.responses[status];
+    const response = resolveRef(spec, operation.responses[status]);
     const media = (response.content || {})[CONTENT_TYPE_JSON] || {};
-    for (const example of Object.values(media.examples || {})) {
+    const examples = Object.values(media.examples || {});
+    if ('example' in media) examples.push({ summary: response.description, value: media.example });
+    if (examples.length === 0 && !response.content) {
+      saved.push({
+        name: response.description || STATUS_CODES[status] || `HTTP ${status}`,
+        status: STATUS_CODES[status] || `HTTP ${status}`,
+        code: parseInt(status, 10),
+        header: [],
+        body: ''
+      });
+      continue;
+    }
+    for (const example of examples) {
       saved.push({
         name: example.summary || response.description || `HTTP ${status}`,
         status: STATUS_CODES[status] || `HTTP ${status}`,
@@ -64,8 +92,8 @@ function savedResponsesFor(operation) {
 }
 
 /**
- * Recursively replace the saved responses of job requests. Auth endpoints use the overlay's
- * AuthError format and keep only their success examples (unchanged behaviour).
+ * Recursively replace the saved responses of every request with the spec's examples for its
+ * operation (job endpoints: DD-generated examples; auth endpoints: the auth overlay's).
  * Returns the number of saved responses written.
  */
 function processItems(items, spec, unmatched) {
@@ -75,15 +103,6 @@ function processItems(items, spec, unmatched) {
       responseCount += processItems(item.item, spec, unmatched);
     }
     if (!item.request || item.item) return;
-
-    const isAuthEndpoint = ((item.request.url && item.request.url.path) || []).some(p => p === 'auth');
-    if (isAuthEndpoint) {
-      item.response = (item.response || []).filter(resp => {
-        const code = parseInt(resp.code || resp.status || 200);
-        return code >= 200 && code < 300;
-      });
-      return;
-    }
 
     const method = (item.request.method || '').toLowerCase();
     const pathKey = specPathOf(item.request);
@@ -101,7 +120,7 @@ function processItems(items, spec, unmatched) {
       body: item.request.body || null,
       url: item.request.url
     };
-    item.response = savedResponsesFor(operation).map(saved => ({
+    item.response = savedResponsesFor(spec, operation).map(saved => ({
       ...saved,
       id: generateUUID(),
       originalRequest

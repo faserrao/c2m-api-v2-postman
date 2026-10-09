@@ -13,7 +13,7 @@ See top-level `CLAUDE.md` (`C2M_API_v2/CLAUDE.md`) for full project context and 
 | `scripts/active/ebnf_to_openapi_dynamic_v3.py` | EBNF DD → OpenAPI spec translator; writes every success/error example from the DD (`@error_examples`, `standardResponse` `@hint`s) |
 | `scripts/active/fix_oneOf_placeholders.js` | Resolves oneOf placeholders; normalises jobOptions enums |
 | `scripts/test_data_generator_for_collections/addRandomDataToRaw.js` | Resolves `<Type>` placeholders for test collection |
-| `scripts/active/add_error_responses_to_collection.js` | Copies each operation's spec examples (success + errors) into the collection's saved responses |
+| `scripts/active/add_error_responses_to_collection.js` | Copies each operation's spec examples (success + errors; auth via the overlay) into the saved responses of the Test, Linked and Real-World collections |
 | `scripts/active/add_auth_examples.js` | Injects auth request examples |
 | `scripts/active/add_tests_jwt.js` | Adds JWT test scripts to test collection |
 | `scripts/validation/validate_configs_against_dd.py` | V1–V8 build-time config validators |

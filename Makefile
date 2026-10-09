@@ -1211,6 +1211,8 @@ postman-linked-collection-flatten:
 	@echo "✅ URL raw fields fixed"
 	@echo "🔐 Adding auth examples to linked collection..."
 	@node scripts/active/add_auth_examples.js $(POSTMAN_LINKED_COLLECTION_FLAT) $(POSTMAN_LINKED_COLLECTION_FLAT) --auth-overlay "$(OPENAPI_AUTH_OVERLAY)"
+	@# X1: saved responses = the spec's examples (the converter synthesised wrong ones)
+	@node scripts/active/add_error_responses_to_collection.js $(POSTMAN_LINKED_COLLECTION_FLAT) $(POSTMAN_LINKED_COLLECTION_FLAT) --spec $(C2MAPIV2_OPENAPI_SPEC)
 	@echo "✅ Auth examples added"
 	@echo "📝 Adding pre-request script to collection..."
 	@node scripts/active/add_pre_request_script.js $(POSTMAN_LINKED_COLLECTION_FLAT) postman/scripts/jwt-pre-request.js $(POSTMAN_LINKED_COLLECTION_FLAT)
@@ -1569,6 +1571,11 @@ postman-generate-use-case-collection:
 		--api-title "$(API_TITLE)" \
 		--output-name $(C2MAPIV2_POSTMAN_API_NAME_KC)-real-world-use-cases-collection \
 		--schema-url $(POSTMAN_SCHEMA_V2)
+	@# X2: saved responses = the spec's examples, with originalRequest = each use case's request
+	@node scripts/active/add_error_responses_to_collection.js \
+		$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-real-world-use-cases-collection.json \
+		$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-real-world-use-cases-collection.json \
+		--spec $(C2MAPIV2_OPENAPI_SPEC)
 	@echo "✅ Real World Use Cases collection generated"
 
 # Upload enhanced test collection with all oneOf examples

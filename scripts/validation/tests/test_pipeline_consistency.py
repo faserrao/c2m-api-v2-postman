@@ -179,6 +179,18 @@ class TestCollectionChecks(unittest.TestCase):
                                         "MUTUAL_EXCLUSION_VIOLATION", zip_body)
         self.assertEqual({k for k, _ in problems}, {"IMPOSSIBLE-ERROR"})
 
+    def test_auth_error_examples_not_checked_against_dd_error_map(self):
+        """Auth endpoints use the overlay's AuthError format (code/message/details); the DD
+        error map (errorType/errorCode) applies to job endpoints only."""
+        item = {"name": "POST /auth/tokens/short", "request": {
+            "method": "POST",
+            "url": {"raw": "{{baseUrl}}/auth/tokens/short", "host": ["{{baseUrl}}"], "path": ["auth", "tokens", "short"]},
+            "header": [{"key": "Content-Type", "value": "application/json"}], "auth": {"type": "bearer"},
+            "body": {"mode": "raw", "raw": json.dumps({"scopes": ["jobs:submit"]})}},
+            "response": [{"name": "Bad request", "code": 400,
+                          "body": json.dumps({"code": "invalid_request", "message": "Bad request"})}]}
+        self.assertNotIn("B-EXAMPLE-ERROR-MAP", run_collection([item]))
+
     def test_merge_minimum(self):
         self.assertEqual(
             [c for c, _ in V.cross_field_errors({"mergeDocumentSource": [{}]}, SPEC["info"])], ["B-MERGE-MINIMUM"])

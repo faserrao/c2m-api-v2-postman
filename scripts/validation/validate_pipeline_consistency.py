@@ -75,16 +75,7 @@ KNOWN_OPEN = {
     ("B-NO-AUTH", "Real-World"): "L8 (Real-World has no auth / pre-request script)",
     ("B-MERGE-MINIMUM", "*"): "X9b / decision D4 (merge minimum 1 or 2)",
     ("B-PLACEHOLDER-IN-EXAMPLE", "Test"): "L6 (auth examples carry <dateTime>/<string>)",
-    ("B-PLACEHOLDER-IN-EXAMPLE", "Real-World"): "X2 (saved responses copied from typed Linked)",
     ("B-FILLER-VALUE", "*"): "L7 (example_ filler values)",
-    ("B-EXAMPLE-BODY-SCHEMA", "Real-World"): "X2 (saved responses copied from typed Linked)",
-    ("B-EXAMPLE-ERROR-MAP", "Linked"): "X1 (converter synthesises error examples)",
-    ("B-EXAMPLE-ERROR-COVERAGE", "Linked"): "X1 (converter writes one example per status, not per DD code)",
-    ("B-EXAMPLE-ERROR-COVERAGE", "Real-World"): "X1/X2 (saved responses copied from Linked)",
-    ("B-EXAMPLE-DIFFERS-FROM-SPEC", "Linked"): "X1 (converter synthesises saved responses; D10 step 3)",
-    ("B-EXAMPLE-DIFFERS-FROM-SPEC", "Real-World"): "X1/X2 (saved responses copied from Linked; D10 step 3)",
-    ("B-EXAMPLE-ERROR-MAP", "Real-World"): "X1/X2 (copied from Linked)",
-    ("B-EXAMPLE-ORIGINAL-REQUEST", "Real-World"): "X2 (typed originalRequest bodies)",
     ("B-EXAMPLE-ORIGINAL-REQUEST", "Linked"): "X9b (merge minimum in saved examples)",
     ("B-EXAMPLE-ORIGINAL-REQUEST", "Test"): "L6 (random auth ttl_seconds can fall below 3600 — intermittent)",
     ("B-TEST-STATUS-ASSERTION", "*"): "X12 / decision D7 (global allowed-codes list)",
@@ -686,7 +677,8 @@ def check_collection(label, collection, typed, spec, tools, F):
                     F.add("B-EXAMPLE-BODY-SCHEMA", label, f"{where}: {e}")
                 for k in tools.unknown_fields(ex_body, resp_schema, typed):
                     F.add("B-EXAMPLE-BODY-SCHEMA", label, f"{where}: unknown field {k}")
-            if isinstance(ex_body, dict) and code in error_map:
+            # DD error format applies to job endpoints only — auth endpoints use the overlay's AuthError
+            if isinstance(ex_body, dict) and code in error_map and uses_dd_errors(op):
                 entry = error_map[code]
                 ec, et = ex_body.get("errorCode"), ex_body.get("errorType")
                 if (ec not in entry["errorCodes"] and not is_placeholder(ec)) or \
