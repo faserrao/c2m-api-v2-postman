@@ -144,6 +144,32 @@ class TestCompare(unittest.TestCase):
         self.assertEqual(M.compare(snapshot(True), after, allowing, NEVER_RANDOM).items, [])
 
 
+    def _rotation(self, variants):
+        """Two Test requests whose recipientAddressSource variants are `variants` (in order)."""
+        s = snapshot(False)
+        reqs = {}
+        for i, v in enumerate(variants):
+            reqs[f"POST /r{i}"] = {"method": "POST", "path": f"/r{i}", "saved": [],
+                                   "body": {f"recipientAddressSource.{v}.x": 1}}
+        s["collections"]["Test"] = reqs
+        return s
+
+    def test_rotated_field_shift_is_clean_when_variant_set_is_kept(self):
+        rotating = M.Migration({"name": "rot", "rotated_fields": {"Test": ["recipientAddressSource"]}})
+        rep = M.compare(self._rotation(["a", "b"]), self._rotation(["b", "a"]), rotating, NEVER_RANDOM)
+        self.assertEqual(rep.items, [])
+
+    def test_rotated_field_dropped_variant_is_reported(self):
+        rotating = M.Migration({"name": "rot", "rotated_fields": {"Test": ["recipientAddressSource"]}})
+        rep = M.compare(self._rotation(["a", "b"]), self._rotation(["a", "a"]), rotating, NEVER_RANDOM)
+        self.assertIn(("LOST", "Test"), kinds(rep))
+
+    def test_rotated_field_extra_variant_is_accepted(self):
+        rotating = M.Migration({"name": "rot", "rotated_fields": {"Test": ["recipientAddressSource"]}})
+        rep = M.compare(self._rotation(["a", "a"]), self._rotation(["a", "b"]), rotating, NEVER_RANDOM)
+        self.assertEqual(rep.items, [])
+
+
 class TestRetiredNames(unittest.TestCase):
 
     def test_retired_name_found_and_archive_skipped(self):

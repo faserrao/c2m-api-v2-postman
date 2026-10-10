@@ -116,16 +116,17 @@ examples:
       startPage: <Integer>
       endPage: <Integer>
       recipientAddressSource:
-        singleAddress:
-          firstName: <String>
-          lastName: <String>
-          address1: <String>
-          address2: <String>
-          address3: <String>
-          city: <String>
-          state: <String>
-          zip: <String>
-          country: <String>
+        recipientAddressByList:
+          addressList:
+            - firstName: <String>
+              lastName: <String>
+              address1: <String>
+              address2: <String>
+              address3: <String>
+              city: <String>
+              state: <String>
+              zip: <String>
+              country: <String>
 - name: /mail-merge
   method: POST
   path: /mail-merge
@@ -133,7 +134,7 @@ examples:
   tags: []
   description: /mail-merge
   select:
-    recipientAddressSource: singleAddress
+    recipientAddressSource: recipientAddressByList
   values:
     jobTemplate: <String>
     mergeDocumentSource:
@@ -151,7 +152,7 @@ examples:
   description: /static - using options
   select:
     docSourceAll: requestIdSource
-    recipientAddressSource: singleAddress
+    recipientAddressSource: recipientAddressByList
   values:
     jobOptions:
       documentClass: <String>
@@ -170,7 +171,7 @@ examples:
   description: /static - using URL
   select:
     docSourceAll: urlSource
-    recipientAddressSource: singleAddress
+    recipientAddressSource: recipientAddressByList
   values:
     jobTemplate: <String>
 - name: /static - setting tags
@@ -181,7 +182,7 @@ examples:
   description: /static - setting tags
   select:
     docSourceAll: requestIdSource
-    recipientAddressSource: singleAddress
+    recipientAddressSource: recipientAddressByList
   values:
     jobTemplate: <String>
     tags:
@@ -218,7 +219,7 @@ examples:
   description: /static - payment option
   select:
     docSourceAll: requestIdSource
-    recipientAddressSource: singleAddress
+    recipientAddressSource: recipientAddressByList
     paymentDetails: creditCard
   values:
     jobTemplate: <String>
@@ -236,16 +237,17 @@ examples:
     - jobTemplate: <String>
       filename: <String>
       recipientAddressSource:
-        singleAddress:
-          firstName: <String>
-          lastName: <String>
-          address1: <String>
-          address2: <String>
-          address3: <String>
-          city: <String>
-          state: <String>
-          zip: <String>
-          country: <String>
+        recipientAddressByList:
+          addressList:
+            - firstName: <String>
+              lastName: <String>
+              address1: <String>
+              address2: <String>
+              address3: <String>
+              city: <String>
+              state: <String>
+              zip: <String>
+              country: <String>
 - name: /batch/zip - using documentId
   method: POST
   path: /batch/zip
@@ -260,16 +262,17 @@ examples:
     - jobTemplate: <String>
       filename: <String>
       recipientAddressSource:
-        singleAddress:
-          firstName: <String>
-          lastName: <String>
-          address1: <String>
-          address2: <String>
-          address3: <String>
-          city: <String>
-          state: <String>
-          zip: <String>
-          country: <String>
+        recipientAddressByList:
+          addressList:
+            - firstName: <String>
+              lastName: <String>
+              address1: <String>
+              address2: <String>
+              address3: <String>
+              city: <String>
+              state: <String>
+              zip: <String>
+              country: <String>
 - name: /static - using documentID
   method: POST
   path: /static
@@ -278,7 +281,7 @@ examples:
   description: /static - using documentID
   select:
     docSourceAll: documentIdSource
-    recipientAddressSource: singleAddress
+    recipientAddressSource: recipientAddressByList
   values:
     jobTemplate: <String>
 - name: /static - using addressListId
@@ -300,7 +303,7 @@ examples:
   description: /static - return address
   select:
     docSourceAll: requestIdSource
-    recipientAddressSource: singleAddress
+    recipientAddressSource: recipientAddressByList
   values:
     jobTemplate: <String>
     returnAddress:

@@ -64,7 +64,7 @@ examples:
     description: Law firm sends certified court appearance notices to clients with proof of delivery tracking
     select:
       docSourceAll: documentIdSource
-      recipientAddressSource: singleAddress
+      recipientAddressSource: recipientAddressByList
       paymentDetails: creditCard
     values:
       # Document source
@@ -107,7 +107,7 @@ examples:
       - document-merging
     description: Medical office merges patient test results with consultation letters
     select:
-      recipientAddressSource: singleAddress
+      recipientAddressSource: recipientAddressByList
       paymentDetails: ach
     values:
       mergeDocumentSource:
@@ -199,25 +199,27 @@ examples:
         - jobTemplate: standard_letter
           filename: invoice_001.pdf
           recipientAddressSource:
-            singleAddress:
-              firstName: John
-              lastName: Smith
-              address1: 123 Main St
-              city: Austin
-              state: TX
-              zip: "78701"
-              country: US
+            recipientAddressByList:
+              addressList:
+                - firstName: John
+                  lastName: Smith
+                  address1: 123 Main St
+                  city: Austin
+                  state: TX
+                  zip: "78701"
+                  country: US
         - jobTemplate: standard_letter
           filename: invoice_002.pdf
           recipientAddressSource:
-            singleAddress:
-              firstName: Jane
-              lastName: Doe
-              address1: 456 Oak Ave
-              city: Denver
-              state: CO
-              zip: "80202"
-              country: US
+            recipientAddressByList:
+              addressList:
+                - firstName: Jane
+                  lastName: Doe
+                  address1: 456 Oak Ave
+                  city: Denver
+                  state: CO
+                  zip: "80202"
+                  country: US
       tags:
         - reseller
         - batch
@@ -261,7 +263,7 @@ examples:
     description: Send a personalized document to one recipient (most common use case)
     select:
       docSourceAll: documentIdSource
-      recipientAddressSource: singleAddress
+      recipientAddressSource: recipientAddressByList
       paymentDetails: creditCard
     values:
       jobTemplate: standard_letter
@@ -350,14 +352,15 @@ examples:
         - startPage: 1
           endPage: 3
           recipientAddressSource:
-            singleAddress:
-              firstName: John
-              lastName: Smith
-              address1: 123 Main St
-              city: Austin
-              state: TX
-              zip: "78701"
-              country: US
+            recipientAddressByList:
+              addressList:
+                - firstName: John
+                  lastName: Smith
+                  address1: 123 Main St
+                  city: Austin
+                  state: TX
+                  zip: "78701"
+                  country: US
       tags:
         - bulk
         - split-pdf
@@ -393,7 +396,7 @@ examples:
       - merge
     description: Merge multiple separate documents into one mailing per recipient
     select:
-      recipientAddressSource: singleAddress
+      recipientAddressSource: recipientAddressByList
       paymentDetails: creditCard
     values:
       mergeDocumentSource:
@@ -418,7 +421,7 @@ examples:
     description: Specify mailing options directly without using a saved template
     select:
       docSourceAll: documentIdSource
-      recipientAddressSource: singleAddress
+      recipientAddressSource: recipientAddressByList
       paymentDetails: creditCard
     values:
       jobOptions:
@@ -464,7 +467,7 @@ examples:
     description: Add custom tags to organize and track your mailings
     select:
       docSourceAll: documentIdSource
-      recipientAddressSource: singleAddress
+      recipientAddressSource: recipientAddressByList
       paymentDetails: invoice
     values:
       jobTemplate: marketing_postcard
@@ -511,7 +514,7 @@ examples:
     description: Choose between credit card, ACH, or invoice billing
     select:
       docSourceAll: documentIdSource
-      recipientAddressSource: singleAddress
+      recipientAddressSource: recipientAddressByList
       paymentDetails: ach
     values:
       jobTemplate: invoice_statement
@@ -537,25 +540,27 @@ examples:
         - jobTemplate: standard_letter
           filename: letter_001.pdf
           recipientAddressSource:
-            singleAddress:
-              firstName: John
-              lastName: Smith
-              address1: 123 Main St
-              city: Austin
-              state: TX
-              zip: "78701"
-              country: US
+            recipientAddressByList:
+              addressList:
+                - firstName: John
+                  lastName: Smith
+                  address1: 123 Main St
+                  city: Austin
+                  state: TX
+                  zip: "78701"
+                  country: US
         - jobTemplate: standard_letter
           filename: letter_002.pdf
           recipientAddressSource:
-            singleAddress:
-              firstName: Jane
-              lastName: Doe
-              address1: 456 Oak Ave
-              city: Denver
-              state: CO
-              zip: "80202"
-              country: US
+            recipientAddressByList:
+              addressList:
+                - firstName: Jane
+                  lastName: Doe
+                  address1: 456 Oak Ave
+                  city: Denver
+                  state: CO
+                  zip: "80202"
+                  country: US
       tags:
         - advanced
         - zip
@@ -571,7 +576,7 @@ examples:
     description: Reference a previously uploaded document by its ID
     select:
       docSourceAll: documentIdSource
-      recipientAddressSource: singleAddress
+      recipientAddressSource: recipientAddressByList
       paymentDetails: creditCard
     values:
       jobTemplate: stored_template

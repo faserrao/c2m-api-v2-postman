@@ -22,7 +22,7 @@ def extract_oneof_variant(obj, parent_key=""):
     Recursively detect oneOf variant selection by examining object structure.
 
     Returns dict of field → variant mappings.
-    Example: {"docSourceAll": "documentId", "recipientAddressSource": "singleAddress"}
+    Example: {"docSourceAll": "documentId", "recipientAddressSource": "addressList"}
     """
     selections = {}
 
@@ -33,7 +33,7 @@ def extract_oneof_variant(obj, parent_key=""):
     oneof_fields = {
         "documentSource": ["documentId", "requestId", "url", "documentsToMerge"],
         "docSourceAll": ["documentId", "requestId", "url", "zipDocumentId", "zipRequestId"],
-        "recipientAddressSource": ["singleAddress", "addressList", "addressListId", "addressListName"],
+        "recipientAddressSource": ["addressList", "addressListId", "addressId"],
         "paymentDetails": ["creditCard", "ach", "invoice"]
     }
 

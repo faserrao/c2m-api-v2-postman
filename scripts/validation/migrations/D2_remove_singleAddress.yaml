@@ -26,7 +26,18 @@ schemas:
 # Intentionally empty: a converted single address must carry exactly the same fields.
 # If the generators add list-level fields (mappingId, addressListName), the check will
 # report them and they must be either prevented or explicitly accepted here.
-allowed_added_paths: []
+# The Getting Started and Real-World generators fill every property of the chosen oneOf
+# branch, so a converted top-level example gains recipientAddressByList's optional mappingId
+# and addressListName — exactly as the three examples that already used the list form had
+# before D2. Only these two fields, only at the top level (not inside job arrays).
+allowed_added_paths:
+  - '^recipientAddressSource\.recipientAddressByList\.(mappingId|addressListName)$'
 allowed_removed_paths: []
 
 retired_names: [singleAddress, addressName]
+# The Test collection gives each request the next recipientAddressSource variant in turn
+# (addRandomDataToRaw.js getNextOneOfValue). Removing a variant shifts every choice, so the
+# subtree is checked as a set: the variants used across the collection must be unchanged
+# after singleAddress -> recipientAddressByList.
+rotated_fields:
+  Test: [recipientAddressSource]

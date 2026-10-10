@@ -35,6 +35,11 @@ Migration file (YAML):
   retired_names: [singleAddress, addressName]
   nondeterministic:                   # optional extra: collection -> body-path regexes compared by path only
     Test: ["\\.someField$"]
+  rotated_fields:                     # collection -> oneOf fields whose variant is chosen round-robin
+    Test: [recipientAddressSource]    # per request; removing a variant shifts every choice, so the
+                                      # subtree is not compared request by request — instead every
+                                      # variant the baseline used (after select_rewrites) must still
+                                      # be used somewhere in the collection
 
 Usage:
   python3 scripts/validation/validate_migration.py snapshot --out reports/migration-baseline.json
@@ -236,6 +241,20 @@ class Migration:
         self.retired = data.get("retired_names") or []
         self.nondeterministic = {k: [re.compile(p) for p in v]
                                  for k, v in (data.get("nondeterministic") or {}).items()}
+        self.rotated = {k: list(v) for k, v in (data.get("rotated_fields") or {}).items()}
+
+    def rotated_split(self, collection, flat):
+        """Split a flattened body into (paths outside rotated subtrees, variants used per field)."""
+        kept, used = {}, {}
+        for path, value in (flat or {}).items():
+            for fld in self.rotated.get(collection, []):
+                m = re.search(rf"(?:^|\.){re.escape(fld)}\.([A-Za-z0-9_]+)", path)
+                if m:
+                    used.setdefault(fld, set()).add(m.group(1))
+                    break
+            else:
+                kept[path] = value
+        return kept, used
 
     def rewrite(self, text):
         if not isinstance(text, str):
@@ -350,6 +369,7 @@ def compare(baseline, current, mig, is_random=None):
         if b_col is None or c_col is None:
             rep.add("UNEXPECTED", "collection", f"{label} missing ({'before' if b_col is None else 'after'})")
             continue
+        b_used, c_used = {}, {}
         for key in sorted(set(b_col) | set(c_col)):
             if key not in c_col or key not in b_col:
                 rep.add("UNEXPECTED", f"{label} request", f"{key!r} {'removed' if key not in c_col else 'added'}")
@@ -357,7 +377,13 @@ def compare(baseline, current, mig, is_random=None):
             b, c = b_col[key], c_col[key]
             if (b["method"], b["path"]) != (c["method"], c["path"]):
                 rep.add("UNEXPECTED", f"{label} request", f"{key!r} {b['method']} {b['path']} -> {c['method']} {c['path']}")
-            _compare_flat(rep, f"{label} {key!r} body", mig.rewrite_flat(b["body"]), c["body"], mig,
+            b_body, bu = mig.rotated_split(label, mig.rewrite_flat(b["body"]))
+            c_body, cu = mig.rotated_split(label, c["body"])
+            for fld, names in bu.items():
+                b_used.setdefault(fld, set()).update((mig.select_rewrites.get(fld) or {}).get(n, n) for n in names)
+            for fld, names in cu.items():
+                c_used.setdefault(fld, set()).update(names)
+            _compare_flat(rep, f"{label} {key!r} body", b_body, c_body, mig,
                           collection=label, is_random=is_random)
             b_saved = [(s["code"], s["name"]) for s in b["saved"]]
             c_saved = [(s["code"], s["name"]) for s in c["saved"]]
@@ -367,6 +393,13 @@ def compare(baseline, current, mig, is_random=None):
                 for bs, cs in zip(b["saved"], c["saved"]):
                     _compare_flat(rep, f"{label} {key!r} saved {bs['code']} {bs['name']!r}",
                                   mig.rewrite_flat(bs["body"]), cs["body"], mig, collection=label)
+        for fld in mig.rotated.get(label, []):
+            # Every variant the baseline exercised must still be exercised; a rotation that now
+            # reaches an extra variant gains coverage and is accepted.
+            missing = b_used.get(fld, set()) - c_used.get(fld, set())
+            if missing:
+                rep.add("LOST", f"{label} rotated {fld}",
+                        f"variants no longer used: {sorted(missing)} (now {sorted(c_used.get(fld, set()))})")
     return rep
 
 

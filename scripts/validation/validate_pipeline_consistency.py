@@ -60,7 +60,7 @@ COLLECTIONS = {
 # (category, scope) -> tracking reference. scope is a collection label, or "*" for any.
 # Categories not listed here are ERRORs. Remove an entry as soon as its fix lands.
 KNOWN_OPEN = {
-    ("A-UNREACHABLE-RULE", "*"): "X6 / D2 (addressName orphan); multiDocJobs reserved for /static/multi; HTTP_* aliases",
+    ("A-UNREACHABLE-RULE", "*"): "X6; multiDocJobs reserved for /static/multi; HTTP_* aliases",
     ("A-PRIMER-ENDPOINT-UNDEFINED", "*"): "/static/multi is PLANNED in the DD primer",
     ("A-VALID-COMBINATION-NOOP", "*"): "X11 / decision D5 (envelope=none rule)",
     ("A-HINT-INVALID-TYPE", "*"): "L1 (routingNumber @hint has no type)",

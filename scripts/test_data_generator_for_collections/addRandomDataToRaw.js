@@ -111,23 +111,7 @@ function hexSuffix() {
  */
 let oneOfFixtures = {
     recipientAddressSource: [
-        // Variant 1: singleAddress
-        {
-            singleAddress: {
-                firstName: "John",
-                lastName: "Smith",
-                address1: "123 Main St",
-                address2: "",
-                address3: "",
-                city: "Springfield",
-                state: "IL",
-                zip: "62701",
-                country: "USA",
-                foo1: "",
-                foo2: ""
-            }
-        },
-        // Variant 2: recipientAddressByList
+        // Variant 1: recipientAddressByList (a single recipient is a one-entry addressList — D2)
         {
             recipientAddressByList: {
                 mappingId: 5001,  // K3: matches faker_hints.yaml static value for mappingId
@@ -145,11 +129,11 @@ let oneOfFixtures = {
                 addressListName: "Marketing Campaign Q1"
             }
         },
-        // Variant 3: recipientAddressByAddressId (integer)
+        // Variant 2: recipientAddressByAddressId (integer)
         {
             recipientAddressByAddressId: 5000
         },
-        // Variant 4: recipientAddressByListId (integer)
+        // Variant 3: recipientAddressByListId (integer)
         {
             recipientAddressByListId: 1001
         }

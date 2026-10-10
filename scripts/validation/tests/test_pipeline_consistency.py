@@ -31,7 +31,7 @@ DD = V.DDModel(REPO_ROOT / "data_dictionary" / "c2mapiv2-dd.ebnf")
 ADDRESS = {"firstName": "A", "lastName": "B", "address1": "1 Main St", "city": "Springfield",
            "state": "IL", "zip": "62701", "country": "USA"}
 CLEAN_BODY = {"docSourceAll": {"documentIdSource": {"documentId": 1}},
-              "recipientAddressSource": {"singleAddress": ADDRESS}}
+              "recipientAddressSource": {"recipientAddressByList": {"addressList": [ADDRESS]}}}
 STATIC_CODES = sorted(SPEC["paths"]["/static"]["post"]["responses"])
 
 
@@ -167,7 +167,7 @@ class TestCollectionChecks(unittest.TestCase):
     def test_error_example_real_dotted_path_accepted(self):
         examples = all_dd_error_examples()
         examples[0] = error_example("400", "ValidationError", "INVALID_FORMAT",
-                                    details='{"errors": [{"field": "recipientAddressSource.singleAddress.zip"}]}')
+                                    details='{"errors": [{"field": "recipientAddressSource.recipientAddressByList.addressList[0].zip"}]}')
         cats = run_collection([request(CLEAN_BODY, examples)])
         self.assertNotIn("B-EXAMPLE-FIELD-NOT-IN-BODY", cats)
 

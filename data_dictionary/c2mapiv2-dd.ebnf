@@ -200,11 +200,12 @@
 
      *** Mahesh: Can this endpoint be called with zipDocumentIdSource and zipRequestIdSource??
 
-   - Body MUST include recipientAddressSource (single address OR list OR stored list).
+   - Body MUST include recipientAddressSource (inline list OR stored list OR stored address).
      recipientAddressSource can be:
-       - (mappingId + singleAddress [+addressName]): Single recipient with mapping
-       - (mappingId + addressList [+addressListName]): List of recipients with mapping
-       - addressListId: Reference to stored address list
+       - recipientAddressByList ([mappingId] + addressList [+addressListName]): one or more
+         inline recipients — a single recipient is a one-entry addressList (D2, 2026-10-09)
+       - recipientAddressByListId (addressListId): reference to a stored address list
+       - recipientAddressByAddressId (addressId): reference to a stored address
      Note: mappingId is optional. If omitted, the server will use the default mapping ID.
    - Body MAY include paymentDetails, returnAddress, jobOptions, tags.
 *)
@@ -228,15 +229,13 @@
      ELSE reject (no supported docSourceAll variant).
 
    Recipient source (recipientAddressSource):
-     IF recipientAddressSource is addressListId
+     IF recipientAddressSource is recipientAddressByListId (addressListId)
        THEN load stored list by addressListId.
-     ELSE IF recipientAddressSource is ([mappingId] + singleAddress [+addressName])
-       THEN treat as single-recipient source; validate required address fields per product rules.
-            IF mappingId is omitted
-              THEN use server default mapping ID for merge-variable mapping.
-            ELSE apply provided mappingId for merge-variable mapping.
-     ELSE IF recipientAddressSource is ([mappingId] + addressList [+addressListName])
-       THEN validate addressList has >= 1 entry.
+     ELSE IF recipientAddressSource is recipientAddressByAddressId (addressId)
+       THEN load the stored address by addressId.
+     ELSE IF recipientAddressSource is recipientAddressByList ([mappingId] + addressList [+addressListName])
+       THEN validate addressList has >= 1 entry; validate required address fields per product rules.
+            (A single recipient is a one-entry addressList — there is no separate single-address form.)
             IF mappingId is omitted
               THEN use server default mapping ID for merge-variable mapping.
             ELSE apply provided mappingId for merge-variable mapping.
@@ -406,7 +405,7 @@ submitSinglePdfSplitAddressCaptureParams =
 (* ------------------------------------------------------------------------- *)
 (* Endpoint: POST /mail-merge                                                           *)
 (* @summary Submit mail merge *)
-(* @description Merges multiple documents into a single mailing sent to one recipient. Useful for creating document packets or multi-page letters. *)
+(* @description Merges multiple documents into a single mailing sent to each recipient. Useful for creating document packets or multi-page letters. *)
 (* ------------------------------------------------------------------------- *)
 
 (* English meaning:
@@ -648,15 +647,11 @@ address =
     + [ address2 ] + [ address3 ]
     + [ foo1 ] + [ foo2 ] ;
 
-(* @doc Recipient address specification — one of: inline single address (with optional mapping), inline address list (with optional mapping), stored list ID, or stored address ID. *)
+(* @doc Recipient address specification — one of: inline address list of one or more recipients (with optional mapping), stored list ID, or stored address ID. *)
 recipientAddressSource =
-      singleAddress
-    | recipientAddressByList
+      recipientAddressByList
     | recipientAddressByAddressId
     | recipientAddressByListId ; (* @structural named_wrapper_oneof *)
-
-(* @doc A single recipient mailing address (alias for address). *)
-singleAddress = address ;
 
 (* @doc Inline list of recipient addresses with an optional merge-field mapping ID. *)
 recipientAddressByList =
@@ -672,8 +667,6 @@ recipientAddressByAddressId =
 
 (* @doc Integer ID of a merge-field mapping profile that associates address columns to template variables. If omitted, the account default mapping is used. *)
 mappingId = id ; (* @hint static 5001 *)
-(* @doc Optional label for this recipient address record. *)
-addressName = string ; (* @hint static Main Office *)
 (* @doc Optional name for this address list record. *)
 addressListName = string ; (* @hint static Marketing Campaign Q1 *)
 (* @doc Integer ID of a previously stored recipient address list. *)

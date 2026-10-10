@@ -44,14 +44,16 @@ SYNTHETIC_SPEC = {
             },
             "recipientAddressSource": {
                 "oneOf": [
-                    {"$ref": "#/components/schemas/recipientAddressBySingle"},
+                    {"$ref": "#/components/schemas/syntheticNestedVariant"},
                     {"$ref": "#/components/schemas/recipientAddressByList"},
                 ]
             },
-            "recipientAddressBySingle": {
+            "syntheticNestedVariant": {
                 "type": "object",
                 "properties": {
-                    "singleAddress": {
+                    # Synthetic nested-object variant (not a real DD name) — exercises the
+                    # resolver's object-within-variant handling.
+                    "nestedAddress": {
                         "type": "object",
                         "properties": {
                             "firstName": {"type": "string"},
@@ -153,9 +155,9 @@ class TestFindVariantByDiscriminatorKey(unittest.TestCase):
 
     def test_direct_oneof_match(self):
         name, schema = find_variant_by_discriminator_key(
-            SYNTHETIC_SPEC, "recipientAddressSource", "singleAddress"
+            SYNTHETIC_SPEC, "recipientAddressSource", "nestedAddress"
         )
-        self.assertEqual(name, "recipientAddressBySingle")
+        self.assertEqual(name, "syntheticNestedVariant")
         self.assertIsNotNone(schema)
 
     def test_nested_oneof_match(self):
@@ -225,11 +227,11 @@ class TestBuildVariantPlaceholderStructure(unittest.TestCase):
 
     def test_nested_object(self):
         structure = build_variant_placeholder_structure(
-            SYNTHETIC_SPEC, "recipientAddressBySingle"
+            SYNTHETIC_SPEC, "syntheticNestedVariant"
         )
-        self.assertIn("singleAddress", structure)
-        self.assertIn("firstName", structure["singleAddress"])
-        self.assertEqual(structure["singleAddress"]["firstName"], "<String>")
+        self.assertIn("nestedAddress", structure)
+        self.assertIn("firstName", structure["nestedAddress"])
+        self.assertEqual(structure["nestedAddress"]["firstName"], "<String>")
 
     def test_unknown_schema_returns_none(self):
         result = build_variant_placeholder_structure(SYNTHETIC_SPEC, "doesNotExist")
@@ -265,9 +267,10 @@ class TestWithRealSpec(unittest.TestCase):
         name, _ = find_variant_by_discriminator_key(self.spec, "docSourceAll", "documentIdSource")
         self.assertIsNotNone(name)
 
-    def test_single_address(self):
+    def test_address_list(self):
+        # D2 (2026-10-09): inline recipients are always a list — no single-address variant.
         name, _ = find_variant_by_discriminator_key(
-            self.spec, "recipientAddressSource", "singleAddress"
+            self.spec, "recipientAddressSource", "recipientAddressByList"
         )
         self.assertIsNotNone(name)
 
@@ -281,7 +284,7 @@ class TestWithRealSpec(unittest.TestCase):
             ("docSourceAll",           "requestIdSource"),
             ("docSourceAll",           "documentIdSource"),
             ("docSourceAll",           "urlSource"),
-            ("recipientAddressSource", "singleAddress"),
+            ("recipientAddressSource", "recipientAddressByAddressId"),
             ("recipientAddressSource", "recipientAddressByList"),
             ("recipientAddressSource", "recipientAddressByListId"),
             ("paymentDetails",         "creditCard"),

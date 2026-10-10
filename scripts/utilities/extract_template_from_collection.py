@@ -121,7 +121,7 @@ def detect_oneof_selections(body_obj: Dict) -> Dict:
     Detect oneOf variant selections in request body.
 
     Returns dict mapping oneOf field → selected variant.
-    Example: {"docSourceAll": "documentId", "recipientAddressSource": "singleAddress"}
+    Example: {"docSourceAll": "documentId", "recipientAddressSource": "addressList"}
     """
     selections = {}
 
@@ -129,7 +129,7 @@ def detect_oneof_selections(body_obj: Dict) -> Dict:
     oneof_fields = {
         "documentSource": ["documentId", "requestId", "url"],
         "docSourceAll": ["documentId", "requestId", "url", "zipDocumentId", "zipRequestId"],
-        "recipientAddressSource": ["singleAddress", "addressList", "addressListId", "addressListName"],
+        "recipientAddressSource": ["addressList", "addressListId", "addressId"],
         "paymentDetails": ["creditCard", "ach", "invoice"],
         "documentsToMerge": ["documentIds", "requestIds"]
     }

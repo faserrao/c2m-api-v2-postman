@@ -136,7 +136,7 @@ def test_synthetic_faults():
     clean_addr = {"firstName": "A", "lastName": "B", "address1": "1 Main St",
                   "city": "Springfield", "state": "IL", "zip": "62701", "country": "USA"}
     clean_single = {"docSourceAll": {"documentIdSource": {"documentId": 1}},
-                    "recipientAddressSource": {"singleAddress": clean_addr}}
+                    "recipientAddressSource": {"recipientAddressByList": {"addressList": [clean_addr]}}}
     check(errs_for("/static", clean_single) == [],
           "clean /static body -> no errors")
 
@@ -153,7 +153,7 @@ def test_synthetic_faults():
     # 3g. Placeholder values must NOT cause type false-positives (V3 descends, V4 skips placeholders)
     ph_addr = {f: "<String>" for f in ["firstName", "lastName", "address1", "city", "state", "zip", "country"]}
     ph = {"docSourceAll": {"documentIdSource": {"documentId": "<Integer>"}},
-          "recipientAddressSource": {"singleAddress": ph_addr},
+          "recipientAddressSource": {"recipientAddressByList": {"addressList": [ph_addr]}},
           "jobTemplate": "<String>"}
     check(errs_for("/static", ph) == [],
           "placeholder /static body -> no false positives")
@@ -205,7 +205,7 @@ def test_synthetic_faults():
 
     # 3j. Empty oneOf value must FAIL (not silently pass)
     e = errs_for("/static", {"docSourceAll": {},
-                              "recipientAddressSource": {"singleAddress": clean_addr}})
+                              "recipientAddressSource": {"recipientAddressByList": {"addressList": [clean_addr]}}})
     check(len(e) > 0,
           "/static with empty docSourceAll -> should flag error")
 
@@ -222,7 +222,7 @@ def test_synthetic_faults():
         "productionTime": "next_day",
     }
     base_with_opts = {"docSourceAll": {"documentIdSource": {"documentId": 1}},
-                      "recipientAddressSource": {"singleAddress": clean_addr}}
+                      "recipientAddressSource": {"recipientAddressByList": {"addressList": [clean_addr]}}}
 
     # 3k. Invalid mailClass enum value must be caught by K-V4
     bad_opts = dict(full_joboptions, mailClass="INVALID_VALUE")
