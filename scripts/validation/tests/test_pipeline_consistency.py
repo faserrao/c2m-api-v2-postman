@@ -248,6 +248,41 @@ class TestSpecChecks(unittest.TestCase):
         V.check_spec_examples(spec, DD, F)
         self.assertIn(("C-EXAMPLE-FIELD-NOT-IN-BODY", "*"), F.items)
 
+    # X4 — every DD @doc reaches the spec (component schema + inline properties)
+    def _doc_problems(self, mutate):
+        specs = self.specs()
+        mutate(specs["final"]["components"]["schemas"])
+        return [m for m in run_dd(specs).items.get(("A-DOC-NOT-IN-SPEC", "*"), [])]
+
+    def test_doc_missing_on_component_is_flagged(self):
+        problems = self._doc_problems(lambda s: s["mailClass"].pop("description"))
+        self.assertTrue(any(p.startswith("mailClass: component") for p in problems), problems)
+
+    def test_doc_text_drift_on_component_is_flagged(self):
+        problems = self._doc_problems(lambda s: s["jobOptions"].update(description="stale text"))
+        self.assertTrue(any(p.startswith("jobOptions: component") for p in problems), problems)
+
+    def test_doc_missing_on_inline_property_is_flagged(self):
+        problems = self._doc_problems(lambda s: s["returnAddress"]["properties"]["firstName"].pop("description"))
+        self.assertIn("returnAddress.firstName", " ".join(problems))
+
+    def test_doc_missing_on_tag_property_is_flagged(self):
+        problems = self._doc_problems(lambda s: s["achPayment"]["properties"]["paymentType"].pop("description"))
+        self.assertIn("achPayment.paymentType", " ".join(problems))
+
+    def test_array_alias_target_without_description_is_flagged(self):
+        problems = self._doc_problems(lambda s: s["tagsList"].pop("description"))
+        self.assertTrue(any(p.startswith("tags: alias") for p in problems), problems)
+
+    def test_non_dd_schema_fields_are_not_checked(self):
+        """The auth overlay's AuthError.message is not the DD `message` rule."""
+        problems = V.doc_description_problems(
+            {"message": "DD text"},
+            {"message": {"description": "DD text", "type": "string"},
+             "AuthError": {"type": "object", "properties": {"message": {"type": "string"}}}},
+            {"message"})
+        self.assertEqual(problems, [])
+
     def test_known_open_entries_reference_a_tracking_id(self):
         for key, ref in V.KNOWN_OPEN.items():
             self.assertRegex(ref, r"(\b[XLDC]\d+[a-z]?\b|/static/multi)", f"{key} has no tracking reference")

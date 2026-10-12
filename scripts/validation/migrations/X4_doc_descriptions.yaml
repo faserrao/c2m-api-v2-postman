@@ -1,0 +1,15 @@
+name: X4 — DD @doc descriptions emitted to the spec
+# Descriptions only. The snapshot strips `description` and `title` from every schema
+# before comparing, so this migration declares no change: any difference the check
+# reports is something other than a description. Completeness — every @doc reaching its
+# component schema and every inline property — is enforced by the consistency gate (A6).
+#
+# Eight @doc rules are aliases of the integer `id` (directly or through another alias) and
+# were bare $refs. OpenAPI 3.0 forbids a description beside a $ref (lint no-$ref-siblings),
+# so each becomes a copy of the integer schema plus its own description — the shape the
+# translator already gives these fields as inline properties. Structure-equivalent.
+# (tags and mergeDocumentSource alias arrays and stay $refs: inlining an array made the
+# Postman converter fill two items instead of one — this check caught it.)
+schemas:
+  changed: [recipientAddressByListId, recipientAddressByAddressId, mappingId,
+            addressListId, addressId, documentId, requestId, zipDocumentId]

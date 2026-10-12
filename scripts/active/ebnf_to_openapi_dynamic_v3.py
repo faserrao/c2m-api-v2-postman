@@ -13,6 +13,7 @@ Features:
 - Comprehensive error reporting
 """
 
+import copy
 import re
 from http import HTTPStatus
 import sys
@@ -185,6 +186,17 @@ class Endpoint:
     summary: Optional[str] = None
     description: Optional[str] = None
 
+# X4: `(* @doc Description. *)` on the line before a rule. Same pattern as
+# generate_dd_table.py _extract_doc_annotations() and the consistency gate (A6).
+_DOC_ANNOTATION_RE = re.compile(r'\(\*\s*@doc\s+(.*?)\s*\*\)\s*\n\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*=', re.DOTALL)
+
+
+def _extract_doc_annotations(ebnf_text: str) -> Dict[str, str]:
+    """{rule name: @doc description} — emitted as the spec `description` of the rule's
+    component schema and of every inline property schema the rule becomes (X4)."""
+    return {m.group(2): ' '.join(m.group(1).split()) for m in _DOC_ANNOTATION_RE.finditer(ebnf_text)}
+
+
 def _extract_structural_annotations(ebnf_text: str) -> Dict[str, Set[str]]:
     """Extract @structural role annotations from EBNF rules.
 
@@ -276,6 +288,7 @@ class EBNFToOpenAPITranslator:
         self.schema_counter = 0  # Counter for unique schema names
         self.http_error_map: Dict[str, Any] = {}  # Parsed from @http_error_map block in EBNF
         self.numeric_constraints: Dict[str, Dict[str, Any]] = {}  # Parsed from @numeric_constraints block
+        self.doc_annotations: Dict[str, str] = {}  # X4: rule name -> @doc description
         self.valid_combinations: List[Dict[str, Any]] = []  # Parsed from @valid_combinations block
         self.mutual_exclusion_fields: List[str] = list(_MUTUAL_EXCLUSION_FIELDS)  # Parsed from @mutual_exclusion
         # Structural role sets — populated by parse_ebnf() from @structural annotations in the DD
@@ -324,6 +337,7 @@ class EBNFToOpenAPITranslator:
             self.mutual_exclusion_fields = parsed_mutual
         self.error_examples = self._parse_error_examples(content)
         self.faker_hints = extract_faker_hints(content)
+        self.doc_annotations = _extract_doc_annotations(content)
 
         # Load structural role sets from @structural annotations in the DD
         structural = _extract_structural_annotations(content)
@@ -764,7 +778,26 @@ class EBNFToOpenAPITranslator:
                     "mapping": {value: f"#/components/schemas/{branch}"
                                 for branch, (p, value) in self._tagged_branches.items() if p == prop},
                 }
-        
+
+        # X4: each rule's @doc becomes its component schema's description. An alias rule
+        # (`documentId = id`) is a bare $ref, which OpenAPI 3.0 forbids siblings on (lint:
+        # no-$ref-siblings). An alias of a scalar gets a copy of the scalar schema instead —
+        # the shape _get_field_type() already gives the same fields as inline properties.
+        # An alias of an array/object (tags -> tagsList) stays a $ref: inlining it changes
+        # how the Postman converter fills the body; its target's own @doc is shown instead.
+        for name, doc in self.doc_annotations.items():
+            schema = schemas.get(name)
+            if not isinstance(schema, dict):
+                continue
+            seen = set()
+            while set(schema) == {"$ref"} and schema["$ref"] not in seen:
+                seen.add(schema["$ref"])
+                schema = schemas.get(schema["$ref"].split("/")[-1], schema)
+            if seen and schema.get("type") not in ("string", "integer", "number", "boolean"):
+                continue
+            body = {k: copy.deepcopy(v) for k, v in schema.items() if k != "description"}
+            schemas[name] = {"description": doc, **body}
+
         return schemas
     
     def _generate_paths(self) -> OrderedDict:
@@ -1087,7 +1120,10 @@ class EBNFToOpenAPITranslator:
                         if item_type == 'literal' and context in getattr(self, '_tagged_branches', {}):
                             # D1: the branch's type literal becomes a required tag property
                             prop, value = self._tagged_branches[context]
-                            schema['properties'][prop] = {"type": "string", "enum": [value]}
+                            tag = {"type": "string", "enum": [value]}
+                            if prop in self.doc_annotations:  # X4
+                                tag = {"description": self.doc_annotations[prop], **tag}
+                            schema['properties'][prop] = tag
                             schema['required'].append(prop)
 
                         elif item_type == 'symbol':
@@ -1279,6 +1315,8 @@ class EBNFToOpenAPITranslator:
             # @numeric_constraints bounds must reach the inline property schemas that
             # request bodies are validated against, not just the standalone schema.
             schema.update(self.numeric_constraints.get(field_name, {}))
+            if field_name in self.doc_annotations:  # X4: inline properties carry the rule's @doc
+                schema = {"description": self.doc_annotations[field_name], **schema}
             return schema
 
         # For complex types (array, oneOf, object), use a reference

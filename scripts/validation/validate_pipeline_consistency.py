@@ -65,7 +65,6 @@ KNOWN_OPEN = {
     ("A-VALID-COMBINATION-NOOP", "*"): "X11 / decision D5 (envelope=none rule)",
     ("A-HINT-INVALID-TYPE", "*"): "L1 (routingNumber @hint has no type)",
     ("A-HINT-EMPTY-STATIC", "*"): "L1 (address3 empty static hint)",
-    ("A-DOC-NOT-IN-SPEC", "*"): "X4 (@doc not emitted as spec descriptions)",
     ("A-DOC-TYPE-CLAIM", "*"): "L2 / decision D6 (errorDetails object vs string)",
     ("A-DOC-CARDINALITY-UNENFORCED", "*"): "X9 / decision D4 (array minimums)",
     ("B-OPERATION-NOT-IN-COLLECTION", "GS-Linked"): "L10 (Getting Started has no auth endpoints)",
@@ -483,9 +482,8 @@ def check_dd_to_spec(dd, specs, faker_hints, F):
     # A6 @doc
     doc_re = re.compile(r"\(\*\s*@doc\s+(.*?)\s*\*\)\s*\n\s*([a-zA-Z_]\w*)\s*=", re.S)
     docs = {m.group(2): m.group(1) for m in doc_re.finditer(dd.text)}
-    in_spec = sum(1 for n in docs if isinstance(schemas.get(n), dict) and schemas[n].get("description"))
-    if docs and in_spec < len(docs):
-        F.add("A-DOC-NOT-IN-SPEC", "*", f"{len(docs) - in_spec} of {len(docs)} @doc descriptions not emitted")
+    for problem in doc_description_problems(docs, schemas, set(dd.rules)):
+        F.add("A-DOC-NOT-IN-SPEC", "*", problem)
     for n, d in docs.items():
         p = dd.prim(n)
         if "JSON object" in d and p and p[0] == "string":
@@ -498,6 +496,45 @@ def check_dd_to_spec(dd, specs, faker_hints, F):
         for n in dd.rules:
             if n in schemas and _strip(other.get(n)) != _strip(schemas.get(n)):
                 F.add("A-SPEC-FILE-DRIFT", "*", f"{n}: final vs {label}")
+
+
+def doc_description_problems(docs, schemas, dd_rules=None):
+    """X4: every DD @doc must reach the spec — as its component schema's description and
+    as the description of every inline (non-$ref) property schema the rule becomes. An
+    alias of an array/object stays a bare $ref (no siblings allowed in OpenAPI 3.0); the
+    schema it resolves to must then carry a description of its own. Only DD-generated
+    schemas are walked (dd_rules); the auth overlay's schemas have their own fields."""
+    norm = {n: " ".join(d.split()) for n, d in docs.items()}
+    problems = []
+    for n, d in norm.items():
+        sch = schemas.get(n)
+        if not isinstance(sch, dict):
+            problems.append(f"{n}: no component schema")
+            continue
+        if set(sch) == {"$ref"}:
+            seen = set()
+            while set(sch) == {"$ref"} and sch["$ref"] not in seen:
+                seen.add(sch["$ref"])
+                sch = schemas.get(sch["$ref"].split("/")[-1], {})
+            if not sch.get("description"):
+                problems.append(f"{n}: alias whose target has no description")
+        elif sch.get("description") != d:
+            problems.append(f"{n}: component description {sch.get('description')!r} != @doc")
+
+    def walk(node, where):
+        if isinstance(node, dict):
+            for k, v in (node.get("properties") or {}).items():
+                if k in norm and isinstance(v, dict) and "$ref" not in v and v.get("description") != norm[k]:
+                    problems.append(f"{where}.{k}: inline property description {v.get('description')!r} != @doc")
+            for k, v in node.items():
+                walk(v, where)
+        elif isinstance(node, list):
+            for v in node:
+                walk(v, where)
+    for name, sch in schemas.items():
+        if dd_rules is None or name in dd_rules:
+            walk(sch, name)
+    return problems
 
 
 # --------------------------------------------------------------------------- #

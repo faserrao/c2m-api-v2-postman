@@ -373,7 +373,8 @@ class TestDDConstraints(unittest.TestCase):
         self.assertEqual(sorted(disc.get("mapping", {})), sorted(allowed))
         for value, ref in disc["mapping"].items():
             variant = schemas[ref.split("/")[-1]]
-            self.assertEqual(variant["properties"]["paymentType"], {"type": "string", "enum": [value]})
+            tag = {k: v for k, v in variant["properties"]["paymentType"].items() if k != "description"}  # X4
+            self.assertEqual(tag, {"type": "string", "enum": [value]})
             self.assertEqual(variant["required"][0], "paymentType")
 
     def test_payment_branch_tag_must_be_a_payment_type(self):
