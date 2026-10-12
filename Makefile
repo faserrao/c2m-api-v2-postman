@@ -464,7 +464,7 @@ postman-create-test-collection:
 	$(MAKE) postman-test-collection-add-error-responses
 	$(MAKE) postman-test-collection-merge-overrides
 	$(MAKE) postman-test-collection-add-tests
-	$(MAKE) postman-auth-setup || echo "⚠️  Skipping auth setup (provider not available)."
+	$(MAKE) postman-auth-setup
 	$(MAKE) postman-test-collection-diff-tests
 	$(MAKE) postman-test-collection-auto-fix
 	$(MAKE) postman-test-collection-fix-v2
@@ -552,7 +552,7 @@ postman-instance-build-with-tests:
 	$(MAKE) postman-test-collection-add-error-responses
 	$(MAKE) postman-test-collection-merge-overrides
 	$(MAKE) postman-test-collection-add-tests
-	$(MAKE) postman-auth-setup || echo "⚠️  Skipping auth setup (provider not available)."
+	$(MAKE) postman-auth-setup
 	$(MAKE) postman-test-collection-diff-tests
 	$(MAKE) postman-test-collection-auto-fix
 	$(MAKE) postman-test-collection-fix-v2
@@ -601,7 +601,7 @@ postman-instance-build-without-tests:
 	$(MAKE) postman-test-collection-add-error-responses
 	$(MAKE) postman-test-collection-merge-overrides
 	$(MAKE) postman-test-collection-add-tests
-	$(MAKE) postman-auth-setup || echo "⚠️  Skipping auth setup (provider not available)."
+	$(MAKE) postman-auth-setup
 	$(MAKE) postman-test-collection-diff-tests
 	$(MAKE) postman-test-collection-auto-fix
 	$(MAKE) postman-test-collection-fix-v2
@@ -769,7 +769,7 @@ install:
 	@stoplight/prism-cli \
 	newman newman-reporter-html \
 	swagger-ui-dist \
-	swagger-cli widdershins lodash || echo "✅ npm packages installed or already available"
+	swagger-cli widdershins lodash
 
 # ========================================================================
 # OPENAPI SPECIFICATION GENERATION
@@ -1494,16 +1494,9 @@ postman-test-collection-flatten-rename:
 .PHONY: postman-test-collection-add-auth-examples
 postman-test-collection-add-auth-examples:
 	@echo "🔐 Adding auth examples to test collection..."
-	@if [ ! -f "$(POSTMAN_TEST_COLLECTION_FLAT)" ]; then \
-		echo "⚠️  Flattened test collection not found. Skipping auth examples."; \
-		exit 0; \
-	fi
-	@if [ -f "$(SCRIPTS_DIR)/active/add_auth_examples.js" ]; then \
-		node $(SCRIPTS_DIR)/active/add_auth_examples.js $(POSTMAN_TEST_COLLECTION_FLAT) $(POSTMAN_TEST_COLLECTION_FLAT) --auth-overlay "$(OPENAPI_AUTH_OVERLAY)" && \
-		echo "✅ Auth examples added to test collection"; \
-	else \
-		echo "⚠️  Auth examples script not found"; \
-	fi
+	@$(call guard-file,$(POSTMAN_TEST_COLLECTION_FLAT))
+	@node $(SCRIPTS_DIR)/active/add_auth_examples.js $(POSTMAN_TEST_COLLECTION_FLAT) $(POSTMAN_TEST_COLLECTION_FLAT) --auth-overlay "$(OPENAPI_AUTH_OVERLAY)"
+	@echo "✅ Auth examples added to test collection"
 
 # ========================================================================
 # TEST COLLECTION UPLOAD
@@ -1752,7 +1745,7 @@ postman-inject-docs-link-all:
 		"$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-linked-collection.json" \
 		"$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-test-collection.json"; do \
 		if [ -f "$$collection" ]; then \
-			node scripts/active/inject_documentation_link.js "$$collection" "$(REDOC_DOCS_URL)" || true; \
+			node scripts/active/inject_documentation_link.js "$$collection" "$(REDOC_DOCS_URL)" || exit 1; \
 		fi; \
 	done; \
 	echo "✅ Documentation links injected into all collections"
@@ -1838,13 +1831,15 @@ postman-env-upload:
 		fi; \
 		AWS_ENV_UID=$$(echo "$$RESPONSE" | jq -r '.environment.uid // empty'); \
 		if [ -z "$$AWS_ENV_UID" ]; then \
-			echo "⚠️  Failed to upload AWS Dev environment"; \
+			echo "❌ Failed to upload AWS Dev environment"; \
+			exit 1; \
 		else \
 			echo "✅ AWS Dev environment upserted with UID: $$AWS_ENV_UID"; \
 			echo $$AWS_ENV_UID > $(POSTMAN_AWS_ENV_UID_FILE); \
 		fi \
 	else \
-		echo "⚠️  AWS Dev environment file not found: $$AWS_ENV_FILE"; \
+		echo "❌ AWS Dev environment file not found: $$AWS_ENV_FILE (run postman-env-create)"; \
+		exit 1; \
 	fi
 
 # ========================================================================
@@ -2743,17 +2738,18 @@ postman-auth-setup: ## Configure authentication for Postman collection
 	@echo "🔐 Setting up authentication configuration..."
 	@if [ -f "$(SECURITY_POSTMAN_SCRIPTS_DIR)/jwt-auth-provider.js" ]; then \
 		echo "📋 Using JWT auth provider script from security repo..."; \
-		node scripts/active/add_pre_request_script.js "$(POSTMAN_TEST_COLLECTION_WITH_TESTS)" "$(SECURITY_POSTMAN_SCRIPTS_DIR)/jwt-auth-provider.js" "$(POSTMAN_TEST_COLLECTION_WITH_TESTS)" && \
-		echo "✅ Auth provider script added to test collection" || \
-		echo "❌ Failed to add auth provider script"; \
+		node scripts/active/add_pre_request_script.js "$(POSTMAN_TEST_COLLECTION_WITH_TESTS)" "$(SECURITY_POSTMAN_SCRIPTS_DIR)/jwt-auth-provider.js" "$(POSTMAN_TEST_COLLECTION_WITH_TESTS)" || \
+			{ echo "❌ Failed to add auth provider script"; exit 1; }; \
+		echo "✅ Auth provider script added to test collection"; \
 	else \
 		echo "📋 Auth provider script not found in security repo, using local script..."; \
 		if [ -f "$(POSTMAN_DIR)/scripts/jwt-pre-request.js" ]; then \
-			node scripts/active/add_pre_request_script.js "$(POSTMAN_TEST_COLLECTION_WITH_TESTS)" "$(POSTMAN_DIR)/scripts/jwt-pre-request.js" "$(POSTMAN_TEST_COLLECTION_WITH_TESTS)" && \
-			echo "✅ Local auth provider script added to test collection" || \
-			echo "❌ Failed to add local auth provider script"; \
+			node scripts/active/add_pre_request_script.js "$(POSTMAN_TEST_COLLECTION_WITH_TESTS)" "$(POSTMAN_DIR)/scripts/jwt-pre-request.js" "$(POSTMAN_TEST_COLLECTION_WITH_TESTS)" || \
+				{ echo "❌ Failed to add local auth provider script"; exit 1; }; \
+			echo "✅ Local auth provider script added to test collection"; \
 		else \
-			echo "⚠️  No auth provider script found"; \
+			echo "❌ No auth provider script found (security repo or $(POSTMAN_DIR)/scripts/jwt-pre-request.js)"; \
+			exit 1; \
 		fi; \
 	fi
 
