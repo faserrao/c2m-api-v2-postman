@@ -18,23 +18,40 @@ See top-level `CLAUDE.md` (`C2M_API_v2/CLAUDE.md`) for full project context and 
 | `scripts/active/add_tests_jwt.js` | Adds JWT test scripts to test collection |
 | `scripts/validation/validate_configs_against_dd.py` | V1–V8 build-time config validators |
 | `scripts/validation/validate_collections_against_spec.py` | Spec-driven conformance gate (K-V3…K-V6) |
-| `scripts/validation/validate_pipeline_consistency.py` | End-to-end DD → spec → Postman consistency gate (saved examples, error map, spec examples); `KNOWN_OPEN` table lists tracked open findings |
+| `scripts/validation/validate_pipeline_consistency.py` | End-to-end DD → spec → Postman consistency gate (saved examples, error map, spec examples, `@doc` descriptions); `KNOWN_OPEN` table lists tracked open findings |
+| `scripts/validation/validate_migration.py` | Migration check: `snapshot` the whole system, then `compare` a rebuild under a declared migration (`scripts/validation/migrations/*.yaml`) — UNEXPECTED / INCOMPLETE / LOST; `retired` scans for removed names. Make: `migration-snapshot`, `validate-migration`, `validate-migration-retired` (`MIGRATION=<name>`) |
 
 ---
 
 # Important Patterns
 
 - **Constants over inline strings**: every reused string literal (schema names, content types, field names, enum fallbacks) lives behind a module-level constant.
-- **`@doc` annotations**: rule descriptions live in `data_dictionary/c2mapiv2-dd.ebnf` as `(* @doc Description. *)` preceding-line annotations, read at parse time by `generate_dd_table.py`.
+- **`@doc` annotations**: rule descriptions live in `data_dictionary/c2mapiv2-dd.ebnf` as `(* @doc Description. *)` preceding-line annotations. They feed the DD table (`generate_dd_table.py`) and, since X4, every spec `description` (component + inline properties). The gate fails on a missing or different description. OpenAPI 3.0 forbids siblings beside `$ref`: scalar alias rules are written out as the target schema plus a description; array aliases stay `$ref`.
+- **Error examples come from the DD (D10)**: the `@error_examples` block holds every example's summary/message/details; the translator renders them per endpoint; `add_error_responses_to_collection.js` copies the spec's examples into Test, Linked and Real-World. `config/error-response-examples.yaml`, V6 and `add_response_examples.py` are retired.
+- **Prove a contract change with a migration**: snapshot before, declare the change in `scripts/validation/migrations/<name>.yaml`, rebuild, compare — zero findings required (used for D2 and X4).
 - **`ph<>` format is defensive only**: `fix_oneOf_placeholders.js` now writes the first canonical enum value (`propDef.enum[0]`) directly for `jobOptions` fields. The `ph<val1|val2|...>` handler in `addRandomDataToRaw.js` is a fallback for manually-constructed collections only.
 - **Repeatable spec builds (M4)**: spec examples use `_EXAMPLE_NOW` and sha256-seeded IDs — two builds from the same DD are byte-identical. Never reintroduce `random`/`datetime.now()` into spec examples (`test_spec_generation_is_repeatable` fails).
 - **No silent no-ops**: pipeline scripts exit 1 when they process nothing; Makefile no longer masks guarded steps with `|| echo "Skipping"`.
-- **Error map is the authority**: job-endpoint responses and Postman error examples are built from the DD `@http_error_map` per `(status, errorCode)` pair.
+- **Error map is the authority**: job-endpoint responses and Postman error examples are built from the DD `@http_error_map` per `(status, errorCode)` pair (an example that cannot occur on an endpoint is omitted: `/batch/zip` has 17 error examples).
 - **Derived artifacts**: `config/faker_hints.yaml`, `config/c2m_provider_mappings.yaml`, `openapi/c2mapiv2-openapi-spec-*.yaml` — all generated. Do not edit directly.
 
 ---
 
 # Recent Changes
+
+## 2026-10-08 → 2026-10-12 — D10, X1/X2, D1, migration validator, D2, X4, Makefile masks
+
+**Commits:** `64389ff`, `461275c`, `7b919cf`, `a8e22d4`, `d836ce5`, `e85c1cb`, `e16705b`, `6453386` (all CI-green on click2mail + origin). Full detail: `c2m-api-v2-manuals/audit-reports/PIPELINE_CHANGES_2026-10-12.md`.
+
+| ID | Change |
+|---|---|
+| D10 (user) | DD `@error_examples` block is the single source of example content; Postman saved responses copy the spec's examples; YAML / V6 / `add_response_examples.py` retired |
+| X1/X2 | Linked and Real-World saved responses are the spec's examples (auth endpoints included) |
+| D1 (user) | `paymentType` field (creditCard/invoice/ach/userCredit) + OpenAPI discriminator on `paymentDetails` |
+| migration | `validate_migration.py` + golden tests; required before D2 by the user |
+| D2 (user) | `singleAddress` removed — `recipientAddressSource` = ByList / ByListId / ByAddressId; address-list minimum deferred to D4 |
+| X4 | `@doc` → spec descriptions; gate requires them |
+| masks | `postman-auth-setup` (×3 + inside), auth examples, docs-link injection, AWS Dev env upload and `npm install` now fail instead of continuing |
 
 ## 2026-10-02 → 2026-10-07 — DD→Spec→Postman audits, H1–H5 / M4 / X3 / N1 / N2 / N5 fixes, consistency gate
 
@@ -128,14 +145,15 @@ make validate-collections-conformance-test      # Golden tests: validator script
 make validate-collections-conformance-gate-all  # All 5 collections conform to spec
 make validate-dd-gates                          # spec vs DD, all 5 collections vs DD, catalog vs spec
 make validate-pipeline-consistency              # end-to-end DD → spec → Postman gate
+make validate-migration MIGRATION=<name>        # compare a rebuild against a migration's baseline
 ```
 
 Expected outputs (all clean):
 - `✅ All config field names are valid DD rule names`
-- `20 passed` / `37 passed, 43 subtests passed` / `24 passed`
+- `20 passed` / `44 passed, 43 subtests passed` / `33 passed` / `17 passed` (resolver / DD constraints / consistency / migration validator)
 - `PASS=9 FAIL=0 SKIP=1` (linked/test), `PASS=17 FAIL=0` (GS), `PASS=8 FAIL=0` (real-world)
 - `✅ TOTAL — PASS=191 FAIL=0` (spec vs DD); `0 finding(s) across 5 collection(s)`
-- `ERROR categories: 0 · known-open WARN categories: 30`
+- `ERROR categories: 0 · known-open WARN categories: 18` (one stale allowance, L6, is intermittent)
 
 ---
 
@@ -143,4 +161,4 @@ Expected outputs (all clean):
 
 Config field names: none — V1–V8 cover them.
 
-Open DD → spec → Postman findings are tracked in the `KNOWN_OPEN` table of `scripts/validation/validate_pipeline_consistency.py` (each entry cites its audit/decision ID; the gate flags entries that stop occurring). Main open items: X1/X2 (Linked/Real-World saved responses synthesised by the converter), X4 (`@doc` not emitted to spec), C1 (no request examples), N3/D9 (Getting Started collections have no saved responses), N4/N5/D10 (spec vs YAML error-example content), decisions D1–D8 (see the 2026-10-05 audit reports).
+Open DD → spec → Postman findings are tracked in the `KNOWN_OPEN` table of `scripts/validation/validate_pipeline_consistency.py` (each entry cites its audit/decision ID; the gate flags entries that stop occurring). Main open items: C1 (no request examples), D9 (Getting Started collections have no saved responses — the guides build the mock from a collection that has them), decisions D3–D8 (see the 2026-10-05 audit reports; the address-list minimum is part of D4), X6 remainder (unreachable rules), L1/L6/L7/L8/L10, M3.
