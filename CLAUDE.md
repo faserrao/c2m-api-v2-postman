@@ -39,11 +39,19 @@ See top-level `CLAUDE.md` (`C2M_API_v2/CLAUDE.md`) for full project context and 
 - **`@reserved`**: `rule = … ; (* @reserved POST /path *)` marks a rule kept for a planned endpoint (`multiDocJobs` → `/static/multi`). The gate accepts it as unreachable and fails once the rule is used or the endpoint is defined.
 - **Never pass a spec file as one argument**: Linux caps a single argument at 128 KB (the final spec is ~136 KB). Use `jq --rawfile`, `--data @file` or a pipe; a golden test checks the Makefile.
 - **Local builds**: the security repo is cloned beside this one as `c2m-api-v2-postman-security`; `postman/mock-env.json` and `postman/environments/` receive real credentials and are git-ignored (a test enforces it). Environment uploads create a new environment when the saved UID's environment is gone.
+- **GNU Make 3.82+ only**: the Makefile stops under macOS Make 3.81 (it ignores `.ONESHELL`/`.SHELLFLAGS`). Locally use Homebrew's (`gnubin` first on PATH); recipes run with `-eu -o pipefail`, so a command substitution that can legitimately fail needs `|| true`.
+- **Never an empty workspace ID**: Postman URLs take it through `POSTMAN_WS_Q`, which stops make when empty (an empty `?workspace=` lists every workspace the key can see). `.env` exports only `NAME=value` lines.
+- **Dependencies**: `requirements.txt` = exactly the 8 imported packages (a test enforces it); `make install` = `npm ci`.
+- **CI smoke test**: replays the Getting Started setup in a fresh clone and requires a clean tree — commit regenerated base spec / faker_hints with the DD.
 - **Derived artifacts**: `config/faker_hints.yaml`, `config/c2m_provider_mappings.yaml`, `openapi/c2mapiv2-openapi-spec-*.yaml` — all generated. Do not edit directly.
 
 ---
 
 # Recent Changes
+
+## 2026-10-13 — Getting Started guide tested from a fresh clone (`a501d81` … `cae3da3`)
+
+Empty-workspace guard (a guide-made `.env` emptied the workspace ID; cleanup would have hit every workspace); 8 pinned Python packages (91 before; 3.14 could not build); `npm ci`; GNU Make required, with `prism-start`, the with-tests build and fresh-clone noise fixed; helper retries transport failures; CI smoke test of the guide's setup; venv ignored at any depth. Detail: manuals change report §16.
 
 ## 2026-10-13 — X6 / L1 / L7 DD cleanup (`d609421`, CI-green click2mail 38455508600 + origin 38455513217)
 
@@ -161,7 +169,7 @@ Four additional iterative audit passes fixing 14 items across 9 files (all LOW/M
 ```bash
 make openapi-build && make postman-build-golden-test-fixtures   # build spec + all 5 collections (no API keys)
 make validate-configs                           # V1–V8 config validators
-make validate-collections-conformance-test      # Golden tests: validator script + resolver 20 + DD constraints 50 + consistency 47 + migration 22 + Postman API helper 10
+make validate-collections-conformance-test      # Golden tests: validator script + resolver 20 + DD constraints 50 + consistency 47 + migration 22 + Postman API helper 21
 make validate-collections-conformance-gate-all  # All 5 collections conform to spec
 make validate-dd-gates                          # spec vs DD, all 5 collections vs DD, catalog vs spec
 make validate-pipeline-consistency              # end-to-end DD → spec → Postman gate
@@ -170,7 +178,7 @@ make validate-migration MIGRATION=<name>        # compare a rebuild against a mi
 
 Expected outputs (all clean):
 - `✅ All config field names are valid DD rule names`
-- `20 passed` / `50 passed, 43 subtests passed` / `47 passed` / `22 passed` / `10 passed` (resolver / DD constraints / consistency / migration validator / Postman API helper)
+- `20 passed` / `50 passed, 43 subtests passed` / `47 passed` / `22 passed` / `21 passed` (resolver / DD constraints / consistency / migration validator / Postman API helper)
 - `PASS=9 FAIL=0 SKIP=1` (linked/test), `PASS=17 FAIL=0` (GS), `PASS=8 FAIL=0` (real-world)
 - `✅ TOTAL — PASS=184 FAIL=0` (spec vs DD); `0 finding(s) across 5 collection(s)`
 - `ERROR categories: 0 · known-open WARN categories: 12` (plus L6, which is intermittent and sometimes shows as stale)
