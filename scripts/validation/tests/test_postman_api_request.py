@@ -200,5 +200,47 @@ class TestMakefileWorkspace(unittest.TestCase):
         self.assertEqual(r.returncode, 0, r.stderr)
 
 
+class TestDependencies(unittest.TestCase):
+    """Found by the Getting Started test on 2026-10-13: requirements.txt pinned 91 packages
+    (a whole TensorFlow environment) of which the pipeline imports 8, and two of the unused
+    ones (h5py, pydantic_core) cannot be installed on Python 3.14, so a new developer's first
+    build failed. And `make install` ran `npm install <names>`, which upgraded every tool and
+    rewrote package.json / package-lock.json in a fresh clone."""
+
+    # import name -> distribution name, where they differ
+    DIST = {"yaml": "pyyaml", "dotenv": "python-dotenv", "faker": "faker"}
+    DIRS = ("scripts/active", "scripts/validation", "scripts/utilities",
+            "scripts/test_data_generator_for_collections", "tests")
+
+    def test_requirements_are_exactly_the_imported_packages(self):
+        import re
+        import sys
+        local = {p.stem for d in self.DIRS for p in (REPO_ROOT / d).rglob("*.py")} | {"utilities"}
+        imported = set()
+        for d in self.DIRS:
+            for p in (REPO_ROOT / d).rglob("*.py"):
+                if "archive" in p.parts:
+                    continue
+                for m in re.finditer(r"^\s*(?:import|from)\s+([A-Za-z_]\w*)", p.read_text(errors="ignore"), re.M):
+                    name = m.group(1)
+                    if name not in sys.stdlib_module_names and name not in local:
+                        imported.add(self.DIST.get(name, name).lower())
+        imported.add("pytest")  # the golden tests run under pytest
+        lines = (REPO_ROOT / "scripts" / "python_env" / "requirements.txt").read_text().splitlines()
+        pinned = {l.split("==")[0].strip().lower() for l in lines if l.strip() and not l.startswith("#")}
+        self.assertTrue(all("==" in l for l in lines if l.strip() and not l.startswith("#")), "unpinned requirement")
+        # code-sample strings in add-sdk-samples-to-spec.py look like imports (Java/Kotlin)
+        imported -= {"com", "okhttp3", "the"}
+        self.assertEqual(sorted(pinned - imported), [], "pinned but never imported")
+        self.assertEqual(sorted(imported - pinned), [], "imported but not pinned")
+
+    def test_make_install_uses_the_lockfile(self):
+        import re
+        recipe = re.search(r"^install:\n((?:\t.*\n)+)", (REPO_ROOT / "Makefile").read_text(), re.M).group(1)
+        body = "\n".join(l for l in recipe.splitlines() if not l.strip().startswith("#"))
+        self.assertIn("npm ci", body)
+        self.assertNotRegex(body, r"npm install\b")
+
+
 if __name__ == "__main__":
     unittest.main()

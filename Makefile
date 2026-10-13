@@ -772,14 +772,9 @@ check-mock:
 # Install all required dependencies
 .PHONY: install
 install:
-	npm install \
-	openapi-to-postmanv2 \
-	@redocly/cli \
-	@stoplight/spectral-cli \
-	@stoplight/prism-cli \
-	newman newman-reporter-html \
-	swagger-ui-dist \
-	swagger-cli widdershins lodash
+	# From the lockfile: same tool versions everywhere, and package.json / package-lock.json
+	# stay unchanged (npm install <names> upgraded every tool to its latest release).
+	npm ci
 
 # ========================================================================
 # OPENAPI SPECIFICATION GENERATION
