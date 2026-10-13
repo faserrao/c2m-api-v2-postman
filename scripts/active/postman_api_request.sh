@@ -5,6 +5,9 @@
 # a 404 on DELETE counts as success (the resource is already gone).
 # Used by the Makefile cleanup targets: curl --silent alone exits 0 on HTTP errors,
 # so a refused list call looked like an empty workspace and a refused delete was ignored.
+# Transport failures (dropped connection, HTTP/2 framing error, timeout) are retried a
+# few times; an HTTP error status is not retried here and fails at once. Retrying a
+# DELETE is safe: if the first attempt went through, the retry gets 404 (accepted).
 
 set -euo pipefail
 
@@ -20,7 +23,8 @@ shift 2
 body=$(mktemp)
 trap 'rm -f "$body"' EXIT
 
-code=$(curl --silent --location --request "$method" "$url" "$@" \
+code=$(curl --silent --location --retry 3 --retry-delay 2 --retry-all-errors \
+    --request "$method" "$url" "$@" \
     --output "$body" --write-out '%{http_code}') || {
   rc=$?
   echo "❌ $method $url: request failed (curl exit $rc)" >&2

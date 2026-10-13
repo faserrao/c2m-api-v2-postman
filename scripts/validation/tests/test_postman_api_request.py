@@ -33,8 +33,18 @@ ROUTES = {
 }
 
 
+FLAKY_SEEN = set()
+
+
 class _Handler(http.server.BaseHTTPRequestHandler):
     def _reply(self):
+        if self.path.startswith("/flaky-") and self.path not in FLAKY_SEEN:
+            FLAKY_SEEN.add(self.path)          # first request: drop the connection, no response
+            self.close_connection = True
+            self.connection.shutdown(socket.SHUT_RDWR)
+            return
+        if self.path.startswith("/flaky-"):
+            self.path = "/ok"
         status, body = ROUTES.get(self.path.split("?")[0], (500, b"{}"))
         self.send_response(status)
         self.send_header("Content-Type", "application/json")
@@ -93,6 +103,12 @@ class TestPostmanApiRequest(unittest.TestCase):
     def test_get_of_missing_resource_fails(self):
         r = self.run_helper("GET", f"{self.base}/missing")
         self.assertEqual(r.returncode, 1)
+
+    def test_transient_transport_failure_is_retried(self):
+        """2026-10-13: a cleanup DELETE failed with curl exit 16 (HTTP/2 framing error),
+        a momentary network error, and stopped the whole build."""
+        r = self.run_helper("DELETE", f"{self.base}/flaky-delete")
+        self.assertEqual(r.returncode, 0, r.stderr)
 
     def test_connection_failure_fails(self):
         with socket.socket() as s:
