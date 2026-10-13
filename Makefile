@@ -40,7 +40,10 @@ VARS_OLD := $(.VARIABLES)
 #   POSTMAN_C2M_API_KEY=alternate-api-key
 ifneq (,$(wildcard .env))
     include .env
-    export $(shell sed 's/=.*//' .env)
+    # Export only real NAME=value lines. Exporting every word (comments included) once
+    # turned "# C2M_WS=..." in a .env copied from .env.example into "export C2M_WS", an
+    # empty definition that blocked the C2M_WS default below (empty workspace ID).
+    export $(shell sed -n 's/^[[:space:]]*\([A-Za-z_][A-Za-z0-9_]*\)[[:space:]]*=.*/\1/p' .env)
 endif
 
 # ========================================================================
@@ -389,9 +392,14 @@ POSTMAN_CURL_HEADERS_ACA         := $(POSTMAN_HEADER_ACCEPT) $(POSTMAN_HEADER_CO
 # ========================================================================
 # NOTE: specs API uses workspaceId=, collections & mocks often use workspace=
 # for /apis and /specs
-POSTMAN_Q_ID    := ?workspaceId=$(POSTMAN_WS)
+# Every Postman URL takes the workspace ID through POSTMAN_WS_Q, which stops make when it
+# is empty: with an empty ?workspace= the Postman API lists everything the key can see in
+# every workspace, so a cleanup would delete all of it. Recursive (=), so it is checked
+# only when a recipe uses it; targets that never call Postman are unaffected.
+POSTMAN_WS_Q    = $(if $(strip $(POSTMAN_WS)),$(POSTMAN_WS),$(error POSTMAN_WS (Postman workspace ID) is empty. Check .git-context and C2M_WS / SERRAO_WS in .env))
+POSTMAN_Q_ID    = ?workspaceId=$(POSTMAN_WS_Q)
 # for /collections, /mocks, /environments
-POSTMAN_Q            := ?workspace=$(POSTMAN_WS)
+POSTMAN_Q       = ?workspace=$(POSTMAN_WS_Q)
 
 # ========================================================================
 # DEFAULT TARGET
@@ -407,7 +415,7 @@ empty-test:
 # Test target to verify mock environment update calls work correctly
 .PHONY: test-update-mock-env-call
 test-update-mock-env-call:
-	curl -s --location "$$(POSTMAN_MOCKS_URL)?workspace=$$(POSTMAN_WS)" \
+	curl -s --location "$(POSTMAN_MOCKS_URL)$(POSTMAN_Q)" \
 		$(POSTMAN_HEADER_API_KEY) | jq '.mocks[] | {id, uid, name, mockUrl}'
 
 # ========================================================================
@@ -939,7 +947,7 @@ fix-yaml:
 postman-import-openapi-flat-native:
 	@echo "📥 Importing OpenAPI from file $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES) with native flattening (folderStrategy=none)..."
 	@mkdir -p $(POSTMAN_DIR)
-	@curl --silent --location --request POST "$(POSTMAN_BASE_URL)/import/openapi?workspace=$(POSTMAN_WS)" \
+	@curl --silent --location --request POST "$(POSTMAN_BASE_URL)/import/openapi?workspace=$(POSTMAN_WS_Q)" \
 		-H "X-Api-Key: $(POSTMAN_API_KEY)" \
 		--form "type=file" \
 		--form "input=@$(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES)" \
@@ -974,7 +982,7 @@ postman-import-openapi-flat-native:
 #	@$(MAKE) postman-delete-apis
 #	@echo "🔑 Using API Key: $$(echo $(POSTMAN_API_KEY) | head -c 8)..."
 #	@echo "📍 Target Workspace: $(POSTMAN_WS)"
-#	@echo "🌐 API URL: $(POSTMAN_APIS_URL)?workspaceId=$(POSTMAN_WS)"
+#	@echo "🌐 API URL: $(POSTMAN_APIS_URL)?workspaceId=$(POSTMAN_WS_Q)"
 #	@CONTENT=$$(cat "$(C2MAPIV2_OPENAPI_SPEC)"); \
 #	PAYLOAD=$$(jq -n \
 #		--arg name "$(POSTMAN_API_NAME)" \
@@ -983,7 +991,7 @@ postman-import-openapi-flat-native:
 #	echo "🔧 Headers: X-Api-Key: $$(echo $(POSTMAN_API_KEY) | head -c 8)..."; \
 #	echo "📤 Sending request to Postman API..."; \
 #	HTTP_CODE=$$(curl --silent --show-error --write-out "%{http_code}" --output postman/import-api-response.json \
-#		--location --request POST "$(POSTMAN_APIS_URL)?workspaceId=$(POSTMAN_WS)" \
+#		--location --request POST "$(POSTMAN_APIS_URL)?workspaceId=$(POSTMAN_WS_Q)" \
 #		--header "X-Api-Key: $(POSTMAN_API_KEY)" \
 #		--header "Content-Type: application/json" \
 #		--header "Accept: application/vnd.api.v10+json" \
@@ -1100,7 +1108,7 @@ postman-spec-create-standalone:
 		--arg type "OPENAPI:3.0" \
 		--rawfile content "$(C2MAPIV2_OPENAPI_SPEC)" \
 		'{ name: $$name, type: $$type, files: [{ path: "openapi.yaml", content: $$content }] }' > "$(POSTMAN_DIR)/spec-standalone-payload.json"
-	@RESPONSE=$$(curl --silent --location --request POST "$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS)" \
+	@RESPONSE=$$(curl --silent --location --request POST "$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS_Q)" \
 		$(POSTMAN_CURL_HEADERS_XC) \
 		--data-binary "@$(POSTMAN_DIR)/spec-standalone-payload.json"); \
 	echo "$$RESPONSE" | jq . > $(POSTMAN_DIR)/spec-standalone-response.json || echo "$$RESPONSE" > $(POSTMAN_DIR)/spec-standalone-response.json; \
@@ -1119,7 +1127,7 @@ postman-spec-create-standalone:
 .PHONY: postman-spec-list
 postman-spec-list:
 	@echo "📋 Listing all specs in workspace..."
-	@curl --silent --location "$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS)" \
+	@curl --silent --location "$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS_Q)" \
 		$(POSTMAN_CURL_HEADERS_XC) | jq '.specs // [] | .[] | {id: .id, name: .name, type: .type}'
 
 # ========================================================================
@@ -1234,7 +1242,7 @@ postman-linked-collection-upload:
 		echo "📤 Uploading Postman collection $$UPLOAD_FILE to workspace $(POSTMAN_WS)..."; \
 	fi; \
 	COLLECTION_UID=$$(jq -c '{collection: .}' "$$UPLOAD_FILE" | \
-		curl --silent --location --request POST "$(POSTMAN_COLLECTIONS_URL)?workspace=$(POSTMAN_WS)" \
+		curl --silent --location --request POST "$(POSTMAN_COLLECTIONS_URL)?workspace=$(POSTMAN_WS_Q)" \
 			$(POSTMAN_CURL_HEADERS_XC) \
 			--data-binary @- | jq -r '.collection.uid'); \
 	if [ "$$COLLECTION_UID" = "null" ] || [ -z "$$COLLECTION_UID" ]; then \
@@ -1520,7 +1528,7 @@ postman-test-collection-upload:
 	fi; \
 	$(call guard-file,$$UPLOAD_FILE); \
 	RESPONSE=$$(jq -c '{collection: .}' "$$UPLOAD_FILE" | \
-		curl --silent --location --request POST "$(POSTMAN_COLLECTIONS_URL)?workspace=$(POSTMAN_WS)" \
+		curl --silent --location --request POST "$(POSTMAN_COLLECTIONS_URL)?workspace=$(POSTMAN_WS_Q)" \
 			$(POSTMAN_CURL_HEADERS_XC) \
 			--data-binary @-); \
 	echo "$$RESPONSE" | jq . > "$(POSTMAN_UPLOAD_TEST_DEBUG)" || echo "$$RESPONSE" > "$(POSTMAN_UPLOAD_TEST_DEBUG)"; \
@@ -1611,7 +1619,7 @@ postman-upload-use-case-collection:
 		exit 1; \
 	fi; \
 	RW_UID=$$(jq -c '{collection: .}' "$$REAL_WORLD_FILE" | \
-		curl --silent --location --request POST "$(POSTMAN_COLLECTIONS_URL)?workspace=$(POSTMAN_WS)" \
+		curl --silent --location --request POST "$(POSTMAN_COLLECTIONS_URL)?workspace=$(POSTMAN_WS_Q)" \
 			$(POSTMAN_CURL_HEADERS_XC) \
 			--data-binary @- | jq -r '.collection.uid'); \
 	if [ "$$RW_UID" = "null" ] || [ -z "$$RW_UID" ]; then \
@@ -1670,7 +1678,7 @@ postman-upload-getting-started-linked:
 		exit 1; \
 	fi; \
 	COLLECTION_UID=$$(jq -c '{collection: .}' "$$GETTING_STARTED_FILE" | \
-		curl --silent --location --request POST "$(POSTMAN_COLLECTIONS_URL)?workspace=$(POSTMAN_WS)" \
+		curl --silent --location --request POST "$(POSTMAN_COLLECTIONS_URL)?workspace=$(POSTMAN_WS_Q)" \
 			$(POSTMAN_CURL_HEADERS_XC) \
 			--data-binary @- | jq -r '.collection.uid'); \
 	if [ "$$COLLECTION_UID" = "null" ] || [ -z "$$COLLECTION_UID" ]; then \
@@ -1690,7 +1698,7 @@ postman-upload-getting-started-test:
 		exit 1; \
 	fi; \
 	COLLECTION_UID=$$(jq -c '{collection: .}' "$$GETTING_STARTED_FILE" | \
-		curl --silent --location --request POST "$(POSTMAN_COLLECTIONS_URL)?workspace=$(POSTMAN_WS)" \
+		curl --silent --location --request POST "$(POSTMAN_COLLECTIONS_URL)?workspace=$(POSTMAN_WS_Q)" \
 			$(POSTMAN_CURL_HEADERS_XC) \
 			--data-binary @- | jq -r '.collection.uid'); \
 	if [ "$$COLLECTION_UID" = "null" ] || [ -z "$$COLLECTION_UID" ]; then \
@@ -2116,7 +2124,7 @@ postman-api-list-specs:
 	@echo "📜 Listing all specs in workspace $(POSTMAN_WS)..."
 	curl --silent \
 		--header "X-Api-Key: $(POSTMAN_API_KEY)" \
-		"$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS)" \
+		"$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS_Q)" \
 		| jq -r '.specs[] | "\(.name)\t\(.id)\t\(.type)\t\(.updatedAt)"' \
 		| column -t -s\t'
 
@@ -2249,7 +2257,7 @@ postman-delete-specs-by-name:
 		if [ "$$PASS" -gt $(POSTMAN_DELETE_MAX_PASSES) ]; then \
 			echo "❌ Specs named '$(NAME)' still listed after $(POSTMAN_DELETE_MAX_PASSES) passes"; exit 1; \
 		fi; \
-		RESP=$$($(POSTMAN_API_REQUEST) GET "$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS)&limit=100" $(POSTMAN_CURL_HEADERS_XC)) || exit 1; \
+		RESP=$$($(POSTMAN_API_REQUEST) GET "$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS_Q)&limit=100" $(POSTMAN_CURL_HEADERS_XC)) || exit 1; \
 		SPECS=$$(echo "$$RESP" | jq -r --arg name "$(NAME)" '.specs // [] | .[] | select(.name == $$name) | .id') || exit 1; \
 		for SPEC in $$SPECS; do \
 			echo "🗑  Deleting spec $$SPEC..."; \
@@ -2274,7 +2282,7 @@ postman-delete-specs:
 		if [ "$$PASS" -gt $(POSTMAN_DELETE_MAX_PASSES) ]; then \
 			echo "❌ Specs still listed after $(POSTMAN_DELETE_MAX_PASSES) passes"; exit 1; \
 		fi; \
-		RESPONSE=$$($(POSTMAN_API_REQUEST) GET "$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS)&limit=100" \
+		RESPONSE=$$($(POSTMAN_API_REQUEST) GET "$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS_Q)&limit=100" \
 			$(POSTMAN_CURL_HEADERS_XC) $(POSTMAN_CURL_HEADERS_AA)) || exit 1; \
 		SPECS=$$(echo "$$RESPONSE" | jq -r '.specs // [] | .[].id') || exit 1; \
 		for SPEC in $$SPECS; do \
@@ -2352,14 +2360,14 @@ postman-api-debug-B:
 	@echo "📜 Listing specs in workspace $(POSTMAN_WS)..."
 	@curl --silent --location \
 		$(POSTMAN_CURL_HEADERS_XC) \
-		"$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS)" \
+		"$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS_Q)" \
 		| jq . > $(POSTMAN_DIR)/debug-specs.json || cat $(POSTMAN_DIR)/debug-specs.json
 	@echo "✅ Saved to $(POSTMAN_DIR)/debug-specs.json"
 
 # Debug workspace configuration
 .PHONY: postman-workspace-debug
 postman-workspace-debug:
-	@echo "🔍 Current Postman workspace ID: $(POSTMAN_WS)"
+	@echo "🔍 Current Postman workspace ID: $(POSTMAN_WS_Q)"
 
 # ========================================================================
 # ADVANCED TESTING UTILITIES

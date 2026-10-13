@@ -159,5 +159,46 @@ class TestCredentialFilesAreIgnored(unittest.TestCase):
             self.assertFalse(tracked, f"{path} is tracked by git")
 
 
+class TestMakefileWorkspace(unittest.TestCase):
+    """The Postman workspace ID must never be empty: with ?workspace= empty the Postman API
+    lists every workspace the key can see, so postman-cleanup-all would delete all of it.
+    On 2026-10-13 a .env made as the Getting Started guide says (cp .env.example .env)
+    produced exactly that: the Makefile exported every word of .env, comments included, and
+    "# C2M_WS=..." became an empty C2M_WS that blocked the default."""
+
+    def make(self, *args, env_text=None, extra=""):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            for name in ("Makefile", ".git-context"):
+                (Path(d) / name).write_text((REPO_ROOT / name).read_text())
+            if env_text is not None:
+                (Path(d) / ".env").write_text(env_text)
+            (Path(d) / "probe.mk").write_text(extra or "probe: ; @echo WS=[$(POSTMAN_WS)]\n")
+            return subprocess.run(["make", "--no-print-directory", "-f", "Makefile", "-f", "probe.mk", *args],
+                                  cwd=d, capture_output=True, text=True, timeout=60,
+                                  env={k: v for k, v in __import__("os").environ.items()
+                                       if not k.startswith(("POSTMAN_", "C2M_", "SERRAO_"))})
+
+    def default_ws(self):
+        import re
+        return re.search(r"^C2M_WS\s*\?=\s*(\S+)", (REPO_ROOT / "Makefile").read_text(), re.M).group(1)
+
+    def test_env_copied_from_example_keeps_the_default_workspace(self):
+        r = self.make("probe", env_text=(REPO_ROOT / ".env.example").read_text())
+        self.assertIn(f"WS=[{self.default_ws()}]", r.stdout, r.stderr)
+
+    def test_cleanup_stops_before_any_call_when_workspace_is_empty(self):
+        for target in ("postman-delete-collections", "postman-delete-mock-servers",
+                       "postman-delete-environments", "postman-collections-clean", "postman-workspace-debug"):
+            r = self.make(target, "C2M_WS=", env_text="")
+            self.assertNotEqual(r.returncode, 0, target)
+            self.assertIn("POSTMAN_WS (Postman workspace ID) is empty", r.stderr, target)
+            self.assertNotIn("Deleting", r.stdout, target)
+
+    def test_targets_without_postman_calls_still_run_when_workspace_is_empty(self):
+        r = self.make("empty-test", "C2M_WS=", env_text="")
+        self.assertEqual(r.returncode, 0, r.stderr)
+
+
 if __name__ == "__main__":
     unittest.main()
