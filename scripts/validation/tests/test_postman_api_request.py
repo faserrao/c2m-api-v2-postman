@@ -120,5 +120,20 @@ class TestMakefileSpecPayloads(unittest.TestCase):
         self.assertEqual(offenders, [])
 
 
+class TestMakefileSecurityRepoPath(unittest.TestCase):
+    """Local builds take the JWT auth script from the security repo cloned beside this one.
+    Until 2026-10-13 the Makefile looked for ../c2m-api-v2-security (the folder name CI
+    checks it out into), not the repo's own name, so a plain clone was never found and
+    local builds silently used the older fallback script."""
+
+    def test_local_path_is_the_security_repo_name_ci_checks_out(self):
+        import re
+        makefile = (REPO_ROOT / "Makefile").read_text()
+        workflow = (REPO_ROOT / ".github" / "workflows" / "api-ci-cd.yml").read_text()
+        repo = re.search(r"repository: \$\{\{ github\.repository_owner \}\}/(\S*security\S*)", workflow).group(1)
+        local = re.search(r"^else\nSECURITY_POSTMAN_SCRIPTS_DIR\s*:=\s*(\S+)", makefile, re.M).group(1)
+        self.assertEqual(local, f"../{repo}/postman/scripts")
+
+
 if __name__ == "__main__":
     unittest.main()

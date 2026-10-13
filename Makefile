@@ -238,7 +238,7 @@ REPORT_HTML                      := $(POSTMAN_DIR)/newman-report.html
 ifdef CI
 SECURITY_POSTMAN_SCRIPTS_DIR     := c2m-api-v2-security/postman/scripts
 else
-SECURITY_POSTMAN_SCRIPTS_DIR     := ../c2m-api-v2-security/postman/scripts
+SECURITY_POSTMAN_SCRIPTS_DIR     := ../c2m-api-v2-postman-security/postman/scripts
 endif
 # Token updated 2025-09-09
 
