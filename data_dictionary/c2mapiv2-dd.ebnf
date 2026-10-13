@@ -259,7 +259,6 @@ submitDocParams =
     + recipientAddressSource
     + [ paymentDetails ]
     + [ returnAddress ]
-    + [ priority ]           (* NEW - add this line *)
     + [ jobOptions ]
     + [ tags ] ;
 
@@ -1239,6 +1238,3 @@ errorTrackingId = string ;  (* Optional request ID for support tracking - format
    mailClass=non_profit: documentClass must be one of (letter|flat)
    envelope=none: layout must be one of (address_on_first_page|address_on_back_page)
    @end_valid_combinations *)
-
-(* @doc Delivery speed for the job. *)
-priority = "standard" | "rush" | "overnight" ;
