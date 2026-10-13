@@ -250,6 +250,15 @@ class TestDependencies(unittest.TestCase):
         self.assertEqual(sorted(pinned - imported), [], "pinned but never imported")
         self.assertEqual(sorted(imported - pinned), [], "imported but not pinned")
 
+    def test_venv_is_ignored_by_the_repo_gitignore(self):
+        """CI's Getting Started smoke test (2026-10-13): the rule was */e2o.venv/, one level
+        deep, so scripts/python_env/e2o.venv/ showed as untracked under Python 3.11/3.12.
+        (3.13+ writes its own .gitignore inside every venv, which hid it locally.)"""
+        r = subprocess.run(["git", "-c", "core.excludesfile=/dev/null", "check-ignore", "--no-index", "-v",
+                            "scripts/python_env/e2o.venv/bin/python"], cwd=REPO_ROOT, capture_output=True, text=True)
+        self.assertEqual(r.returncode, 0, "venv not ignored")
+        self.assertTrue(r.stdout.startswith(".gitignore:"), r.stdout)   # the repo's root file, not the venv's own
+
     def test_make_install_uses_the_lockfile(self):
         import re
         recipe = re.search(r"^install:\n((?:\t.*\n)+)", (REPO_ROOT / "Makefile").read_text(), re.M).group(1)
