@@ -1067,12 +1067,11 @@ postman-spec-create:
 		echo "❌ Missing API UID file: $(POSTMAN_API_UID_FILE). Requires postman-import-openapi-as-api (disabled 2026-02-19)."; exit 1; \
 	fi
 	@echo "📄 Creating/updating OpenAPI spec under Specs tab..."
-	@CONTENT=$$(cat "$(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES)"); \
-	jq -n \
+	@jq -n \
 		--arg name "$(C2MAPIV2_POSTMAN_API_NAME_PC)" \
 		--arg type "openapi3" \
 		--arg path "openapi.yaml" \
-		--arg content "$$CONTENT" \
+		--rawfile content "$(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES)" \
 		'{ type: $$type, files: [{ path: $$path, content: $$content }] }' \
 		> "$(POSTMAN_DIR)/spec-payload.json"
 	@RESPONSE=$$(curl --silent --location --request POST "$(POSTMAN_BASE_URL)/apis/$(shell cat $(POSTMAN_API_UID_FILE))/versions/1.0.0/schemas" \
@@ -1085,6 +1084,7 @@ postman-spec-create:
 		echo $$SPEC_ID > $(POSTMAN_DIR)/spec-id.txt; \
 	else \
 		echo "❌ Failed to create spec. Check $(POSTMAN_DIR)/spec-create-response.json"; \
+		exit 1; \
 	fi
 
 # Create standalone spec in Specs tab (without deleting existing)
@@ -1093,11 +1093,10 @@ postman-spec-create-standalone:
 	@echo "🧹 Deleting existing specs with the same name before creating new one..."
 	$(MAKE) postman-delete-specs-by-name NAME="$(C2MAPIV2_POSTMAN_API_NAME_PC)"
 	@echo "📄 Creating standalone spec in Specs tab..."
-	@CONTENT=$$(cat "$(C2MAPIV2_OPENAPI_SPEC)"); \
-	jq -n \
+	@jq -n \
 		--arg name "$(C2MAPIV2_POSTMAN_API_NAME_PC)" \
 		--arg type "OPENAPI:3.0" \
-		--arg content "$$CONTENT" \
+		--rawfile content "$(C2MAPIV2_OPENAPI_SPEC)" \
 		'{ name: $$name, type: $$type, files: [{ path: "openapi.yaml", content: $$content }] }' > "$(POSTMAN_DIR)/spec-standalone-payload.json"
 	@RESPONSE=$$(curl --silent --location --request POST "$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS)" \
 		$(POSTMAN_CURL_HEADERS_XC) \
@@ -1111,6 +1110,7 @@ postman-spec-create-standalone:
 	else \
 		echo "❌ Failed to create standalone spec. Check $(POSTMAN_DIR)/spec-standalone-response.json"; \
 		cat $(POSTMAN_DIR)/spec-standalone-response.json | jq . || cat $(POSTMAN_DIR)/spec-standalone-response.json; \
+		exit 1; \
 	fi
 
 # List all specs in workspace
@@ -1142,12 +1142,11 @@ postman-api-full-publish:
 
 	# Build payload JSON for new spec (YAML as raw string; no fromjson)
 	@echo "🆕 Creating a fresh Postman Spec with $(C2MAPIV2_OPENAPI_SPEC)..."
-	@CONTENT=$$(cat "$(C2MAPIV2_OPENAPI_SPEC)"); \
-	jq -n \
+	@jq -n \
 		--arg name "$(C2MAPIV2_POSTMAN_API_NAME_PC)" \
 		--arg type "OPENAPI:3.0" \
 		--arg path "index.yaml" \
-		--arg content "$$CONTENT" \
+		--rawfile content "$(C2MAPIV2_OPENAPI_SPEC)" \
 		'{ name: $$name, type: $$type, files: [ { path: $$path, content: $$content } ] }' \
 		> "$(POSTMAN_FULL_PAYLOAD)"
 
@@ -2314,12 +2313,13 @@ postman-collections-clean:
 postman-api-debug-A:
 	@echo "🐞 Debugging Postman API import..."
 
-	@curl --verbose --location --request POST "$(POSTMAN_APIS_URL)$(POSTMAN_Q_ID)" \
+	@jq -Rs --arg name '$(POSTMAN_API_NAME)' \
+		'{ api: { name: $$name, schema: { type: "openapi3", language: "yaml", schema: . }}}' \
+		$(C2MAPIV2_OPENAPI_SPEC) \
+	| curl --verbose --location --request POST "$(POSTMAN_APIS_URL)$(POSTMAN_Q_ID)" \
 		$(POSTMAN_CURL_HEADERS_XC) \
 		$(POSTMAN_CURL_HEADERS_AA) \
-		--data "$$(jq -Rs --arg name '$(POSTMAN_API_NAME)' \
-			'{ api: { name: $$name, schema: { type: "openapi3", language: "yaml", schema: . }}}' \
-			$(C2MAPIV2_OPENAPI_SPEC)" \
+		--data @- \
 	| tee $(POSTMAN_IMPORT_DEBUG)
 
 # Debug API credentials and workspace

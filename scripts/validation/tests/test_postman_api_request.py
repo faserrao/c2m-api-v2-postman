@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 Golden tests for scripts/active/postman_api_request.sh — the helper the Makefile cleanup
-targets use for every Postman API call. Before 2026-10-13 those targets called
+targets use for every Postman API call — and for how the Makefile hands the spec to the
+Postman API. Before 2026-10-13 those targets called
 `curl --silent` directly, which exits 0 on HTTP errors: a refused list call read as an
 empty workspace and a refused delete was ignored (and the spec-delete loops could spin).
 
@@ -100,6 +101,23 @@ class TestPostmanApiRequest(unittest.TestCase):
         r = self.run_helper("GET", f"http://127.0.0.1:{port}/ok")
         self.assertEqual(r.returncode, 1)
         self.assertIn("request failed", r.stderr)
+
+
+class TestMakefileSpecPayloads(unittest.TestCase):
+    """Linux caps one command-line argument at 128 KB (MAX_ARG_STRLEN). The spec passed
+    that on 2026-10-13 and `jq --arg content "$$(cat spec)"` failed in CI with
+    'Argument list too long' (macOS has no such cap, so local builds passed).
+    Spec content must reach jq/curl from the file (--rawfile, --data @file, a pipe)."""
+
+    def test_no_recipe_passes_a_spec_file_as_one_argument(self):
+        offenders = []
+        for n, line in enumerate((REPO_ROOT / "Makefile").read_text().splitlines(), 1):
+            code = line.split("#", 1)[0] if line.lstrip().startswith("#") else line
+            if "$$(cat" in code and "SPEC" in code and "CONTENT=" in code:
+                offenders.append(f"{n}: {line.strip()}")
+            if '--arg content "$$' in code or ('--data "$$(jq' in code):
+                offenders.append(f"{n}: {line.strip()}")
+        self.assertEqual(offenders, [])
 
 
 if __name__ == "__main__":
