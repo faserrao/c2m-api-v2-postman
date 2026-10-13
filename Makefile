@@ -53,6 +53,12 @@ endif
 # -e: Exit on error
 # -u: Error on undefined variables
 # -o pipefail: Fail on pipe errors
+# GNU Make 3.82+ is required: .ONESHELL and .SHELLFLAGS (below) are silently ignored by
+# 3.81, the version macOS ships, so recipes would run without -eu -o pipefail and each line
+# in its own shell -- not the way CI runs them.
+ifeq ($(filter oneshell,$(.FEATURES)),)
+$(error GNU Make 3.82 or later is required (this is $(MAKE_VERSION)). On macOS: brew install make, then put "$$(brew --prefix)/opt/make/libexec/gnubin" first on PATH)
+endif
 SHELL := bash
 .ONESHELL:
 .SHELLFLAGS := -eu -o pipefail -c
@@ -164,7 +170,7 @@ POSTMAN_TEST_COLLECTION_FIXED_WITH_TESTS := $(basename $(POSTMAN_TEST_COLLECTION
 
 #--- Linked Collection Variables ---
 POSTMAN_LINKED_COLLECTION_UID_FILE := $(POSTMAN_DIR)/postman_linked_collection_uid.txt
-POSTMAN_LINKED_COLLECTION_UID    := $(shell cat $(POSTMAN_LINKED_COLLECTION_UID_FILE))
+POSTMAN_LINKED_COLLECTION_UID    = $(shell cat $(POSTMAN_LINKED_COLLECTION_UID_FILE) 2>/dev/null)
 POSTMAN_LINKED_COLLECTION_TMP    := $(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-linked-collection-tmp.json
 POSTMAN_LINKED_COLLECTION_NAME   := $(C2MAPIV2_POSTMAN_API_NAME_PC)CollectionLinked
 POSTMAN_COLLECTIONS_URL          := $(POSTMAN_BASE_URL)/collections
@@ -209,7 +215,8 @@ POSTMAN_MOCK_LINK_DEBUG_FILE     := $(POSTMAN_DIR)/postman-mock-link-debug.json
 POSTMAN_MOCK_UID                 := $(shell cat $(POSTMAN_MOCK_UID_FILE) 2>/dev/null || echo "")
 POSTMAN_MOCK_URL_FILE            := $(POSTMAN_DIR)/postman_mock_url.txt
 POSTMAN_MOCKS_URL                := $(POSTMAN_BASE_URL)/mocks
-POSTMAN_MOCK_URL                 := $(shell cat $(POSTMAN_MOCK_URL_FILE) 2>/dev/null || (echo "❌ Mock server URL not found: run 'make postman-mock-create' first" >&2; echo "https://MISSING-MOCK-URL"))
+# Recursive (=): read when a recipe uses it, so a fresh clone's "make <anything>" doesn't print the error
+POSTMAN_MOCK_URL                 = $(shell cat $(POSTMAN_MOCK_URL_FILE) 2>/dev/null || (echo "❌ Mock server URL not found: run 'make postman-mock-create' first" >&2; echo "https://MISSING-MOCK-URL"))
 POSTMAN_MOCK_ID_FILE             := $(POSTMAN_DIR)/postman_mock_id.txt
 POSTMAN_MOCK_ID                  := $(shell cat $(POSTMAN_MOCK_ID_FILE) 2>/dev/null || echo "")
 
@@ -588,8 +595,11 @@ postman-instance-build-with-tests:
 	# Start local mock and run tests
 	$(MAKE) prism-start
 	$(MAKE) postman-mock
+	$(MAKE) prism-stop
 	# Generate and serve documentation
-	$(MAKE) postman-docs-build-and-serve-up
+	# Build docs and serve them in the background (make docs-stop) so the build finishes
+	$(MAKE) docs-build
+	$(MAKE) docs-serve-bg
 	# Validate pipeline outputs
 	$(MAKE) validate-pipeline
 
@@ -1917,7 +1927,7 @@ prism-start:
 	# Preflight: spec exists?
 	@test -f "$(PRISM_SPEC)" || { echo "❌ Spec not found: $(PRISM_SPEC)"; exit 1; }
 	# If something is already on the port, stop it first
-	@EXISTING=$$(lsof -ti :$(PRISM_PORT)) ; \
+	@EXISTING=$$(lsof -ti :$(PRISM_PORT) || true) ; \
 	if [ -n "$$EXISTING" ]; then \
 		echo "ℹ️ Port $(PRISM_PORT) is in use (PID $$EXISTING). Stopping it..."; \
 		kill $$EXISTING || true; sleep 1; \

@@ -242,5 +242,52 @@ class TestDependencies(unittest.TestCase):
         self.assertNotRegex(body, r"npm install\b")
 
 
+class TestLocalMakeBehaviour(unittest.TestCase):
+    """Found by the Getting Started test on 2026-10-13 (fresh clone, GNU Make 4 as the
+    guide now requires): prism-start stopped silently under -eu when nothing listened on
+    the port; postman-instance-build-with-tests never finished (it ended by serving docs in
+    the foreground, so validate-pipeline never ran and Prism kept running); every make
+    command in a fresh clone printed 'cat: ... No such file' and '❌ Mock server URL not
+    found'; and Make 3.81 (macOS) ignored .ONESHELL/.SHELLFLAGS without a word."""
+
+    MAKEFILE = (REPO_ROOT / "Makefile").read_text()
+
+    def target(self, name):
+        import re
+        return re.search(rf"^{re.escape(name)}:.*\n((?:\t.*\n|#.*\n)+)", self.MAKEFILE, re.M).group(1)
+
+    def run_make(self, make, *args):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            for name in ("Makefile", ".git-context"):
+                (Path(d) / name).write_text((REPO_ROOT / name).read_text())
+            return subprocess.run([make, "--no-print-directory", *args], cwd=d, capture_output=True,
+                                  text=True, timeout=60)
+
+    def test_fresh_clone_make_prints_no_errors(self):
+        r = self.run_make("make", "empty-test")
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertNotIn("No such file", r.stderr)
+        self.assertNotIn("Mock server URL not found", r.stderr)
+
+    def test_make_3_81_is_refused(self):
+        old = "/usr/bin/make"
+        if not Path(old).exists() or "3.81" not in subprocess.run([old, "--version"], capture_output=True, text=True).stdout:
+            self.skipTest("Make 3.81 not available here")
+        r = self.run_make(old, "empty-test")
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn("GNU Make 3.82 or later is required", r.stderr)
+
+    def test_build_with_tests_finishes_and_stops_prism(self):
+        body = self.target("postman-instance-build-with-tests")
+        self.assertNotIn("postman-docs-build-and-serve-up", body)   # served docs in the foreground
+        self.assertIn("docs-serve-bg", body)
+        self.assertLess(body.index("postman-mock"), body.index("prism-stop"))
+        self.assertLess(body.index("docs-serve-bg"), body.index("validate-pipeline"))
+
+    def test_prism_start_tolerates_a_free_port(self):
+        self.assertIn("lsof -ti :$(PRISM_PORT) || true", self.target("prism-start"))
+
+
 if __name__ == "__main__":
     unittest.main()
