@@ -38,6 +38,7 @@ See top-level `CLAUDE.md` (`C2M_API_v2/CLAUDE.md`) for full project context and 
 - **Hint types**: `HINT_TYPES` in the translator (`faker`, `static`, `random_int`, `aba_routing_number`); the gate imports it. An intentionally empty static hint is written `""`.
 - **`@reserved`**: `rule = … ; (* @reserved POST /path *)` marks a rule kept for a planned endpoint (`multiDocJobs` → `/static/multi`). The gate accepts it as unreachable and fails once the rule is used or the endpoint is defined.
 - **Never pass a spec file as one argument**: Linux caps a single argument at 128 KB (the final spec is ~136 KB). Use `jq --rawfile`, `--data @file` or a pipe; a golden test checks the Makefile.
+- **Local builds**: the security repo is cloned beside this one as `c2m-api-v2-postman-security`; `postman/mock-env.json` and `postman/environments/` receive real credentials and are git-ignored (a test enforces it). Environment uploads create a new environment when the saved UID's environment is gone.
 - **Derived artifacts**: `config/faker_hints.yaml`, `config/c2m_provider_mappings.yaml`, `openapi/c2mapiv2-openapi-spec-*.yaml` — all generated. Do not edit directly.
 
 ---
@@ -160,7 +161,7 @@ Four additional iterative audit passes fixing 14 items across 9 files (all LOW/M
 ```bash
 make openapi-build && make postman-build-golden-test-fixtures   # build spec + all 5 collections (no API keys)
 make validate-configs                           # V1–V8 config validators
-make validate-collections-conformance-test      # Golden tests: validator script + resolver 20 + DD constraints 50 + consistency 47 + migration 22 + Postman API helper 8
+make validate-collections-conformance-test      # Golden tests: validator script + resolver 20 + DD constraints 50 + consistency 47 + migration 22 + Postman API helper 10
 make validate-collections-conformance-gate-all  # All 5 collections conform to spec
 make validate-dd-gates                          # spec vs DD, all 5 collections vs DD, catalog vs spec
 make validate-pipeline-consistency              # end-to-end DD → spec → Postman gate
@@ -169,7 +170,7 @@ make validate-migration MIGRATION=<name>        # compare a rebuild against a mi
 
 Expected outputs (all clean):
 - `✅ All config field names are valid DD rule names`
-- `20 passed` / `50 passed, 43 subtests passed` / `47 passed` / `22 passed` / `8 passed` (resolver / DD constraints / consistency / migration validator / Postman API helper)
+- `20 passed` / `50 passed, 43 subtests passed` / `47 passed` / `22 passed` / `10 passed` (resolver / DD constraints / consistency / migration validator / Postman API helper)
 - `PASS=9 FAIL=0 SKIP=1` (linked/test), `PASS=17 FAIL=0` (GS), `PASS=8 FAIL=0` (real-world)
 - `✅ TOTAL — PASS=184 FAIL=0` (spec vs DD); `0 finding(s) across 5 collection(s)`
 - `ERROR categories: 0 · known-open WARN categories: 12` (plus L6, which is intermittent and sometimes shows as stale)
