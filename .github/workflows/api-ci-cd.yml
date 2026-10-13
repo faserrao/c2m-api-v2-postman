@@ -13,6 +13,11 @@ on:
       - 'scripts/validation/**'         # Validation scripts
       - 'scripts/test_data_generator_for_collections/**'  # Test data generation
       - '.github/workflows/api-ci-cd.yml'  # Workflow changes
+      - '.env.example'                  # Copied by the Getting Started guide (smoke test)
+      - '.git-context'                  # Workspace selector
+      - 'package.json'                  # Node tools (make install = npm ci)
+      - 'package-lock.json'
+      - 'scripts/python_env/requirements.txt'  # Python packages for the venv
       - '!**/*.md'                      # Docs live in c2m-api-v2-manuals, never trigger a build
   pull_request:
     branches: [ main ]
@@ -25,6 +30,11 @@ on:
       - 'scripts/validation/**'         # Validation scripts
       - 'scripts/test_data_generator_for_collections/**'  # Test data generation
       - '.github/workflows/api-ci-cd.yml'  # Workflow changes
+      - '.env.example'                  # Copied by the Getting Started guide (smoke test)
+      - '.git-context'                  # Workspace selector
+      - 'package.json'                  # Node tools (make install = npm ci)
+      - 'package-lock.json'
+      - 'scripts/python_env/requirements.txt'  # Python packages for the venv
       - '!**/*.md'                      # Docs live in c2m-api-v2-manuals, never trigger a build
   workflow_dispatch:
     inputs:
@@ -144,6 +154,38 @@ jobs:
 
       - name: Print Make variables (debug)
         run: make -n print-vars || true
+
+      # The Getting Started guide's setup, replayed in a fresh clone of this commit:
+      # cp .env.example .env, make install, the verify step, make openapi-build and the
+      # local checks. No Postman calls. Fails if a command fails, if the verify step prints
+      # anything but one workspace-ID line, or if the clone is dirty afterwards (a committed
+      # generated file out of date with the DD, or make install rewriting package files).
+      - name: Getting Started smoke test (fresh clone, the guide's setup commands)
+        run: |
+          set -euo pipefail
+          G="$RUNNER_TEMP/guide-smoke"
+          rm -rf "$G"
+          git clone --quiet "$GITHUB_WORKSPACE" "$G"
+          cd "$G"
+          cp .env.example .env
+          make install
+          out=$(make --no-print-directory postman-workspace-debug 2>&1)
+          echo "$out"
+          if [[ ! "$out" =~ ^"🔍 Current Postman workspace ID: "[0-9a-f-]{36}$ ]]; then
+            echo "::error::'make postman-workspace-debug' (the guide's verify step) must print exactly one workspace-ID line"
+            exit 1
+          fi
+          make openapi-build
+          make validate-configs
+          make postman-build-golden-test-fixtures
+          make validate-dd-gates
+          dirty=$(git status --porcelain)
+          if [ -n "$dirty" ]; then
+            echo "$dirty"
+            echo "::error::the guide's setup left the clone dirty: a committed generated file is out of date with the DD, or make install rewrote package files"
+            exit 1
+          fi
+          echo "✅ Getting Started setup works from a fresh clone"
 
       # ---------- Build Steps ----------
       - name: Build OpenAPI from EBNF
