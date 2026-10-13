@@ -1787,8 +1787,9 @@ postman-env-create:
 postman-env-upload:
 	@echo "📤 Uploading Mock environment to workspace $(POSTMAN_WS)..."
 	@$(call guard-file,$(POSTMAN_ENV_FILE))
-	@if [ -f "$(POSTMAN_ENV_UID_FILE)" ] && [ -s "$(POSTMAN_ENV_UID_FILE)" ]; then \
-		EXISTING_UID=$$(cat $(POSTMAN_ENV_UID_FILE)); \
+	@# The saved UID is from an earlier local build; cleanup may have deleted that environment.
+	@EXISTING_UID=$$(cat $(POSTMAN_ENV_UID_FILE) 2>/dev/null); \
+	if [ -n "$$EXISTING_UID" ] && $(POSTMAN_API_REQUEST) GET "$(POSTMAN_ENVIRONMENTS_URL)/$$EXISTING_UID" $(POSTMAN_CURL_HEADERS_XC) >/dev/null 2>&1; then \
 		echo "🔄 Updating existing Mock environment (UID: $$EXISTING_UID)..."; \
 		RESPONSE=$$(curl --silent --show-error --fail --location \
 			--request PUT "$(POSTMAN_ENVIRONMENTS_URL)/$$EXISTING_UID$(POSTMAN_Q)" \
@@ -1814,8 +1815,8 @@ postman-env-upload:
 	@echo "📤 Uploading AWS Dev environment to workspace $(POSTMAN_WS)..."
 	@AWS_ENV_FILE="postman/environments/c2m-aws-dev.postman_environment.json"; \
 	if [ -f "$$AWS_ENV_FILE" ]; then \
-		if [ -f "$(POSTMAN_AWS_ENV_UID_FILE)" ] && [ -s "$(POSTMAN_AWS_ENV_UID_FILE)" ]; then \
-			EXISTING_UID=$$(cat $(POSTMAN_AWS_ENV_UID_FILE)); \
+		EXISTING_UID=$$(cat $(POSTMAN_AWS_ENV_UID_FILE) 2>/dev/null); \
+		if [ -n "$$EXISTING_UID" ] && $(POSTMAN_API_REQUEST) GET "$(POSTMAN_ENVIRONMENTS_URL)/$$EXISTING_UID" $(POSTMAN_CURL_HEADERS_XC) >/dev/null 2>&1; then \
 			echo "🔄 Updating existing AWS Dev environment (UID: $$EXISTING_UID)..."; \
 			RESPONSE=$$(curl --silent --show-error --fail --location \
 				--request PUT "$(POSTMAN_ENVIRONMENTS_URL)/$$EXISTING_UID$(POSTMAN_Q)" \
