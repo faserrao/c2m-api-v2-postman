@@ -1,0 +1,7 @@
+name: C1 — request-body examples in the spec
+# Adds a request example to each of the 7 job endpoints (translator, from the schema and
+# the DD @hint values) and an @hint on tagsList. Declares no change: the check proves that
+# DD rule structure, every spec schema, every response example and all five collections
+# are unchanged — the Postman converter generates bodies from the schema, not the example.
+# The baseline was taken before request examples were recorded in snapshots, so the new
+# examples themselves are not compared here; the consistency gate checks their content.

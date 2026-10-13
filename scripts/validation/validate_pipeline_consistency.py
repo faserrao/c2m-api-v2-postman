@@ -77,7 +77,7 @@ KNOWN_OPEN = {
     ("B-EXAMPLE-ORIGINAL-REQUEST", "Linked"): "X9b (merge minimum in saved examples)",
     ("B-EXAMPLE-ORIGINAL-REQUEST", "Test"): "L6 (random auth ttl_seconds can fall below 3600 — intermittent)",
     ("B-TEST-STATUS-ASSERTION", "*"): "X12 / decision D7 (global allowed-codes list)",
-    ("C-REQUEST-EXAMPLE-MISSING", "*"): "C1 (no request-example generator for job endpoints)",
+    ("C-REQUEST-EXAMPLE-MERGE-MINIMUM", "*"): "X9b / decision D4 (merge minimum 1 or 2)",
 }
 
 
@@ -797,7 +797,35 @@ def check_collection(label, collection, typed, spec, tools, F):
 # --------------------------------------------------------------------------- #
 # Layer C — spec examples                                                      #
 # --------------------------------------------------------------------------- #
-def check_spec_examples(spec, dd, F):
+def hint_mismatches(obj, hints, key=None, path=""):
+    """Leaves of a request example that contradict the DD @hint for their field
+    (static value differs, or random_int value outside its range). Array items use
+    the array field's hint."""
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            yield from hint_mismatches(v, hints, k, f"{path}.{k}" if path else k)
+    elif isinstance(obj, list):
+        for i, v in enumerate(obj):
+            yield from hint_mismatches(v, hints, key, f"{path}[{i}]")
+    else:
+        h = hints.get(key) or {}
+        if h.get("type") == "static" and obj != h.get("value"):
+            yield f"{path}={obj!r}, @hint static {h.get('value')!r}"
+        elif h.get("type") == "random_int" and not (isinstance(obj, int) and h["min"] <= obj <= h["max"]):
+            yield f"{path}={obj!r}, @hint random_int {h['min']}..{h['max']}"
+
+
+def request_example_problems(value, info, hints):
+    """(category, message) pairs for one spec request example (C1), beyond schema validity."""
+    out = [(f"C-REQUEST-EXAMPLE-{cat[2:]}", msg) for cat, msg in cross_field_errors(value, info)]
+    for p_, v in leaf_values(value):
+        if is_placeholder(v) or (isinstance(v, str) and v.startswith("example_")):
+            out.append(("C-REQUEST-EXAMPLE-FILLER", f"body{p_}={v!r}"))
+    out += [("C-REQUEST-EXAMPLE-HINT-MISMATCH", m) for m in hint_mismatches(value, hints or {})]
+    return out
+
+
+def check_spec_examples(spec, dd, F, faker_hints=None):
     resolver = RefResolver(base_uri="", referrer=spec)
     tools = SpecTools(spec)
     dd_eps = {(e.method.lower(), e.path) for e in dd.t.endpoints}
@@ -808,6 +836,13 @@ def check_spec_examples(spec, dd, F):
             rb = ((op.get("requestBody") or {}).get("content") or {}).get(CONTENT_TYPE_JSON, {})
             if rb.get("schema") and "example" not in rb and not rb.get("examples"):
                 F.add("C-REQUEST-EXAMPLE-MISSING", "*", f"{m.upper()} {p}")
+            req_values = ([rb["example"]] if "example" in rb else []) + [e.get("value") for e in (rb.get("examples") or {}).values()]
+            for v in req_values:
+                for e in Draft7Validator(rb["schema"], resolver=resolver).iter_errors(v):
+                    F.add("C-REQUEST-EXAMPLE-INVALID", "*",
+                          f"{m.upper()} {p}: {'/'.join(map(str, e.absolute_path)) or '<root>'}: {e.message[:120]}")
+                for cat, msg in request_example_problems(v, spec.get("info", {}), faker_hints):
+                    F.add(cat, "*", f"{m.upper()} {p}: {msg}")
             for code, r in op.get("responses", {}).items():
                 c = (r.get("content") or {}).get(CONTENT_TYPE_JSON, {})
                 values = ([c["example"]] if "example" in c else []) + [e.get("value") for e in (c.get("examples") or {}).values()]
@@ -862,7 +897,7 @@ def main(argv=None):
             F.add("B-COLLECTION-MISSING", label, str(f))
             continue
         check_collection(label, json.loads(f.read_text()), typed, specs["final"], tools, F)
-    check_spec_examples(specs["final-with-examples"], dd, F)
+    check_spec_examples(specs["final-with-examples"], dd, F, faker_hints)
 
     errors, warns, stale = F.classified()
     lines = ["# Pipeline consistency (DD → spec → Postman)", "",

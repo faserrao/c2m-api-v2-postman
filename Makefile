@@ -283,6 +283,10 @@ endef
 #--- SCRIPTS ---
 ADD_TESTS_SCRIPT                 := $(SCRIPTS_DIR)/active/add_tests.js
 EBNF_TO_OPENAPI_SCRIPT           := $(SCRIPTS_DIR)/active/ebnf_to_openapi_dynamic_v3.py
+# Postman API call that exits 1 on a non-2xx status (cleanup targets; curl --silent alone exits 0)
+POSTMAN_API_REQUEST              := $(SCRIPTS_DIR)/active/postman_api_request.sh
+# Spec deletes loop until the list is empty; stop if specs are still listed after this many passes
+POSTMAN_DELETE_MAX_PASSES        ?= 50
 FIX_COLLECTION_URLS              := $(SCRIPTS_DIR)/active/fix_collection_urls_v2.py
 FIX_PATHS_SCRIPT                 := $(SCRIPTS_DIR)/jq/fix_paths.jq
 JQ_ADD_INFO                      := --arg name "$$(POSTMAN_LINKED_COLLECTION_NAME)" '. as $$c | {info: {name: $$name, schema: "$$(POSTMAN_SCHEMA_V2)"}, item: $$c.item}'
@@ -653,18 +657,15 @@ postman-cleanup-all:
 	# Collections are generated locally from OpenAPI spec, not from API resource
 	#$(MAKE) postman-delete-apis
 	$(MAKE) postman-delete-environments
-	$(MAKE) postman-api-clean-trash
 	$(MAKE) postman-delete-specs
 	@echo "🔍 Verifying cleanup..."
 	# NOTE: API verification updated 2026-02-19 (no longer deleting API resources)
-	@REMAINING_APIS=$$(curl --silent --location \
-		--request GET "$(POSTMAN_APIS_URL)$(POSTMAN_Q_ID)" \
-		--header "X-Api-Key: $(POSTMAN_API_KEY)" | jq -r '.apis | length' || echo 0); \
+	@APIS_RESP=$$($(POSTMAN_API_REQUEST) GET "$(POSTMAN_APIS_URL)$(POSTMAN_Q_ID)" \
+		--header "X-Api-Key: $(POSTMAN_API_KEY)") || exit 1; \
+	REMAINING_APIS=$$(echo "$$APIS_RESP" | jq -r '.apis | length') || exit 1; \
 	if [ "$$REMAINING_APIS" -gt 0 ]; then \
 		echo "ℹ️  Note: $$REMAINING_APIS API(s) exist in workspace (not deleted - API resources no longer used)"; \
-		curl --silent --location \
-			--request GET "$(POSTMAN_APIS_URL)$(POSTMAN_Q_ID)" \
-			--header "X-Api-Key: $(POSTMAN_API_KEY)" | jq -r '.apis[] | "  - \(.id): \(.name)"'; \
+		echo "$$APIS_RESP" | jq -r '.apis[] | "  - \(.id): \(.name)"'; \
 	else \
 		echo "ℹ️  No API resources found in workspace"; \
 	fi
@@ -676,18 +677,17 @@ postman-cleanup-except-mocks-and-envs:
 	@echo "🧹 Starting cleanup of Postman resources (preserving mock servers and environments) for workspace $(POSTMAN_WS)..."
 	@echo "ℹ️  Note: Mock servers and environments will NOT be deleted to preserve URLs for forked environments"
 	$(MAKE) postman-delete-collections
-	$(MAKE) postman-api-clean-trash
 	$(MAKE) postman-delete-specs
 	@echo "🔍 Verifying cleanup..."
-	@REMAINING_APIS=$$(curl --silent --location \
-		--request GET "$(POSTMAN_APIS_URL)$(POSTMAN_Q_ID)" \
-		--header "X-Api-Key: $(POSTMAN_API_KEY)" | jq -r '.apis | length' || echo 0); \
+	@APIS_RESP=$$($(POSTMAN_API_REQUEST) GET "$(POSTMAN_APIS_URL)$(POSTMAN_Q_ID)" \
+		--header "X-Api-Key: $(POSTMAN_API_KEY)") || exit 1; \
+	REMAINING_APIS=$$(echo "$$APIS_RESP" | jq -r '.apis | length') || exit 1; \
 	if [ "$$REMAINING_APIS" -gt 0 ]; then \
 		echo "ℹ️  Note: $$REMAINING_APIS API(s) exist in workspace (not deleted - API resources no longer used)"; \
 	fi
-	@REMAINING_MOCKS=$$(curl --silent --location \
-		--request GET "$(POSTMAN_MOCKS_URL)$(POSTMAN_Q_ID)" \
-		--header "X-Api-Key: $(POSTMAN_API_KEY)" | jq -r '.mocks | length' || echo 0); \
+	@MOCKS_RESP=$$($(POSTMAN_API_REQUEST) GET "$(POSTMAN_MOCKS_URL)$(POSTMAN_Q_ID)" \
+		--header "X-Api-Key: $(POSTMAN_API_KEY)") || exit 1; \
+	REMAINING_MOCKS=$$(echo "$$MOCKS_RESP" | jq -r '.mocks | length') || exit 1; \
 	echo "ℹ️  Preserved mock servers: $$REMAINING_MOCKS (not deleted to preserve forked environment URLs)"
 	@echo "✅ Postman cleanup complete (mock servers preserved) for workspace $(POSTMAN_WS)."
 
@@ -2123,18 +2123,15 @@ postman-api-list-specs:
 .PHONY: postman-delete-mock-servers
 postman-delete-mock-servers:
 	@echo "🔍 Fetching mock servers from workspace $(POSTMAN_WS)..."
-	@MOCKS=$$(curl --silent --location \
-		--request GET "$(POSTMAN_MOCKS_URL)$(POSTMAN_Q)" \
-		$(POSTMAN_CURL_HEADERS_XC) | jq -r '.mocks[]?.id' 2>/dev/null | grep -v '^null$$' || true); \
+	@RESP=$$($(POSTMAN_API_REQUEST) GET "$(POSTMAN_MOCKS_URL)$(POSTMAN_Q)" $(POSTMAN_CURL_HEADERS_XC)) || exit 1; \
+	MOCKS=$$(echo "$$RESP" | jq -r '.mocks[]?.id') || exit 1; \
 	if [ -z "$$MOCKS" ]; then \
 		echo "ℹ️  No mock servers found in workspace"; \
 	else \
 		for MOCK in $$MOCKS; do \
 			if [ -n "$$MOCK" ]; then \
 				echo "🗑 Deleting mock server $$MOCK..."; \
-		curl --silent --location \
-			--request DELETE "$(POSTMAN_MOCKS_URL)/$$MOCK" \
-			$(POSTMAN_CURL_HEADERS_XC) || echo "⚠️ Failed to delete mock server $$MOCK"; \
+		$(POSTMAN_API_REQUEST) DELETE "$(POSTMAN_MOCKS_URL)/$$MOCK" $(POSTMAN_CURL_HEADERS_XC) >/dev/null || exit 1; \
 		fi; \
 		done; \
 	fi
@@ -2143,18 +2140,15 @@ postman-delete-mock-servers:
 .PHONY: postman-delete-collections
 postman-delete-collections:
 	@echo "🔍 Fetching collections from workspace $(POSTMAN_WS)..."
-	@COLLECTIONS=$$(curl --silent --location \
-		--request GET "$(POSTMAN_COLLECTIONS_URL)$(POSTMAN_Q)" \
-		$(POSTMAN_CURL_HEADERS_XC) | jq -r '.collections[]?.uid' 2>/dev/null | grep -v '^null$$' || true); \
+	@RESP=$$($(POSTMAN_API_REQUEST) GET "$(POSTMAN_COLLECTIONS_URL)$(POSTMAN_Q)" $(POSTMAN_CURL_HEADERS_XC)) || exit 1; \
+	COLLECTIONS=$$(echo "$$RESP" | jq -r '.collections[]?.uid') || exit 1; \
 	if [ -z "$$COLLECTIONS" ]; then \
 		echo "ℹ️  No collections found in workspace"; \
 	else \
 		for COL in $$COLLECTIONS; do \
 			if [ -n "$$COL" ]; then \
 				echo "🗑 Deleting collection $$COL..."; \
-		curl --silent --location \
-			--request DELETE "$(POSTMAN_COLLECTIONS_URL)/$$COL" \
-			$(POSTMAN_CURL_HEADERS_XC) || echo "⚠️ Failed to delete collection $$COL"; \
+		$(POSTMAN_API_REQUEST) DELETE "$(POSTMAN_COLLECTIONS_URL)/$$COL" $(POSTMAN_CURL_HEADERS_XC) >/dev/null || exit 1; \
 		fi; \
 		done; \
 	fi
@@ -2203,57 +2197,35 @@ postman-delete-collections:
 .PHONY: postman-delete-environments
 postman-delete-environments:
 	@echo "🔍 Fetching environments from workspace $(POSTMAN_WS)..."
-	@ENVS=$$(curl --silent --location \
-		--request GET "$(POSTMAN_ENVIRONMENTS_URL)$(POSTMAN_Q)" \
-		--header "X-Api-Key: $(POSTMAN_API_KEY)" | jq -r '.environments[]?.uid' 2>/dev/null | grep -v '^null$$' || true); \
+	@RESP=$$($(POSTMAN_API_REQUEST) GET "$(POSTMAN_ENVIRONMENTS_URL)$(POSTMAN_Q)" --header "X-Api-Key: $(POSTMAN_API_KEY)") || exit 1; \
+	ENVS=$$(echo "$$RESP" | jq -r '.environments[]?.uid') || exit 1; \
 	if [ -z "$$ENVS" ]; then \
 		echo "ℹ️  No environments found in workspace"; \
 	else \
 		for ENV in $$ENVS; do \
 			if [ -n "$$ENV" ]; then \
 				echo "🗑 Deleting environment $$ENV..."; \
-		curl --silent --location \
-			--request DELETE "$(POSTMAN_ENVIRONMENTS_URL)/$$ENV" \
-			--header "X-Api-Key: $(POSTMAN_API_KEY)" || echo "⚠️ Failed to delete environment $$ENV"; \
+		$(POSTMAN_API_REQUEST) DELETE "$(POSTMAN_ENVIRONMENTS_URL)/$$ENV" --header "X-Api-Key: $(POSTMAN_API_KEY)" >/dev/null || exit 1; \
 		fi; \
 		done; \
 	fi
 
-# Clean trash in workspace
-.PHONY: postman-api-clean-trash
-postman-api-clean-trash:
-	@echo "🗑️ Checking for trashed specs in workspace $(POSTMAN_WS)..."
-	@TRASH=$$(curl --silent \
-		$(POSTMAN_CURL_HEADERS_XC) \
-		"$(POSTMAN_SPECS_URL)$(POSTMAN_Q_ID)&status=trashed&limit=100" \
-		| jq -r '.specs // [] | .[].id'); \
-	if [ -z "$$TRASH" ]; then \
-		echo "   No trashed specs found in workspace $(POSTMAN_WS)."; \
-	else \
-		for ID in $$TRASH; do \
-			echo "   🚮 Permanently deleting trashed spec $$ID..."; \
-			curl --silent --location \
-				--request DELETE "$(POSTMAN_SPECS_URL)/$$ID?permanent=true" \
-				$(POSTMAN_CURL_HEADERS_XC) | jq .; \
-		done; \
-		echo "   ✅ All trashed specs have been permanently deleted."; \
-	fi
+# postman-api-clean-trash removed 2026-10-13: its list call (?status=trashed) has returned
+# HTTP 400 "query parameter /status is invalid" on every build, so it never deleted anything.
 
 # Delete old specs keeping the most recent
 .PHONY: postman-api-delete-old-specs
 postman-api-delete-old-specs:
 	@echo "🧹 Deleting old specs in workspace: $(POSTMAN_WS), keeping the most recent one..."
-	@RESPONSE=$$(curl --silent $(POSTMAN_CURL_HEADERS_XC) "$(POSTMAN_SPECS_URL)$(POSTMAN_Q_ID)"); \
+	@RESPONSE=$$($(POSTMAN_API_REQUEST) GET "$(POSTMAN_SPECS_URL)$(POSTMAN_Q_ID)" $(POSTMAN_CURL_HEADERS_XC)) || exit 1; \
 	echo "$$RESPONSE" > $(POSTMAN_DIR)/specs-debug.json; \
-	SPECS=$$(echo "$$RESPONSE" | jq -r 'select(.specs != null) | .specs | sort_by(.updatedAt) | reverse | .[1:] | .[].id'); \
+	SPECS=$$(echo "$$RESPONSE" | jq -r '.specs // [] | sort_by(.updatedAt) | reverse | .[1:] | .[].id') || exit 1; \
 	if [ -z "$$SPECS" ]; then \
 		echo "ℹ️  No old specs to delete."; \
 	else \
 		for ID in $$SPECS; do \
 			echo "   ➡️ Deleting spec $$ID..."; \
-			curl --silent --location \
-				--request DELETE "$(POSTMAN_SPECS_URL)/$$ID" \
-				$(POSTMAN_CURL_HEADERS_XC) | jq .; \
+			$(POSTMAN_API_REQUEST) DELETE "$(POSTMAN_SPECS_URL)/$$ID" $(POSTMAN_CURL_HEADERS_XC) >/dev/null || exit 1; \
 		done; \
 		echo "✅ Old specs deleted."; \
 	fi
@@ -2267,17 +2239,17 @@ postman-delete-specs-by-name:
 		exit 1; \
 	fi
 	@echo "🔍 Deleting all specs named '$(NAME)' in workspace $(POSTMAN_WS)..."
-	@TOTAL=0; KEEP_GOING=1; \
+	@TOTAL=0; PASS=0; KEEP_GOING=1; \
 	while [ "$$KEEP_GOING" -eq 1 ]; do \
-		KEEP_GOING=0; \
-		SPECS=$$(curl --silent --location \
-			--request GET "$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS)&limit=100" \
-			$(POSTMAN_CURL_HEADERS_XC) | jq -r --arg name "$(NAME)" '.specs // [] | .[] | select(.name == $$name) | .id'); \
+		KEEP_GOING=0; PASS=$$((PASS + 1)); \
+		if [ "$$PASS" -gt $(POSTMAN_DELETE_MAX_PASSES) ]; then \
+			echo "❌ Specs named '$(NAME)' still listed after $(POSTMAN_DELETE_MAX_PASSES) passes"; exit 1; \
+		fi; \
+		RESP=$$($(POSTMAN_API_REQUEST) GET "$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS)&limit=100" $(POSTMAN_CURL_HEADERS_XC)) || exit 1; \
+		SPECS=$$(echo "$$RESP" | jq -r --arg name "$(NAME)" '.specs // [] | .[] | select(.name == $$name) | .id') || exit 1; \
 		for SPEC in $$SPECS; do \
 			echo "🗑  Deleting spec $$SPEC..."; \
-			curl --silent --location \
-				--request DELETE "$(POSTMAN_SPECS_URL)/$$SPEC" \
-				$(POSTMAN_CURL_HEADERS_XC) || echo "⚠️ Failed to delete spec $$SPEC"; \
+			$(POSTMAN_API_REQUEST) DELETE "$(POSTMAN_SPECS_URL)/$$SPEC" $(POSTMAN_CURL_HEADERS_XC) >/dev/null || exit 1; \
 			TOTAL=$$((TOTAL + 1)); KEEP_GOING=1; \
 		done; \
 	done; \
@@ -2292,18 +2264,18 @@ postman-delete-specs-by-name:
 .PHONY: postman-delete-specs
 postman-delete-specs:
 	@echo "🔍 Deleting all specs in workspace $(POSTMAN_WS)..."
-	@TOTAL=0; KEEP_GOING=1; \
+	@TOTAL=0; PASS=0; KEEP_GOING=1; \
 	while [ "$$KEEP_GOING" -eq 1 ]; do \
-		KEEP_GOING=0; \
-		RESPONSE=$$(curl --silent --location \
-			--request GET "$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS)&limit=100" \
-			$(POSTMAN_CURL_HEADERS_XC) $(POSTMAN_CURL_HEADERS_AA)); \
-		SPECS=$$(echo "$$RESPONSE" | jq -r '.specs // [] | .[].id' 2>/dev/null); \
+		KEEP_GOING=0; PASS=$$((PASS + 1)); \
+		if [ "$$PASS" -gt $(POSTMAN_DELETE_MAX_PASSES) ]; then \
+			echo "❌ Specs still listed after $(POSTMAN_DELETE_MAX_PASSES) passes"; exit 1; \
+		fi; \
+		RESPONSE=$$($(POSTMAN_API_REQUEST) GET "$(POSTMAN_SPECS_URL)?workspaceId=$(POSTMAN_WS)&limit=100" \
+			$(POSTMAN_CURL_HEADERS_XC) $(POSTMAN_CURL_HEADERS_AA)) || exit 1; \
+		SPECS=$$(echo "$$RESPONSE" | jq -r '.specs // [] | .[].id') || exit 1; \
 		for SPEC in $$SPECS; do \
 			echo "🗑 Deleting spec $$SPEC..."; \
-			curl --silent --location \
-				--request DELETE "$(POSTMAN_SPECS_URL)/$$SPEC" \
-				$(POSTMAN_CURL_HEADERS_XC) $(POSTMAN_CURL_HEADERS_AA) || echo "⚠️ Failed to delete spec $$SPEC"; \
+			$(POSTMAN_API_REQUEST) DELETE "$(POSTMAN_SPECS_URL)/$$SPEC" $(POSTMAN_CURL_HEADERS_XC) $(POSTMAN_CURL_HEADERS_AA) >/dev/null || exit 1; \
 			TOTAL=$$((TOTAL + 1)); KEEP_GOING=1; \
 		done; \
 	done; \
@@ -2870,7 +2842,8 @@ validate-collections-conformance-test: ## Run all validation golden tests (valid
 	C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" $(VENV_PYTEST) scripts/validation/tests/test_oneof_resolver.py -v && \
 	$(VENV_PYTEST) scripts/validation/tests/test_dd_constraints.py -v && \
 	$(VENV_PYTEST) scripts/validation/tests/test_pipeline_consistency.py -v && \
-	$(VENV_PYTEST) scripts/validation/tests/test_migration_validator.py -v
+	$(VENV_PYTEST) scripts/validation/tests/test_migration_validator.py -v && \
+	$(VENV_PYTEST) scripts/validation/tests/test_postman_api_request.py -v
 
 .PHONY: validate-collections-deep
 validate-collections-deep: ## Deep field audit of all *.json files in postman/generated (auto-discovers, exit 1 on errors)

@@ -6,7 +6,7 @@ Proves that a planned change (e.g. D2: remove singleAddress) was applied complet
 and that nothing else in the system changed. Three modes:
 
   snapshot  Record the system state: DD rules, spec schemas + operations + every
-            example, every catalog/template example, and all five canonical
+            example (request and response), every catalog/template example, and all five canonical
             collections (requests, body field paths/values, saved responses).
 
   compare   Compare the current state with a snapshot under a migration file that
@@ -165,6 +165,8 @@ def take_snapshot(root=REPO_ROOT):
                                      for k, e in (media.get("examples") or {}).items()}
             operations[f"{method.upper()} {path}"] = {
                 "requestBody": (body.get("schema") or {}).get("$ref"),
+                "requestExamples": {k: flatten(e.get("value"))
+                                    for k, e in (body.get("examples") or {}).items()},
                 "responses": responses,
             }
 
@@ -339,6 +341,13 @@ def compare(baseline, current, mig, is_random=None):
             rep.add("UNEXPECTED", "spec operation", f"{key} requestBody {b['requestBody']} -> {c['requestBody']}")
         if set(b["responses"]) != set(c["responses"]):
             rep.add("UNEXPECTED", "spec operation", f"{key} statuses {sorted(b['responses'])} -> {sorted(c['responses'])}")
+        # request examples (C1); baselines taken before 2026-10-13 do not record them
+        if "requestExamples" in b and "requestExamples" in c:
+            be, ce = b["requestExamples"], c["requestExamples"]
+            if set(be) != set(ce):
+                rep.add("UNEXPECTED", "spec request example", f"{key} examples {sorted(be)} -> {sorted(ce)}")
+            for ex in set(be) & set(ce):
+                _compare_flat(rep, f"spec request example {key} {ex}", mig.rewrite_flat(be[ex]), ce[ex], mig)
         for status in set(b["responses"]) & set(c["responses"]):
             be, ce = b["responses"][status], c["responses"][status]
             if set(be) != set(ce):

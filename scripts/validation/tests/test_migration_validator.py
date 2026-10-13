@@ -39,6 +39,7 @@ def snapshot(single=True, schema_extra=None):
                **({"singleAddress": "x"} if single else {})},
         "spec": {"schemas": schemas, "operations": {"POST /static": {
             "requestBody": "#/components/schemas/submitDocParams",
+            "requestExamples": {"default": dict(body)},
             "responses": {"400": {"invalid-format": {"errorDetails": f'{{"field": "{p}zip"}}'}}}}}},
         "configs": {"catalog": {"Ex": {"method": "POST", "path": "/static",
                                         "select": {"recipientAddressSource": "singleAddress" if single else "recipientAddressByList"},
@@ -119,6 +120,23 @@ class TestCompare(unittest.TestCase):
         rep = M.compare(snapshot(True), after, MIGRATION, NEVER_RANDOM)
         self.assertIn(("UNEXPECTED", "spec"), kinds(rep))
 
+    def test_request_example_change_is_reported(self):
+        after = snapshot(False)
+        after["spec"]["operations"]["POST /static"]["requestExamples"]["default"][
+            "docSourceAll.documentIdSource.documentId"] = 99999
+        rep = M.compare(snapshot(True), after, MIGRATION, NEVER_RANDOM)
+        self.assertIn(("UNEXPECTED", "spec"), kinds(rep))
+
+    def test_request_example_paths_follow_the_rewrite(self):
+        rep = M.compare(snapshot(True), snapshot(False), MIGRATION, NEVER_RANDOM)
+        self.assertNotIn("spec request example", " ".join(a for _k, a, _m in rep.items))
+
+    def test_baseline_without_request_examples_is_accepted(self):
+        before = snapshot(True)
+        del before["spec"]["operations"]["POST /static"]["requestExamples"]
+        rep = M.compare(before, snapshot(False), MIGRATION, NEVER_RANDOM)
+        self.assertEqual(rep.errors(), [])
+
     def test_removed_request_is_reported(self):
         after = snapshot(False)
         del after["collections"]["Real-World"]["POST /static"]
@@ -191,6 +209,10 @@ class TestSnapshotOfRealBuild(unittest.TestCase):
         self.assertGreater(len(s["dd"]), 50)
         self.assertGreater(len(s["spec"]["schemas"]), 50)
         self.assertEqual(len(s["spec"]["operations"]), 10)
+        jobs = [k for k in s["spec"]["operations"] if " /auth/" not in k]
+        self.assertEqual(len(jobs), 7)
+        for k in jobs:
+            self.assertTrue(s["spec"]["operations"][k]["requestExamples"], f"{k}: no request example (C1)")
         self.assertTrue(s["configs"]["catalog"] and s["configs"]["template"])
         for label in M.COLLECTIONS:
             self.assertTrue(s["collections"][label], f"{label} collection missing from the snapshot")

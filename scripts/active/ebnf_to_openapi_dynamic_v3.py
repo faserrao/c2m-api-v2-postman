@@ -101,6 +101,9 @@ _CONTENT_TYPE_JSON = "application/json"
 # (the former hardcoded details dict and operational constants were removed 2026-10-08).
 _ERROR_EXAMPLE_TOKEN    = re.compile(r"\{([A-Za-z]\w*)\}")
 _SUCCESS_EXAMPLE_SUMMARY = "Request accepted and queued"
+# C1: request-body examples. One item per array unless the schema sets minItems
+# (decision D4 will set the DD array minimums; the example then follows automatically).
+_REQUEST_EXAMPLE_SUMMARY = "Example request"
 # H1: Fallback used when the @mutual_exclusion annotation is absent from the EBNF DD.
 # The authoritative source is the @mutual_exclusion block in data_dictionary/c2mapiv2-dd.ebnf;
 # the translator stores parsed values in self.mutual_exclusion_fields at parse time.
@@ -836,7 +839,9 @@ class EBNFToOpenAPITranslator:
                     "required": True,
                     "content": {
                         _CONTENT_TYPE_JSON: {
-                            "schema": {"$ref": f"#/components/schemas/{endpoint.production_name}"}
+                            "schema": {"$ref": f"#/components/schemas/{endpoint.production_name}"},
+                            "examples": {"default": {"summary": _REQUEST_EXAMPLE_SUMMARY,
+                                                     "value": self._request_example(endpoint)}}
                         }
                     }
                 }),
@@ -963,6 +968,82 @@ class EBNFToOpenAPITranslator:
             else:
                 raise RuntimeError(f"{_RESPONSE_SCHEMA_NAME}.{name}: @hint type '{hint['type']}' cannot give a fixed example")
         return value
+
+    def _request_example(self, endpoint: Endpoint) -> Dict[str, Any]:
+        """C1: request-body example built from the generated schema and the DD @hint values.
+
+        - oneOf: the first branch (DD order).
+        - Arrays: minItems items, at least one.
+        - Mutual exclusion: at the top level only the last field listed in the DD
+          @mutual_exclusion block is included (jobOptions, which shows every option).
+        - Leaves: the @hint value for the property (or the rule it refers to), else the
+          first enum value. A leaf with neither stops the build.
+        Values are seeded from the endpoint path and the field path, so a rebuild with no
+        DD change gives the same example (M4).
+        """
+        schemas = getattr(self, '_schemas', {}) or {}
+        missing: List[str] = []
+        excluded = set(self.mutual_exclusion_fields[:-1])
+
+        def deref(sch, names):
+            while isinstance(sch, dict) and '$ref' in sch:
+                name = sch['$ref'].rsplit('/', 1)[-1]
+                names.append(name)
+                sch = schemas.get(name, {})
+            return sch
+
+        def build(sch, names, path, depth=0):
+            sch = deref(sch, names)
+            if depth > 20 or not isinstance(sch, dict):
+                return None
+            if sch.get('oneOf'):
+                return build(sch['oneOf'][0], list(names), path, depth + 1)
+            if sch.get('type') == 'object' or 'properties' in sch:
+                out = {}
+                for key, sub in (sch.get('properties') or {}).items():
+                    if depth == 0 and key in excluded:
+                        continue
+                    out[key] = build(sub, [key], f"{path}.{key}" if path else key, depth + 1)
+                return out
+            if sch.get('type') == 'array':
+                count = max(sch.get('minItems', 0), 1)
+                return [build(sch.get('items', {}), list(names), f"{path}[{i}]", depth + 1) for i in range(count)]
+            for name in names:
+                if name in self.faker_hints:
+                    return self._hint_value(self.faker_hints[name], f"{endpoint.path}:{path}")
+            if sch.get('enum'):
+                return sch['enum'][0]
+            missing.append(path)
+            return None
+
+        root = schemas.get(endpoint.production_name)
+        if root is None:
+            raise RuntimeError(f"No schema '{endpoint.production_name}' for the request example of {endpoint.path}")
+        value = build(root, [endpoint.production_name], "")
+        if missing:
+            raise RuntimeError(f"{endpoint.method} {endpoint.path}: no @hint or enum for request-example "
+                               f"field(s) {', '.join(missing)} — add an @hint in the DD")
+        return value
+
+    @staticmethod
+    def _hint_value(hint: Dict[str, Any], seed: str) -> Any:
+        """Deterministic value for one DD @hint (same hint types as the Getting Started generator)."""
+        n = int(_example_hex(seed, 12), 16)
+        kind = hint['type']
+        if kind == 'static':
+            return hint['value']
+        if kind == 'random_int':
+            return hint['min'] + n % (hint['max'] - hint['min'] + 1)
+        if kind == 'faker':
+            from faker import Faker
+            fake = Faker('en_US')
+            fake.seed_instance(n)
+            return getattr(fake, hint['method'])()
+        if kind == 'aba_routing_number':
+            d = [int(c) for c in str(n % 10**8).zfill(8)]
+            check = (10 - (3*d[0] + 7*d[1] + d[2] + 3*d[3] + 7*d[4] + d[5] + 3*d[6] + 7*d[7]) % 10) % 10
+            return ''.join(map(str, d)) + str(check)
+        raise RuntimeError(f"Unsupported @hint type '{kind}' for a request example")
 
     def _get_enum_values(self, production_name: str) -> List[str]:
         """Extract enum values from an EBNF alternation production"""

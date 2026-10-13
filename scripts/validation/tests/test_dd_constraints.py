@@ -315,6 +315,44 @@ class TestDDConstraints(unittest.TestCase):
             self.assertEqual(v["message"], hints["message"]["value"])
             self.assertTrue(hints["requestId"]["min"] <= v["requestId"] <= hints["requestId"]["max"])
 
+    # ── C1: request-body examples ─────────────────────────────────────────────
+
+    def _request_example(self, ep):
+        return self.spec["paths"][ep.path][ep.method.lower()]["requestBody"]["content"][
+            "application/json"]["examples"]["default"]["value"]
+
+    def test_every_job_endpoint_has_a_valid_request_example(self):
+        """C1: each job endpoint's request example exists and validates against its schema."""
+        from jsonschema import Draft7Validator
+        from jsonschema.validators import RefResolver
+        resolver = RefResolver(base_uri="", referrer=self.spec)
+        for ep in self.translator.endpoints:
+            schema = self.spec["paths"][ep.path][ep.method.lower()]["requestBody"]["content"][
+                "application/json"]["schema"]
+            errors = [e.message for e in Draft7Validator(schema, resolver=resolver).iter_errors(self._request_example(ep))]
+            self.assertEqual(errors, [], f"{ep.method} {ep.path}")
+
+    def test_request_example_values_come_from_dd_hints(self):
+        """C1: static @hint values are used as-is; top-level mutual exclusion keeps one field."""
+        hints = self.translator.faker_hints
+        for ep in self.translator.endpoints:
+            v = self._request_example(ep)
+            present = [f for f in self.translator.mutual_exclusion_fields if f in v]
+            self.assertLessEqual(len(present), 1, f"{ep.path}: {present}")
+            if "jobOptions" in v:
+                self.assertEqual(v["jobOptions"]["mailClass"], hints["mailClass"]["value"])
+            if "tags" in v:
+                self.assertEqual(v["tags"], [hints["tagsList"]["value"]])
+
+    def test_request_example_leaf_without_hint_or_enum_is_build_error(self):
+        """C1: a request field with no @hint and no enum stops the build (no filler values)."""
+        text = EBNF_PATH.read_text(encoding="utf-8").replace(
+            'tagsList = { string } ; (* @hint static "q1-campaign" *)', 'tagsList = { string } ;')
+        t = EBNFToOpenAPITranslator()
+        t.parse_ebnf(text)
+        with self.assertRaisesRegex(RuntimeError, "tags"):
+            t.generate_openapi()
+
     def test_error_example_fields_exist_in_endpoint_body(self):
         """N5: every field an error example names must be a real path in that endpoint's
         request body (arrays as [0]), and INVALID_ENUM_VALUE's allowedValues must be that

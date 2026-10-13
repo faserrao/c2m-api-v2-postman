@@ -248,6 +248,52 @@ class TestSpecChecks(unittest.TestCase):
         V.check_spec_examples(spec, DD, F)
         self.assertIn(("C-EXAMPLE-FIELD-NOT-IN-BODY", "*"), F.items)
 
+    # C1 — request-body examples in the spec
+    def _request_findings(self, mutate=None):
+        spec = copy.deepcopy(SPECX)
+        content = spec["paths"]["/static"]["post"]["requestBody"]["content"]["application/json"]
+        if mutate:
+            mutate(content)
+        F = V.Findings()
+        V.check_spec_examples(spec, DD, F, HINTS)
+        return F
+
+    @staticmethod
+    def _value(content):
+        return content["examples"]["default"]["value"]
+
+    def test_real_request_examples_are_clean(self):
+        cats = {c for c, _s in self._request_findings().items if c.startswith("C-REQUEST")}
+        self.assertEqual(cats, {"C-REQUEST-EXAMPLE-MERGE-MINIMUM"})  # D4 still open
+
+    def test_missing_request_example_is_an_error(self):
+        F = self._request_findings(lambda c: c.pop("examples"))
+        self.assertIn(("C-REQUEST-EXAMPLE-MISSING", "*"), F.items)
+        errors, _w, _s = F.classified()
+        self.assertIn(("C-REQUEST-EXAMPLE-MISSING", "*"), errors)
+
+    def test_request_example_schema_violation(self):
+        F = self._request_findings(lambda c: self._value(c)["jobOptions"].update(mailClass="bogus"))
+        self.assertIn(("C-REQUEST-EXAMPLE-INVALID", "*"), F.items)
+
+    def test_request_example_mutual_exclusion(self):
+        F = self._request_findings(lambda c: self._value(c).update(jobTemplate="standard_letter"))
+        self.assertIn(("C-REQUEST-EXAMPLE-MUTUAL-EXCLUSION", "*"), F.items)
+
+    def test_request_example_valid_combination(self):
+        F = self._request_findings(
+            lambda c: self._value(c)["jobOptions"].update(color="black_and_white", paperType="glossy"))
+        self.assertIn(("C-REQUEST-EXAMPLE-VALID-COMBINATION", "*"), F.items)
+
+    def test_request_example_value_contradicting_hint(self):
+        F = self._request_findings(
+            lambda c: self._value(c)["recipientAddressSource"]["recipientAddressByList"].update(mappingId=1))
+        self.assertIn(("C-REQUEST-EXAMPLE-HINT-MISMATCH", "*"), F.items)
+
+    def test_request_example_filler_value(self):
+        F = self._request_findings(lambda c: self._value(c).update(tags=["example_tags"]))
+        self.assertIn(("C-REQUEST-EXAMPLE-FILLER", "*"), F.items)
+
     # X4 — every DD @doc reaches the spec (component schema + inline properties)
     def _doc_problems(self, mutate):
         specs = self.specs()

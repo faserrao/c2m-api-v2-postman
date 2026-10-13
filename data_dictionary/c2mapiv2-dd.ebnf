@@ -605,7 +605,7 @@ mailClass      = "first_class" | "standard" | "non_profit" ; (* @hint static fir
 (* @doc Optional list of user-defined string tags for reporting and filtering. *)
 tags = tagsList ;
 (* @doc Array of user-defined string tags. *)
-tagsList = { string } ;
+tagsList = { string } ; (* @hint static "q1-campaign" *)
 
 (***********************************)
 (*          ADDRESS OBJECTS         *)
