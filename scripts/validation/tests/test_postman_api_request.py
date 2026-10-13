@@ -135,5 +135,29 @@ class TestMakefileSecurityRepoPath(unittest.TestCase):
         self.assertEqual(local, f"../{repo}/postman/scripts")
 
 
+class TestCredentialFilesAreIgnored(unittest.TestCase):
+    """postman-env-create writes real clientId/clientSecret into the environment files.
+    Until 2026-10-13 postman/environments/c2m-aws-dev.postman_environment.json was
+    tracked, so a local build followed by `git add -A` would commit the credentials."""
+
+    def test_every_generated_environment_file_is_ignored_and_untracked(self):
+        import re
+        makefile = (REPO_ROOT / "Makefile").read_text()
+        variables = dict(re.findall(r"^([A-Z_]+)\s*:=\s*(\S+)", makefile, re.M))
+
+        def expand(value):
+            for _ in range(5):
+                value = re.sub(r"\$\((\w+)\)", lambda m: variables.get(m.group(1), m.group(0)), value)
+            return value
+        outputs = [expand(p) for p in re.findall(r'generate_postman_env\.sh\s+""\s+(\S+)', makefile)]
+        self.assertGreaterEqual(len(outputs), 2)
+        for path in outputs:
+            ignored = subprocess.run(["git", "check-ignore", "-q", path], cwd=REPO_ROOT).returncode == 0
+            tracked = subprocess.run(["git", "ls-files", "--error-unmatch", path], cwd=REPO_ROOT,
+                                     capture_output=True).returncode == 0
+            self.assertTrue(ignored, f"{path} is not git-ignored")
+            self.assertFalse(tracked, f"{path} is tracked by git")
+
+
 if __name__ == "__main__":
     unittest.main()

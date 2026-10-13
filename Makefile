@@ -89,6 +89,8 @@ POSTMAN_API_NAME                 := $(C2MAPIV2_POSTMAN_API_NAME_PC)
 # All paths are relative to the Makefile location
 POSTMAN_DIR                      := postman
 POSTMAN_ENV_FILE                 := $(POSTMAN_DIR)/mock-env.json
+# Generated with real credentials (clientId/clientSecret) — git-ignored, never commit
+POSTMAN_AWS_ENV_FILE             := $(POSTMAN_DIR)/environments/c2m-aws-dev.postman_environment.json
 POSTMAN_BASE_URL                 := https://api.postman.com
 LOCALHOST_URL                    := http://127.0.0.1
 
@@ -1772,12 +1774,12 @@ postman-env-create:
 	@echo "✅ Mock environment file written to $(POSTMAN_ENV_FILE) with auth credentials"
 	
 	@echo "🌐 Creating AWS Dev environment for token testing..."
-	@mkdir -p postman/environments
+	@mkdir -p $(dir $(POSTMAN_AWS_ENV_FILE))
 	@eval $$(USE_LOCAL_CREDS=true ./scripts/active/fetch_aws_credentials.sh) && \
 	export C2M_BASE_URL="$$C2M_BASE_URL" && \
 	export ENV_NAME="C2M API - AWS Dev" && \
-	./scripts/active/generate_postman_env.sh "" postman/environments/c2m-aws-dev.postman_environment.json
-	@echo "✅ AWS Dev environment file written to postman/environments/c2m-aws-dev.postman_environment.json"
+	./scripts/active/generate_postman_env.sh "" $(POSTMAN_AWS_ENV_FILE)
+	@echo "✅ AWS Dev environment file written to $(POSTMAN_AWS_ENV_FILE)"
 
 # ========================================================================
 # ENVIRONMENT UPLOAD
@@ -1814,7 +1816,7 @@ postman-env-upload:
 	fi
 
 	@echo "📤 Uploading AWS Dev environment to workspace $(POSTMAN_WS)..."
-	@AWS_ENV_FILE="postman/environments/c2m-aws-dev.postman_environment.json"; \
+	@AWS_ENV_FILE="$(POSTMAN_AWS_ENV_FILE)"; \
 	if [ -f "$$AWS_ENV_FILE" ]; then \
 		EXISTING_UID=""; \
 		if [ -s "$(POSTMAN_AWS_ENV_UID_FILE)" ]; then EXISTING_UID=$$(cat "$(POSTMAN_AWS_ENV_UID_FILE)"); fi; \
