@@ -104,6 +104,9 @@ _SUCCESS_EXAMPLE_SUMMARY = "Request accepted and queued"
 # C1: request-body examples. One item per array unless the schema sets minItems
 # (decision D4 will set the DD array minimums; the example then follows automatically).
 _REQUEST_EXAMPLE_SUMMARY = "Example request"
+# @hint types every generator understands (translator, Getting Started / Real-World
+# generators, addRandomDataToRaw.js). The consistency gate imports this list.
+HINT_TYPES = ("faker", "static", "random_int", "aba_routing_number")
 # H1: Fallback used when the @mutual_exclusion annotation is absent from the EBNF DD.
 # The authoritative source is the @mutual_exclusion block in data_dictionary/c2mapiv2-dd.ebnf;
 # the translator stores parsed values in self.mutual_exclusion_fields at parse time.

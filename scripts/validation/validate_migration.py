@@ -35,6 +35,8 @@ Migration file (YAML):
   retired_names: [singleAddress, addressName]
   nondeterministic:                   # optional extra: collection -> body-path regexes compared by path only
     Test: ["\\.someField$"]
+  value_changes:                      # intended value changes, matched by leaf field name;
+    - {field: country, from: US, to: USA}   # one that never occurs is INCOMPLETE
   rotated_fields:                     # collection -> oneOf fields whose variant is chosen round-robin
     Test: [recipientAddressSource]    # per request; removing a variant shifts every choice, so the
                                       # subtree is not compared request by request — instead every
@@ -244,6 +246,17 @@ class Migration:
         self.nondeterministic = {k: [re.compile(p) for p in v]
                                  for k, v in (data.get("nondeterministic") or {}).items()}
         self.rotated = {k: list(v) for k, v in (data.get("rotated_fields") or {}).items()}
+        self.value_changes = list(data.get("value_changes") or [])
+        self.value_changes_seen = set()
+
+    def value_change(self, path, before, after):
+        """True if this before -> after change at path is declared in value_changes."""
+        leaf = re.sub(r"\[\d+\]", "", path.split(".")[-1])
+        for i, vc in enumerate(self.value_changes):
+            if vc.get("field") == leaf and vc.get("from") == before and vc.get("to") == after:
+                self.value_changes_seen.add(i)
+                return True
+        return False
 
     def rotated_split(self, collection, flat):
         """Split a flattened body into (paths outside rotated subtrees, variants used per field)."""
@@ -297,7 +310,7 @@ def _compare_flat(rep, area, before, after, mig, collection=None, values=True, i
         if collection and is_random and (is_random(re.sub(r"\[\d+\]", "", path.split(".")[-1]))
                                          or mig.random_value(collection, path)):
             continue
-        if before[path] != after[path]:
+        if before[path] != after[path] and not mig.value_change(path, before[path], after[path]):
             rep.add("UNEXPECTED", area, f"{path}: {before[path]!r} -> {after[path]!r}")
 
 
@@ -409,6 +422,9 @@ def compare(baseline, current, mig, is_random=None):
             if missing:
                 rep.add("LOST", f"{label} rotated {fld}",
                         f"variants no longer used: {sorted(missing)} (now {sorted(c_used.get(fld, set()))})")
+    for i, vc in enumerate(mig.value_changes):
+        if i not in mig.value_changes_seen:
+            rep.add("INCOMPLETE", "value change", f"{vc} declared but never seen")
     return rep
 
 

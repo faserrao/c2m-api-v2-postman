@@ -51,13 +51,14 @@ def snapshot(single=True, schema_extra=None):
     }
 
 
-MIGRATION = M.Migration({
+MIGRATION_DATA = {
     "name": "test D2",
     "path_rewrites": [{"from": OLD, "to": NEW}],
     "select_rewrites": {"recipientAddressSource": {"singleAddress": "recipientAddressByList"}},
     "rules": {"removed": ["singleAddress"], "changed": ["recipientAddressSource"]},
     "schemas": {"removed": ["singleAddress"], "changed": ["recipientAddressSource"]},
-})
+}
+MIGRATION = M.Migration(MIGRATION_DATA)
 NEVER_RANDOM = (lambda name: False)
 
 
@@ -136,6 +137,19 @@ class TestCompare(unittest.TestCase):
         del before["spec"]["operations"]["POST /static"]["requestExamples"]
         rep = M.compare(before, snapshot(False), MIGRATION, NEVER_RANDOM)
         self.assertEqual(rep.errors(), [])
+
+    def test_declared_value_change_is_accepted_and_undeclared_reported(self):
+        after = snapshot(False)
+        after["collections"]["Linked"]["POST /static"]["body"]["docSourceAll.documentIdSource.documentId"] = 777
+        rep = M.compare(snapshot(True), after, MIGRATION, NEVER_RANDOM)
+        self.assertIn(("UNEXPECTED", "Linked"), kinds(rep))
+        mig = M.Migration({**MIGRATION_DATA, "value_changes": [{"field": "documentId", "from": 12345, "to": 777}]})
+        self.assertEqual(M.compare(snapshot(True), after, mig, NEVER_RANDOM).errors(), [])
+
+    def test_declared_value_change_that_never_happens_is_incomplete(self):
+        mig = M.Migration({**MIGRATION_DATA, "value_changes": [{"field": "documentId", "from": 12345, "to": 777}]})
+        rep = M.compare(snapshot(True), snapshot(False), mig, NEVER_RANDOM)
+        self.assertIn(("INCOMPLETE", "value"), kinds(rep))
 
     def test_removed_request_is_reported(self):
         after = snapshot(False)

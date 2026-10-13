@@ -402,16 +402,20 @@ function resolveRef(spec, ref) {
 function buildSampleFromSchema(spec, schema, depth, fieldName) {
     if (depth > 7 || !schema) return null;
 
-    // Hint lookup by property name
+    // Hint lookup by property name. A hint on an array field is the value of each item.
+    const resolvedSchema = schema.$ref ? resolveRef(spec, schema.$ref) : schema;
+    const isArray = resolvedSchema && resolvedSchema.type === 'array';
     if (fieldName && fakerHints[fieldName] !== undefined) {
-        return applyHint(fakerHints[fieldName]);
+        const value = applyHint(fakerHints[fieldName]);
+        return isArray ? [value] : value;
     }
 
     // Resolve $ref — also try the schema name from the ref for hint lookup
     if (schema.$ref) {
         const refSchemaName = schema.$ref.split('/').pop();
         if (fakerHints[refSchemaName] !== undefined) {
-            return applyHint(fakerHints[refSchemaName]);
+            const value = applyHint(fakerHints[refSchemaName]);
+            return isArray ? [value] : value;
         }
         const resolved = resolveRef(spec, schema.$ref);
         if (!resolved) return null;
@@ -620,8 +624,12 @@ function generateRandomValue(key, existingValue) {
         return getNextOneOfValue(key);
     }
 
-    // HC2: Check faker hints for this field name before key-name heuristics
+    // HC2: Check faker hints for this field name before key-name heuristics.
+    // A hint on an array field (e.g. tags) is the value of each item.
     if (fakerHints[key] !== undefined) {
+        if (Array.isArray(existingValue)) {
+            return existingValue.map(() => applyHint(fakerHints[key]));
+        }
         return applyHint(fakerHints[key]);
     }
 
@@ -635,7 +643,6 @@ function generateRandomValue(key, existingValue) {
     // Key-specific overrides below take priority over the generic item-by-item fallback.
     if (isPlaceholderArray(existingValue)) {
         if (keyLower.includes('scope')) return ['api:read', 'api:write'];
-        if (keyLower.includes('tag'))   return ['important', 'customer-docs'];
         // Generic: replace each placeholder item with an appropriately-typed value
         return existingValue.map(item => {
             if (item === '<integer>') return faker.number.int({ min: 10000, max: 99999 });

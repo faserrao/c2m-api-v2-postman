@@ -603,9 +603,9 @@ printOption    = "double_sided" | "single_sided" ; (* @hint static double_sided 
 mailClass      = "first_class" | "standard" | "non_profit" ; (* @hint static first_class *)
 
 (* @doc Optional list of user-defined string tags for reporting and filtering. *)
-tags = tagsList ;
+tags = tagsList ; (* @hint static "q1-campaign" *)
 (* @doc Array of user-defined string tags. *)
-tagsList = { string } ; (* @hint static "q1-campaign" *)
+tagsList = { string } ;
 
 (***********************************)
 (*          ADDRESS OBJECTS         *)
@@ -623,7 +623,7 @@ address1  = string ; (* @hint faker street_address *)
 (* @doc Secondary address line (suite, apartment, floor, etc.). *)
 address2  = string ; (* @hint static Suite 100 *)
 (* @doc Tertiary address line. *)
-address3  = string ; (* @hint static  *)
+address3  = string ; (* @hint static "" *)
 
 (* @doc City name. *)
 city     = string ; (* @hint faker city *)
@@ -760,9 +760,11 @@ mergeByRequestId  = requestId + [ filename ] ;
 (***********************************)
 
 (* PLANNED — reserved for POST /static/multi (not yet implemented).
-   multiDocJobs and multiDocJobItem schemas are generated but not wired to any endpoint path. *)
+   multiDocJobs and multiDocJobItem schemas are generated but not wired to any endpoint path.
+   The @reserved annotation tells the consistency gate these rules are intentionally
+   unreachable; it fails once they are used or the endpoint is defined (remove it then). *)
 (* @doc List of independent document-per-recipient jobs (each job has its own document source and recipient address). *)
-multiDocJobs = { multiDocJobItem } ;
+multiDocJobs = { multiDocJobItem } ; (* @reserved POST /static/multi *)
 
 (* @doc A single independent document job entry within a multi-doc batch. *)
 multiDocJobItem =
@@ -900,7 +902,7 @@ accountNumber = string ; (* @hint static "1234567890" *)
 (* @doc ACH check digit. *)
 checkDigit = integer ;
 (* @doc Invoice reference number. *)
-invoiceNumber = string ;
+invoiceNumber = string ; (* @hint static "INV-2026-0001" *)
 (* @doc Amount due on the invoice. *)
 amountDue = number ;
 
@@ -1079,22 +1081,13 @@ errorDetails = string ;  (* JSON object with error context - additionalPropertie
 (* @doc Optional support tracking identifier in the format TRK-YYYYMMDD-XXXXXX. *)
 errorTrackingId = string ;  (* Optional request ID for support tracking - format: TRK-YYYYMMDD-XXXXXX *)
 
-(* HTTP Error Response Aliases *)
-HTTP_400_BAD_REQUEST = errorResponse ;
-HTTP_401_UNAUTHORIZED = errorResponse ;
-HTTP_403_FORBIDDEN = errorResponse ;
-HTTP_404_NOT_FOUND = errorResponse ;
-HTTP_422_UNPROCESSABLE_ENTITY = errorResponse ;
-HTTP_429_TOO_MANY_REQUESTS = errorResponse ;
-HTTP_500_INTERNAL_SERVER_ERROR = errorResponse ;
-
 (* ----------------------------------------------------------------
    HTTP STATUS → ERROR MAPPING
    Declares which errorType and errorCodes apply for each HTTP status.
    Edit this block (not the Python scripts) to change which error
    variants are produced in the OpenAPI spec and Postman collections.
-   Both ebnf_to_openapi_dynamic_v3.py and add_response_examples.py
-   read this block at build time via the x-http-error-map spec extension.
+   ebnf_to_openapi_dynamic_v3.py reads this block at build time (and writes it to the
+   spec as x-http-error-map); the Postman collections copy the spec's examples.
    ----------------------------------------------------------------
    @http_error_map
    400: errorType=ValidationError; errorCodes=MISSING_REQUIRED_FIELD,INVALID_ONEOF,INVALID_JSON,INVALID_FORMAT

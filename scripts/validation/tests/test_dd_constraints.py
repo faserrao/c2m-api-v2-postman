@@ -342,16 +342,53 @@ class TestDDConstraints(unittest.TestCase):
             if "jobOptions" in v:
                 self.assertEqual(v["jobOptions"]["mailClass"], hints["mailClass"]["value"])
             if "tags" in v:
-                self.assertEqual(v["tags"], [hints["tagsList"]["value"]])
+                self.assertEqual(v["tags"], [hints["tags"]["value"]])
 
     def test_request_example_leaf_without_hint_or_enum_is_build_error(self):
         """C1: a request field with no @hint and no enum stops the build (no filler values)."""
         text = EBNF_PATH.read_text(encoding="utf-8").replace(
-            'tagsList = { string } ; (* @hint static "q1-campaign" *)', 'tagsList = { string } ;')
+            'tags = tagsList ; (* @hint static "q1-campaign" *)', 'tags = tagsList ;')
         t = EBNFToOpenAPITranslator()
         t.parse_ebnf(text)
         with self.assertRaisesRegex(RuntimeError, "tags"):
             t.generate_openapi()
+
+    # ── L1 / L7: hints ─────────────────────────────────────────────────────────
+
+    def test_every_dd_hint_reaches_faker_hints(self):
+        """L1: every @hint in the DD has a supported type and an entry in faker_hints
+        (an unsupported type used to be dropped silently)."""
+        import re
+        from ebnf_to_openapi_dynamic_v3 import HINT_TYPES, extract_faker_hints
+        text = EBNF_PATH.read_text(encoding="utf-8")
+        dd = dict(re.findall(r"^([a-zA-Z_]\w*)\s*=[^;\n]*;[^(\n]*\(\*\s*@hint\s+(\w+)", text, re.M))
+        self.assertEqual({n: k for n, k in dd.items() if k not in HINT_TYPES}, {})
+        self.assertEqual(sorted(set(dd) - set(extract_faker_hints(text))), [])
+
+    def test_no_empty_static_hint(self):
+        """L1: a static hint gives a value; an intentionally empty one is written as \"\"."""
+        import re
+        text = EBNF_PATH.read_text(encoding="utf-8")
+        self.assertEqual(re.findall(r"^(\w+)\s*=[^;\n]*;\s*\(\*\s*@hint\s+static\s*\*\)", text, re.M), [])
+
+    def test_curated_catalog_country_matches_dd_hint(self):
+        """L7: Real-World used country "US" while the DD documents and hints "USA"."""
+        catalog = yaml.safe_load((REPO_ROOT / "config" / "curated-examples-catalog.yaml").read_text())
+        expected = self.translator.faker_hints["country"]["value"]
+        found = []
+
+        def walk(o):
+            if isinstance(o, dict):
+                for k, v in o.items():
+                    if k == "country" and not isinstance(v, (dict, list)):
+                        found.append(v)
+                    walk(v)
+            elif isinstance(o, list):
+                for v in o:
+                    walk(v)
+        walk(catalog)
+        self.assertTrue(found)
+        self.assertEqual(sorted({v for v in found if v != expected}), [])
 
     def test_error_example_fields_exist_in_endpoint_body(self):
         """N5: every field an error example names must be a real path in that endpoint's

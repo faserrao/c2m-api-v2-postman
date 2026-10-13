@@ -39,14 +39,13 @@ from jsonschema.validators import RefResolver
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(REPO_ROOT / "scripts" / "active"))
-from ebnf_to_openapi_dynamic_v3 import EBNFToOpenAPITranslator, _extract_structural_annotations  # noqa: E402
+from ebnf_to_openapi_dynamic_v3 import EBNFToOpenAPITranslator, HINT_TYPES, _extract_structural_annotations  # noqa: E402
 
 CONTENT_TYPE_JSON = "application/json"
 PRIMITIVES = {"string": "string", "integer": "integer", "number": "number", "boolean": "boolean"}
 PLACEHOLDER = re.compile(r"^(<[^<>]+>|ph<.*>)$")
 TRACKING_ID = re.compile(r"^TRK-\d{8}-[0-9A-F]{6}$")
 UNRESOLVED_TOKEN = re.compile(r"\{[A-Za-z_]\w*\}")  # e.g. {mailClass_enum} left in a JSON string
-HINT_TYPES = {"faker", "static", "random_int"}
 
 # Collection label -> (file name suffix after "<api-name>-", typed?)
 COLLECTIONS = {
@@ -60,11 +59,7 @@ COLLECTIONS = {
 # (category, scope) -> tracking reference. scope is a collection label, or "*" for any.
 # Categories not listed here are ERRORs. Remove an entry as soon as its fix lands.
 KNOWN_OPEN = {
-    ("A-UNREACHABLE-RULE", "*"): "X6; multiDocJobs reserved for /static/multi; HTTP_* aliases",
-    ("A-PRIMER-ENDPOINT-UNDEFINED", "*"): "/static/multi is PLANNED in the DD primer",
     ("A-VALID-COMBINATION-NOOP", "*"): "X11 / decision D5 (envelope=none rule)",
-    ("A-HINT-INVALID-TYPE", "*"): "L1 (routingNumber @hint has no type)",
-    ("A-HINT-EMPTY-STATIC", "*"): "L1 (address3 empty static hint)",
     ("A-DOC-TYPE-CLAIM", "*"): "L2 / decision D6 (errorDetails object vs string)",
     ("A-DOC-CARDINALITY-UNENFORCED", "*"): "X9 / decision D4 (array minimums)",
     ("B-OPERATION-NOT-IN-COLLECTION", "GS-Linked"): "L10 (Getting Started has no auth endpoints)",
@@ -73,7 +68,6 @@ KNOWN_OPEN = {
     ("B-NO-AUTH", "Real-World"): "L8 (Real-World has no auth / pre-request script)",
     ("B-MERGE-MINIMUM", "*"): "X9b / decision D4 (merge minimum 1 or 2)",
     ("B-PLACEHOLDER-IN-EXAMPLE", "Test"): "L6 (auth examples carry <dateTime>/<string>)",
-    ("B-FILLER-VALUE", "*"): "L7 (example_ filler values)",
     ("B-EXAMPLE-ORIGINAL-REQUEST", "Linked"): "X9b (merge minimum in saved examples)",
     ("B-EXAMPLE-ORIGINAL-REQUEST", "Test"): "L6 (random auth ttl_seconds can fall below 3600 — intermittent)",
     ("B-TEST-STATUS-ASSERTION", "*"): "X12 / decision D7 (global allowed-codes list)",
@@ -312,6 +306,15 @@ class DDModel:
         return {"_unsupported": ty}
 
 
+RESERVED_RE = re.compile(r"^([a-zA-Z]\w*)\s*=[^;]*;\s*\(\*\s*@reserved\s+([A-Z]+\s+/\S+)\s*\*\)", re.M)
+
+
+def reserved_rules(text):
+    """Rules marked `(* @reserved METHOD /path *)`: kept for a planned endpoint, so
+    intentionally unreachable until it exists."""
+    return {m.group(1): m.group(2) for m in RESERVED_RE.finditer(text)}
+
+
 def _strip(schema):
     if isinstance(schema, dict):
         return {k: _strip(v) for k, v in schema.items() if k not in ("description", "example", "examples", "title")}
@@ -379,14 +382,27 @@ def check_dd_to_spec(dd, specs, faker_hints, F):
             for v in e:
                 refs(v, acc)
         return acc
-    reach, stack = set(), [ep.production_name for ep in t.endpoints] + ["standardResponse", "errorResponse"]
-    while stack:
-        n = stack.pop()
-        if n in reach or n not in dd.rules:
-            continue
-        reach.add(n)
-        stack += list(refs(dd.rules[n], set()))
-    for n in sorted(set(dd.rules) - reach - set(PRIMITIVES)):
+    discriminators = getattr(t, "_discriminated_oneofs", {})   # rule -> tag rule (@structural, D1)
+
+    def closure(roots):
+        seen, stack = set(), list(roots)
+        while stack:
+            n = stack.pop()
+            if n in seen or n not in dd.rules:
+                continue
+            seen.add(n)
+            stack += list(refs(dd.rules[n], set()))
+            if n in discriminators:
+                stack.append(discriminators[n])
+        return seen
+    reach = closure([ep.production_name for ep in t.endpoints] + ["standardResponse", "errorResponse"])
+    reserved = reserved_rules(dd.text)                         # rule -> "METHOD /path"
+    for n in sorted(set(reserved) & reach):
+        F.add("A-RESERVED-RULE-IN-USE", "*", f"{n}: @reserved {reserved[n]} but used — remove the annotation")
+    for n, ep in sorted(reserved.items()):
+        if tuple(ep.lower().split(" ", 1)) in {(e.method.lower(), e.path) for e in t.endpoints}:
+            F.add("A-RESERVED-ENDPOINT-DEFINED", "*", f"{n}: {ep} is now a DD endpoint — remove @reserved")
+    for n in sorted(set(dd.rules) - reach - closure(reserved) - set(PRIMITIVES)):
         F.add("A-UNREACHABLE-RULE", "*", n)
     for n in sorted({s for r in dd.rules.values() for s in refs(r, set())} - set(dd.rules) - set(PRIMITIVES)):
         F.add("A-UNDEFINED-SYMBOL", "*", n)
@@ -407,8 +423,9 @@ def check_dd_to_spec(dd, specs, faker_hints, F):
         if not (op.get("requestBody") or {}).get("required"):
             F.add("A-ENDPOINT-BODY-NOT-REQUIRED", "*", str(key))
     primer = dd.text.split("If you have never seen EBNF")[0]
+    planned = {ep.split(" ", 1)[1] for ep in reserved.values()}
     for p in re.findall(r"POST (/\S+)", primer):
-        if ("post", p) not in dd_eps:
+        if ("post", p) not in dd_eps and p not in planned:
             F.add("A-PRIMER-ENDPOINT-UNDEFINED", "*", p)
     # A4 annotation blocks
     info = spec["info"]

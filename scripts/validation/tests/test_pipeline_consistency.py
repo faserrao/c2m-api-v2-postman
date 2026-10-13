@@ -248,6 +248,52 @@ class TestSpecChecks(unittest.TestCase):
         V.check_spec_examples(spec, DD, F)
         self.assertIn(("C-EXAMPLE-FIELD-NOT-IN-BODY", "*"), F.items)
 
+    # X6 / L1 — DD reachability, @reserved, hint types
+    def _dd_findings(self, mutate_text):
+        import tempfile
+        text = mutate_text((REPO_ROOT / "data_dictionary" / "c2mapiv2-dd.ebnf").read_text(encoding="utf-8"))
+        with tempfile.NamedTemporaryFile("w", suffix=".ebnf", delete=False, encoding="utf-8") as f:
+            f.write(text)
+        F = V.Findings()
+        V.check_dd_to_spec(V.DDModel(f.name), self.specs(), HINTS, F)
+        Path(f.name).unlink()
+        return F
+
+    def test_unreferenced_rule_is_an_error(self):
+        F = self._dd_findings(lambda t: t + "\norphanRule = string ;\n")
+        self.assertIn("orphanRule", F.items.get(("A-UNREACHABLE-RULE", "*"), []))
+        errors, _w, _s = F.classified()
+        self.assertIn(("A-UNREACHABLE-RULE", "*"), errors)
+
+    def test_discriminator_tag_rule_counts_as_reachable(self):
+        """paymentType is used through @structural discriminated_oneof, not a rule reference."""
+        self.assertNotIn("paymentType", run_dd(self.specs()).items.get(("A-UNREACHABLE-RULE", "*"), []))
+
+    def test_reserved_rules_are_not_unreachable_and_primer_endpoint_is_planned(self):
+        F = run_dd(self.specs())
+        unreachable = F.items.get(("A-UNREACHABLE-RULE", "*"), [])
+        self.assertNotIn("multiDocJobs", unreachable)
+        self.assertNotIn("multiDocJobItem", unreachable)
+        self.assertNotIn(("A-PRIMER-ENDPOINT-UNDEFINED", "*"), F.items)
+
+    def test_reserved_rule_in_use_is_flagged(self):
+        """A rule marked @reserved but reachable from an endpoint must lose the annotation."""
+        F = self._dd_findings(lambda t: t.replace(
+            "jobTemplate = string ; (* @hint static standard_letter *)",
+            "jobTemplate = string ; (* @reserved POST /static/multi *)"))
+        self.assertIn(("A-RESERVED-RULE-IN-USE", "*"), F.items)
+
+    def test_reserved_for_a_defined_endpoint_is_flagged(self):
+        F = self._dd_findings(lambda t: t.replace("(* @reserved POST /static/multi *)", "(* @reserved POST /static *)"))
+        self.assertIn(("A-RESERVED-ENDPOINT-DEFINED", "*"), F.items)
+
+    def test_unknown_hint_type_is_flagged(self):
+        F = self._dd_findings(lambda t: t.replace('(* @hint static "INV-2026-0001" *)', "(* @hint bogus 1 *)"))
+        self.assertIn(("A-HINT-INVALID-TYPE", "*"), F.items)
+
+    def test_aba_routing_number_is_a_valid_hint_type(self):
+        self.assertNotIn(("A-HINT-INVALID-TYPE", "*"), run_dd(self.specs()).items)
+
     # C1 — request-body examples in the spec
     def _request_findings(self, mutate=None):
         spec = copy.deepcopy(SPECX)

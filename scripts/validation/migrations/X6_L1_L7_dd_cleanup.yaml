@@ -1,0 +1,22 @@
+name: X6 / L1 / L7 — DD cleanup (unused aliases, hints, filler values)
+# X6: the seven HTTP_* aliases of errorResponse were referenced by nothing (the
+#     @http_error_map is the source of error responses); removed from the DD and the spec.
+#     multiDocJobs/multiDocJobItem are kept and marked @reserved (no spec change).
+# L1: address3's empty hint is written as "" (same value); routingNumber unchanged.
+# L7: invoiceNumber and tags get DD hints, replacing "example_*" filler; the tags hint
+#     moved from tagsList to tags, and the Test generator applies it to each array item
+#     (its hardcoded ['important', 'customer-docs'] fallback is gone, so Test sends one
+#     tag, like the one placeholder in Linked); catalog country US -> USA (the DD value).
+rules:
+  removed: [HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND,
+            HTTP_422_UNPROCESSABLE_ENTITY, HTTP_429_TOO_MANY_REQUESTS, HTTP_500_INTERNAL_SERVER_ERROR]
+schemas:
+  removed: [HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND,
+            HTTP_422_UNPROCESSABLE_ENTITY, HTTP_429_TOO_MANY_REQUESTS, HTTP_500_INTERNAL_SERVER_ERROR]
+value_changes:
+  - {field: country, from: US, to: USA}
+  - {field: tags, from: important, to: q1-campaign}
+  - {field: tags, from: example_tags, to: q1-campaign}
+  - {field: invoiceNumber, from: example_invoiceNumber, to: INV-2026-0001}
+allowed_removed_paths:
+  - "^tags\\[1\\]$"

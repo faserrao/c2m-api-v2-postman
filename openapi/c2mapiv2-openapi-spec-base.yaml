@@ -1208,20 +1208,6 @@ components:
     errorTrackingId:
       description: Optional support tracking identifier in the format TRK-YYYYMMDD-XXXXXX.
       type: string
-    HTTP_400_BAD_REQUEST:
-      $ref: '#/components/schemas/errorResponse'
-    HTTP_401_UNAUTHORIZED:
-      $ref: '#/components/schemas/errorResponse'
-    HTTP_403_FORBIDDEN:
-      $ref: '#/components/schemas/errorResponse'
-    HTTP_404_NOT_FOUND:
-      $ref: '#/components/schemas/errorResponse'
-    HTTP_422_UNPROCESSABLE_ENTITY:
-      $ref: '#/components/schemas/errorResponse'
-    HTTP_429_TOO_MANY_REQUESTS:
-      $ref: '#/components/schemas/errorResponse'
-    HTTP_500_INTERNAL_SERVER_ERROR:
-      $ref: '#/components/schemas/errorResponse'
   parameters:
     Authorization:
       name: Authorization
