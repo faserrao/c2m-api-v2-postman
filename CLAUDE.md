@@ -34,13 +34,19 @@ See top-level `CLAUDE.md` (`C2M_API_v2/CLAUDE.md`) for full project context and 
 - **Repeatable spec builds (M4)**: spec examples use `_EXAMPLE_NOW` and sha256-seeded IDs — two builds from the same DD are byte-identical. Never reintroduce `random`/`datetime.now()` into spec examples (`test_spec_generation_is_repeatable` fails).
 - **No silent no-ops**: pipeline scripts exit 1 when they process nothing; Makefile no longer masks guarded steps with `|| echo "Skipping"`.
 - **Error map is the authority**: job-endpoint responses and Postman error examples are built from the DD `@http_error_map` per `(status, errorCode)` pair (an example that cannot occur on an endpoint is omitted: `/batch/zip` has 17 error examples).
-- **Request examples (C1)**: built by the translator from the schema and the DD `@hint`s (first oneOf branch, one item per array unless `minItems`, top-level mutual exclusion keeps `jobOptions`). A request field with no `@hint` and no enum stops the build. A hint on an array is put on the element rule (`tagsList`, not `tags`): the Test-collection generator applies hints by field name. The Postman converter ignores request examples (bodies come from the schema).
+- **Request examples (C1)**: built by the translator from the schema and the DD `@hint`s (first oneOf branch, one item per array unless `minItems`, top-level mutual exclusion keeps `jobOptions`). A request field with no `@hint` and no enum stops the build. A hint on an array field (`tags`) gives the value of each item; every generator applies it that way. The Postman converter ignores request examples (bodies come from the schema).
+- **Hint types**: `HINT_TYPES` in the translator (`faker`, `static`, `random_int`, `aba_routing_number`); the gate imports it. An intentionally empty static hint is written `""`.
+- **`@reserved`**: `rule = … ; (* @reserved POST /path *)` marks a rule kept for a planned endpoint (`multiDocJobs` → `/static/multi`). The gate accepts it as unreachable and fails once the rule is used or the endpoint is defined.
 - **Never pass a spec file as one argument**: Linux caps a single argument at 128 KB (the final spec is ~136 KB). Use `jq --rawfile`, `--data @file` or a pipe; a golden test checks the Makefile.
 - **Derived artifacts**: `config/faker_hints.yaml`, `config/c2m_provider_mappings.yaml`, `openapi/c2mapiv2-openapi-spec-*.yaml` — all generated. Do not edit directly.
 
 ---
 
 # Recent Changes
+
+## 2026-10-13 — X6 / L1 / L7 DD cleanup (`d609421`, CI-green click2mail 38455508600 + origin 38455513217)
+
+Unused `HTTP_*` aliases removed (spec −7 schemas); `@reserved` for `multiDocJobs`; gate reachability follows `discriminated_oneof`; `HINT_TYPES` shared; `address3` `""`, `invoiceNumber` and `tags` hints; `addRandomDataToRaw.js` applies hints per array item; catalog `country` USA. Migration validator `value_changes`. `KNOWN_OPEN` 18 → 13 entries. Detail: manuals change report §14.
 
 ## 2026-10-13 — C1 request examples; Postman cleanup fails on API errors
 
@@ -154,7 +160,7 @@ Four additional iterative audit passes fixing 14 items across 9 files (all LOW/M
 ```bash
 make openapi-build && make postman-build-golden-test-fixtures   # build spec + all 5 collections (no API keys)
 make validate-configs                           # V1–V8 config validators
-make validate-collections-conformance-test      # Golden tests: validator script + resolver 20 + DD constraints 47 + consistency 40 + migration 20 + Postman API helper 8
+make validate-collections-conformance-test      # Golden tests: validator script + resolver 20 + DD constraints 50 + consistency 47 + migration 22 + Postman API helper 8
 make validate-collections-conformance-gate-all  # All 5 collections conform to spec
 make validate-dd-gates                          # spec vs DD, all 5 collections vs DD, catalog vs spec
 make validate-pipeline-consistency              # end-to-end DD → spec → Postman gate
@@ -163,10 +169,10 @@ make validate-migration MIGRATION=<name>        # compare a rebuild against a mi
 
 Expected outputs (all clean):
 - `✅ All config field names are valid DD rule names`
-- `20 passed` / `47 passed, 43 subtests passed` / `40 passed` / `20 passed` / `8 passed` (resolver / DD constraints / consistency / migration validator / Postman API helper)
+- `20 passed` / `50 passed, 43 subtests passed` / `47 passed` / `22 passed` / `8 passed` (resolver / DD constraints / consistency / migration validator / Postman API helper)
 - `PASS=9 FAIL=0 SKIP=1` (linked/test), `PASS=17 FAIL=0` (GS), `PASS=8 FAIL=0` (real-world)
-- `✅ TOTAL — PASS=191 FAIL=0` (spec vs DD); `0 finding(s) across 5 collection(s)`
-- `ERROR categories: 0 · known-open WARN categories: 18` (one stale allowance, L6, is intermittent)
+- `✅ TOTAL — PASS=184 FAIL=0` (spec vs DD); `0 finding(s) across 5 collection(s)`
+- `ERROR categories: 0 · known-open WARN categories: 12` (plus L6, which is intermittent and sometimes shows as stale)
 
 ---
 
@@ -174,4 +180,4 @@ Expected outputs (all clean):
 
 Config field names: none — V1–V8 cover them.
 
-Open DD → spec → Postman findings are tracked in the `KNOWN_OPEN` table of `scripts/validation/validate_pipeline_consistency.py` (each entry cites its audit/decision ID; the gate flags entries that stop occurring). Main open items: D9 (Getting Started collections have no saved responses — the guides build the mock from a collection that has them), decisions D3–D8 (see the 2026-10-05 audit reports; the address-list minimum is part of D4), X6 remainder (unreachable rules), L1/L6/L7/L8/L10, M3.
+Open DD → spec → Postman findings are tracked in the `KNOWN_OPEN` table of `scripts/validation/validate_pipeline_consistency.py` (each entry cites its audit/decision ID; the gate flags entries that stop occurring). Main open items: D9 (Getting Started collections have no saved responses — the guides build the mock from a collection that has them), decisions D3–D8 (see the 2026-10-05 audit reports; the address-list minimum is part of D4), L2–L6, L8–L13, M3.
