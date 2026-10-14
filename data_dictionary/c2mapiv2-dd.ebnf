@@ -342,6 +342,12 @@ submitSinglePdfAddressCaptureParams =
          THEN reject.
        IF recipientAddressSource missing
          THEN reject (required for /batch/split).
+
+   jobTemplate vs jobOptions:
+     Apply the same mutual-exclusion/default policy as /static (request level).
+
+   Job-item jobTemplate precedence:
+     See JOB LISTS below — an item's jobTemplate replaces the request-level settings for that item.
 *)
 
 submitSinglePdfSplitParams =
@@ -391,6 +397,12 @@ submitSinglePdfSplitParams =
        Validate startPage/endPage same as /batch/split.
        IF recipientAddressSource is present
          THEN reject (addresses must be captured externally for this endpoint).
+
+   jobTemplate vs jobOptions:
+     Apply the same mutual-exclusion/default policy as /static (request level).
+
+   Job-item jobTemplate precedence:
+     See JOB LISTS below — an item's jobTemplate replaces the request-level settings for that item.
 *)
 
 submitSinglePdfSplitAddressCaptureParams =
@@ -462,7 +474,8 @@ submitMultiDocMergeParams =
    - Each `multiZipJobs[]` item is a `multiZipJobItem` containing:
        [ jobTemplate ] + filename + recipientAddressSource
    - Each job can have its own jobTemplate, specifies which file within the zip, and recipient address.
-   - Body MAY include paymentDetails and tags.
+   - Body MAY include jobTemplate, paymentDetails, returnAddress, jobOptions, tags
+     (the same request-level options as /batch/split; D3, 2026-10-13).
 *)
 
 (* Decision / validation rules (implementation-required):
@@ -484,25 +497,30 @@ submitMultiDocMergeParams =
        - zipDocumentIdOnly (documentId only, no filename), OR
        - zipRequestIdOnly (requestId only, no filename)
      Each job item then specifies:
-       - Optional jobTemplate (or inherits default if not specified)
+       - Optional jobTemplate (see precedence below)
        - filename (which file within the zip)
        - recipientAddressSource (who receives it)
 
      Implementation should still validate:
-       IF multiZipJobs[i] uses zipRequestIdSource:
-         THEN zipFilename MUST identify a zip file within that upload request.
-       IF multiZipJobs[i] uses zipDocumentIdSource:
-         THEN filename MUST exist inside the referenced zipDocumentId.
+       FOR EACH multiZipJobs[i]:
+         filename MUST exist inside the zip referenced by docSourceZipFileRef
+         (zipDocumentIdOnly: the stored zip document; zipRequestIdOnly: the zip uploaded
+         with that request).
 
-   jobTemplate scoping:
-     Same as POST /static — a top-level jobTemplate provides defaults for all jobs
-     in multiZipJobs, with each job item able to override it.
+   jobTemplate vs jobOptions:
+     Apply the same mutual-exclusion/default policy as /static (request level).
+
+   Job-item jobTemplate precedence:
+     See JOB LISTS below — an item's jobTemplate replaces the request-level settings for that item.
 *)
 
 submitMultiZipParams =
-      docSourceZipFileRef
+      [ jobTemplate ]
+    + docSourceZipFileRef
     + multiZipJobs
     + [ paymentDetails ]
+    + [ returnAddress ]
+    + [ jobOptions ]
     + [ tags ] ;
 
 
@@ -724,7 +742,7 @@ zipDocumentSource =
    - docSourceStandard/docSourceZipFile/docSourceAll are specialized document source variants used to keep
      endpoint schemas tight (only accepting the source types each endpoint supports).
    - zipDocumentSource is used only by /batch/zip/address-capture and is intentionally zip-only.
-   - Zip-only behavior for /batch/zip is enforced indirectly via multiZipJobItem using docSourceZipFile.
+   - Zip-only behavior for /batch/zip comes from docSourceZipFileRef at the top level (items name a filename inside that zip).
 *)
 
 (* @doc Document source — standard (non-zip) variants only: requestId, documentId, or URL. *)
@@ -787,11 +805,20 @@ startPage = integer ; (* @hint random_int 1 5 *)
 (* @doc Last page of this job's page range (inclusive). Must be >= startPage. *)
 endPage   = integer ; (* @hint random_int 6 10 *)
 
+(* Job-item jobTemplate precedence (D3, 2026-10-13) — applies to every jobs array whose
+   items carry [ jobTemplate ] (POST /batch/split, /batch/split/address-capture, /batch/zip):
+     - An item with its own jobTemplate uses that template ONLY: it replaces the
+       request-level jobTemplate or jobOptions for that item (no field-by-field merge).
+     - An item without one uses the request-level jobTemplate or jobOptions.
+     - With neither, the request-level defaults policy applies (see /static).
+     - The request-level jobTemplate / jobOptions mutual exclusion is unchanged.
+*)
+
 (* Zip-only jobs list:
    - Used by POST /batch/zip.
    - Zip file specified at top-level (docSourceZipFileRef in submitMultiZipParams).
    - Each item specifies optional jobTemplate, filename (which file within zip), and recipient.
-   - Each job is independent with its own template and recipient.
+   - Each job has its own recipient; its template follows the precedence rule above.
 *)
 (* @doc List of per-file job items extracted from a ZIP archive (POST /batch/zip). *)
 multiZipJobs = { multiZipJobItem } ;

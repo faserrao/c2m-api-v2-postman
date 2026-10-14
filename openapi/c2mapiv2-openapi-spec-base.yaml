@@ -208,12 +208,19 @@ components:
     submitMultiZipParams:
       type: object
       properties:
+        jobTemplate:
+          description: Saved job template name; pre-populates all print and mail options. Mutually exclusive with jobOptions.
+          type: string
         docSourceZipFileRef:
           $ref: '#/components/schemas/docSourceZipFileRef'
         multiZipJobs:
           $ref: '#/components/schemas/multiZipJobs'
         paymentDetails:
           $ref: '#/components/schemas/paymentDetails'
+        returnAddress:
+          $ref: '#/components/schemas/returnAddress'
+        jobOptions:
+          $ref: '#/components/schemas/jobOptions'
         tags:
           $ref: '#/components/schemas/tags'
       required:
@@ -2625,6 +2632,26 @@ paths:
                         month: 12
                         year: 2029
                       cvv: 123
+                  returnAddress:
+                    firstName: Jay
+                    lastName: Wilson
+                    company: Carter-Lopez
+                    address1: 49364 Sarah Viaduct Suite 794
+                    city: New April
+                    state: TX
+                    zip: '75032'
+                    country: USA
+                    address2: Suite 100
+                    address3: ''
+                  jobOptions:
+                    documentClass: letter
+                    layout: address_on_first_page
+                    productionTime: next_day
+                    envelope: standard
+                    color: full_color
+                    paperType: white
+                    printOption: double_sided
+                    mailClass: first_class
                   tags:
                   - q1-campaign
       responses:
@@ -2770,8 +2797,16 @@ paths:
                     errorType: ValidationError
                     errorMessage: Field contains a value not allowed by the enumeration
                     errorCode: INVALID_ENUM_VALUE
-                    errorDetails: '{"field": "paymentDetails.paymentType", "value": "invalid_value", "allowedValues": ["creditCard", "invoice", "ach", "userCredit"]}'
+                    errorDetails: '{"field": "jobOptions.documentClass", "value": "invalid_value", "allowedValues": ["letter", "postcard", "brochure", "flat"]}'
                     errorTrackingId: TRK-20260115-34E184
+                mutual-exclusion-violation:
+                  summary: Mutually exclusive fields
+                  value:
+                    errorType: ValidationError
+                    errorMessage: Request contains mutually exclusive fields
+                    errorCode: MUTUAL_EXCLUSION_VIOLATION
+                    errorDetails: '{"fields": ["jobTemplate", "jobOptions"], "issue": "only one may be provided"}'
+                    errorTrackingId: TRK-20260115-13C7AB
                 invalid-format:
                   summary: Validation failed
                   value:

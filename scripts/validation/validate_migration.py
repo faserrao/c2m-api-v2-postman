@@ -35,6 +35,9 @@ Migration file (YAML):
   retired_names: [singleAddress, addressName]
   nondeterministic:                   # optional extra: collection -> body-path regexes compared by path only
     Test: ["\\.someField$"]
+  added_examples:                     # new response examples (spec key / saved-response name)
+    - {operation: POST /batch/zip, status: "422", key: mutual-exclusion-violation,
+       name: Mutually exclusive fields}       # one that never appears is INCOMPLETE
   value_changes:                      # intended value changes, matched by leaf field name;
     - {field: country, from: US, to: USA}   # one that never occurs is INCOMPLETE
   rotated_fields:                     # collection -> oneOf fields whose variant is chosen round-robin
@@ -248,6 +251,17 @@ class Migration:
         self.rotated = {k: list(v) for k, v in (data.get("rotated_fields") or {}).items()}
         self.value_changes = list(data.get("value_changes") or [])
         self.value_changes_seen = set()
+        self.added_examples = list(data.get("added_examples") or [])
+        self.added_examples_seen = set()
+
+    def added_example(self, operation, status, key=None, name=None):
+        """True if a new example (spec key, or saved-response name) is declared in added_examples."""
+        for i, ae in enumerate(self.added_examples):
+            if ae.get("operation") == operation and str(ae.get("status")) == str(status) and (
+                    (key is not None and ae.get("key") == key) or (name is not None and ae.get("name") == name)):
+                self.added_examples_seen.add(i)
+                return True
+        return False
 
     def value_change(self, path, before, after):
         """True if this before -> after change at path is declared in value_changes."""
@@ -363,7 +377,8 @@ def compare(baseline, current, mig, is_random=None):
                 _compare_flat(rep, f"spec request example {key} {ex}", mig.rewrite_flat(be[ex]), ce[ex], mig)
         for status in set(b["responses"]) & set(c["responses"]):
             be, ce = b["responses"][status], c["responses"][status]
-            if set(be) != set(ce):
+            undeclared = {k for k in set(ce) - set(be) if not mig.added_example(key, status, key=k)}
+            if set(be) - set(ce) or undeclared:
                 rep.add("UNEXPECTED", "spec example", f"{key} {status} examples {sorted(be)} -> {sorted(ce)}")
             for ex in set(be) & set(ce):
                 _compare_flat(rep, f"spec example {key} {status} {ex}", mig.rewrite_flat(be[ex]), ce[ex], mig)
@@ -408,11 +423,15 @@ def compare(baseline, current, mig, is_random=None):
             _compare_flat(rep, f"{label} {key!r} body", b_body, c_body, mig,
                           collection=label, is_random=is_random)
             b_saved = [(s["code"], s["name"]) for s in b["saved"]]
-            c_saved = [(s["code"], s["name"]) for s in c["saved"]]
+            operation = f"{c['method']} {c['path']}"
+            c_kept = [s for s in c["saved"]
+                      if (s["code"], s["name"]) in b_saved
+                      or not mig.added_example(operation, s["code"], name=s["name"])]
+            c_saved = [(s["code"], s["name"]) for s in c_kept]
             if b_saved != c_saved:
                 rep.add("UNEXPECTED", f"{label} saved responses", f"{key!r} {b_saved} -> {c_saved}")
             else:
-                for bs, cs in zip(b["saved"], c["saved"]):
+                for bs, cs in zip(b["saved"], c_kept):
                     _compare_flat(rep, f"{label} {key!r} saved {bs['code']} {bs['name']!r}",
                                   mig.rewrite_flat(bs["body"]), cs["body"], mig, collection=label)
         for fld in mig.rotated.get(label, []):
@@ -422,6 +441,9 @@ def compare(baseline, current, mig, is_random=None):
             if missing:
                 rep.add("LOST", f"{label} rotated {fld}",
                         f"variants no longer used: {sorted(missing)} (now {sorted(c_used.get(fld, set()))})")
+    for i, ae in enumerate(mig.added_examples):
+        if i not in mig.added_examples_seen:
+            rep.add("INCOMPLETE", "added example", f"{ae} declared but never seen")
     for i, vc in enumerate(mig.value_changes):
         if i not in mig.value_changes_seen:
             rep.add("INCOMPLETE", "value change", f"{vc} declared but never seen")

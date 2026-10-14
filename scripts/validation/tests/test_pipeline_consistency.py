@@ -172,9 +172,12 @@ class TestCollectionChecks(unittest.TestCase):
         self.assertNotIn("B-EXAMPLE-FIELD-NOT-IN-BODY", cats)
 
     def test_mutual_exclusion_example_where_fields_absent_is_impossible(self):
+        """A body without jobTemplate/jobOptions (no job endpoint has one since D3, so the
+        /batch/zip body minus the pair stands in for it)."""
         tools = V.SpecTools(SPEC)
         zip_body = tools.body_paths(SPEC["paths"]["/batch/zip"]["post"]["requestBody"]["content"]
                                     ["application/json"]["schema"])
+        zip_body = {k: v for k, v in zip_body.items() if not k.startswith(("jobTemplate", "jobOptions"))}
         problems = V.field_ref_problems('{"fields": ["jobTemplate", "jobOptions"]}',
                                         "MUTUAL_EXCLUSION_VIOLATION", zip_body)
         self.assertEqual({k for k, _ in problems}, {"IMPOSSIBLE-ERROR"})

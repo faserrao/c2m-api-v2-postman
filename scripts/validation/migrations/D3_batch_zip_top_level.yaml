@@ -1,0 +1,27 @@
+name: D3 — /batch/zip request-level jobTemplate, returnAddress, jobOptions
+# User decision 2026-10-13 (option A): /batch/zip accepts the same optional request-level
+# options as /batch/split. Non-breaking (all optional). Job-item precedence written once in
+# the DD (JOB LISTS): an item's jobTemplate replaces the request-level settings for that item.
+#
+# Consequences declared here:
+# - new body paths in the /batch/zip request example and the Linked / Test bodies
+#   (Linked and Test send jobTemplate, not jobOptions: one of the mutually exclusive pair);
+# - the 422 "Mutually exclusive fields" example now applies to /batch/zip (spec, and the
+#   saved responses of Linked, Test and the Real-World request that uses /batch/zip);
+# - the 422 "Invalid enum value" example names jobOptions.documentClass, the preferred enum
+#   field, now that /batch/zip has it (it used paymentDetails.paymentType).
+rules:
+  changed: [submitMultiZipParams]
+schemas:
+  changed: [submitMultiZipParams]
+allowed_added_paths:
+  - "^jobTemplate$"
+  - "^returnAddress\\."
+  - "^jobOptions\\."
+added_examples:
+  - {operation: POST /batch/zip, status: "422", key: mutual-exclusion-violation,
+     name: Mutually exclusive fields}
+value_changes:
+  - field: errorDetails
+    from: '{"field": "paymentDetails.paymentType", "value": "invalid_value", "allowedValues": ["creditCard", "invoice", "ach", "userCredit"]}'
+    to: '{"field": "jobOptions.documentClass", "value": "invalid_value", "allowedValues": ["letter", "postcard", "brochure", "flat"]}'

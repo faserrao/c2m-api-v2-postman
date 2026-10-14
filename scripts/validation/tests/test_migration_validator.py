@@ -151,6 +151,26 @@ class TestCompare(unittest.TestCase):
         rep = M.compare(snapshot(True), snapshot(False), mig, NEVER_RANDOM)
         self.assertIn(("INCOMPLETE", "value"), kinds(rep))
 
+    def _with_new_example(self):
+        after = snapshot(False)
+        op = after["spec"]["operations"]["POST /static"]
+        op["responses"]["400"]["new-one"] = {"errorCode": "X"}
+        after["collections"]["Linked"]["POST /static"]["saved"].append({"code": 400, "name": "New one", "body": {}})
+        return after
+
+    def test_added_example_is_reported_unless_declared(self):
+        rep = M.compare(snapshot(True), self._with_new_example(), MIGRATION, NEVER_RANDOM)
+        self.assertIn(("UNEXPECTED", "spec"), kinds(rep))
+        self.assertIn(("UNEXPECTED", "Linked"), kinds(rep))
+        mig = M.Migration({**MIGRATION_DATA, "added_examples": [
+            {"operation": "POST /static", "status": "400", "key": "new-one", "name": "New one"}]})
+        self.assertEqual(M.compare(snapshot(True), self._with_new_example(), mig, NEVER_RANDOM).errors(), [])
+
+    def test_declared_added_example_that_never_appears_is_incomplete(self):
+        mig = M.Migration({**MIGRATION_DATA, "added_examples": [
+            {"operation": "POST /static", "status": "400", "key": "new-one", "name": "New one"}]})
+        self.assertIn(("INCOMPLETE", "added"), kinds(M.compare(snapshot(True), snapshot(False), mig, NEVER_RANDOM)))
+
     def test_removed_request_is_reported(self):
         after = snapshot(False)
         del after["collections"]["Real-World"]["POST /static"]

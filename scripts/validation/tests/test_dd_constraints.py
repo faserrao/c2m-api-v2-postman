@@ -255,7 +255,8 @@ class TestDDConstraints(unittest.TestCase):
     def test_spec_error_examples_match_dd_map_per_status(self):
         """H3/D10: each status's examples carry the codes (and type) the DD maps to it.
         A code may be absent only where its @error_examples tokens cannot be filled for
-        that endpoint — i.e. the error cannot occur there (e.g. mutual exclusion on /batch/zip)."""
+        that endpoint — i.e. the error cannot occur there (e.g. mutual exclusion on a body
+        without jobTemplate/jobOptions)."""
         t = self.translator
         bad = []
         for ep in t.endpoints:
@@ -275,13 +276,47 @@ class TestDDConstraints(unittest.TestCase):
         self.assertEqual(bad, [])
 
     def test_error_example_omitted_where_impossible(self):
-        """D10/N5: /batch/zip has no top-level jobTemplate/jobOptions, so its 422 examples
-        must not include MUTUAL_EXCLUSION_VIOLATION; /static must."""
-        def codes(path):
-            ex = self.spec["paths"][path]["post"]["responses"]["422"]["content"]["application/json"]["examples"]
+        """D10/N5: an endpoint whose body lacks jobTemplate/jobOptions gets no
+        MUTUAL_EXCLUSION_VIOLATION example. Since D3 every job endpoint has the pair, so the
+        omission is checked on a DD with the pair removed from /batch/zip."""
+        def codes(spec, path):
+            ex = spec["paths"][path]["post"]["responses"]["422"]["content"]["application/json"]["examples"]
             return {e["value"]["errorCode"] for e in ex.values()}
-        self.assertNotIn("MUTUAL_EXCLUSION_VIOLATION", codes("/batch/zip"))
-        self.assertIn("MUTUAL_EXCLUSION_VIOLATION", codes("/static"))
+        for path in ("/static", "/batch/zip"):
+            self.assertIn("MUTUAL_EXCLUSION_VIOLATION", codes(self.spec, path))
+        text = EBNF_PATH.read_text(encoding="utf-8")
+        start = text.index("submitMultiZipParams =")
+        rule = text[start:text.index(";", start) + 1]
+        stripped = rule.replace("[ jobTemplate ]\n    + ", "").replace("    + [ jobOptions ]\n", "")
+        self.assertNotIn("jobOptions", stripped)
+        t = EBNFToOpenAPITranslator()
+        t.parse_ebnf(text.replace(rule, stripped))
+        spec = t.generate_openapi()
+        self.assertNotIn("MUTUAL_EXCLUSION_VIOLATION", codes(spec, "/batch/zip"))
+        self.assertIn("MUTUAL_EXCLUSION_VIOLATION", codes(spec, "/static"))
+
+    def test_job_endpoints_offer_the_same_request_level_options(self):
+        """D3 (user decision 2026-10-13): every job endpoint accepts optional request-level
+        jobTemplate, returnAddress, jobOptions, paymentDetails and tags (/batch/zip lacked the
+        first three)."""
+        missing = []
+        for ep in self.translator.endpoints:
+            schema = self.schemas[ep.production_name]
+            for f in ("jobTemplate", "returnAddress", "jobOptions", "paymentDetails", "tags"):
+                if f not in schema.get("properties", {}) or f in schema.get("required", []):
+                    missing.append(f"{ep.path}: {f}")
+        self.assertEqual(missing, [])
+
+    def test_job_item_template_precedence_is_defined_once_and_referenced(self):
+        """D3: the precedence rule (an item's jobTemplate replaces the request-level settings
+        for that item) is defined once in the DD and referenced by every endpoint whose job
+        items carry jobTemplate."""
+        text = EBNF_PATH.read_text(encoding="utf-8")
+        self.assertEqual(text.count("Job-item jobTemplate precedence (D3"), 1)
+        for path in ("/batch/split", "/batch/split/address-capture", "/batch/zip"):
+            start = text.index(f"(* Endpoint: POST {path} ")
+            section = text[start:text.index("(* Endpoint:", start + 10) if "(* Endpoint:" in text[start + 10:] else None]
+            self.assertIn("Job-item jobTemplate precedence:", section, path)
 
     def test_error_examples_block_must_cover_error_map(self):
         """D10: a mapped (status, code) without an @error_examples entry is a build error."""
