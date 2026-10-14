@@ -422,7 +422,7 @@ empty-test:
 # Test target to verify mock environment update calls work correctly
 .PHONY: test-update-mock-env-call
 test-update-mock-env-call:
-	curl -s --location "$(POSTMAN_MOCKS_URL)$(POSTMAN_Q)" \
+	@curl -s --location "$(POSTMAN_MOCKS_URL)$(POSTMAN_Q)" \
 		$(POSTMAN_HEADER_API_KEY) | jq '.mocks[] | {id, uid, name, mockUrl}'
 
 # ========================================================================
@@ -1519,7 +1519,7 @@ postman-test-collection-add-auth-examples:
 .PHONY: postman-test-collection-upload
 postman-test-collection-upload:
 	@echo "===== DEBUG: Postman Collection Upload Test Variables ====="
-	@echo "POSTMAN_API_KEY: $(POSTMAN_API_KEY)"
+	@echo "POSTMAN_API_KEY: $(if $(POSTMAN_API_KEY),set,EMPTY)"
 	@echo "POSTMAN_WS: $(POSTMAN_WS)"
 	@echo "(POSTMAN_TEST_COLLECTION_FIXED): $(POSTMAN_TEST_COLLECTION_FIXED)"
 	@echo "==========================================================="
@@ -2345,7 +2345,7 @@ postman-api-debug-A:
 postman-api-debug-B:
 	@echo "🐞 Debugging Postman API credentials and workspace..."
 
-	@echo "🔑 API Key: $(POSTMAN_API_KEY)"
+	@echo "🔑 API Key: $(if $(POSTMAN_API_KEY),set,EMPTY)"
 	@echo "🗂️ Workspace: $(POSTMAN_WS)"
 
 	@echo "📡 Verifying API key with /me endpoint..."
@@ -3114,7 +3114,7 @@ context-set-click2mail: ## Set context to click2mail (click2mail repo → corpor
 .PHONY: print-vars
 print-vars:
 	$(foreach v,                                        \
-		$(filter-out $(VARS_OLD) VARS_OLD,$$(.VARIABLES)), \
+		$(filter-out $(VARS_OLD) VARS_OLD %API_KEY %API_KEY_OVERRIDE,$$(.VARIABLES)), \
 		$(info $(v) = $($(v))))
 
 # ========================================================================

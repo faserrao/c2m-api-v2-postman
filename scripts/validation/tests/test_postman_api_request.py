@@ -314,5 +314,46 @@ class TestLocalMakeBehaviour(unittest.TestCase):
         self.assertIn("lsof -ti :$(PRISM_PORT) || true", self.target("prism-start"))
 
 
+class TestNoKeyInBuildOutput(unittest.TestCase):
+    """2026-10-13: a local build printed the Postman API key (the upload step's debug block
+    echoed $(POSTMAN_API_KEY)); CI masks it as ***, a terminal does not. Under .ONESHELL make
+    echoes a whole recipe unless its first line starts with @, so a recipe that uses a key
+    and is not silenced prints it too."""
+
+    KEY_VARS = r"\$\((POSTMAN_API_KEY|POSTMAN_C2M_API_KEY|POSTMAN_SERRAO_API_KEY|POSTMAN_CURL_HEADERS_\w+|POSTMAN_HEADER_API_KEY|POSTMAN_HEADER_AUTH)\)"
+
+    def recipes(self):
+        import re
+        out, cur = [], None
+        for line in (REPO_ROOT / "Makefile").read_text().split("\n"):
+            m = re.match(r"^([A-Za-z0-9_.%/-]+)\s*:(?!=)", line)
+            if m and not line.startswith(".PHONY"):
+                cur = (m.group(1), []); out.append(cur); continue
+            if cur is not None:
+                if line.startswith("\t"):
+                    cur[1].append(line[1:])
+                elif line.strip() and not line.startswith("#"):
+                    cur = None
+        return out
+
+    def test_no_echo_prints_a_key(self):
+        import re
+        bad = [f"{name}: {l.strip()[:80]}" for name, body in self.recipes() for l in body
+               if re.search(r"\b(echo|printf)\b", l) and re.search(self.KEY_VARS, l)
+               and not re.search(r"\$\((if|findstring) \$\(POSTMAN_\w*API_KEY\)", l)]   # used only in a condition
+        self.assertEqual(bad, [])
+
+    def test_recipes_using_a_key_are_silenced(self):
+        import re
+        bad = [name for name, body in self.recipes()
+               if body and re.search(self.KEY_VARS, "\n".join(body)) and not body[0].lstrip().startswith("@")]
+        self.assertEqual(bad, [])
+
+    def test_print_vars_skips_keys(self):
+        import re
+        self.assertRegex(re.search(r"^print-vars:\n((?:\t.*\n)+)", (REPO_ROOT / "Makefile").read_text(), re.M).group(1),
+                         r"%API_KEY\b")
+
+
 if __name__ == "__main__":
     unittest.main()
