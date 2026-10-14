@@ -61,17 +61,13 @@ COLLECTIONS = {
 KNOWN_OPEN = {
     ("A-VALID-COMBINATION-NOOP", "*"): "X11 / decision D5 (envelope=none rule)",
     ("A-DOC-TYPE-CLAIM", "*"): "L2 / decision D6 (errorDetails object vs string)",
-    ("A-DOC-CARDINALITY-UNENFORCED", "*"): "X9 / decision D4 (array minimums)",
     ("B-OPERATION-NOT-IN-COLLECTION", "GS-Linked"): "L10 (Getting Started has no auth endpoints)",
     ("B-OPERATION-NOT-IN-COLLECTION", "GS-Test"): "L10 (Getting Started has no auth endpoints)",
     ("B-OPERATION-NOT-IN-COLLECTION", "Real-World"): "L10 (Real-World covers 4 of 7 job endpoints)",
     ("B-NO-AUTH", "Real-World"): "L8 (Real-World has no auth / pre-request script)",
-    ("B-MERGE-MINIMUM", "*"): "X9b / decision D4 (merge minimum 1 or 2)",
     ("B-PLACEHOLDER-IN-EXAMPLE", "Test"): "L6 (auth examples carry <dateTime>/<string>)",
-    ("B-EXAMPLE-ORIGINAL-REQUEST", "Linked"): "X9b (merge minimum in saved examples)",
     ("B-EXAMPLE-ORIGINAL-REQUEST", "Test"): "L6 (random auth ttl_seconds can fall below 3600 — intermittent)",
     ("B-TEST-STATUS-ASSERTION", "*"): "X12 / decision D7 (global allowed-codes list)",
-    ("C-REQUEST-EXAMPLE-MERGE-MINIMUM", "*"): "X9b / decision D4 (merge minimum 1 or 2)",
 }
 
 
@@ -279,7 +275,7 @@ class DDModel:
             x = e["expression"]
             if x["type"] != "symbol":
                 return {"_unsupported": "repeat of non-symbol"}
-            return {"type": "array", "items": self.field_schema(x["name"])}
+            return {"type": "array", "items": self.field_schema(x["name"]), **self.t.array_constraints.get(name, {})}
         if ty == "concatenation":
             props, req, lits = {}, [], []
             for it in e["items"]:
@@ -571,17 +567,13 @@ def cross_field_errors(body, info):
             got = jo.get(r["then_field"])
             if jo.get(r["when_field"]) == r["when_value"] and got not in r["then_values"] and not is_placeholder(got):
                 out.append(("B-VALID-COMBINATION", f"{r['when_field']}={r['when_value']} but {r['then_field']}={got}"))
+    # List minimums (D4) are minItems in the spec, checked by schema validation (B-BODY-SCHEMA).
     for fld, val in body.items():
-        if isinstance(val, list) and fld != "tags" and len(val) == 0:
-            out.append(("B-EMPTY-ARRAY", f"{fld} is empty"))
         if isinstance(val, list):
             for i, j in enumerate(val):
                 if isinstance(j, dict) and isinstance(j.get("startPage"), int) and isinstance(j.get("endPage"), int) \
                         and j["startPage"] > j["endPage"]:
                     out.append(("B-PAGE-RANGE", f"{fld}[{i}] startPage > endPage"))
-    merge = body.get("mergeDocumentSource")
-    if isinstance(merge, list) and len(merge) < 2:
-        out.append(("B-MERGE-MINIMUM", f"mergeDocumentSource has {len(merge)} entr{'y' if len(merge) == 1 else 'ies'}"))
     return out
 
 

@@ -164,6 +164,18 @@ def test_synthetic_faults():
           any("missing required field 'pdfSplitJobsWithAddress'" in x for x in e),
           "/batch/split wrong names -> flags both missing required fields")
 
+    # 3h2. D4 — list minimums (minItems from the DD ARRAY CONSTRAINTS block)
+    merge_doc = {"mergeByDocumentId": {"documentId": 1}}
+    merge_body = {"mergeDocumentSource": [merge_doc],
+                  "recipientAddressSource": {"recipientAddressByList": {"addressList": [clean_addr]}}}
+    e = errs_for("/mail-merge", merge_body)
+    check(any("at least 2 required" in x for x in e), "D4: one-document merge -> flagged (minItems 2)")
+    check(errs_for("/mail-merge", dict(merge_body, mergeDocumentSource=[merge_doc, merge_doc])) == [],
+          "D4: two-document merge -> clean")
+    e = errs_for("/static", dict(clean_single, recipientAddressSource={"recipientAddressByList": {"addressList": []}}))
+    check(any("at least 1 required" in x for x in e), "D4: empty addressList -> flagged (minItems 1)")
+    check(errs_for("/static", dict(clean_single, tags=[])) == [], "D4: empty tags -> allowed (no minimum)")
+
     # 3i. V5 — cross-field page-range constraint
     from validate_collections_against_spec import page_range_errors
     # startPage > endPage must be caught

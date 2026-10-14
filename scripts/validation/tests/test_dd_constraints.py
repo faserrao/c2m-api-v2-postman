@@ -195,6 +195,43 @@ class TestDDConstraints(unittest.TestCase):
         self.assertEqual(schema.get("minimum"), 1)
         self.assertEqual(schema.get("maximum"), 12)
 
+    # ── 4b. Array constraints (D4, 2026-10-14) ───────────────────────────────
+
+    D4_MINIMUMS = {"addressList": 1, "pdfSplitJobsWithAddress": 1, "pdfSplitJobsNoAddress": 1,
+                   "multiZipJobs": 1, "documentsToMerge": 2}
+
+    def test_array_constraints_parsed(self):
+        self.assertEqual({n: c.get("minItems") for n, c in self.translator.array_constraints.items()},
+                         self.D4_MINIMUMS)
+
+    def test_array_constraints_reach_list_schemas(self):
+        """Each list in the block carries minItems on its component schema; a list not in
+        the block (tagsList) may be empty."""
+        for name, minimum in self.D4_MINIMUMS.items():
+            with self.subTest(name=name):
+                self.assertEqual(self.schemas[name].get("type"), "array")
+                self.assertEqual(self.schemas[name].get("minItems"), minimum)
+        self.assertNotIn("minItems", self.schemas["tagsList"])
+
+    def test_merge_request_example_has_two_documents(self):
+        content = self.spec["paths"]["/mail-merge"]["post"]["requestBody"]["content"]["application/json"]
+        value = content["examples"]["default"]["value"]
+        self.assertEqual(len(value["mergeDocumentSource"]), 2)
+
+    def test_array_constraints_must_name_a_list_rule(self):
+        text = EBNF_PATH.read_text(encoding="utf-8")
+        for bad in ("startPage", "noSuchRule"):
+            with self.subTest(bad=bad):
+                t = EBNFToOpenAPITranslator()
+                with self.assertRaisesRegex(RuntimeError, "not lists"):
+                    t.parse_ebnf(text.replace("documentsToMerge: minItems=2", f"{bad}: minItems=2"))
+
+    def test_unreadable_array_constraint_line_stops_the_build(self):
+        text = EBNF_PATH.read_text(encoding="utf-8")
+        t = EBNFToOpenAPITranslator()
+        with self.assertRaisesRegex(RuntimeError, "cannot read line"):
+            t.parse_ebnf(text.replace("documentsToMerge: minItems=2", "documentsToMerge: min=2"))
+
     # ── 5. x-numeric-constraints emitted in spec info ────────────────────────
 
     def test_spec_info_has_numeric_constraints(self):

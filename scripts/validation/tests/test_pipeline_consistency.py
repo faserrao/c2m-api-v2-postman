@@ -204,9 +204,21 @@ class TestCollectionChecks(unittest.TestCase):
         self.assertNotIn("B-BODY-SCHEMA", run_collection([request(good)]))
         self.assertIn("B-BODY-SCHEMA", run_collection([request(bad)]))
 
-    def test_merge_minimum(self):
-        self.assertEqual(
-            [c for c, _ in V.cross_field_errors({"mergeDocumentSource": [{}]}, SPEC["info"])], ["B-MERGE-MINIMUM"])
+    def test_merge_minimum_comes_from_the_spec(self):
+        """D4: a one-document merge fails schema validation (minItems 2 from the DD
+        ARRAY CONSTRAINTS block); two documents pass. No hardcoded merge check remains."""
+        addr = {"firstName": "A", "lastName": "B", "address1": "1 Main St", "city": "Springfield",
+                "state": "IL", "zip": "62701", "country": "USA"}
+        doc = {"mergeByDocumentId": {"documentId": 1}}
+        body = {"mergeDocumentSource": [doc],
+                "recipientAddressSource": {"recipientAddressByList": {"addressList": [addr]}}}
+        one = request(body)
+        one["request"]["url"] = {"raw": "{{baseUrl}}/mail-merge", "host": ["{{baseUrl}}"], "path": ["mail-merge"]}
+        two = copy.deepcopy(one)
+        two["request"]["body"]["raw"] = json.dumps(dict(body, mergeDocumentSource=[doc, doc]))
+        self.assertIn("B-BODY-SCHEMA", run_collection([one]))
+        self.assertNotIn("B-BODY-SCHEMA", run_collection([two]))
+        self.assertEqual(V.cross_field_errors({"mergeDocumentSource": [doc]}, SPEC["info"]), [])
 
 
 class TestSpecChecks(unittest.TestCase):
@@ -233,6 +245,16 @@ class TestSpecChecks(unittest.TestCase):
         props = specs["final"]["components"]["schemas"]["pdfSplitJobItemNoAddress"]["properties"]
         props["startPage"].pop("minimum")
         self.assertIn(("A-RULE-STRUCTURE-MISMATCH", "*"), run_dd(specs).items)
+
+    def test_missing_list_minimum_is_flagged(self):
+        """D4: a list schema without the minItems its DD ARRAY CONSTRAINTS entry sets
+        (or with a different one) is a structure mismatch."""
+        for change in ("drop", "change"):
+            with self.subTest(change=change):
+                specs = self.specs()
+                lst = specs["final"]["components"]["schemas"]["documentsToMerge"]
+                lst.pop("minItems") if change == "drop" else lst.update(minItems=1)
+                self.assertIn(("A-RULE-STRUCTURE-MISMATCH", "*"), run_dd(specs).items)
 
     def test_missing_success_example_is_flagged(self):
         spec = copy.deepcopy(SPECX)
@@ -313,7 +335,7 @@ class TestSpecChecks(unittest.TestCase):
 
     def test_real_request_examples_are_clean(self):
         cats = {c for c, _s in self._request_findings().items if c.startswith("C-REQUEST")}
-        self.assertEqual(cats, {"C-REQUEST-EXAMPLE-MERGE-MINIMUM"})  # D4 still open
+        self.assertEqual(cats, set())  # D4 closed the last one (one-document merge)
 
     def test_missing_request_example_is_an_error(self):
         F = self._request_findings(lambda c: c.pop("examples"))

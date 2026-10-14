@@ -294,6 +294,7 @@ class EBNFToOpenAPITranslator:
         self.schema_counter = 0  # Counter for unique schema names
         self.http_error_map: Dict[str, Any] = {}  # Parsed from @http_error_map block in EBNF
         self.numeric_constraints: Dict[str, Dict[str, Any]] = {}  # Parsed from @numeric_constraints block
+        self.array_constraints: Dict[str, Dict[str, int]] = {}  # D4: parsed from @array_constraints block
         self.doc_annotations: Dict[str, str] = {}  # X4: rule name -> @doc description
         self.valid_combinations: List[Dict[str, Any]] = []  # Parsed from @valid_combinations block
         self.mutual_exclusion_fields: List[str] = list(_MUTUAL_EXCLUSION_FIELDS)  # Parsed from @mutual_exclusion
@@ -337,6 +338,7 @@ class EBNFToOpenAPITranslator:
         # Parse annotation blocks from EBNF
         self.http_error_map = self._parse_http_error_map(content)
         self.numeric_constraints = self._parse_numeric_constraints(content)
+        self.array_constraints = self._parse_array_constraints(content)
         self.valid_combinations = self._parse_valid_combinations(content)
         parsed_mutual = self._parse_mutual_exclusion(content)
         if parsed_mutual:
@@ -442,6 +444,14 @@ class EBNFToOpenAPITranslator:
                 raise RuntimeError(
                     f"@numeric_constraints names field(s) not defined in the DD: {', '.join(orphans)}"
                 )
+            # D4: an @array_constraints entry must name a list rule ({ item }); on anything
+            # else minItems would be meaningless or silently dropped.
+            not_lists = sorted(n for n in self.array_constraints
+                               if n not in self.productions or self.productions[n].expression.get('type') != 'repeat')
+            if not_lists:
+                raise RuntimeError(
+                    f"@array_constraints names rule(s) that are not lists ({{ item }}) in the DD: {', '.join(not_lists)}"
+                )
 
     def _parse_http_error_map(self, content: str) -> Dict[str, Any]:
         """Parse @http_error_map annotation block from EBNF content.
@@ -532,6 +542,28 @@ class EBNFToOpenAPITranslator:
                 constraints[kw_map[kw]] = val
             if constraints:
                 result[field_name] = constraints
+        return result
+
+    def _parse_array_constraints(self, content: str) -> Dict[str, Dict[str, int]]:
+        """D4: parse the @array_constraints block.
+
+        Returns dict keyed by list rule name: {'documentsToMerge': {'minItems': 2}}
+        Line format:  listRuleName: minItems=N   (maxItems=N is also recognised)
+        A line naming neither keyword stops the build rather than being ignored.
+        """
+        match = re.search(r'@array_constraints\s*\n(.*?)@end_array_constraints', content, re.DOTALL)
+        if not match:
+            return {}
+        result: Dict[str, Dict[str, int]] = {}
+        for line in match.group(1).splitlines():
+            line = line.strip()
+            if not line or line.startswith('#'):
+                continue
+            m = re.match(r'(\w+)\s*:\s*(.+)', line)
+            pairs = re.findall(r'(minItems|maxItems)\s*=\s*(\d+)', m.group(2)) if m else []
+            if not pairs:
+                raise RuntimeError(f"@array_constraints: cannot read line {line!r} (expected 'name: minItems=N')")
+            result[m.group(1)] = {kw: int(val) for kw, val in pairs}
         return result
 
     def _parse_valid_combinations(self, content: str) -> List[Dict[str, Any]]:
@@ -775,6 +807,12 @@ class EBNFToOpenAPITranslator:
 
         # Add any generated named schemas from concatenation structures
         schemas.update(self.generated_schemas)
+
+        # D4: list minimums from the @array_constraints block. Every use of a list is a $ref
+        # to its component schema, so request bodies are validated against these.
+        for name, constraints in self.array_constraints.items():
+            if name in schemas:
+                schemas[name].update(constraints)
 
         # D1: OpenAPI discriminator on each discriminated oneOf
         for parent, prop in getattr(self, '_discriminated_oneofs', {}).items():

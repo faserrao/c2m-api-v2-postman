@@ -243,6 +243,11 @@ def structural_errors(value, schema, spec, loc="body", strict_unknown=True):
         if not isinstance(value, list):
             errors.append(f"{loc}: expected array, got {type(value).__name__}")
             return errors
+        # D4: list minimums/maximums from the DD @array_constraints block
+        if "minItems" in schema and len(value) < schema["minItems"]:
+            errors.append(f"{loc}: {len(value)} item(s), at least {schema['minItems']} required")
+        if "maxItems" in schema and len(value) > schema["maxItems"]:
+            errors.append(f"{loc}: {len(value)} item(s), at most {schema['maxItems']} allowed")
         items = schema.get("items")
         if items:
             for i, el in enumerate(value):

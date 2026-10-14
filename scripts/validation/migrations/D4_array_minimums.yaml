@@ -1,0 +1,17 @@
+name: D4 — list minimums (minItems) from the DD ARRAY CONSTRAINTS block
+# User decision 2026-10-14: option 1 (a DD block), merge minimum 2.
+# New DD block ARRAY CONSTRAINTS (@array_constraints): addressList, pdfSplitJobsWithAddress,
+# pdfSplitJobsNoAddress, multiZipJobs at least 1 entry; documentsToMerge at least 2.
+# tagsList is not listed and may be empty. No DD rule changes shape.
+#
+# Consequences declared here:
+# - the five list schemas gain minItems;
+# - the POST /mail-merge request example and the Linked /mail-merge body now send two
+#   documents (the example builder and the Postman trim follow minItems).
+# Unchanged, and checked: every other schema, response example and collection body.
+rules:
+  changed: []
+schemas:
+  changed: [addressList, documentsToMerge, multiZipJobs, pdfSplitJobsNoAddress, pdfSplitJobsWithAddress]
+allowed_added_paths:
+  - "^mergeDocumentSource\\[1\\]\\."

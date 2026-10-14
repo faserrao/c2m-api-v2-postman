@@ -112,13 +112,17 @@ function discoverOneOfFields(specPath) {
         const arraySchemaNames = new Set(
             Object.entries(allSchemas).filter(([, s]) => s.type === 'array').map(([n]) => n)
         );
+        // D4: each is trimmed to the list's minItems (DD @array_constraints), at least 1 —
+        // e.g. mergeDocumentSource keeps 2 documents.
+        const listSchema = (schema) => schema.$ref ? allSchemas[schema.$ref.split('/').pop()] || {} : schema;
         const jobArrayFields = Object.entries(allSchemas)
             .filter(([name, schema]) =>
                 (schema.type === 'array' && /Job/.test(name)) ||
                 (schema.$ref && arraySchemaNames.has((schema.$ref || '').split('/').pop()))
             )
-            .map(([name]) => name);
-        console.log(`Discovered ${jobArrayFields.length} job array fields from spec: ${jobArrayFields.join(', ')}`);
+            .map(([name, schema]) => ({ name, keep: Math.max(1, listSchema(schema).minItems || 0) }));
+        console.log(`Discovered ${jobArrayFields.length} job array fields from spec: ` +
+            jobArrayFields.map(f => `${f.name} (keep ${f.keep})`).join(', '));
 
         // H2: mutually exclusive field groups from the DD @mutual_exclusion block
         const mutualExclusionFields = (spec.info && spec.info['x-mutual-exclusion']) || [];
@@ -282,10 +286,10 @@ function processRawBody(rawStr, oneOfFields, replacedFields, crossFieldRules, en
         // Process the object
         const processed = processObject(bodyObj, oneOfFields, replacedFields);
 
-        // Trim job arrays to 1 example item (faker generates 2 identical items by default)
-        for (const field of (jobArrayFields || [])) {
-            if (Array.isArray(processed[field]) && processed[field].length > 1) {
-                processed[field] = processed[field].slice(0, 1);
+        // Trim job arrays to their minimum (minItems, at least 1): faker generates extra items
+        for (const { name, keep } of (jobArrayFields || [])) {
+            if (Array.isArray(processed[name]) && processed[name].length > keep) {
+                processed[name] = processed[name].slice(0, keep);
             }
         }
 
