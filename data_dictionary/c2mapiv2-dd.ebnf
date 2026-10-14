@@ -21,11 +21,14 @@
    1) Big picture: how this file is used
    ----------------------------------------------------------------------------
    - EBNF is the SOURCE OF TRUTH in the pipeline.
-   - A translator converts this EBNF into an OpenAPI (YAML) specification.
-   - The generated OpenAPI can then be imported into tools like Postman and used
-     to generate tests once examples are added.
+   - A translator (scripts/active/ebnf_to_openapi_dynamic_v3.py) converts this EBNF
+     into an OpenAPI (YAML) specification: schemas, field descriptions, request
+     examples, success and error examples, numeric limits and cross-field rules.
+   - The Postman collections, mock server, docs and SDKs are generated from that
+     specification. Nothing downstream is edited by hand.
 
-   So the EBNF defines structure; OpenAPI is a generated artifact.
+   So this file defines structure AND the descriptive data around it (the
+   annotations and blocks in sections 11-14); everything else is generated.
 
    ----------------------------------------------------------------------------
    2) What a rule is
@@ -113,23 +116,23 @@
 
    Read as: addressList is a list of addresses.
 
-   Note: This dialect typically does not encode “at least one” (1..N) directly.
-   If the API requires at least one entry, that constraint is enforced by:
-   - API validation, and/or
-   - additional OpenAPI constraints (minItems), if your translator supports them.
+   Note: This dialect does not encode “at least one” (1..N) directly, and the
+   translator emits no minItems today, so an empty list is schema-valid. Where an
+   endpoint needs entries, its validation rules say so and the server enforces
+   it (open decision D4 may add minimums to the specification).
 
    ----------------------------------------------------------------------------
    8) Endpoint request bodies: submit...Params
    ----------------------------------------------------------------------------
    Each endpoint has a rule named like:
 
-     submitSingleDocParams = ... ;
+     submitDocParams = ... ;
 
    This rule defines the JSON body shape for that endpoint. It is built from the
    shared building blocks (docSourceAll, recipientAddressSource, etc.).
 
-   Example:
-     submitSingleDocParams =
+   Example (POST /static):
+     submitDocParams =
            [ jobTemplate ]
          + docSourceAll
          + recipientAddressSource
@@ -137,6 +140,11 @@
          + ... ;
 
    Read as: the request body includes the required parts, plus optional parts.
+
+   Each endpoint section starts with a header comment naming the method and path
+   (look for the word Endpoint, a colon, the method and the path), followed by its @summary and
+   @description annotations (section 11), an "English meaning" comment, a
+   "Decision / validation rules" comment, and then the submit...Params rule.
 
    ----------------------------------------------------------------------------
    9) Primitive types used here
@@ -153,8 +161,101 @@
    - “filename is required only if multiple files were uploaded”
    - “jobs[] must have at least one element”
    - “for endpoint X, recipientAddressSource must be present/absent”
-   Those are enforced by endpoint-level rules and server-side validation, and
-   can also be expressed in OpenAPI once examples/constraints are added.
+   Those are enforced by endpoint-level rules and server-side validation. The
+   rules that CAN be expressed are written as annotation blocks (section 13) and
+   reach the specification from there.
+
+   ----------------------------------------------------------------------------
+   11) Annotations on a rule
+   ----------------------------------------------------------------------------
+   Annotations are ordinary EBNF comments whose text starts with an @ keyword.
+   In the file they are written with the usual comment markers; this primer shows
+   them as <* ... *> because a comment cannot contain its own closing marker.
+
+     <* @doc Text. *>          on the line BEFORE a rule. Becomes the field's
+                               description in the specification and the data
+                               dictionary table. Every rule needs one; the
+                               consistency gate fails on a missing or changed one.
+
+     rule = ... ; <* @hint TYPE ARGS *>     on the SAME line, after the ';'.
+                               Example value for the field. TYPE is one of:
+                                 faker METHOD       a Faker method (first_name, city, ...)
+                                 static VALUE       a fixed value; quote it ("...")
+                                                    to keep digits a string; ""
+                                                    means intentionally empty
+                                 random_int MIN MAX an integer in that range
+                                 aba_routing_number a valid ABA routing number
+                               On an array rule the value is used for each item.
+                               Hints feed config/faker_hints.yaml (generated), the
+                               specification's request and success examples, and
+                               the Postman test data. A request field with no hint
+                               and no enum stops the build.
+
+     <* @summary Text. *>      after an endpoint header: the operation summary.
+     <* @description Text. *>  after an endpoint header: the operation description.
+
+     rule = ... ; <* @reserved POST /path *>
+                               the rule is kept for a planned endpoint and is
+                               intentionally unused (multiDocJobs, for
+                               POST /static/multi). The gate fails once the rule
+                               is used or the endpoint is defined.
+
+   ----------------------------------------------------------------------------
+   12) Shape annotations: @structural
+   ----------------------------------------------------------------------------
+   Written after the ';' of a rule as <* @structural ROLE ... *>. They tell the
+   translator how a rule becomes JSON when the default would be ambiguous:
+
+     single_field_wrapper      a = b ;  becomes the object { "b": ... } so it stays
+                               distinct from its sibling alternatives
+                               (documentIdSource = documentId).
+     named_wrapper_oneof       each alternative is sent wrapped in its own name:
+                               { "recipientAddressByList": { ... } }.
+     transparent_oneof_grouping  when this union is itself an alternative inside
+                               another union, its alternatives are listed there
+                               directly (docSourceStandard inside docSourceAll).
+     discriminated_oneof FIELD each alternative starts with a literal tag
+                               ("creditCard", "invoice", ...); FIELD (paymentType)
+                               is sent with that tag and becomes the OpenAPI
+                               discriminator. FIELD must be a rule listing the tags.
+
+   ----------------------------------------------------------------------------
+   13) Rule-wide blocks at the end of the file
+   ----------------------------------------------------------------------------
+   Five comment blocks near the end hold rules that span fields or endpoints.
+   Each starts and ends with a marker line; their formats are described in the
+   blocks themselves. Edit these blocks, never the scripts:
+
+     HTTP STATUS -> ERROR MAPPING  which errorType and errorCodes each HTTP status
+                                   returns; drives the error responses declared on
+                                   every job endpoint.
+     ERROR EXAMPLES                summary, message and details for each error
+                                   code; every error example in the specification
+                                   and every Postman saved response comes from here.
+     NUMERIC CONSTRAINTS           minimum / maximum per field (month, startPage, ...).
+     MUTUAL EXCLUSION              fields of which a request may send only one
+                                   (jobTemplate, jobOptions).
+     VALID COMBINATIONS            "when field X has value V, field Y must be one
+                                   of ..." rules for jobOptions.
+
+   ----------------------------------------------------------------------------
+   14) Job items with their own jobTemplate
+   ----------------------------------------------------------------------------
+   In POST /batch/split, /batch/split/address-capture and /batch/zip, each job
+   item may carry its own jobTemplate as well as the request-level jobTemplate or
+   jobOptions. The item's jobTemplate replaces the request-level settings for that
+   item; see the precedence rule in the JOB LISTS section.
+
+   ----------------------------------------------------------------------------
+   15) After you change this file
+   ----------------------------------------------------------------------------
+   - make openapi-build regenerates the specification (and config/faker_hints.yaml
+     when a hint changed); commit them together with this file.
+   - make validate-dd-gates and make validate-pipeline-consistency check the
+     specification and the collections against this file.
+   - A change to the request or response contract is proven with a migration check
+     (make migration-snapshot before, make validate-migration after; see
+     scripts/validation/migrations/).
 
    ============================================================================ *)
 
