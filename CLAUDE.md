@@ -33,7 +33,7 @@ See top-level `CLAUDE.md` (`C2M_API_v2/CLAUDE.md`) for full project context and 
 - **`ph<>` format is defensive only**: `fix_oneOf_placeholders.js` now writes the first canonical enum value (`propDef.enum[0]`) directly for `jobOptions` fields. The `ph<val1|val2|...>` handler in `addRandomDataToRaw.js` is a fallback for manually-constructed collections only.
 - **Repeatable spec builds (M4)**: spec examples use `_EXAMPLE_NOW` and sha256-seeded IDs — two builds from the same DD are byte-identical. Never reintroduce `random`/`datetime.now()` into spec examples (`test_spec_generation_is_repeatable` fails).
 - **No silent no-ops**: pipeline scripts exit 1 when they process nothing; Makefile no longer masks guarded steps with `|| echo "Skipping"`.
-- **Error map is the authority**: job-endpoint responses and Postman error examples are built from the DD `@http_error_map` per `(status, errorCode)` pair (an example that cannot occur on an endpoint is omitted: `/batch/zip` has 17 error examples).
+- **Error map is the authority**: job-endpoint responses and Postman error examples are built from the DD `@http_error_map` per `(status, errorCode)` pair (an example that cannot occur on an endpoint is omitted; since D3 every job endpoint has all 18).
 - **Request examples (C1)**: built by the translator from the schema and the DD `@hint`s (first oneOf branch, one item per array unless `minItems`, top-level mutual exclusion keeps `jobOptions`). A request field with no `@hint` and no enum stops the build. A hint on an array field (`tags`) gives the value of each item; every generator applies it that way. The Postman converter ignores request examples (bodies come from the schema).
 - **Hint types**: `HINT_TYPES` in the translator (`faker`, `static`, `random_int`, `aba_routing_number`); the gate imports it. An intentionally empty static hint is written `""`.
 - **`@reserved`**: `rule = … ; (* @reserved POST /path *)` marks a rule kept for a planned endpoint (`multiDocJobs` → `/static/multi`). The gate accepts it as unreachable and fails once the rule is used or the endpoint is defined.
@@ -48,6 +48,10 @@ See top-level `CLAUDE.md` (`C2M_API_v2/CLAUDE.md`) for full project context and 
 ---
 
 # Recent Changes
+
+## 2026-10-13 — D3: /batch/zip request-level options (`f890d21`)
+
+User decision (option A): `/batch/zip` accepts optional `jobTemplate`, `returnAddress`, `jobOptions` like `/batch/split`. Job-item precedence defined once in the DD (JOB LISTS): an item's `jobTemplate` replaces the request-level settings for that item. Migration `D3_batch_zip_top_level` clean; validator gained `added_examples`.
 
 ## 2026-10-13 — Getting Started guide tested from a fresh clone (`a501d81` … `cae3da3`)
 
@@ -189,4 +193,4 @@ Expected outputs (all clean):
 
 Config field names: none — V1–V8 cover them.
 
-Open DD → spec → Postman findings are tracked in the `KNOWN_OPEN` table of `scripts/validation/validate_pipeline_consistency.py` (each entry cites its audit/decision ID; the gate flags entries that stop occurring). Main open items: D9 (Getting Started collections have no saved responses — the guides build the mock from a collection that has them), decisions D3–D8 (see the 2026-10-05 audit reports; the address-list minimum is part of D4), L2–L6, L8–L13, M3.
+Open DD → spec → Postman findings are tracked in the `KNOWN_OPEN` table of `scripts/validation/validate_pipeline_consistency.py` (each entry cites its audit/decision ID; the gate flags entries that stop occurring). Main open items: D9 (Getting Started collections have no saved responses — the guides build the mock from a collection that has them), decisions D4–D8 (see the 2026-10-05 audit reports; the address-list minimum is part of D4), L2–L6, L8–L13, M3.
