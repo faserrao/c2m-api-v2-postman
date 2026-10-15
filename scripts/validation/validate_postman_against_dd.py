@@ -21,7 +21,7 @@ Data Dictionary, adding four checks that no existing validator covers:
               x-valid-combinations in the OpenAPI spec:
                 • color=black_and_white  → paperType ∈ {white, white_24, ivory}
                 • mailClass=non_profit   → documentClass ∈ {letter, flat}
-                • envelope=none          → layout ∈ {address_on_first_page, address_on_back_page}
+                • envelope=none          → documentClass ∈ {postcard, brochure, flat}
 
 Complement to the existing validators:
   • validate_collections_against_spec.py — structural (required/oneOf/properties); skips enums

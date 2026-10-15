@@ -1,0 +1,17 @@
+name: D5 — envelope=none restricts documentClass (was a no-op layout rule)
+# User decision 2026-10-14 (option 1): a mailpiece with no envelope mails itself, so
+# envelope=none allows documentClass postcard, brochure or flat (not letter). The old rule
+# listed both layout values, so it restricted nothing (X11). The build now stops on any
+# @valid_combinations rule that allows every value of its field.
+#
+# Consequences declared here:
+# - x-valid-combinations in the spec info block (not a schema or a rule);
+# - the envelope @doc says what none means, so the envelope schema description changes
+#   (the jobOptions property copies it).
+# Collections: no change. Generated jobOptions use each field's first value (envelope
+# standard), which no combination rule constrains.
+rules:
+  changed: []
+schemas:
+  changed: []
+allowed_added_paths: []

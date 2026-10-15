@@ -244,7 +244,8 @@
      MUTUAL EXCLUSION              fields of which a request may send only one
                                    (jobTemplate, jobOptions).
      VALID COMBINATIONS            "when field X has value V, field Y must be one
-                                   of ..." rules for jobOptions.
+                                   of ..." rules for jobOptions; each rule must
+                                   leave out at least one value of field Y.
 
    ----------------------------------------------------------------------------
    14) Job items with their own jobTemplate
@@ -717,7 +718,7 @@ documentClass  = "letter" | "postcard" | "brochure" | "flat" ; (* @hint static l
 layout         = "address_on_first_page" | "address_on_back_page" ; (* @hint static address_on_first_page *)
 (* @doc Production time preference (next_day, two_day, etc.). *)
 productionTime = "next_day" | "two_day" | "three_day" | "standard" | "same_day" ; (* @hint static next_day *)
-(* @doc Envelope type used for the mailing. *)
+(* @doc Envelope type used for the mailing. none means the mailpiece mails itself: postcard, brochure or flat only. *)
 envelope       = "standard" | "none" | "flat" | "double_window" ; (* @hint static standard *)
 (* @doc Color mode for printing (full_color or black_and_white). *)
 color          = "full_color" | "black_and_white" ; (* @hint static full_color *)
@@ -1383,10 +1384,14 @@ errorTrackingId = string ;  (* Optional request ID for support tracking - format
    Documents which combinations of jobOptions fields are valid
    together.  Parsed by ebnf_to_openapi_dynamic_v3.py and emitted
    as x-valid-combinations in the OpenAPI spec info block.
+   Each rule must leave out at least one value of fieldB; the build
+   stops on a rule that allows every value, since it restricts nothing.
+   envelope=none: a mailpiece with no envelope mails itself, so a
+   letter is not allowed. Decision D5 (2026-10-14).
    Format: fieldA=value: fieldB must be one of (v1|v2|...)
    ----------------------------------------------------------------
    @valid_combinations
    color=black_and_white: paperType must be one of (white|white_24|ivory)
    mailClass=non_profit: documentClass must be one of (letter|flat)
-   envelope=none: layout must be one of (address_on_first_page|address_on_back_page)
+   envelope=none: documentClass must be one of (postcard|brochure|flat)
    @end_valid_combinations *)

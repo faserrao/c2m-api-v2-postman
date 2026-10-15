@@ -261,6 +261,63 @@ class TestDDConstraints(unittest.TestCase):
         self.assertIn("x-valid-combinations", info,
                       "x-valid-combinations must be present in spec info")
 
+    D5_RULE = "envelope=none: documentClass must be one of (postcard|brochure|flat)"
+
+    def test_envelope_none_rule(self):
+        """D5 (2026-10-14): with no envelope the mailpiece mails itself, so no letter."""
+        rule = {"when_field": "envelope", "when_value": "none",
+                "then_field": "documentClass", "then_values": ["postcard", "brochure", "flat"]}
+        self.assertIn(rule, self.translator.valid_combinations)
+        self.assertIn(rule, self.spec["info"]["x-valid-combinations"])
+        self.assertNotIn("layout", [r["then_field"] for r in self.translator.valid_combinations])
+
+    def test_noop_combination_stops_the_build(self):
+        """A rule that allows every value of its field restricts nothing (X11)."""
+        text = EBNF_PATH.read_text(encoding="utf-8")
+        for noop in ("envelope=none: layout must be one of (address_on_first_page|address_on_back_page)",
+                     "envelope=none: documentClass must be one of (letter|postcard|brochure|flat)"):
+            with self.subTest(noop=noop):
+                with self.assertRaisesRegex(RuntimeError, "restricts nothing"):
+                    EBNFToOpenAPITranslator().parse_ebnf(text.replace(self.D5_RULE, noop))
+
+    def test_combination_naming_unknown_field_or_value_stops_the_build(self):
+        text = EBNF_PATH.read_text(encoding="utf-8")
+        for bad, msg in (("envelope=none: noSuchField must be one of (x)", "not a DD enum rule"),
+                         ("envelope=nothing: documentClass must be one of (flat)", "not values of envelope"),
+                         ("envelope=none: documentClass must be one of (flat|leaflet)", "not values of documentClass")):
+            with self.subTest(bad=bad):
+                with self.assertRaisesRegex(RuntimeError, msg):
+                    EBNFToOpenAPITranslator().parse_ebnf(text.replace(self.D5_RULE, bad))
+
+    def test_unreadable_combination_line_stops_the_build(self):
+        text = EBNF_PATH.read_text(encoding="utf-8")
+        with self.assertRaisesRegex(RuntimeError, "cannot read line"):
+            EBNFToOpenAPITranslator().parse_ebnf(
+                text.replace(self.D5_RULE, "envelope=none: documentClass in (postcard|brochure|flat)"))
+
+    def test_collection_enforcer_applies_every_rule_on_a_field(self):
+        """fix_oneOf_placeholders.js must satisfy all rules on one field together, after it
+        normalises jobOptions: non_profit + no envelope leaves only flat (D5)."""
+        import json, subprocess, tempfile
+        spec = yaml.safe_load((REPO_ROOT / "openapi" / "c2mapiv2-openapi-spec-base.yaml").read_text(encoding="utf-8"))
+        for name, first in (("envelope", "none"), ("mailClass", "non_profit")):
+            for schema in (spec["components"]["schemas"][name],
+                           spec["components"]["schemas"]["jobOptions"]["properties"][name]):
+                schema["enum"].remove(first)
+                schema["enum"].insert(0, first)
+        jo = {f: "x" for f in spec["components"]["schemas"]["jobOptions"]["properties"]}
+        body = json.dumps({"jobOptions": jo})
+        coll = {"info": {"name": "t"}, "item": [{"name": "r", "request": {
+            "method": "POST", "url": "{{baseUrl}}/static", "body": {"mode": "raw", "raw": body}}}]}
+        with tempfile.TemporaryDirectory() as d:
+            sp, cp = Path(d, "spec.yaml"), Path(d, "c.json")
+            sp.write_text(yaml.safe_dump(spec), encoding="utf-8")
+            cp.write_text(json.dumps(coll), encoding="utf-8")
+            subprocess.run(["node", str(REPO_ROOT / "scripts/active/fix_oneOf_placeholders.js"), str(sp), str(cp), str(cp)],
+                           check=True, capture_output=True)
+            out = json.loads(json.loads(cp.read_text())["item"][0]["request"]["body"]["raw"])["jobOptions"]
+        self.assertEqual((out["envelope"], out["mailClass"], out["documentClass"]), ("none", "non_profit", "flat"))
+
     # ── 7. x-http-error-map still emitted (regression) ───────────────────────
 
     def test_spec_info_still_has_http_error_map(self):

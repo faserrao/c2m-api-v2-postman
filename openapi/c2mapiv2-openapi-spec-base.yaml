@@ -70,10 +70,11 @@ info:
     - flat
   - when_field: envelope
     when_value: none
-    then_field: layout
+    then_field: documentClass
     then_values:
-    - address_on_first_page
-    - address_on_back_page
+    - postcard
+    - brochure
+    - flat
   x-mutual-exclusion:
   - jobTemplate
   - jobOptions
@@ -317,7 +318,7 @@ components:
           - standard
           - same_day
         envelope:
-          description: Envelope type used for the mailing.
+          description: 'Envelope type used for the mailing. none means the mailpiece mails itself: postcard, brochure or flat only.'
           type: string
           enum:
           - standard
@@ -384,7 +385,7 @@ components:
       - standard
       - same_day
     envelope:
-      description: Envelope type used for the mailing.
+      description: 'Envelope type used for the mailing. none means the mailpiece mails itself: postcard, brochure or flat only.'
       type: string
       enum:
       - standard

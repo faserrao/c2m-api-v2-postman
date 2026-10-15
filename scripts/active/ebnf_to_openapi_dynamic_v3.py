@@ -452,6 +452,20 @@ class EBNFToOpenAPITranslator:
                 raise RuntimeError(
                     f"@array_constraints names rule(s) that are not lists ({{ item }}) in the DD: {', '.join(not_lists)}"
                 )
+            # D5: a @valid_combinations rule must name DD enum values and leave out at least one
+            # value of the constrained field; one that allows every value restricts nothing (X11).
+            for r in self.valid_combinations:
+                text = f"{r['when_field']}={r['when_value']}: {r['then_field']}"
+                for fld, vals in ((r['when_field'], [r['when_value']]), (r['then_field'], r['then_values'])):
+                    allowed = self._get_enum_values(fld)
+                    if not allowed:
+                        raise RuntimeError(f"@valid_combinations {text}: {fld} is not a DD enum rule")
+                    unknown = [v for v in vals if v not in allowed]
+                    if unknown:
+                        raise RuntimeError(f"@valid_combinations {text}: {unknown} not values of {fld} {allowed}")
+                if set(r['then_values']) >= set(self._get_enum_values(r['then_field'])):
+                    raise RuntimeError(f"@valid_combinations {text}: allows every value of "
+                                       f"{r['then_field']}, so it restricts nothing")
 
     def _parse_http_error_map(self, content: str) -> Dict[str, Any]:
         """Parse @http_error_map annotation block from EBNF content.
@@ -584,13 +598,15 @@ class EBNFToOpenAPITranslator:
             if not line or line.startswith('#'):
                 continue
             m = re.match(r'(\w+)=(\w+)\s*:\s*(\w+)\s+must\s+be\s+one\s+of\s+\(([^)]+)\)', line)
-            if m:
-                result.append({
-                    'when_field': m.group(1),
-                    'when_value': m.group(2),
-                    'then_field': m.group(3),
-                    'then_values': [v.strip() for v in m.group(4).split('|')],
-                })
+            if not m:
+                raise RuntimeError(f"@valid_combinations: cannot read line {line!r} "
+                                   "(expected 'fieldA=value: fieldB must be one of (v1|v2|...)')")
+            result.append({
+                'when_field': m.group(1),
+                'when_value': m.group(2),
+                'then_field': m.group(3),
+                'then_values': [v.strip() for v in m.group(4).split('|')],
+            })
         return result
 
     def _parse_mutual_exclusion(self, content: str) -> List[str]:

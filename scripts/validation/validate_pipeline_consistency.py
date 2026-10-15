@@ -59,7 +59,6 @@ COLLECTIONS = {
 # (category, scope) -> tracking reference. scope is a collection label, or "*" for any.
 # Categories not listed here are ERRORs. Remove an entry as soon as its fix lands.
 KNOWN_OPEN = {
-    ("A-VALID-COMBINATION-NOOP", "*"): "X11 / decision D5 (envelope=none rule)",
     ("A-DOC-TYPE-CLAIM", "*"): "L2 / decision D6 (errorDetails object vs string)",
     ("B-OPERATION-NOT-IN-COLLECTION", "GS-Linked"): "L10 (Getting Started has no auth endpoints)",
     ("B-OPERATION-NOT-IN-COLLECTION", "GS-Test"): "L10 (Getting Started has no auth endpoints)",

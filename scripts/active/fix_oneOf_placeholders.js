@@ -238,17 +238,25 @@ function convertJobOptionsToPlaceholders(bodyObj, enumPlaceholders) {
 
 /**
  * Enforce x-valid-combinations rules on jobOptions.
- * When a triggering field value is present and the constrained field violates the rule,
- * reset the constrained field to the first allowed value.
+ * When a constrained field violates the rules that apply to it, reset it to the first value
+ * every applicable rule allows. Several rules can constrain one field (D5: envelope=none and
+ * mailClass=non_profit both limit documentClass), so their allowed values are intersected.
  */
 function fixCrossFieldConstraints(bodyObj, rules) {
     if (!bodyObj || !bodyObj.jobOptions || !rules || rules.length === 0) return;
     const jo = bodyObj.jobOptions;
-    for (const rule of rules) {
-        const { when_field, when_value, then_field, then_values } = rule;
-        if (jo[when_field] === when_value && jo[then_field] !== undefined && !then_values.includes(jo[then_field])) {
-            jo[then_field] = then_values[0];
+    const allowed = {};
+    for (const { when_field, when_value, then_field, then_values } of rules) {
+        if (jo[when_field] !== when_value || jo[then_field] === undefined) continue;
+        allowed[then_field] = (allowed[then_field] || then_values).filter(v => then_values.includes(v));
+    }
+    for (const [field, values] of Object.entries(allowed)) {
+        if (values.length === 0) {
+            // Left as is: the consistency gate reports the violation (B-VALID-COMBINATION)
+            console.warn(`Warning: no ${field} value satisfies every x-valid-combinations rule for ${JSON.stringify(jo)}`);
+            continue;
         }
+        if (!values.includes(jo[field])) jo[field] = values[0];
     }
 }
 
@@ -296,11 +304,12 @@ function processRawBody(rawStr, oneOfFields, replacedFields, crossFieldRules, en
         // Enforce DD mutual exclusion before the jobOptions passes below
         enforceMutualExclusion(processed, mutualExclusionFields, preferredField);
 
-        // Enforce cross-field jobOptions constraints (rules from spec x-valid-combinations)
-        fixCrossFieldConstraints(processed, crossFieldRules);
-
         // Normalise jobOptions enum fields to canonical first value from spec
         convertJobOptionsToPlaceholders(processed, enumPlaceholders);
+
+        // Then enforce cross-field jobOptions constraints (rules from spec x-valid-combinations);
+        // in the other order the normalisation above overwrote the corrections (D5)
+        fixCrossFieldConstraints(processed, crossFieldRules);
 
         // Convert back to formatted JSON string
         return JSON.stringify(processed, null, 2);
