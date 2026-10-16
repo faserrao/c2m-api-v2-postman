@@ -544,10 +544,22 @@ components:
       - addressList
     recipientAddressByListId:
       description: Reference to a previously stored recipient address list by its integer ID.
-      type: integer
+      type: object
+      properties:
+        addressListId:
+          description: Integer ID of a previously stored recipient address list.
+          type: integer
+      required:
+      - addressListId
     recipientAddressByAddressId:
       description: Reference to a previously stored individual recipient address by its integer ID.
-      type: integer
+      type: object
+      properties:
+        addressId:
+          description: Integer ID of a previously stored individual recipient address.
+          type: integer
+      required:
+      - addressId
     mappingId:
       description: Integer ID of a merge-field mapping profile that associates address columns to template variables. If omitted, the account default mapping is used.
       type: integer

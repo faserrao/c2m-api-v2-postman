@@ -317,8 +317,8 @@
      recipientAddressSource can be:
        - recipientAddressByList ([mappingId] + addressList [+addressListName]): one or more
          inline recipients — a single recipient is a one-entry addressList (D2, 2026-10-09)
-       - recipientAddressByListId (addressListId): reference to a stored address list
-       - recipientAddressByAddressId (addressId): reference to a stored address
+       - recipientAddressByListId ({ addressListId }): reference to a stored address list
+       - recipientAddressByAddressId ({ addressId }): reference to a stored address
      Note: mappingId is optional. If omitted, the server will use the default mapping ID.
    - Body MAY include paymentDetails, returnAddress, jobOptions, tags.
 *)
@@ -789,11 +789,13 @@ recipientAddressByList =
 
 (* @doc Reference to a previously stored recipient address list by its integer ID. *)
 recipientAddressByListId =
-    addressListId ;
+    addressListId ; (* @structural single_field_wrapper *)
 
 (* @doc Reference to a previously stored individual recipient address by its integer ID. *)
 recipientAddressByAddressId =
-    addressId ;
+    addressId ; (* @structural single_field_wrapper *)
+(* L4 (D8, 2026-10-16): both ID variants are sent as objects, like documentIdSource:
+   { "recipientAddressByListId": { "addressListId": 1001 } }, not a bare number. *)
 
 (* @doc Integer ID of a merge-field mapping profile that associates address columns to template variables. If omitted, the account default mapping is used. *)
 mappingId = id ; (* @hint static 5001 *)

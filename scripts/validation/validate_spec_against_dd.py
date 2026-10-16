@@ -65,19 +65,10 @@ PRIMITIVE_TYPES = {"string", "integer", "number"}
 # spec as $ref entries, but checking them adds no signal — they always pass.
 HTTP_ALIAS_PREFIX = "HTTP_"
 
-# EBNF rules of the form `a = b ;` (single-symbol body) that represent
-# single-field WRAPPER OBJECTS rather than transparent aliases.  These appear
-# as discriminated oneOf variants alongside multi-field object siblings, so
-# their spec schema must be { type: object, properties: { b: T }, required: [b] }
-# rather than a $ref alias.  Must stay in sync with _SINGLE_FIELD_WRAPPER_RULES
-# in ebnf_to_openapi_dynamic_v3.py.
-SINGLE_FIELD_WRAPPER_RULES: frozenset = frozenset({
-    "documentIdSource",   # documentIdSource = documentId ; → { documentId: integer }
-    "urlSource",          # urlSource = url ;              → { url: string }
-    "zipDocumentIdOnly",  # zipDocumentIdOnly = zipDocumentId ; → { zipDocumentId: integer }
-    "zipRequestIdOnly",   # zipRequestIdOnly = requestId ; → { requestId: integer }
-    "mergeByDocumentId",  # mergeByDocumentId = documentId ; → { documentId: integer }
-})
+# Single-field WRAPPER rules (`a = b ;` emitted as { type: object, properties: { b: T },
+# required: [b] }, not a $ref alias) are derived at runtime from the DD's
+# `@structural single_field_wrapper` annotations, like NAMED_WRAPPER_ONEOF_RULES below
+# (L4/D8, 2026-10-16: was a hardcoded list of five that missed new wrappers).
 
 # NAMED_WRAPPER_ONEOF_RULES is now derived at runtime from @structural annotations
 # in the EBNF DD via _extract_structural_annotations() (imported above).
@@ -413,6 +404,7 @@ def check_wrapper_rules(
     rules: Dict[str, str],
     all_schemas: dict,
     body_types: Dict[str, str],
+    single_field_wrapper_rules: frozenset,
 ) -> List[Finding]:
     """
     Check 5: single-field wrapper rules (a = b ; where b is the field name)
@@ -422,7 +414,7 @@ def check_wrapper_rules(
     """
     findings: List[Finding] = []
 
-    for name in SINGLE_FIELD_WRAPPER_RULES:
+    for name in sorted(single_field_wrapper_rules):
         if name not in rules:
             continue  # rule commented out or not present in this DD version
         if name not in all_schemas:
@@ -596,6 +588,9 @@ def main() -> int:
     named_wrapper_oneof_rules = frozenset(
         name for name, roles in _structural.items() if 'named_wrapper_oneof' in roles
     )
+    single_field_wrapper_rules = frozenset(
+        name for name, roles in _structural.items() if 'single_field_wrapper' in roles
+    )
 
     # Skip rules we intentionally exclude
     rules = {
@@ -629,7 +624,7 @@ def main() -> int:
         ("2. Enum parity",                check_enum_parity(rules, all_schemas, body_types)),
         ("3. Object properties",          check_object_properties(rules, all_schemas, body_types)),
         ("4. Required fields",            check_required_fields(rules, all_schemas, body_types)),
-        ("5. Wrapper rule structure",     check_wrapper_rules(rules, all_schemas, body_types)),
+        ("5. Wrapper rule structure",     check_wrapper_rules(rules, all_schemas, body_types, single_field_wrapper_rules)),
         ("6. Named-wrapper oneOf rules",  check_named_wrapper_oneofs(rules, all_schemas, named_wrapper_oneof_rules)),
     ]
 

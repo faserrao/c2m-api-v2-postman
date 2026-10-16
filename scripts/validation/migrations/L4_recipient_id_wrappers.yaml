@@ -1,0 +1,24 @@
+name: L4 (D8) — recipient ID variants are wrapper objects
+# User decision 2026-10-16: recipientAddressByListId and recipientAddressByAddressId are
+# sent as objects, like documentIdSource and the other single-ID choices:
+#   { "recipientAddressByListId": { "addressListId": 1001 } }   (was ... : 1001)
+# A breaking contract change, made now because no client code exists yet (as D2, D6).
+path_rewrites:
+  - from: "recipientAddressSource.recipientAddressByListId"
+    to:   "recipientAddressSource.recipientAddressByListId.addressListId"
+  - from: "recipientAddressSource.recipientAddressByAddressId"
+    to:   "recipientAddressSource.recipientAddressByAddressId.addressId"
+# The DD rules' expressions are unchanged (only their @structural annotation), so no rule
+# is declared changed; the spec schemas are.
+rules:
+  changed: []
+schemas:
+  changed: [recipientAddressByListId, recipientAddressByAddressId]
+allowed_added_paths: []
+# The IDs now get the DD's @hint values (addressListId 1001, addressId 2001). Before, the
+# bare number sat under the variant name, which has no hint: the Test collection filled
+# it randomly and Getting Started / Real-World with the filler 123.
+value_changes:
+  - {field: addressListId, from: 123, to: 1001}
+nondeterministic:
+  Test: ["recipientAddressByListId\\.addressListId$", "recipientAddressByAddressId\\.addressId$"]

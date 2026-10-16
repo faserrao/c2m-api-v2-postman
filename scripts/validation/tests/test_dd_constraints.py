@@ -349,6 +349,65 @@ class TestDDConstraints(unittest.TestCase):
         self.assertEqual(sorted(ach["properties"]), ["accountNumber", "routingNumber"])
         self.assertEqual(sorted(ach["required"]), ["accountNumber", "routingNumber"])
 
+    # ── L4 / D8 (2026-10-16): recipient ID variants are wrapper objects ────────
+
+    def test_recipient_id_variants_are_wrapper_objects(self):
+        """L4: { "recipientAddressByListId": { "addressListId": 1001 } }, like documentIdSource."""
+        import json as _json
+        for rule, field in (("recipientAddressByListId", "addressListId"),
+                            ("recipientAddressByAddressId", "addressId")):
+            with self.subTest(rule=rule):
+                schema = self.schemas[rule]
+                self.assertEqual(schema.get("type"), "object")
+                self.assertEqual(list(schema["properties"]), [field])
+                self.assertEqual(schema["required"], [field])
+        # Every generated collection sends the object form, with the DD hint value
+        hints = yaml.safe_load((REPO_ROOT / "config" / "faker_hints.yaml").read_text())["faker_hints"]
+        seen = 0
+        for name in ("linked-collection-flat", "test-collection-flat", "getting-started-test-collection",
+                     "real-world-use-cases-collection"):
+            text = (REPO_ROOT / "postman" / "generated" / f"c2mapiv2-{name}.json").read_text()
+            def walk(o):
+                nonlocal seen
+                if isinstance(o, dict):
+                    for rule, field in (("recipientAddressByListId", "addressListId"),
+                                        ("recipientAddressByAddressId", "addressId")):
+                        if rule in o:
+                            seen += 1
+                            self.assertEqual(o[rule], {field: hints[field]["value"]}, f"{name}: {o[rule]!r}")
+                    for v in o.values():
+                        walk(v)
+                elif isinstance(o, list):
+                    for v in o:
+                        walk(v)
+            for it in _json.loads(text)["item"]:
+                stack = [it]
+                while stack:
+                    x = stack.pop()
+                    stack += x.get("item", [])
+                    raw = ((x.get("request") or {}).get("body") or {}).get("raw")
+                    if raw:
+                        walk(_json.loads(raw))
+        self.assertGreater(seen, 0)
+
+    def test_spec_gate_wrapper_list_comes_from_the_dd(self):
+        """L4: validate_spec_against_dd.py checks every @structural single_field_wrapper rule
+        (it had a hardcoded list of five), and fails one emitted as a bare type."""
+        import copy as _copy
+        sys.path.insert(0, str(REPO_ROOT / "scripts" / "validation"))
+        import validate_spec_against_dd as G
+        from ebnf_to_openapi_dynamic_v3 import _extract_structural_annotations
+        text = EBNF_PATH.read_text(encoding="utf-8")
+        wrappers = frozenset(n for n, r in _extract_structural_annotations(text).items()
+                             if "single_field_wrapper" in r)
+        self.assertTrue({"recipientAddressByListId", "recipientAddressByAddressId"} <= wrappers)
+        rules = G.extract_rules(text)
+        schemas = _copy.deepcopy(self.schemas)
+        self.assertEqual([f for f in G.check_wrapper_rules(rules, schemas, {}, wrappers) if f[0] == G.FAIL], [])
+        schemas["recipientAddressByListId"] = {"type": "integer"}
+        failed = [f[1] for f in G.check_wrapper_rules(rules, schemas, {}, wrappers) if f[0] == G.FAIL]
+        self.assertEqual(failed, ["recipientAddressByListId"])
+
     def test_collection_enforcer_applies_every_rule_on_a_field(self):
         """fix_oneOf_placeholders.js must satisfy all rules on one field together, after it
         normalises jobOptions: non_profit + no envelope leaves only flat (D5)."""

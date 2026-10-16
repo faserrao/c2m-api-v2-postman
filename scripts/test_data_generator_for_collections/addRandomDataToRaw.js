@@ -129,13 +129,13 @@ let oneOfFixtures = {
                 addressListName: "Marketing Campaign Q1"
             }
         },
-        // Variant 2: recipientAddressByAddressId (integer)
+        // Variant 2: recipientAddressByAddressId ({ addressId }, L4)
         {
-            recipientAddressByAddressId: 5000
+            recipientAddressByAddressId: { addressId: 5000 }
         },
-        // Variant 3: recipientAddressByListId (integer)
+        // Variant 3: recipientAddressByListId ({ addressListId }, L4)
         {
-            recipientAddressByListId: 1001
+            recipientAddressByListId: { addressListId: 1001 }
         }
     ],
 
