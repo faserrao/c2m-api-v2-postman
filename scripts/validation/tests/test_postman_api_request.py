@@ -148,6 +148,24 @@ class TestMakefileScriptsExist(unittest.TestCase):
         self.assertGreater(len(paths), 30)
         self.assertEqual(sorted(p for p in paths if not (REPO_ROOT / p).exists()), [])
 
+    def test_every_referenced_target_exists(self):
+        """Every target named as a prerequisite or in a `$(MAKE) target` call is defined
+        (local-test-pipeline called a `clean` target that never existed; M3 removed
+        postman-upload-enhanced-collection while it was still a prerequisite)."""
+        import re
+        mk = (REPO_ROOT / "Makefile").read_text()
+        targets = set(re.findall(r"^([A-Za-z0-9][\w.-]*)\s*:(?!=)", mk, re.M))
+        refs = set()
+        for m in re.finditer(r"^([A-Za-z0-9][\w.-]*)\s*:(?!=)([^\n#]*)", mk, re.M):
+            refs |= {d for d in m.group(2).split() if not re.search(r"[$/.|]", d)}
+        for line in mk.splitlines():
+            if line.lstrip().startswith("#"):
+                continue
+            for m in re.finditer(r"\$\(MAKE\)\s+(?:-[\w-]+\s+)*(?:\w+=\S+\s+)*([A-Za-z0-9][\w-]*)(?![\w$(=-])", line):
+                refs.add(m.group(1))
+        self.assertGreater(len(targets), 100)
+        self.assertEqual(sorted(refs - targets), [])
+
     def test_duplicate_collection_validator_is_retired(self):
         """M3: validate_all_collections_against_spec.py duplicated the conformance gate +
         consistency gate (every fault it checks is caught there) and is archived."""

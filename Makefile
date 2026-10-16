@@ -1686,9 +1686,10 @@ postman-upload-getting-started-all: postman-upload-getting-started-linked postma
 postman-upload-getting-started-with-examples: postman-upload-getting-started-all
 	@echo "✅ Getting Started collections uploaded (both versions)"
 
-# Upload all enhanced collections (enhanced test, use case, and getting started)
+# Upload the curated collections (use case and getting started); the "enhanced test"
+# collection and its upload target were retired with M3 (2026-10-16)
 .PHONY: postman-upload-all-enhanced-collections
-postman-upload-all-enhanced-collections: postman-upload-enhanced-collection postman-upload-use-case-collection postman-upload-getting-started-all
+postman-upload-all-enhanced-collections: postman-upload-use-case-collection postman-upload-getting-started-all
 	@echo "✅ All enhanced collections uploaded successfully"
 
 # ========================================================================
@@ -3116,8 +3117,6 @@ local-full-build: ## Full build with artifacts sync
 .PHONY: local-test-pipeline
 local-test-pipeline: ## Test the full two-repo pipeline locally
 	@echo "🧪 Testing full pipeline locally..."
-	@echo "🧹 Cleaning previous builds..."
-	@$(MAKE) clean
 	@echo "🏗️  Running full build..."
 	@$(MAKE) local-full-build
 	@echo "📊 Checking artifacts repo for changes..."
