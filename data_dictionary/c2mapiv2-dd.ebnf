@@ -58,9 +58,11 @@
      and objects are modeled by combining fields with '+'.
 
    Example:
-     returnAddress = firstName + lastName + address1 + city + state + zip + country ;
+     returnAddress = firstName + lastName + [ company ] + address1
+                   + city + state + zip + country + [ address2 ] + [ address3 ] ;
 
-   Read as: returnAddress contains firstName, lastName, address1, city, state, zip, country.
+   Read as: returnAddress contains firstName, lastName, address1, city, state, zip and
+   country, and may contain company, address2 and address3 ([ ] = optional).
 
    Important: the EBNF describes the set/shape of fields, while the generated
    OpenAPI expresses them as JSON object properties.
@@ -298,7 +300,7 @@
 (* ------------------------------------------------------------------------- *)
 (* Endpoint: POST /static                                                              *)
 (* @summary Submit single document *)
-(* @description Submits a mailing job for a single document to one or more recipients. The request body must include a document source, recipient address information, and payment details. *)
+(* @description Submits a mailing job for a single document to one or more recipients. The request body must include a document source and recipient address information; payment details are optional. *)
 (* ------------------------------------------------------------------------- *)
 
 (* English meaning:
@@ -311,7 +313,9 @@
        - zipDocumentIdSource (zipDocumentId + filename): References a file within a stored zip archive
        - zipRequestIdSource (requestId + zipFilename + filename): References a file within an uploaded zip archive
 
-     *** Mahesh: Can this endpoint be called with zipDocumentIdSource and zipRequestIdSource??
+     Open question for Click2Mail (PROJECT_TODO.md, "Confirm Business Rules with Click2Mail"):
+     can /static be called with zipDocumentIdSource and zipRequestIdSource? The grammar
+     allows them today.
 
    - Body MUST include recipientAddressSource (inline list OR stored list OR stored address).
      recipientAddressSource can be:
@@ -399,7 +403,8 @@ submitDocParams =
      Apply the same docSourceStandard resolution rules as /static.
 
    Job list constraint:
-     IF request body includes jobs
+     IF request body includes multiDocJobs, multiZipJobs, pdfSplitJobsWithAddress or
+        pdfSplitJobsNoAddress
        THEN reject (this endpoint is not a split/bulk endpoint).
 
    jobTemplate vs jobOptions:
@@ -480,7 +485,7 @@ submitSinglePdfSplitParams =
 (* ------------------------------------------------------------------------- *)
 
 (* English meaning:
-   - Same as /single/pdf/split, but recipient addresses are captured externally.
+   - Same as /batch/split, but recipient addresses are captured externally.
    - Body MAY include jobTemplate.
    - Body MUST include `docSourceStandard`.
    - Body MUST include `pdfSplitJobsNoAddress` (list of page ranges without addresses).
@@ -489,8 +494,9 @@ submitSinglePdfSplitParams =
    - Body MAY include paymentDetails, returnAddress, jobOptions, tags.
 
    Implementation note:
-   - This DD models pdfSplitJobItem with [ recipientAddressSource ] (optional).
-     Endpoint-level validation differentiates required/omitted usage per path.
+   - The two split endpoints use different item rules: pdfSplitJobItemWithAddress
+     (/batch/split; recipientAddressSource required) and pdfSplitJobItemNoAddress
+     (this endpoint; no recipientAddressSource). The schema itself enforces the difference.
 *)
 
 (* Decision / validation rules (implementation-required):
@@ -560,7 +566,7 @@ submitSinglePdfSplitAddressCaptureParams =
        THEN reject.
 
    Recipient:
-     recipientAddressSource is REQUIRED and must resolve using /single/doc rules.
+     recipientAddressSource is REQUIRED and must resolve using the /static rules.
 *)
 
 submitMultiDocMergeParams =
@@ -581,7 +587,8 @@ submitMultiDocMergeParams =
 
 (* English meaning:
    - Submits multiple jobs from a single ZIP file.
-   - Body MUST include docSourceZipFileRef (specifies which zip file - requestId or documentId only, no filename).
+   - Body MUST include docSourceZipFileRef (which zip file: zipDocumentIdOnly { zipDocumentId }
+     or zipRequestIdOnly { requestId }; no filename — each job item names its file).
    - Body MUST include `multiZipJobs` (list of job items).
    - Each `multiZipJobs[]` item is a `multiZipJobItem` containing:
        [ jobTemplate ] + filename + recipientAddressSource
@@ -668,9 +675,9 @@ submitMultiZipParams =
 
      IF using zipRequestIdSource:
        THEN zipFilename MUST identify a zip file within the upload request.
-            filename (inner file) selection is not provided at top-level here,
-            so processing MUST define how the server selects files/jobs from the zip
-            (e.g., implicit enumeration, metadata inside zip, or subsequent capture step).
+     Both zip modes carry filename, so the body names ONE file inside the zip.
+     Open question for Click2Mail (PROJECT_TODO.md): is that intended for a batch endpoint,
+     or should the server process every file in the zip (filename optional or absent)?
 
    Job list constraint:
      IF request body includes multiDocJobs OR multiZipJobs OR pdfSplitJobsWithAddress OR pdfSplitJobsNoAddress (i.e., any jobs array)
@@ -835,7 +842,8 @@ zipDocumentIdSource = zipDocumentId + filename ;
 (* @doc Integer ID of a previously stored ZIP archive. *)
 zipDocumentId = id ; (* @hint random_int 10000 99999 *)
 
-(* TO CHECK *)
+(* Open question for Click2Mail (PROJECT_TODO.md): whether an uploaded-zip source needs all
+   three of requestId, zipFilename and filename. *)
 (* @doc Source a specific file within an uploaded ZIP archive — requires the upload request ID, the zip filename within that request, and the target filename in the zip. *)
 zipRequestIdSource = requestId + zipFilename + filename ;
 (* @doc Filename of the ZIP file within an upload request (distinguishes the zip from other files uploaded in the same request). *)

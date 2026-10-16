@@ -424,6 +424,41 @@ class TestDDConstraints(unittest.TestCase):
         failed = [f[1] for f in G.check_wrapper_rules(rules, schemas, {}, wrappers) if f[0] == G.FAIL]
         self.assertEqual(failed, ["recipientAddressByListId"])
 
+    # ── L11 / L13 (2026-10-16): DD prose matches the contract ─────────────────
+
+    def test_dd_prose_names_only_real_endpoints(self):
+        """L11: every endpoint path the DD's prose mentions is a spec path (or the planned
+        /static/multi); old names like /single/pdf/split fail."""
+        import re as _re
+        text = EBNF_PATH.read_text(encoding="utf-8")
+        paths = set(self.spec["paths"]) | {"/static/multi"}
+        mentioned = set(_re.findall(r"(?<![\w.:/])(/(?:static|batch|mail-merge|single|multi|jobs|auth)(?:/[\w{}-]+)*)", text))
+        self.assertEqual(sorted(m for m in mentioned if m not in paths), [])
+
+    def test_dd_has_no_unresolved_markers(self):
+        """L11: open questions live in PROJECT_TODO.md, not as markers in the DD."""
+        import re as _re
+        text = EBNF_PATH.read_text(encoding="utf-8")
+        # "*** Name:" notes (not the "(*****)" banner lines), TO CHECK / TODO / FIXME, "??"
+        self.assertEqual(_re.findall(r"\*\*\* [A-Za-z]|\bTO CHECK\b|\bTODO\b|\bFIXME\b|\?\?", text), [])
+
+    def test_endpoint_descriptions_do_not_require_optional_fields(self):
+        """L13: an endpoint @description must not call an optional body field required
+        (/static said payment details were required)."""
+        import re as _re
+        bad = []
+        for ep in self.translator.endpoints:
+            body = self.schemas.get(ep.production_name, {})
+            optional = set(body.get("properties", {})) - set(body.get("required", []))
+            for clause in _re.split(r"[.;]", ep.description or ""):
+                if not _re.search(r"\bmust\b|\brequired\b", clause, _re.I) or "optional" in clause.lower():
+                    continue
+                for field in optional:
+                    words = _re.sub(r"(?<!^)([A-Z])", r" \1", field).lower()  # paymentDetails -> payment details
+                    if words in clause.lower():
+                        bad.append(f"{ep.path}: '{clause.strip()}' calls optional {field} required")
+        self.assertEqual(bad, [])
+
     def test_collection_enforcer_applies_every_rule_on_a_field(self):
         """fix_oneOf_placeholders.js must satisfy all rules on one field together, after it
         normalises jobOptions: non_profit + no envelope leaves only flat (D5)."""
