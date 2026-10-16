@@ -2,24 +2,37 @@
 
 const fs = require('fs');
 const yaml = require('js-yaml');
+const { loadDeclaredStatuses, statusesForRequest, statusTest } = require('./declared_statuses');
 
 // G1: Matches CONTENT_TYPE_JSON / _CONTENT_TYPE_JSON used in all other active pipeline scripts.
 const CONTENT_TYPE_JSON = 'application/json';
 
 const args = process.argv.slice(2);
 if (args.length < 2) {
-  console.error("Usage: node scripts/add_tests_jwt.js <input_file> <output_file> [--allowed-codes \"200,400,401\"] --auth-overlay <path>");
+  console.error("Usage: node scripts/active/add_tests_jwt.js <input_file> <output_file> --spec <openapi spec> --auth-overlay <path>");
   process.exit(1);
 }
 
 const inputFile = args[0];
 const outputFile = args[1];
-let allowedCodes = "200";
 let authOverlayPath = null;
 
-const codesIndex = args.indexOf("--allowed-codes");
-if (codesIndex !== -1 && args[codesIndex + 1]) {
-  allowedCodes = args[codesIndex + 1];
+if (args.includes("--allowed-codes")) {
+  console.error("❌ --allowed-codes is retired (D7): each request's statuses now come from its operation in --spec");
+  process.exit(1);
+}
+const specIndex = args.indexOf("--spec");
+const specPath = specIndex !== -1 ? args[specIndex + 1] : null;
+if (!specPath) {
+  console.error("❌ --spec <path> is required: each request asserts the statuses its operation declares (D7).");
+  process.exit(1);
+}
+let declared;
+try {
+  declared = loadDeclaredStatuses(specPath);
+} catch (err) {
+  console.error(`❌ Cannot read declared statuses from ${specPath}: ${err.message}`);
+  process.exit(1);
 }
 const overlayIndex = args.indexOf("--auth-overlay");
 if (overlayIndex !== -1 && args[overlayIndex + 1]) {
@@ -72,11 +85,10 @@ ${checks}
 
 console.log(`ℹ️ Input file: ${inputFile}`);
 console.log(`ℹ️ Output file: ${outputFile}`);
-console.log(`ℹ️ Allowed status codes: ${allowedCodes}`);
+console.log(`ℹ️ Statuses per operation from: ${specPath}`);
 
-// Standard tests for all endpoints
+// Standard tests for all endpoints; the status assertion is added per request (D7)
 const standardTests = [
-  `pm.test("Status code is allowed (${allowedCodes})", function () { pm.expect([${allowedCodes}]).to.include(pm.response.code); });`,
   `pm.test("Response time < 1s", function () { pm.expect(pm.response.responseTime).to.be.below(1000); });`
 ];
 
@@ -138,11 +150,9 @@ const _REVOKE_TESTS = [
         pm.environment.unset('tokenExpiry');
         pm.environment.unset('currentTokenId');
       }
-    });`,
-  `pm.test("Revocation is idempotent", function () {
-      // 204 is expected for both first revocation and repeated attempts
-      pm.expect([204, 404]).to.include(pm.response.code);
     });`
+  // A repeated revocation may return 404; the per-operation status test (D7) accepts
+  // exactly the statuses revoke declares (204, 401, 404), so no separate list here.
 ];
 
 /**
@@ -291,8 +301,15 @@ function addTestsToItem(item) {
       item.event.push(testEvent);
     }
 
-    // Clear existing tests
-    testEvent.script.exec = [];
+    // Clear existing tests; the status assertion is this request's operation's statuses (D7)
+    let codes;
+    try {
+      codes = statusesForRequest(item.request, declared);
+    } catch (err) {
+      console.error(`❌ ${item.name}: ${err.message}`);
+      process.exit(1);
+    }
+    testEvent.script.exec = [statusTest(codes)];
 
     // Add standard tests
     standardTests.forEach(test => {

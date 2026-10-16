@@ -225,6 +225,84 @@ class TestCollectionChecks(unittest.TestCase):
         self.assertEqual(V.cross_field_errors({"mergeDocumentSource": [doc]}, SPEC["info"]), [])
 
 
+class TestPerOperationStatusAssertions(unittest.TestCase):
+    """D7 (2026-10-16): add_tests.js writes each request's own operation's statuses, from the spec."""
+
+    SPEC_PATH = REPO_ROOT / "openapi" / "c2mapiv2-openapi-spec-final.yaml"
+    SCRIPT = REPO_ROOT / "scripts" / "active" / "add_tests.js"
+
+    @staticmethod
+    def item(method, segments, exec_lines=()):
+        it = {"name": f"{method} /{'/'.join(segments)}", "request": {
+            "method": method, "url": {"raw": "{{baseUrl}}/" + "/".join(segments),
+                                      "host": ["{{baseUrl}}"], "path": list(segments)}}}
+        if exec_lines:
+            it["event"] = [{"listen": "test", "script": {"type": "text/javascript", "exec": list(exec_lines)}}]
+        return it
+
+    def run_script(self, items, *extra):
+        import subprocess
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            src, out = Path(d) / "in.json", Path(d) / "out.json"
+            src.write_text(json.dumps({"info": {"name": "t"}, "item": items}))
+            args = list(extra) if extra else ["--spec", str(self.SPEC_PATH)]
+            r = subprocess.run(["node", str(self.SCRIPT), str(src), str(out), *args],
+                               capture_output=True, text=True)
+            return r, (json.loads(out.read_text()) if out.exists() else None)
+
+    def declared(self, method, path):
+        return sorted(int(c) for c in SPEC["paths"][path][method.lower()]["responses"])
+
+    def asserted(self, item):
+        src = "\n".join(l for e in item.get("event", []) if e["listen"] == "test" for l in e["script"]["exec"])
+        arrays = [sorted(int(c) for c in a.split(",")) for a in
+                  __import__("re").findall(r"\[(\s*\d{3}(?:\s*,\s*\d{3})*\s*)\]", src)]
+        return arrays
+
+    def test_each_request_asserts_its_own_operations_statuses(self):
+        items = [self.item("POST", ["static"]), self.item("POST", ["auth", "tokens", "short"]),
+                 self.item("POST", ["auth", "tokens", ":tokenId", "revoke"])]
+        r, out = self.run_script(items)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        for it, path in zip(out["item"], ["/static", "/auth/tokens/short", "/auth/tokens/{tokenId}/revoke"]):
+            with self.subTest(path=path):
+                self.assertEqual(self.asserted(it), [self.declared("POST", path)])
+
+    def test_earlier_global_assertion_is_replaced(self):
+        old = 'pm.test("Status code is allowed (200,201,204,400)", function () { pm.expect([200,201,204,400]).to.include(pm.response.code); });'
+        r, out = self.run_script([self.item("POST", ["auth", "tokens", "short"], [old])])
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertEqual(self.asserted(out["item"][0]), [self.declared("POST", "/auth/tokens/short")])
+
+    def test_request_not_in_spec_stops_the_script(self):
+        r, _ = self.run_script([self.item("POST", ["no", "such", "path"])])
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn("not an operation in the spec", r.stderr)
+
+    def test_global_list_option_is_retired(self):
+        r, _ = self.run_script([self.item("POST", ["static"])], "--spec", str(self.SPEC_PATH),
+                               "--allowed-codes", "200,400")
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn("retired", r.stderr)
+
+    def test_built_test_collection_has_no_status_assertion_findings(self):
+        """Positive control on the real Test collection (built by postman-build-golden-test-fixtures)."""
+        path = REPO_ROOT / "postman" / "generated" / "c2mapiv2-test-collection-flat.json"
+        cats = {cat for (cat, _s) in run_findings_for(json.loads(path.read_text()))}
+        self.assertNotIn("B-TEST-STATUS-ASSERTION", cats)
+
+    def test_status_assertion_mismatch_is_an_error(self):
+        """D7: no longer tracked in KNOWN_OPEN."""
+        self.assertIsNone(V.Findings.tracking("B-TEST-STATUS-ASSERTION", "Test"))
+
+
+def run_findings_for(collection):
+    F = V.Findings()
+    V.check_collection("Test", collection, False, SPEC, V.SpecTools(SPEC), F)
+    return F.items
+
+
 class TestSpecChecks(unittest.TestCase):
 
     def specs(self):

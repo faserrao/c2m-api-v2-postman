@@ -328,15 +328,8 @@ VENV_PYTHON                      := $(VENV_DIR)/bin/python
 VENV_PYTEST                      := $(VENV_DIR)/bin/pytest
 PYTHON3                          := python3
 
-# Allowed status codes for Newman and Postman test generation.
-# Success codes (200, 201, 204) are fixed. Error codes are read dynamically
-# from the spec's x-http-error-map at parse time so that adding a new HTTP
-# status to the @http_error_map block in data_dictionary/c2mapiv2-dd.ebnf is
-# sufficient — no Makefile edit needed.
-# The fallback list is used only when the spec hasn't been built yet (e.g.,
-# fresh checkout before make openapi-build). It must mirror @http_error_map.
-_SPEC_ALLOWED_CODES := $(shell test -x "$(VENV_PYTHON)" && test -f "$(C2MAPIV2_OPENAPI_SPEC)" && $(VENV_PYTHON) -c "import yaml; d=yaml.safe_load(open('$(C2MAPIV2_OPENAPI_SPEC)')); codes=list(d.get('info',{}).get('x-http-error-map',{}).keys()); print(','.join(['200','201','204']+codes))" 2>/dev/null)
-POSTMAN_ALLOWED_CODES ?= $(if $(_SPEC_ALLOWED_CODES),$(_SPEC_ALLOWED_CODES),200,201,204,400,401,403,404,422,429,500)
+# Newman status assertions: each request asserts the statuses its own operation declares
+# in the spec (D7, 2026-10-16) — add_tests.js / add_tests_jwt.js read them via --spec.
 SUPPORT_EMAIL                    ?= support@click2mail.com
 C2MAPIV2_API_URL                 ?= https://api.click2mail.com/v2
 API_TITLE                        ?= C2M API v2
@@ -922,7 +915,7 @@ postman-add-jwt-tests:
 		node scripts/active/add_tests_jwt.js \
 			"$(TEST_COLLECTION_WITH_TESTS)" \
 			"$(TEST_COLLECTION_WITH_JWT_TESTS)" \
-			--allowed-codes "$(POSTMAN_ALLOWED_CODES)" \
+			--spec "$(C2MAPIV2_OPENAPI_SPEC)" \
 			--auth-overlay "$(OPENAPI_AUTH_OVERLAY)"; \
 		echo "✅ JWT tests added to collection"; \
 	else \
@@ -1382,12 +1375,12 @@ postman-test-collection-merge-overrides:
 # Add automated tests to collection endpoints
 .PHONY: postman-test-collection-add-tests
 postman-test-collection-add-tests:
-	@echo "🧪 Adding default Postman tests to $(POSTMAN_TEST_COLLECTION_MERGED) with allowed codes: $(POSTMAN_ALLOWED_CODES)..."
+	@echo "🧪 Adding default Postman tests to $(POSTMAN_TEST_COLLECTION_MERGED) (statuses per operation from $(C2MAPIV2_OPENAPI_SPEC))..."
 	@if [ ! -f $(POSTMAN_TEST_COLLECTION_MERGED) ]; then \
 		echo "⚠️  $(POSTMAN_TEST_COLLECTION_MERGED) not found. Run postman-collection-add-examples first."; \
 		exit 1; \
 	fi
-	@node $(ADD_TESTS_SCRIPT) $(POSTMAN_TEST_COLLECTION_MERGED) $(POSTMAN_TEST_COLLECTION_WITH_TESTS) --allowed-codes "$(POSTMAN_ALLOWED_CODES)"
+	@node $(ADD_TESTS_SCRIPT) $(POSTMAN_TEST_COLLECTION_MERGED) $(POSTMAN_TEST_COLLECTION_WITH_TESTS) --spec "$(C2MAPIV2_OPENAPI_SPEC)"
 	@echo "✅ Tests added to $(POSTMAN_TEST_COLLECTION_WITH_TESTS)"
 	@echo " "
 	@echo " "
@@ -1985,7 +1978,7 @@ prism-status:
 # Run tests against Prism mock server
 .PHONY: prism-mock-test
 prism-mock-test:
-	@echo "🔬 Running Newman tests against Prism mock with allowed codes: $(POSTMAN_ALLOWED_CODES)..."
+	@echo "🔬 Running Newman tests against Prism mock (each request asserts its operation's declared statuses)..."
 	@if [ ! -f $(POSTMAN_TEST_COLLECTION_FIXED) ]; then \
 		echo "❌ Missing Postman collection: $(POSTMAN_TEST_COLLECTION_FIXED)"; \
 		exit 1; \

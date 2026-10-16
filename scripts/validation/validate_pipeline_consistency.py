@@ -66,7 +66,6 @@ KNOWN_OPEN = {
     ("B-NO-AUTH", "Real-World"): "L8 (Real-World has no auth / pre-request script)",
     ("B-PLACEHOLDER-IN-EXAMPLE", "Test"): "L6 (auth examples carry <dateTime>/<string>)",
     ("B-EXAMPLE-ORIGINAL-REQUEST", "Test"): "L6 (random auth ttl_seconds can fall below 3600 — intermittent)",
-    ("B-TEST-STATUS-ASSERTION", "*"): "X12 / decision D7 (global allowed-codes list)",
 }
 
 

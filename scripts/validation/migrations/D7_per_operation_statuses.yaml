@@ -1,0 +1,11 @@
+name: D7 — Newman status assertions per operation
+# User decision 2026-10-16 (option 1): each Test-collection request asserts the statuses
+# its own operation declares in the spec, instead of one global list for every request.
+# Only test scripts change (not recorded by snapshots): no DD, spec, config, request-body
+# or saved-response differences are expected. Response-body schema assertions (the
+# audit's follow-up) are on the to-do list, not part of this change.
+rules:
+  changed: []
+schemas:
+  changed: []
+allowed_added_paths: []
