@@ -5,7 +5,8 @@
  * Replaces the saved responses of every request in a Postman collection with the
  * examples the OpenAPI spec declares for that operation — the success (2xx) example and
  * every error example; a declared status with no response body (e.g. 204) gets an
- * empty-body saved response. Used for the Test, Linked and Real-World collections. The spec's examples are generated from the DD (@error_examples
+ * empty-body saved response. Used for the Test, Linked, Real-World and both Getting Started
+ * collections (D9, 2026-10-16). The spec's examples are generated from the DD (@error_examples
  * block and standardResponse @hint values), so Postman shows exactly what Redoc shows
  * (D10, 2026-10-08). config/error-response-examples.yaml is retired.
  *

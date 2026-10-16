@@ -1,0 +1,12 @@
+name: D9 — Getting Started collections carry saved responses
+# User decision 2026-10-16 (option 1): both Getting Started collections get, per request,
+# the spec's examples as saved responses (success + every DD error example) — the same
+# injector as Linked, Test and Real-World — so a mock built from a Getting Started fork
+# answers. Their content is checked by the consistency gate (equal to the spec's examples,
+# originalRequest = the request); here: every request gains them, nothing else changes.
+saved_responses_added: [GS-Linked, GS-Test]
+rules:
+  changed: []
+schemas:
+  changed: []
+allowed_added_paths: []

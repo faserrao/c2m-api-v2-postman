@@ -127,6 +127,36 @@ class TestAddedRequests(unittest.TestCase):
         self.assertIn(("UNEXPECTED", "Real-World"), kinds(M.compare(after, before, mig, NEVER_RANDOM)))
 
 
+class TestSavedResponsesAdded(unittest.TestCase):
+    """D9: a collection declared in saved_responses_added may gain saved responses where it had none."""
+
+    def pair(self, after_saved):
+        before, after = snapshot(False), snapshot(False)
+        before["collections"]["GS-Test"]["POST /static"]["saved"] = []
+        after["collections"]["GS-Test"]["POST /static"]["saved"] = after_saved
+        return before, after
+
+    SAVED = [{"code": 200, "name": "ok", "body": {"status": "accepted"}}]
+
+    def test_declared_gain_is_clean(self):
+        mig = M.Migration({"name": "d9", "saved_responses_added": ["GS-Test"]})
+        self.assertEqual(M.compare(*self.pair(self.SAVED), mig, NEVER_RANDOM).items, [])
+
+    def test_undeclared_gain_is_reported(self):
+        rep = M.compare(*self.pair(self.SAVED), M.Migration({"name": "none"}), NEVER_RANDOM)
+        self.assertIn(("UNEXPECTED", "GS-Test"), kinds(rep))
+
+    def test_declared_but_still_none_is_incomplete(self):
+        mig = M.Migration({"name": "d9", "saved_responses_added": ["GS-Test"]})
+        self.assertIn(("INCOMPLETE", "GS-Test"), kinds(M.compare(*self.pair([]), mig, NEVER_RANDOM)))
+
+    def test_existing_saved_responses_are_still_compared(self):
+        before, after = snapshot(False), snapshot(False)
+        after["collections"]["GS-Test"]["POST /static"]["saved"][0]["body"] = {"status": "rejected"}
+        mig = M.Migration({"name": "d9", "saved_responses_added": ["GS-Test"]})
+        self.assertIn(("UNEXPECTED", "GS-Test"), kinds(M.compare(before, after, mig, NEVER_RANDOM)))
+
+
 class TestCompare(unittest.TestCase):
 
     def test_identical_snapshots_with_null_migration_are_clean(self):

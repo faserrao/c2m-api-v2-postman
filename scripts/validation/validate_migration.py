@@ -44,6 +44,10 @@ Migration file (YAML):
     - {where: Real-World, name: Utility Company - Monthly Bills}   # where: a collection
     - {where: catalog, name: Utility Company - Monthly Bills}      # or config label; one never
                                                                    # seen is INCOMPLETE
+  saved_responses_added: [GS-Linked]  # collections whose requests had no saved responses and now
+                                      # must have them (D9); their content is the consistency gate's
+                                      # check (equal to the spec's examples). A request still without
+                                      # any is INCOMPLETE
   json_decoded_fields: [errorDetails] # fields that were a string holding JSON and are now that
                                       # JSON (D6): baseline values are decoded before comparing,
                                       # so the content must be unchanged; one never decoded is INCOMPLETE
@@ -260,6 +264,7 @@ class Migration:
         self.value_changes_seen = set()
         self.added_examples = list(data.get("added_examples") or [])
         self.added_examples_seen = set()
+        self.saved_added = set(data.get("saved_responses_added") or [])
         self.added_requests = list(data.get("added_requests") or [])
         self.added_requests_seen = set()
         self.json_decoded = set(data.get("json_decoded_fields") or [])
@@ -459,6 +464,11 @@ def compare(baseline, current, mig, is_random=None):
             _compare_flat(rep, f"{label} {key!r} body", b_body, c_body, mig,
                           collection=label, is_random=is_random)
             b_saved = [(s["code"], s["name"]) for s in b["saved"]]
+            if label in mig.saved_added and not b_saved:
+                # D9: this request gains its saved responses; it must not stay without them
+                if not c["saved"]:
+                    rep.add("INCOMPLETE", f"{label} saved responses", f"{key!r} still has none")
+                continue
             operation = f"{c['method']} {c['path']}"
             c_kept = [s for s in c["saved"]
                       if (s["code"], s["name"]) in b_saved

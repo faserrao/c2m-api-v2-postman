@@ -334,6 +334,28 @@ class TestCollectionCoverage(unittest.TestCase):
         self.assertIsNone(V.Findings.tracking("B-NO-AUTH", "Real-World"))
 
 
+class TestSavedResponsesEverywhere(unittest.TestCase):
+    """D9: every collection carries saved responses, Getting Started included."""
+
+    def test_getting_started_collections_have_the_spec_examples(self):
+        for label, name in (("GS-Linked", "getting-started-linked-collection"),
+                            ("GS-Test", "getting-started-test-collection")):
+            with self.subTest(label=label):
+                coll = json.loads((REPO_ROOT / "postman" / "generated" / f"c2mapiv2-{name}.json").read_text())
+                F = V.Findings()
+                V.check_collection(label, coll, V.COLLECTIONS[label][1], SPEC, V.SpecTools(SPEC), F)
+                cats = {c for (c, _s) in F.items}
+                self.assertFalse({"B-NO-SAVED-RESPONSES", "B-EXAMPLE-DIFFERS-FROM-SPEC",
+                                  "B-EXAMPLE-ERROR-COVERAGE"} & cats, F.items)
+                counts = {len(it.get("response") or []) for _f, it in V.iter_requests(coll)}
+                self.assertEqual(counts, {len(V.spec_examples(SPEC["paths"]["/static"]["post"]))})
+
+    def test_request_without_saved_responses_is_an_error(self):
+        cats = run_collection([request(CLEAN_BODY)])
+        self.assertIn("B-NO-SAVED-RESPONSES", cats)
+        self.assertIsNone(V.Findings.tracking("B-NO-SAVED-RESPONSES", "GS-Test"))
+
+
 def run_findings_for(collection):
     F = V.Findings()
     V.check_collection("Test", collection, False, SPEC, V.SpecTools(SPEC), F)

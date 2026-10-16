@@ -1664,7 +1664,14 @@ postman-generate-getting-started-with-examples:
 		--schema-url $(POSTMAN_SCHEMA_V2) \
 		--output-linked $(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-linked-collection.json \
 		--output-test $(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-test-collection.json
-	@echo "✅ Getting Started collections generated (linked + test, template-based)"
+	@# D9: saved responses = the spec's examples, so a mock built from a Getting Started fork answers
+	@for f in getting-started-linked-collection getting-started-test-collection; do \
+		node scripts/active/add_error_responses_to_collection.js \
+			$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-$$f.json \
+			$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-$$f.json \
+			--spec $(C2MAPIV2_OPENAPI_SPEC) || exit 1; \
+	done
+	@echo "✅ Getting Started collections generated (linked + test, template-based, with saved responses)"
 
 # Generate Getting Started collection (both versions)
 .PHONY: postman-generate-getting-started-all

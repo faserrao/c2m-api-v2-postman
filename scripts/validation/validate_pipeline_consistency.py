@@ -772,6 +772,10 @@ def check_collection(label, collection, typed, spec, tools, F):
                     problems += [m for _c, m in cross_field_errors(orig_body, info)]
                     for msg in problems:
                         F.add("B-EXAMPLE-ORIGINAL-REQUEST", label, f"{where}: {msg}")
+        # D9 (2026-10-16): every collection carries saved responses — a mock server built from
+        # any fork can only answer with the saved responses of that collection
+        if not it.get("response"):
+            F.add("B-NO-SAVED-RESPONSES", label, f"{tag}: no saved responses (a mock built from this collection returns nothing)")
         # Error-example coverage: when an operation carries DD-format error examples, every
         # error example the spec declares for it must be present (N2; since D10 the spec omits
         # examples that cannot occur on an endpoint, so the spec — not the raw map — is the target)
