@@ -417,6 +417,18 @@ class TestAuthExamplesL6(unittest.TestCase):
         self.assertIn("B-EXAMPLE-ORIGINAL-REQUEST-DIFFERS", cats)
         self.assertIsNone(V.Findings.tracking("B-EXAMPLE-ORIGINAL-REQUEST-DIFFERS", "Test"))
 
+    def test_newman_runs_the_published_test_collection(self):
+        """L6: Newman (CI's ci_verify.sh and the local make targets) runs the flat Test
+        collection that is uploaded and gate-checked, not the intermediate -fixed file,
+        which predates the auth examples."""
+        import re as _re
+        ci = (REPO_ROOT / "scripts" / "validation" / "ci_verify.sh").read_text()
+        self.assertIn("test-collection-flat.json", ci)
+        self.assertNotIn("test-collection-fixed.json", ci)
+        runs = _re.findall(r"\$\(NEWMAN\) run (\S+)", (REPO_ROOT / "Makefile").read_text())
+        self.assertTrue(runs)
+        self.assertEqual(set(runs), {"$(POSTMAN_TEST_COLLECTION_FLAT)"})
+
     def test_nothing_is_tracked_as_open(self):
         """With L6 fixed, the gate's KNOWN_OPEN table is empty: every finding is an ERROR."""
         self.assertEqual(V.KNOWN_OPEN, {})

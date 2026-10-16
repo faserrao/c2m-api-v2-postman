@@ -189,8 +189,11 @@ run_newman_tests() {
 
     log_step "Running Newman tests against published mock..."
 
+    # The published Test collection (flattened, auth examples, docs link) — not the
+    # intermediate -fixed file, which predates the auth examples (L6, 2026-10-16)
+    local collection="${POSTMAN_TEST_COLLECTION_FLAT:-postman/generated/c2mapiv2-test-collection-flat.json}"
     if ./scripts/validation/run_newman.sh \
-        -c postman/generated/c2mapiv2-test-collection-fixed.json \
+        -c "$collection" \
         -e postman/mock-env.json \
         -o reports; then
         log_success "Newman tests passed"

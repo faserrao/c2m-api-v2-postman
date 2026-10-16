@@ -1991,16 +1991,16 @@ prism-status:
 .PHONY: prism-mock-test
 prism-mock-test:
 	@echo "🔬 Running Newman tests against Prism mock (each request asserts its operation's declared statuses)..."
-	@if [ ! -f $(POSTMAN_TEST_COLLECTION_FIXED) ]; then \
-		echo "❌ Missing Postman collection: $(POSTMAN_TEST_COLLECTION_FIXED)"; \
+	@if [ ! -f $(POSTMAN_TEST_COLLECTION_FLAT) ]; then \
+		echo "❌ Missing Postman collection: $(POSTMAN_TEST_COLLECTION_FLAT)"; \
 		exit 1; \
 	fi
 	@if ! lsof -i :$(PRISM_PORT) -t >/dev/null; then \
 		echo "❌ Prism is not running on port $(PRISM_PORT). Start it with 'make prism-start'."; \
 		exit 1; \
 	fi
-	@echo "📦 Using test-ready collection: $(POSTMAN_TEST_COLLECTION_FIXED)"
-	NODE_OPTIONS=--no-deprecation $(NEWMAN) run $(POSTMAN_TEST_COLLECTION_FIXED) \
+	@echo "📦 Using the published Test collection: $(POSTMAN_TEST_COLLECTION_FLAT)"
+	NODE_OPTIONS=--no-deprecation $(NEWMAN) run $(POSTMAN_TEST_COLLECTION_FLAT) \
 		--env-var baseUrl=$(PRISM_MOCK_URL) \
 		--env-var token=$(TOKEN) \
 		--reporters cli,html \
@@ -2023,11 +2023,11 @@ postman-mock:
 		echo "ℹ️  Postman mock URL not found. Creating Postman mock..."; \
 		$(MAKE) postman-mock-create; \
 	fi
-	@if [ ! -f $(POSTMAN_TEST_COLLECTION_FIXED) ]; then \
-		echo "❌ Missing Postman collection: $(POSTMAN_TEST_COLLECTION_FIXED)"; \
+	@if [ ! -f $(POSTMAN_TEST_COLLECTION_FLAT) ]; then \
+		echo "❌ Missing Postman collection: $(POSTMAN_TEST_COLLECTION_FLAT)"; \
 		exit 1; \
 	fi
-	NODE_OPTIONS=--no-deprecation $(NEWMAN) run $(POSTMAN_TEST_COLLECTION_FIXED) \
+	NODE_OPTIONS=--no-deprecation $(NEWMAN) run $(POSTMAN_TEST_COLLECTION_FLAT) \
 		--env-var baseUrl=$(POSTMAN_MOCK_URL) \
 		--env-var token=$(TOKEN) \
 		--reporters cli,html \
