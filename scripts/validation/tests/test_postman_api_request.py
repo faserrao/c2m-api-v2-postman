@@ -15,6 +15,7 @@ or:
 """
 
 import http.server
+import os
 import socket
 import subprocess
 import threading
@@ -209,6 +210,38 @@ class TestCredentialFilesAreIgnored(unittest.TestCase):
                                      capture_output=True).returncode == 0
             self.assertTrue(ignored, f"{path} is not git-ignored")
             self.assertFalse(tracked, f"{path} is tracked by git")
+
+
+class TestNoPublishedCredentials(unittest.TestCase):
+    """L12 (2026-10-16): CI copied postman/mock-env.json — with the scripts' built-in
+    placeholder clientId/clientSecret — into the artifacts repos (one of them public)."""
+
+    SCRIPTS = ["scripts/active/fetch_aws_credentials.sh", "scripts/active/generate_postman_env.sh"]
+
+    def test_scripts_have_no_credential_defaults(self):
+        import re
+        for rel in self.SCRIPTS:
+            text = (REPO_ROOT / rel).read_text()
+            with self.subTest(script=rel):
+                # ${C2M_CLIENT_SECRET:-something} / ${CLIENT_ID:-something}; $DEFAULT_… indirection is fine
+                bad = re.findall(r"\$\{(?:C2M_)?CLIENT_(?:ID|SECRET):-([^}$][^}]*)\}", text)
+                self.assertEqual(bad, [], f"{rel} has a built-in credential default")
+
+    def test_empty_credentials_without_environment(self):
+        env = {k: v for k, v in os.environ.items() if not k.startswith("C2M_CLIENT")}
+        env["USE_LOCAL_CREDS"] = "true"
+        out = subprocess.run(["bash", str(REPO_ROOT / self.SCRIPTS[0])], env=env,
+                             capture_output=True, text=True).stdout
+        self.assertIn('export C2M_CLIENT_ID=""', out)
+        self.assertIn('export C2M_CLIENT_SECRET=""', out)
+
+    def test_ci_never_publishes_environment_files_and_wipes_stale_output(self):
+        wf = (REPO_ROOT / ".github" / "workflows" / "api-ci-cd.yml").read_text()
+        step = wf[wf.index("- name: Copy artifacts to artifacts repository"):wf.index("- name: Copy reports to artifacts repository")]
+        self.assertNotIn("POSTMAN_DIR }}/*.json", step, "postman/*.json holds environment files")
+        self.assertIn("rm -rf artifacts-repo/openapi artifacts-repo/postman artifacts-repo/docs artifacts-repo/sdks", step)
+        self.assertIn("mock-env*.json", step)  # the guard
+        self.assertLess(step.index("rm -rf artifacts-repo/openapi"), step.index("cp -v"))
 
 
 class TestMakefileWorkspace(unittest.TestCase):

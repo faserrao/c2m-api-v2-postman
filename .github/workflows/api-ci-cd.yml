@@ -392,7 +392,11 @@ jobs:
           (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         run: |
           echo "📦 Copying ALL generated artifacts to artifacts repository..."
-          # Create directories if they don't exist
+          # L12 (2026-10-16): wipe every generated directory first, so files the build no longer
+          # writes don't linger (stale specs and collections, SDK files from Build #76 such as
+          # Mailclass.md beside MailClass.md, which broke checkout on macOS/Windows).
+          rm -rf artifacts-repo/openapi artifacts-repo/postman artifacts-repo/docs artifacts-repo/sdks
+          find artifacts-repo -name .DS_Store -not -path 'artifacts-repo/.git/*' -delete
           mkdir -p artifacts-repo/openapi
           mkdir -p artifacts-repo/postman/collections
           mkdir -p artifacts-repo/postman/metadata
@@ -406,8 +410,9 @@ jobs:
           cp -v ${{ env.POSTMAN_DIR }}/generated/*.json artifacts-repo/postman/collections/ 2>/dev/null || echo "  ⚠️  No collections to copy"
 
           echo "📄 Copying Postman metadata (UIDs, URLs)..."
+          # Only the .txt UID/URL files. postman/*.json holds environment files (mock-env.json
+          # carries clientId/clientSecret) and API debug payloads, which must never be published.
           cp -v ${{ env.POSTMAN_DIR }}/*.txt artifacts-repo/postman/metadata/ 2>/dev/null || echo "  ⚠️  No txt files to copy"
-          cp -v ${{ env.POSTMAN_DIR }}/*.json artifacts-repo/postman/metadata/ 2>/dev/null || echo "  ⚠️  No json files to copy"
 
           echo "📚 Copying documentation (Redocly)..."
           cp -rv ${{ env.DOCS_DIR }}/* artifacts-repo/docs/ 2>/dev/null || echo "  ⚠️  No docs to copy"
@@ -427,6 +432,12 @@ jobs:
           echo "📝 Generating artifacts README with organization..."
           sed "s|__GITHUB_ORG__|${{ github.repository_owner }}|g" ARTIFACTS_README.md.template > artifacts-repo/README.md
           echo "  ✅ README generated for organization: ${{ github.repository_owner }}"
+
+          # Guard: no Postman environment file may reach the artifacts repo
+          LEAKS=$(find artifacts-repo -not -path 'artifacts-repo/.git/*' \( -name 'mock-env*.json' -o -name '*.postman_environment.json' -o -name '*-env*.json' \) -print)
+          if [ -n "$LEAKS" ]; then
+            echo "❌ Environment files must not be published to the artifacts repo:"; echo "$LEAKS"; exit 1
+          fi
 
           echo "✅ All artifacts copied successfully"
 

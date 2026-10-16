@@ -8,9 +8,9 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ENV_TEMPLATE_FILE="${1:-}"
 OUTPUT_FILE="${2:-}"
 
-# Default values
-DEFAULT_CLIENT_ID="${C2M_CLIENT_ID:-test-client-123}"
-DEFAULT_CLIENT_SECRET="${C2M_CLIENT_SECRET:-super-secret-password-123}"
+# Default values — no built-in client credentials (L12, 2026-10-16); empty unless C2M_CLIENT_* is set
+DEFAULT_CLIENT_ID="${C2M_CLIENT_ID:-}"
+DEFAULT_CLIENT_SECRET="${C2M_CLIENT_SECRET:-}"
 DEFAULT_BASE_URL="${C2M_BASE_URL:-}"
 DEFAULT_AUTH_URL="${C2M_AUTH_URL:-}"
 

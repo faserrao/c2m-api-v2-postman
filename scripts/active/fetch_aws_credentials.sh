@@ -55,8 +55,8 @@ parse_credentials() {
     fi
     
     # Use default values if not found in secret
-    CLIENT_ID="${CLIENT_ID:-test-client-123}"
-    CLIENT_SECRET="${CLIENT_SECRET:-super-secret-password-123}"
+    CLIENT_ID="${CLIENT_ID:-}"
+    CLIENT_SECRET="${CLIENT_SECRET:-}"
     BASE_URL="${BASE_URL:-}"
     
     # Output as environment variable exports
@@ -69,13 +69,16 @@ EOF
 
 # Main execution
 main() {
+    # L12 (2026-10-16): no built-in credential defaults. Unset C2M_CLIENT_ID / C2M_CLIENT_SECRET
+    # give empty values, and the Postman pre-request scripts then skip token fetching. (The old
+    # defaults were placeholders that CI copied into the artifacts repos.)
     # Check if we should use environment variable credentials (for CI/CD or local testing)
     # Set C2M_CLIENT_ID, C2M_CLIENT_SECRET, C2M_BASE_URL in your CI secrets or shell profile.
     if [[ "${USE_LOCAL_CREDS:-false}" == "true" ]]; then
         echo "ℹ️  Using environment variable credentials (USE_LOCAL_CREDS=true)" >&2
         cat <<EOF
-export C2M_CLIENT_ID="${C2M_CLIENT_ID:-test-client-123}"
-export C2M_CLIENT_SECRET="${C2M_CLIENT_SECRET:-super-secret-password-123}"
+export C2M_CLIENT_ID="${C2M_CLIENT_ID:-}"
+export C2M_CLIENT_SECRET="${C2M_CLIENT_SECRET:-}"
 export C2M_BASE_URL="${C2M_BASE_URL:-}"
 EOF
         exit 0
