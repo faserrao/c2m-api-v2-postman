@@ -14,12 +14,13 @@ See top-level `CLAUDE.md` (`C2M_API_v2/CLAUDE.md`) for full project context and 
 | `scripts/active/postman_api_request.sh` | One Postman API call that exits 1 on a non-2xx status (404 on DELETE accepted); used by every cleanup list/delete call |
 | `scripts/active/fix_oneOf_placeholders.js` | Resolves oneOf placeholders; normalises jobOptions enums |
 | `scripts/test_data_generator_for_collections/addRandomDataToRaw.js` | Resolves `<Type>` placeholders for test collection |
-| `scripts/active/add_error_responses_to_collection.js` | Copies each operation's spec examples (success + errors; auth via the overlay) into the saved responses of the Test, Linked and Real-World collections |
-| `scripts/active/add_auth_examples.js` | Injects auth request examples |
-| `scripts/active/add_tests_jwt.js` | Adds JWT test scripts to test collection |
+| `scripts/active/add_error_responses_to_collection.js` | Copies each operation's spec examples (success + errors; auth via the overlay) into the saved responses of all five collections (Getting Started since D9) |
+| `scripts/active/add_auth_examples.js` | Injects auth request examples from the overlay; sets saved responses' `originalRequest` to the request and URL path variables from overlay parameter examples (L6) |
+| `scripts/active/declared_statuses.js` | Each spec operation's declared statuses; `add_tests.js` (build) and `add_tests_jwt.js` (manual) assert exactly those per request (D7) |
+| `scripts/active/add_tests_jwt.js` | Adds JWT test scripts to the test collection (`make postman-add-jwt-tests`; not part of the build) |
 | `scripts/validation/validate_configs_against_dd.py` | V1–V8 build-time config validators |
 | `scripts/validation/validate_collections_against_spec.py` | Spec-driven conformance gate (K-V3…K-V6) |
-| `scripts/validation/validate_pipeline_consistency.py` | End-to-end DD → spec → Postman consistency gate (saved examples, error map, spec examples, `@doc` descriptions); `KNOWN_OPEN` table lists tracked open findings |
+| `scripts/validation/validate_pipeline_consistency.py` | End-to-end DD → spec → Postman consistency gate (saved examples, error map, spec examples, `@doc` descriptions); `KNOWN_OPEN` table lists tracked open findings (empty since L6, 2026-10-16) |
 | `scripts/validation/validate_migration.py` | Migration check: `snapshot` the whole system, then `compare` a rebuild under a declared migration (`scripts/validation/migrations/*.yaml`) — UNEXPECTED / INCOMPLETE / LOST; `retired` scans for removed names. Make: `migration-snapshot`, `validate-migration`, `validate-migration-retired` (`MIGRATION=<name>`) |
 
 ---
@@ -38,16 +39,44 @@ See top-level `CLAUDE.md` (`C2M_API_v2/CLAUDE.md`) for full project context and 
 - **Hint types**: `HINT_TYPES` in the translator (`faker`, `static`, `random_int`, `aba_routing_number`); the gate imports it. An intentionally empty static hint is written `""`.
 - **`@reserved`**: `rule = … ; (* @reserved POST /path *)` marks a rule kept for a planned endpoint (`multiDocJobs` → `/static/multi`). The gate accepts it as unreachable and fails once the rule is used or the endpoint is defined.
 - **Never pass a spec file as one argument**: Linux caps a single argument at 128 KB (the final spec is ~136 KB). Use `jq --rawfile`, `--data @file` or a pipe; a golden test checks the Makefile.
-- **Local builds**: the security repo is cloned beside this one as `c2m-api-v2-postman-security`; `postman/mock-env.json` and `postman/environments/` receive real credentials and are git-ignored (a test enforces it). Environment uploads create a new environment when the saved UID's environment is gone.
+- **Local builds**: the security repo is cloned beside this one as `c2m-api-v2-postman-security`; `postman/mock-env.json` and `postman/environments/` receive the `C2M_CLIENT_*` values (empty unless set, since L12) and are git-ignored (a test enforces it). Environment uploads create a new environment when the saved UID's environment is gone.
 - **GNU Make 3.82+ only**: the Makefile stops under macOS Make 3.81 (it ignores `.ONESHELL`/`.SHELLFLAGS`). Locally use Homebrew's (`gnubin` first on PATH); recipes run with `-eu -o pipefail`, so a command substitution that can legitimately fail needs `|| true`.
 - **Never an empty workspace ID**: Postman URLs take it through `POSTMAN_WS_Q`, which stops make when empty (an empty `?workspace=` lists every workspace the key can see). `.env` exports only `NAME=value` lines.
 - **Dependencies**: `requirements.txt` = exactly the 8 imported packages (a test enforces it); `make install` = `npm ci`.
 - **CI smoke test**: replays the Getting Started setup in a fresh clone and requires a clean tree — commit regenerated base spec / faker_hints with the DD.
+- **DD primitive `object` (D6)**: a free-form JSON object (`type: object, additionalProperties: true`); `errorDetails = object`, so every error example's `errorDetails` is an object. `@error_examples` details must be a JSON object.
+- **Newman runs the published Test collection**: `ci_verify.sh` (CI, against the published Postman mock) and `prism-mock-test` / `postman-mock` run `c2mapiv2-test-collection-flat.json`, never the intermediate `-fixed` file (L6). Each request asserts its operation's declared statuses (D7) — a hung mock that returns 500 now fails the build (rerun; to-do in the manuals).
+- **Every collection carries saved responses** (gate `B-NO-SAVED-RESPONSES`, D9), and each saved `originalRequest` is its request (`B-EXAMPLE-ORIGINAL-REQUEST-DIFFERS`, L6). Getting Started and Real-World cover the job endpoints only, by design (`JOB_ENDPOINTS_ONLY`).
+- **No built-in client credentials (L12)**: `fetch_aws_credentials.sh` / `generate_postman_env.sh` leave `clientId`/`clientSecret` empty unless `C2M_CLIENT_*` is set; the pre-request scripts then skip token fetching. CI copies only `.txt` metadata to the artifacts repo, wipes `openapi/ postman/ docs/ sdks/` there first, and fails if an environment file would be published.
+- **Migration declarations** (`scripts/validation/migrations/*.yaml`): besides rules/schemas/paths, `value_changes`, `added_examples`, `json_decoded_fields` (D6), `added_requests` (L10), `saved_responses_added` (D9), `nondeterministic`, `path_rewrites` (also applied to string values).
+- **Pushes**: until the user lifts it (2026-10-16), push to the `click2mail` remote only, not `origin`.
 - **Derived artifacts**: `config/faker_hints.yaml`, `config/c2m_provider_mappings.yaml`, `openapi/c2mapiv2-openapi-spec-*.yaml` — all generated. Do not edit directly.
 
 ---
 
 # Recent Changes
+
+## 2026-10-16 — D6–D9, L4/L6/L8–L13, M3, L12: all audit decisions closed; consistency gate has nothing tracked as open
+
+Pushed to click2mail only from `3cf5901` on (user instruction). Detail: manuals `audit-reports/PIPELINE_CHANGES_2026-10-12.md` §20–§27.
+
+| Commit | Item | Change |
+|---|---|---|
+| `2772977` | D6 (user) | DD `object` primitive; `errorDetails` an object; `cvv` string; `checkDigit` removed |
+| `601d4bc` | D7 (user) | Per-operation Newman status assertions from the spec (`declared_statuses.js`); `POSTMAN_ALLOWED_CODES` retired |
+| `3769bfe` | L4 (D8) | Recipient ID variants are wrapper objects (breaking, pre-release); spec-vs-DD wrapper list derived from the DD (PASS 185) |
+| `2f565ee` | L9 (D8) | One lowercase placeholder style |
+| `1a5fe00` | L10/L8 (D8) | Real-World covers every job endpoint (3 scenarios) + JWT pre-request; `JOB_ENDPOINTS_ONLY` |
+| `3cf5901` | D9 (user) | Getting Started collections carry saved responses |
+| `8aa25fe`, `a69bc3f` | L6 | Auth `originalRequest` = request; `tokenId` example; Newman runs the published (flat) Test collection |
+| `292d7d8` | L11/L13 | Stale DD prose; `/static` description no longer calls payment required; prose/marker/description tests |
+| `421147e`, `f2d2fbc` | M3 | Duplicate validator retired; Makefile script/target reference tests (another session) |
+| `09c97e8` | L12 | No placeholder credential defaults; CI wipes generated artifact dirs; environment files never published |
+
+## 2026-10-14 — D4 list minimums (`cdd73d7`), D5 envelope=none (`c1c5d63`)
+
+- D4 (user): DD ARRAY CONSTRAINTS block → `minItems` (job/recipient lists ≥1, `documentsToMerge` ≥2, `tags` may be empty); `fix_oneOf_placeholders.js` trims to `minItems`.
+- D5 (user): `envelope=none: documentClass must be one of (postcard|brochure|flat)`; the build stops on a combination rule that allows every value, names an unknown field/value or can't be read; the enforcer intersects rules per field and runs after `jobOptions` normalisation.
 
 ## 2026-10-13 — D3: /batch/zip request-level options (`f890d21`)
 
@@ -173,7 +202,7 @@ Four additional iterative audit passes fixing 14 items across 9 files (all LOW/M
 ```bash
 make openapi-build && make postman-build-golden-test-fixtures   # build spec + all 5 collections (no API keys)
 make validate-configs                           # V1–V8 config validators
-make validate-collections-conformance-test      # Golden tests: validator script + resolver 20 + DD constraints 50 + consistency 47 + migration 22 + Postman API helper 21
+make validate-collections-conformance-test      # Golden tests: validator script + resolver 20 + DD constraints 73 + consistency 68 + migration 36 + Postman API helper 30
 make validate-collections-conformance-gate-all  # All 5 collections conform to spec
 make validate-dd-gates                          # spec vs DD, all 5 collections vs DD, catalog vs spec
 make validate-pipeline-consistency              # end-to-end DD → spec → Postman gate
@@ -182,10 +211,10 @@ make validate-migration MIGRATION=<name>        # compare a rebuild against a mi
 
 Expected outputs (all clean):
 - `✅ All config field names are valid DD rule names`
-- `20 passed` / `50 passed, 43 subtests passed` / `47 passed` / `22 passed` / `21 passed` (resolver / DD constraints / consistency / migration validator / Postman API helper)
-- `PASS=9 FAIL=0 SKIP=1` (linked/test), `PASS=17 FAIL=0` (GS), `PASS=8 FAIL=0` (real-world)
-- `✅ TOTAL — PASS=184 FAIL=0` (spec vs DD); `0 finding(s) across 5 collection(s)`
-- `ERROR categories: 0 · known-open WARN categories: 12` (plus L6, which is intermittent and sometimes shows as stale)
+- `20 passed` / `73 passed` / `68 passed` / `36 passed` / `30 passed` (resolver / DD constraints / consistency / migration validator / Postman API helper; 230 in all)
+- `PASS=9 FAIL=0 SKIP=1` (linked/test), `PASS=17 FAIL=0` (GS), `PASS=11 FAIL=0` (real-world)
+- `✅ TOTAL — PASS=185 FAIL=0` (spec vs DD); `0 finding(s) across 5 collection(s)`
+- `ERROR categories: 0 · known-open WARN categories: 0 · stale allowances: 0`
 
 ---
 
@@ -193,4 +222,4 @@ Expected outputs (all clean):
 
 Config field names: none — V1–V8 cover them.
 
-Open DD → spec → Postman findings are tracked in the `KNOWN_OPEN` table of `scripts/validation/validate_pipeline_consistency.py` (each entry cites its audit/decision ID; the gate flags entries that stop occurring). Main open items: D9 (Getting Started collections have no saved responses — the guides build the mock from a collection that has them), decisions D4–D8 (see the 2026-10-05 audit reports; the address-list minimum is part of D4), L2–L6, L8–L13, M3.
+The consistency gate's `KNOWN_OPEN` table is empty: every finding is an ERROR. All audit decisions (D1–D10) are made. Open: L5 (the auth overlay disagrees with the security repo's service — revoke statuses, token-ID format, short-token request; deferred by the user, see the manuals `PROJECT_TODO.md`). Business rules resting on our reasoning (D3–D6, ZIP sources / address capture) await Click2Mail's confirmation (`PROJECT_TODO.md`).
