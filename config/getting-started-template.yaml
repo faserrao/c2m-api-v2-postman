@@ -12,7 +12,7 @@
 #   Provides: Canonical request structures with all possible fields
 #
 # Two collections will be generated from this template:
-# 1. Linked Collection (placeholders like <String>) - for documentation
+# 1. Linked Collection (placeholders like <string>) - for documentation
 # 2. Test Collection (realistic values) - for actual testing
 
 
@@ -49,7 +49,7 @@ examples:
     docSourceAll: requestIdSource
     recipientAddressSource: recipientAddressByList
   values:
-    jobTemplate: <String>
+    jobTemplate: <string>
 - name: /mail-merge - to address list
   method: POST
   path: /mail-merge
@@ -59,12 +59,12 @@ examples:
   select:
     recipientAddressSource: recipientAddressByList
   values:
-    jobTemplate: <String>
+    jobTemplate: <string>
     mergeDocumentSource:
     - mergeByRequestId:
-        requestId: <Integer>
+        requestId: <integer>
     - mergeByDocumentId:
-        documentId: <Integer>
+        documentId: <integer>
 - name: /static/address-capture
   method: POST
   path: /static/address-capture
@@ -74,7 +74,7 @@ examples:
   select:
     docSourceStandard: requestIdSource
   values:
-    jobTemplate: <String>
+    jobTemplate: <string>
 - name: /batch/split/address-capture
   method: POST
   path: /batch/split/address-capture
@@ -84,11 +84,11 @@ examples:
   select:
     docSourceStandard: requestIdSource
   values:
-    jobTemplate: <String>
+    jobTemplate: <string>
     pdfSplitJobsNoAddress:
-    - jobTemplate: <String>
-      startPage: <Integer>
-      endPage: <Integer>
+    - jobTemplate: <string>
+      startPage: <integer>
+      endPage: <integer>
 - name: /batch/zip/address-capture - using zip file
   method: POST
   path: /batch/zip/address-capture
@@ -96,12 +96,12 @@ examples:
   tags: []
   description: /batch/zip/address-capture - using zip file
   values:
-    jobTemplate: <String>
+    jobTemplate: <string>
     zipDocumentSource:
       zipRequestIdSource:
-        requestId: <Integer>
-        zipFilename: <String>
-        filename: <String>
+        requestId: <integer>
+        zipFilename: <string>
+        filename: <string>
 - name: /batch/split
   method: POST
   path: /batch/split
@@ -112,21 +112,21 @@ examples:
     docSourceStandard: requestIdSource
   values:
     pdfSplitJobsWithAddress:
-    - jobTemplate: <String>
-      startPage: <Integer>
-      endPage: <Integer>
+    - jobTemplate: <string>
+      startPage: <integer>
+      endPage: <integer>
       recipientAddressSource:
         recipientAddressByList:
           addressList:
-            - firstName: <String>
-              lastName: <String>
-              address1: <String>
-              address2: <String>
-              address3: <String>
-              city: <String>
-              state: <String>
-              zip: <String>
-              country: <String>
+            - firstName: <string>
+              lastName: <string>
+              address1: <string>
+              address2: <string>
+              address3: <string>
+              city: <string>
+              state: <string>
+              zip: <string>
+              country: <string>
 - name: /mail-merge
   method: POST
   path: /mail-merge
@@ -136,14 +136,14 @@ examples:
   select:
     recipientAddressSource: recipientAddressByList
   values:
-    jobTemplate: <String>
+    jobTemplate: <string>
     mergeDocumentSource:
     - mergeByRequestId:
-        requestId: <Integer>
+        requestId: <integer>
     - mergeByDocumentId:
-        documentId: <Integer>
+        documentId: <integer>
     - mergeByDocumentId:
-        documentId: <Integer>
+        documentId: <integer>
 - name: /static - using options
   method: POST
   path: /static
@@ -155,14 +155,14 @@ examples:
     recipientAddressSource: recipientAddressByList
   values:
     jobOptions:
-      documentClass: <String>
-      layout: <String>
-      productionTime: <String>
-      envelope: <String>
-      color: <String>
-      paperType: <String>
-      printOption: <String>
-      mailClass: <String>
+      documentClass: <string>
+      layout: <string>
+      productionTime: <string>
+      envelope: <string>
+      color: <string>
+      paperType: <string>
+      printOption: <string>
+      mailClass: <string>
 - name: /static - using URL
   method: POST
   path: /static
@@ -173,7 +173,7 @@ examples:
     docSourceAll: urlSource
     recipientAddressSource: recipientAddressByList
   values:
-    jobTemplate: <String>
+    jobTemplate: <string>
 - name: /static - setting tags
   method: POST
   path: /static
@@ -184,11 +184,11 @@ examples:
     docSourceAll: requestIdSource
     recipientAddressSource: recipientAddressByList
   values:
-    jobTemplate: <String>
+    jobTemplate: <string>
     tags:
-    - <String>
-    - <String>
-    - <String>
+    - <string>
+    - <string>
+    - <string>
 - name: /static - naming addressList
   method: POST
   path: /static
@@ -198,19 +198,19 @@ examples:
   select:
     docSourceAll: requestIdSource
   values:
-    jobTemplate: <String>
+    jobTemplate: <string>
     recipientAddressSource:
       recipientAddressByList:
-        mappingId: <Integer>
+        mappingId: <integer>
         addressList:
-        - firstName: <String>
-          lastName: <String>
-          address1: <String>
-          city: <String>
-          state: <String>
-          zip: <String>
-          country: <String>
-        addressListName: <String>
+        - firstName: <string>
+          lastName: <string>
+          address1: <string>
+          city: <string>
+          state: <string>
+          zip: <string>
+          country: <string>
+        addressListName: <string>
 - name: /static - payment option
   method: POST
   path: /static
@@ -222,7 +222,7 @@ examples:
     recipientAddressSource: recipientAddressByList
     paymentDetails: creditCard
   values:
-    jobTemplate: <String>
+    jobTemplate: <string>
 - name: /batch/zip - using requestId
   method: POST
   path: /batch/zip
@@ -232,22 +232,22 @@ examples:
   values:
     docSourceZipFileRef:
       zipRequestIdOnly:
-        requestId: <Integer>
+        requestId: <integer>
     multiZipJobs:
-    - jobTemplate: <String>
-      filename: <String>
+    - jobTemplate: <string>
+      filename: <string>
       recipientAddressSource:
         recipientAddressByList:
           addressList:
-            - firstName: <String>
-              lastName: <String>
-              address1: <String>
-              address2: <String>
-              address3: <String>
-              city: <String>
-              state: <String>
-              zip: <String>
-              country: <String>
+            - firstName: <string>
+              lastName: <string>
+              address1: <string>
+              address2: <string>
+              address3: <string>
+              city: <string>
+              state: <string>
+              zip: <string>
+              country: <string>
 - name: /batch/zip - using documentId
   method: POST
   path: /batch/zip
@@ -257,22 +257,22 @@ examples:
   values:
     docSourceZipFileRef:
       zipDocumentIdOnly:
-        zipDocumentId: <Integer>
+        zipDocumentId: <integer>
     multiZipJobs:
-    - jobTemplate: <String>
-      filename: <String>
+    - jobTemplate: <string>
+      filename: <string>
       recipientAddressSource:
         recipientAddressByList:
           addressList:
-            - firstName: <String>
-              lastName: <String>
-              address1: <String>
-              address2: <String>
-              address3: <String>
-              city: <String>
-              state: <String>
-              zip: <String>
-              country: <String>
+            - firstName: <string>
+              lastName: <string>
+              address1: <string>
+              address2: <string>
+              address3: <string>
+              city: <string>
+              state: <string>
+              zip: <string>
+              country: <string>
 - name: /static - using documentID
   method: POST
   path: /static
@@ -283,7 +283,7 @@ examples:
     docSourceAll: documentIdSource
     recipientAddressSource: recipientAddressByList
   values:
-    jobTemplate: <String>
+    jobTemplate: <string>
 - name: /static - using addressListId
   method: POST
   path: /static
@@ -294,7 +294,7 @@ examples:
     docSourceAll: requestIdSource
     recipientAddressSource: recipientAddressByListId
   values:
-    jobTemplate: <String>
+    jobTemplate: <string>
 - name: /static - return address
   method: POST
   path: /static
@@ -305,14 +305,14 @@ examples:
     docSourceAll: requestIdSource
     recipientAddressSource: recipientAddressByList
   values:
-    jobTemplate: <String>
+    jobTemplate: <string>
     returnAddress:
-      firstName: <String>
-      lastName: <String>
-      address1: <String>
-      address2: <String>
-      address3: <String>
-      city: <String>
-      state: <String>
-      zip: <String>
-      country: <String>
+      firstName: <string>
+      lastName: <string>
+      address1: <string>
+      address2: <string>
+      address3: <string>
+      city: <string>
+      state: <string>
+      zip: <string>
+      country: <string>

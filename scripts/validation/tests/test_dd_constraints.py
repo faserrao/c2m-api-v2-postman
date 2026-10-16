@@ -390,6 +390,22 @@ class TestDDConstraints(unittest.TestCase):
                         walk(_json.loads(raw))
         self.assertGreater(seen, 0)
 
+    def test_typed_collections_share_one_placeholder_style(self):
+        """L9 (D8): type placeholders are lowercase everywhere (<string>, <integer>, ...),
+        the style openapi-to-postmanv2 writes into Linked; Getting Started — With Types
+        and the template used <String>, <Integer>."""
+        import re as _re
+        capitalised = _re.compile(r'"<(String|Integer|Number|Boolean)>"')
+        for path in [REPO_ROOT / "config" / "getting-started-template.yaml",
+                     *sorted((REPO_ROOT / "postman" / "generated").glob("c2mapiv2-*.json"))]:
+            with self.subTest(path=path.name):
+                text = path.read_text()
+                if path.suffix == ".yaml":
+                    text = _re.sub(r": (<\w+>)", r': "\1"', text)  # quote YAML scalars for one regex
+                self.assertIsNone(capitalised.search(text), f"{path.name}: {capitalised.search(text)}")
+        gs = (REPO_ROOT / "postman" / "generated" / "c2mapiv2-getting-started-linked-collection.json").read_text()
+        self.assertIn('\\"<string>\\"', gs)  # the lowercase form is really there (bodies are JSON strings)
+
     def test_spec_gate_wrapper_list_comes_from_the_dd(self):
         """L4: validate_spec_against_dd.py checks every @structural single_field_wrapper rule
         (it had a hardcoded list of five), and fails one emitted as a bare type."""

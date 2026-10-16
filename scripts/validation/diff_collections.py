@@ -59,7 +59,7 @@ def _kind(v):
         return "null"
     if isinstance(v, str):
         if v.startswith("<") and v.endswith(">"):
-            return f"ph{v}"   # placeholder token, e.g. ph<oneOf>, ph<String>
+            return f"ph{v}"   # placeholder token, e.g. ph<oneOf>, ph<string>
         return "str"
     return "scalar"
 

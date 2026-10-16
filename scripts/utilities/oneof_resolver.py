@@ -138,7 +138,7 @@ def _search_oneof(
 def build_variant_placeholder_structure(spec: dict, schema_name_or_schema: Union[str, dict]) -> Any:
     """
     Given a resolved schema name or an inline schema dict, recursively build a
-    placeholder structure ({"field": "<String>"}, etc.) for use in generated collections.
+    placeholder structure ({"field": "<string>"}, etc.) for use in generated collections.
 
     Accepts either:
     - A string schema name (looked up from components/schemas)
@@ -197,16 +197,16 @@ def _schema_to_placeholder(
             if len(schema['enum']) == 1:
                 return schema['enum'][0]
             return f"<{'|'.join(schema['enum'])}>"
-        return "<String>"
+        return "<string>"
 
     elif schema_type == 'integer':
-        return "<Integer>"
+        return "<integer>"
 
     elif schema_type == 'number':
-        return "<Number>"
+        return "<number>"
 
     elif schema_type == 'boolean':
-        return "<Boolean>"
+        return "<boolean>"
 
     elif 'oneOf' in schema:
         return "<oneOf>"

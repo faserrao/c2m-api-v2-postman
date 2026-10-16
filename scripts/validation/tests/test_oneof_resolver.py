@@ -148,7 +148,7 @@ class TestNamedWrapperResolver(unittest.TestCase):
             NAMED_WRAPPER_SYNTHETIC_SPEC, "docSourceAll", "requestIdSource"
         )
         structure = build_variant_placeholder_structure(NAMED_WRAPPER_SYNTHETIC_SPEC, schema)
-        self.assertEqual(structure, {"requestIdSource": {"requestId": "<Integer>"}})
+        self.assertEqual(structure, {"requestIdSource": {"requestId": "<integer>"}})
 
 
 class TestFindVariantByDiscriminatorKey(unittest.TestCase):
@@ -223,7 +223,7 @@ class TestBuildVariantPlaceholderStructure(unittest.TestCase):
 
     def test_simple_object(self):
         structure = build_variant_placeholder_structure(SYNTHETIC_SPEC, "requestIdSource")
-        self.assertEqual(structure, {"requestId": "<Integer>"})
+        self.assertEqual(structure, {"requestId": "<integer>"})
 
     def test_nested_object(self):
         structure = build_variant_placeholder_structure(
@@ -231,7 +231,7 @@ class TestBuildVariantPlaceholderStructure(unittest.TestCase):
         )
         self.assertIn("nestedAddress", structure)
         self.assertIn("firstName", structure["nestedAddress"])
-        self.assertEqual(structure["nestedAddress"]["firstName"], "<String>")
+        self.assertEqual(structure["nestedAddress"]["firstName"], "<string>")
 
     def test_unknown_schema_returns_none(self):
         result = build_variant_placeholder_structure(SYNTHETIC_SPEC, "doesNotExist")

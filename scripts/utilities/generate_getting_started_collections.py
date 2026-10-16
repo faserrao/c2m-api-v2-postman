@@ -3,7 +3,7 @@
 Generate Getting Started Collections from Template
 
 This script reads a template YAML and generates two Postman collections:
-1. Linked Collection - With placeholders (<String>, <Integer>) for documentation
+1. Linked Collection - With placeholders (<string>, <integer>) for documentation
 2. Test Collection - With realistic values for actual testing
 
 The script uses:
@@ -163,16 +163,16 @@ def build_structure_from_schema(schema: Dict, openapi_spec: Dict) -> Any:
         # A single-value enum is a fixed value (e.g. a paymentType tag, D1), not a choice
         if len(schema.get('enum') or []) == 1:
             return schema['enum'][0]
-        return "<String>"
+        return "<string>"
 
     elif schema_type == 'integer':
-        return "<Integer>"
+        return "<integer>"
 
     elif schema_type == 'number':
-        return "<Number>"
+        return "<number>"
 
     elif schema_type == 'boolean':
-        return "<Boolean>"
+        return "<boolean>"
 
     # Handle enums
     elif 'enum' in schema:
@@ -275,7 +275,7 @@ def apply_template_to_request(template_example: Dict, linked_request: Dict, open
         structure = get_oneof_structure_from_openapi(openapi_spec, field, variant)
         if structure is not None:
             if use_realistic_values:
-                # Scalar variants (e.g. urlSource = string) resolve to a bare "<String>" placeholder.
+                # Scalar variants (e.g. urlSource = string) resolve to a bare "<string>" placeholder.
                 # Use the variant name for hint lookup so faker_hints['url'] fires, not faker_hints['docSourceAll'].
                 hint_key = variant if isinstance(structure, str) and structure.startswith('<') else field
                 new_body[field] = replace_placeholders_recursive(structure, hint_key, faker_hints)

@@ -16,7 +16,7 @@ Structural validation (spec-driven):
   - no unexpected top-level/nested fields (when additionalProperties is not allowed)
   - oneOf/anyOf branch discrimination by required-key overlap (named-wrapper pattern)
   - scalar type and enum checks for non-placeholder values; placeholder strings
-    ("<String>", "<Integer>") are always skipped
+    ("<string>", "<integer>") are always skipped
 
 Usage:
   VENV=scripts/python_env/e2o.venv/bin/python
@@ -254,7 +254,7 @@ def structural_errors(value, schema, spec, loc="body", strict_unknown=True):
                 errors += structural_errors(el, items, spec, f"{loc}[{i}]", strict_unknown)
         return errors
 
-    # V4: type and enum checks — skipped for placeholder values ("<String>", "<Integer>", …)
+    # V4: type and enum checks — skipped for placeholder values ("<string>", "<integer>", …)
     if isinstance(value, str) and PLACEHOLDER.search(value):
         return errors
     if stype and not _type_matches(value, stype):

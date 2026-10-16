@@ -1,0 +1,16 @@
+name: L9 (D8) — one placeholder style in the typed collections
+# User decision 2026-10-16: Getting Started — With Types uses the same lowercase type
+# placeholders as Linked (<string>, <integer>, <number>, <boolean>), which come from
+# openapi-to-postmanv2. Was <String>, <Integer>, ... from our own generator and template.
+# path_rewrites also apply to string values, so every placeholder is compared after the
+# rename: anything else that changed is reported.
+path_rewrites:
+  - {from: "<String>", to: "<string>"}
+  - {from: "<Integer>", to: "<integer>"}
+  - {from: "<Number>", to: "<number>"}
+  - {from: "<Boolean>", to: "<boolean>"}
+rules:
+  changed: []
+schemas:
+  changed: []
+allowed_added_paths: []

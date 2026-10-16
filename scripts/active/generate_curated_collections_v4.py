@@ -539,8 +539,8 @@ def materialize_request_body(canonical_request_item, example, openapi_spec, mode
     filtered_body = filter_to_yaml_fields(filled_body, values, selections)
 
     # Step 5.5: Fill any remaining <...> placeholder strings with realistic values.
-    # Variant structures from build_variant_placeholder_structure contain <String>,
-    # <Integer>, and <val1|val2|...> enum placeholders for fields not in catalog values.
+    # Variant structures from build_variant_placeholder_structure contain <string>,
+    # <integer>, and <val1|val2|...> enum placeholders for fields not in catalog values.
     if mode == 'examples' and faker_hints:
         filtered_body = replace_placeholders_recursive(filtered_body, faker_hints=faker_hints)
 

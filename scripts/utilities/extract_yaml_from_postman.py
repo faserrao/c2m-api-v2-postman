@@ -79,7 +79,7 @@ def extract_leaf_values(obj, parent_key="", exclude_keys=None):
             elif isinstance(value, (str, int, float, bool)):
                 # Leaf value
                 if not value or str(value).startswith("<"):
-                    # Skip placeholders like "<String>"
+                    # Skip placeholders like "<string>"
                     continue
                 values[key] = value
             elif isinstance(value, list):

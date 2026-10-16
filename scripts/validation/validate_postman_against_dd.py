@@ -29,7 +29,7 @@ Complement to the existing validators:
   • validate_spec_against_dd.py          — spec vs DD (not collections vs DD)
 
 The EBNF is parsed directly, so this script catches drift even before the spec is regenerated.
-Placeholder values (<String>, <Integer>, etc.) are intentionally skipped on checks 2, 3, and 4
+Placeholder values (<string>, <integer>, etc.) are intentionally skipped on checks 2, 3, and 4
 so the linked/type collections never produce false positives.
 
 Usage:
@@ -85,7 +85,7 @@ _COLLECTION_BASENAMES = [
     f"{_API_NAME}-getting-started-test-collection.json",
 ]
 
-# Placeholder pattern — values like <String>, <Integer>, <oneOf>
+# Placeholder pattern — values like <string>, <integer>, <oneOf>
 PLACEHOLDER = re.compile(r"<[^>]+>")
 
 # EBNF rules in the commented-out Apple Pay / Google Pay blocks — excluded from analysis

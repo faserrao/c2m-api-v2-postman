@@ -361,7 +361,7 @@ def main():
 #   Provides: Canonical request structures with all possible fields
 #
 # Two collections will be generated from this template:
-# 1. Linked Collection (placeholders like <String>) - for documentation
+# 1. Linked Collection (placeholders like <string>) - for documentation
 # 2. Test Collection (realistic values) - for actual testing
 
 """

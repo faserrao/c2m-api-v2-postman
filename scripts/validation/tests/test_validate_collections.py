@@ -151,10 +151,10 @@ def test_synthetic_faults():
           "/static missing recipientAddressSource -> flagged")
 
     # 3g. Placeholder values must NOT cause type false-positives (V3 descends, V4 skips placeholders)
-    ph_addr = {f: "<String>" for f in ["firstName", "lastName", "address1", "city", "state", "zip", "country"]}
-    ph = {"docSourceAll": {"documentIdSource": {"documentId": "<Integer>"}},
+    ph_addr = {f: "<string>" for f in ["firstName", "lastName", "address1", "city", "state", "zip", "country"]}
+    ph = {"docSourceAll": {"documentIdSource": {"documentId": "<integer>"}},
           "recipientAddressSource": {"recipientAddressByList": {"addressList": [ph_addr]}},
-          "jobTemplate": "<String>"}
+          "jobTemplate": "<string>"}
     check(errs_for("/static", ph) == [],
           "placeholder /static body -> no false positives")
 
