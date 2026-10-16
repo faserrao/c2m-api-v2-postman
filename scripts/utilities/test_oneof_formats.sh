@@ -390,7 +390,7 @@ test_paymentDetails() {
                         "month": 12,
                         "year": 2025
                     },
-                    "cvv": 123
+                    "cvv": "123"
                 }
             }
         }' \

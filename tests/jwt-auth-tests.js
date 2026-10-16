@@ -170,7 +170,7 @@ const jwtAuthTests = {
                     cardType: 'visa',
                     cardNumber: '4111111111111111',
                     expirationDate: { month: 12, year: 2099 },
-                    cvv: 123
+                    cvv: '123'
                 }
             }
         }, {

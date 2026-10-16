@@ -42,7 +42,8 @@ sys.path.insert(0, str(REPO_ROOT / "scripts" / "active"))
 from ebnf_to_openapi_dynamic_v3 import EBNFToOpenAPITranslator, HINT_TYPES, _extract_structural_annotations  # noqa: E402
 
 CONTENT_TYPE_JSON = "application/json"
-PRIMITIVES = {"string": "string", "integer": "integer", "number": "number", "boolean": "boolean"}
+PRIMITIVES = {"string": "string", "integer": "integer", "number": "number", "boolean": "boolean",
+              "object": "object"}  # D6: DD `object` = free-form JSON object
 PLACEHOLDER = re.compile(r"^(<[^<>]+>|ph<.*>)$")
 TRACKING_ID = re.compile(r"^TRK-\d{8}-[0-9A-F]{6}$")
 UNRESOLVED_TOKEN = re.compile(r"\{[A-Za-z_]\w*\}")  # e.g. {mailClass_enum} left in a JSON string
@@ -59,7 +60,6 @@ COLLECTIONS = {
 # (category, scope) -> tracking reference. scope is a collection label, or "*" for any.
 # Categories not listed here are ERRORs. Remove an entry as soon as its fix lands.
 KNOWN_OPEN = {
-    ("A-DOC-TYPE-CLAIM", "*"): "L2 / decision D6 (errorDetails object vs string)",
     ("B-OPERATION-NOT-IN-COLLECTION", "GS-Linked"): "L10 (Getting Started has no auth endpoints)",
     ("B-OPERATION-NOT-IN-COLLECTION", "GS-Test"): "L10 (Getting Started has no auth endpoints)",
     ("B-OPERATION-NOT-IN-COLLECTION", "Real-World"): "L10 (Real-World covers 4 of 7 job endpoints)",
@@ -220,6 +220,8 @@ class DDModel:
         if not p:
             return {"$ref": f"#/components/schemas/{name}"}
         s = {"type": p[0]}
+        if p[0] == "object":  # D6: free-form keys
+            s["additionalProperties"] = True
         # Name-based format convention (e.g. url -> uri), applied by the translator (audit L5)
         fmt = self.t.format_mappings.get(name.lower())
         if fmt:
@@ -577,25 +579,18 @@ def cross_field_errors(body, info):
 
 
 def details_problems(details):
-    """Problems with an errorDetails string: must be JSON with no unresolved {token}s."""
-    if not isinstance(details, str) or is_placeholder(details):
+    """Problems with errorDetails: it must be a JSON object (D6), with no unresolved {token}s."""
+    if details is None or is_placeholder(details):
         return []
-    out = []
-    if UNRESOLVED_TOKEN.search(details):
-        out.append(("UNRESOLVED-TOKEN", f"unresolved token {UNRESOLVED_TOKEN.search(details).group(0)}"))
-    try:
-        json.loads(details)
-    except json.JSONDecodeError:
-        out.append(("NOT-JSON", f"errorDetails is not valid JSON: {details[:80]!r}"))
-    return out
+    if not isinstance(details, dict):
+        return [("NOT-OBJECT", f"errorDetails is not a JSON object: {json.dumps(details)[:80]}")]
+    token = UNRESOLVED_TOKEN.search(json.dumps(details))
+    return [("UNRESOLVED-TOKEN", f"unresolved token {token.group(0)}")] if token else []
 
 
 def error_field_refs(details):
-    """Field names an errorDetails JSON string refers to (field, fields[], errors[].field)."""
-    try:
-        d = json.loads(details) if isinstance(details, str) else None
-    except json.JSONDecodeError:
-        return []
+    """Field names an errorDetails object refers to (field, fields[], errors[].field)."""
+    d = details
     if not isinstance(d, dict):
         return []
     refs = d.get("fields") if isinstance(d.get("fields"), list) else [d.get("field")]

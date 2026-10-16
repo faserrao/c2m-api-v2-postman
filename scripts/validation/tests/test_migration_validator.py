@@ -66,6 +66,38 @@ def kinds(rep):
     return {(k, a.split(" ")[0]) for k, a, _m in rep.items}
 
 
+class TestJsonDecodedFields(unittest.TestCase):
+    """D6: a field that held a JSON string and now holds that JSON is compared by content."""
+
+    ZIP = NEW + "zip"
+
+    def pair(self, after_flat):
+        before, after = snapshot(False), snapshot(False)
+        after["spec"]["operations"]["POST /static"]["responses"]["400"]["invalid-format"] = after_flat
+        return before, after
+
+    def test_same_content_as_object_is_clean(self):
+        before, after = self.pair({"errorDetails.field": self.ZIP})
+        rep = M.compare(before, after, M.Migration({"name": "d6", "json_decoded_fields": ["errorDetails"]}), NEVER_RANDOM)
+        self.assertEqual(rep.items, [])
+
+    def test_without_declaration_the_type_change_is_reported(self):
+        before, after = self.pair({"errorDetails.field": self.ZIP})
+        rep = M.compare(before, after, M.Migration({"name": "none"}), NEVER_RANDOM)
+        self.assertIn(("LOST", "spec"), kinds(rep))
+        self.assertIn(("UNEXPECTED", "spec"), kinds(rep))
+
+    def test_changed_content_is_reported(self):
+        before, after = self.pair({"errorDetails.field": "docSourceAll"})
+        rep = M.compare(before, after, M.Migration({"name": "d6", "json_decoded_fields": ["errorDetails"]}), NEVER_RANDOM)
+        self.assertIn(("UNEXPECTED", "spec"), kinds(rep))
+
+    def test_declared_but_never_decoded_is_incomplete(self):
+        rep = M.compare(snapshot(False), snapshot(False),
+                        M.Migration({"name": "d6", "json_decoded_fields": ["nothingHere"]}), NEVER_RANDOM)
+        self.assertIn(("INCOMPLETE", "json"), kinds(rep))
+
+
 class TestCompare(unittest.TestCase):
 
     def test_identical_snapshots_with_null_migration_are_clean(self):

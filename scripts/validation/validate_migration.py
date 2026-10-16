@@ -40,6 +40,9 @@ Migration file (YAML):
        name: Mutually exclusive fields}       # one that never appears is INCOMPLETE
   value_changes:                      # intended value changes, matched by leaf field name;
     - {field: country, from: US, to: USA}   # one that never occurs is INCOMPLETE
+  json_decoded_fields: [errorDetails] # fields that were a string holding JSON and are now that
+                                      # JSON (D6): baseline values are decoded before comparing,
+                                      # so the content must be unchanged; one never decoded is INCOMPLETE
   rotated_fields:                     # collection -> oneOf fields whose variant is chosen round-robin
     Test: [recipientAddressSource]    # per request; removing a variant shifts every choice, so the
                                       # subtree is not compared request by request — instead every
@@ -253,6 +256,8 @@ class Migration:
         self.value_changes_seen = set()
         self.added_examples = list(data.get("added_examples") or [])
         self.added_examples_seen = set()
+        self.json_decoded = set(data.get("json_decoded_fields") or [])
+        self.json_decoded_seen = set()
 
     def added_example(self, operation, status, key=None, name=None):
         """True if a new example (spec key, or saved-response name) is declared in added_examples."""
@@ -292,8 +297,21 @@ class Migration:
             text = text.replace(old, new)
         return text
 
+    def decode_flat(self, flat):
+        """Expand baseline string values of json_decoded_fields into the JSON they hold."""
+        out = {}
+        for k, v in (flat or {}).items():
+            leaf = re.sub(r"\[\d+\]", "", k.split(".")[-1])
+            decoded = _json_or_none(v) if leaf in self.json_decoded and isinstance(v, str) else None
+            if isinstance(decoded, (dict, list)):
+                self.json_decoded_seen.add(leaf)
+                out.update(flatten(decoded, k))
+            else:
+                out[k] = v
+        return out
+
     def rewrite_flat(self, flat):
-        return {self.rewrite(k): self.rewrite(v) for k, v in (flat or {}).items()}
+        return {self.rewrite(k): self.rewrite(v) for k, v in self.decode_flat(flat).items()}
 
     def allowed(self, patterns, path):
         return any(p.search(path) for p in patterns)
@@ -447,6 +465,8 @@ def compare(baseline, current, mig, is_random=None):
     for i, vc in enumerate(mig.value_changes):
         if i not in mig.value_changes_seen:
             rep.add("INCOMPLETE", "value change", f"{vc} declared but never seen")
+    for name in sorted(mig.json_decoded - mig.json_decoded_seen):
+        rep.add("INCOMPLETE", "json decoded field", f"{name}: no baseline value held JSON to decode")
     return rep
 
 

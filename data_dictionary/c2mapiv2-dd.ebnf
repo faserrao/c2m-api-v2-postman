@@ -158,6 +158,9 @@
    - string  : a JSON string
    - integer : a JSON integer
    - id      : an alias for integer, used when the integer is an ID
+   - object  : a JSON object with free-form keys (additionalProperties in the
+               specification). Used only where the contents are not fixed, such
+               as errorDetails (D6).
 
    ----------------------------------------------------------------------------
    10) What EBNF does NOT capture by itself
@@ -1005,11 +1008,12 @@ invoiceDetails =
       invoiceNumber
     + amountDue ;
 
-(* @doc ACH payment fields: routing number, bank account number, and check digit. *)
+(* @doc ACH payment fields: routing number and bank account number. *)
 achDetails =
       routingNumber
-    + accountNumber
-    + checkDigit ;
+    + accountNumber ;
+(* D6, 2026-10-16: no separate check digit. The ninth digit of an ABA routing number
+   is its check digit, so a separate field could only repeat it or contradict it. *)
 
 (* @doc Account credit payment fields: monetary amount and ISO currency code. *)
 creditAmount =
@@ -1029,14 +1033,12 @@ expirationDate = month + year ;
 month = integer ; (* @hint static 12 *)
 (* @doc Expiration year as a four-digit integer (e.g. 2029). *)
 year = integer ; (* @hint static 2029 *)
-(* @doc Card security code (CVV/CVC) as an integer. *)
-cvv = integer ; (* @hint static 123 *)
+(* @doc Card security code (CVV/CVC): 3 digits, or 4 for American Express. A string, so a leading zero is kept. *)
+cvv = string ; (* @hint static "123" *)
 (* @doc ABA bank routing number. *)
 routingNumber = string ; (* @hint aba_routing_number *)
 (* @doc Bank account number. *)
 accountNumber = string ; (* @hint static "1234567890" *)
-(* @doc ACH check digit. *)
-checkDigit = integer ;
 (* @doc Invoice reference number. *)
 invoiceNumber = string ; (* @hint static "INV-2026-0001" *)
 (* @doc Amount due on the invoice. *)
@@ -1212,7 +1214,7 @@ errorCode = "MISSING_REQUIRED_FIELD"
           | "RATE_LIMIT_EXCEEDED" ;
 
 (* @doc Optional JSON object with additional error context (free-form key/value pairs). *)
-errorDetails = string ;  (* JSON object with error context - additionalProperties in OpenAPI *)
+errorDetails = object ;  (* D6, 2026-10-16: a JSON object, not a string holding JSON *)
 
 (* @doc Optional support tracking identifier in the format TRK-YYYYMMDD-XXXXXX. *)
 errorTrackingId = string ;  (* Optional request ID for support tracking - format: TRK-YYYYMMDD-XXXXXX *)
@@ -1248,7 +1250,7 @@ errorTrackingId = string ;  (* Optional request ID for support tracking - format
      [STATUS] ERROR_CODE
          summary: <short example name, shown in Redoc / Postman>
          message: <errorMessage>
-         details: <errorDetails — one line of JSON>
+         details: <errorDetails — one line of JSON; must be an object>
 
    Tokens in details are filled per endpoint by ebnf_to_openapi_dynamic_v3.py:
      {documentField}  the endpoint's top-level document-source field

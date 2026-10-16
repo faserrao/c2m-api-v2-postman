@@ -295,6 +295,60 @@ class TestDDConstraints(unittest.TestCase):
             EBNFToOpenAPITranslator().parse_ebnf(
                 text.replace(self.D5_RULE, "envelope=none: documentClass in (postcard|brochure|flat)"))
 
+    # ── D6 (2026-10-16): field types ──────────────────────────────────────────
+
+    def test_error_details_is_a_free_form_object(self):
+        """D6: errorDetails is a JSON object (DD primitive `object`), in the schema and in every
+        error example, with content unchanged from the DD's @error_examples."""
+        free_form = {"type": "object", "additionalProperties": True}
+        strip = lambda s: {k: v for k, v in s.items() if k != "description"}
+        self.assertEqual(strip(self.schemas["errorDetails"]), free_form)
+        self.assertEqual(strip(self.schemas["errorResponse"]["properties"]["errorDetails"]), free_form)
+        seen = 0
+        for path_item in self.spec["paths"].values():
+            for op in path_item.values():
+                for resp in op.get("responses", {}).values():
+                    for ex in resp.get("content", {}).get("application/json", {}).get("examples", {}).values():
+                        if "errorCode" in ex["value"]:
+                            seen += 1
+                            self.assertIsInstance(ex["value"]["errorDetails"], dict, ex["summary"])
+        self.assertGreater(seen, 100)
+
+    def test_error_example_details_must_be_an_object(self):
+        """D6: @error_examples details that are valid JSON but not an object stop the build."""
+        text = EBNF_PATH.read_text(encoding="utf-8")
+        old = 'details: {"field": "{documentField}", "location": "requestBody"}'
+        self.assertIn(old, text)
+        t = EBNFToOpenAPITranslator()
+        t.parse_ebnf(text.replace(old, 'details: ["{documentField}"]'))
+        with self.assertRaisesRegex(RuntimeError, "must be a JSON object"):
+            t.generate_openapi()
+
+    def test_dd_object_primitive_follows_aliases(self):
+        """D6: a rule aliasing the `object` primitive (directly or via another rule) is free-form."""
+        text = EBNF_PATH.read_text(encoding="utf-8") + "\nextraContext = errorDetails ;\n"
+        t = EBNFToOpenAPITranslator()
+        t.parse_ebnf(text)
+        self.assertTrue(t._is_free_form_object("errorDetails"))
+        self.assertTrue(t._is_free_form_object("extraContext"))
+        self.assertFalse(t._is_free_form_object("errorTrackingId"))
+        self.assertEqual(t._get_field_type("extraContext")["additionalProperties"], True)
+
+    def test_cvv_is_a_string_with_a_string_hint(self):
+        """D6: cvv is a string so a leading zero is kept; its example value is the string "123"."""
+        self.assertEqual(self.schemas["cvv"]["type"], "string")
+        self.assertEqual(self.schemas["creditCardDetails"]["properties"]["cvv"]["type"], "string")
+        self.assertEqual(self.translator.faker_hints["cvv"], {"type": "static", "value": "123"})
+        hints = yaml.safe_load((REPO_ROOT / "config" / "faker_hints.yaml").read_text())["faker_hints"]
+        self.assertEqual(hints["cvv"]["value"], "123")
+
+    def test_ach_details_have_no_check_digit(self):
+        """D6: the routing number's ninth digit is the check digit; no separate field. (The
+        retired rule name is not written here: the migration's retired-name scan covers it.)"""
+        ach = self.schemas["achDetails"]
+        self.assertEqual(sorted(ach["properties"]), ["accountNumber", "routingNumber"])
+        self.assertEqual(sorted(ach["required"]), ["accountNumber", "routingNumber"])
+
     def test_collection_enforcer_applies_every_rule_on_a_field(self):
         """fix_oneOf_placeholders.js must satisfy all rules on one field together, after it
         normalises jobOptions: non_profit + no envelope leaves only flat (D5)."""
@@ -555,7 +609,7 @@ class TestDDConstraints(unittest.TestCase):
                     v = ex["value"]
                     if v.get("errorCode") is None:
                         continue
-                    d = _json.loads(v.get("errorDetails") or "{}")
+                    d = v.get("errorDetails") or {}  # D6: an object
                     refs = [d.get("field")] + list(d.get("fields") or []) + [e.get("field") for e in d.get("errors", [])]
                     for f in filter(None, refs):
                         if f not in body:

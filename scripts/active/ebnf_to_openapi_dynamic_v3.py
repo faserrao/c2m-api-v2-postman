@@ -117,6 +117,8 @@ _MUTUAL_EXCLUSION_FIELDS = ["jobTemplate", "jobOptions"]
 # OpenAPI component schema names.  Centralised here so a DD rule rename
 # surfaces a single change point rather than silent $ref breakage.
 _RESPONSE_SCHEMA_NAME = "standardResponse"
+# D6: the DD primitive `object` is a JSON object with free-form keys (errorDetails).
+_FREE_FORM_OBJECT_SCHEMA = {"type": "object", "additionalProperties": True}
 _ERROR_SCHEMA_NAME    = "errorResponse"
 
 # ── F1/N5: Fields named in INVALID_FORMAT / INVALID_ENUM_VALUE error-detail examples.
@@ -312,6 +314,7 @@ class EBNFToOpenAPITranslator:
             'integer': 'integer',
             'number': 'number',
             'boolean': 'boolean',
+            'object': 'object',  # D6: free-form JSON object, see _FREE_FORM_OBJECT_SCHEMA
             'id': 'integer',
             'url': 'string',
             'uri': 'string',
@@ -978,10 +981,10 @@ class EBNFToOpenAPITranslator:
         return examples
 
     def render_error_details(self, template: str, endpoint: Endpoint,
-                             field_names: Dict[str, Any], seed: str) -> Optional[str]:
-        """Fill @error_examples tokens for one endpoint. Returns None when a token has no
-        value on this endpoint (the error cannot occur there). Unknown tokens and results
-        that are not valid JSON are build errors."""
+                             field_names: Dict[str, Any], seed: str) -> Optional[Dict[str, Any]]:
+        """Fill @error_examples tokens for one endpoint and return errorDetails as an object
+        (D6). Returns None when a token has no value on this endpoint (the error cannot
+        occur there). Unknown tokens, and results that are not a JSON object, are build errors."""
         body = (getattr(self, '_schemas', {}) or {}).get(endpoint.production_name, {})
         top_level = set((body.get('properties') or {}).keys())
         group = self.mutual_exclusion_fields
@@ -1005,9 +1008,12 @@ class EBNFToOpenAPITranslator:
             return None
         rendered = _ERROR_EXAMPLE_TOKEN.sub(lambda m: str(values[m.group(1)]), template)
         try:
-            return json.dumps(json.loads(rendered))
+            details = json.loads(rendered)
         except json.JSONDecodeError as e:
             raise RuntimeError(f"@error_examples: details are not valid JSON after filling tokens: {rendered}") from e
+        if not isinstance(details, dict):
+            raise RuntimeError(f"@error_examples: details must be a JSON object (errorDetails is an object): {rendered}")
+        return details
 
     def _success_example(self, endpoint: Endpoint) -> Dict[str, Any]:
         """Success (200) example built from the DD @hint values of standardResponse's fields."""
@@ -1329,6 +1335,8 @@ class EBNFToOpenAPITranslator:
                     if symbol_name in skip_types:
                         # Inline the primitive type instead of creating a $ref
                         return {"type": symbol_name}
+                    elif symbol_name == 'object':  # D6
+                        return dict(_FREE_FORM_OBJECT_SCHEMA)
                     elif symbol_name in self.productions:
                         # Single-field wrapper rules (e.g. documentIdSource = documentId)
                         # must be emitted as { type: object, properties: { b: T } } so
@@ -1439,6 +1447,11 @@ class EBNFToOpenAPITranslator:
     
     def _get_field_type(self, field_name: str, format: Optional[str] = None) -> Dict[str, Any]:
         """Get the OpenAPI type for a field, resolving from EBNF if needed"""
+        if self._is_free_form_object(field_name):  # D6
+            schema = dict(_FREE_FORM_OBJECT_SCHEMA)
+            if field_name in self.doc_annotations:
+                schema = {"description": self.doc_annotations[field_name], **schema}
+            return schema
         # Check if this field is a primitive alias (e.g., paymentData = string)
         type_info = self._resolve_type(field_name)
 
@@ -1461,6 +1474,16 @@ class EBNFToOpenAPITranslator:
         # This includes arrays like multiDocJobs, unions like paymentDetails, and objects
         return {"$ref": f"#/components/schemas/{field_name}"}
     
+    def _is_free_form_object(self, name: str, seen: Tuple[str, ...] = ()) -> bool:
+        """D6: True if name is the DD primitive `object` or an alias chain ending in it."""
+        if name == 'object':
+            return True
+        prod = self.productions.get(name)
+        expr = prod.expression if prod else None
+        return (isinstance(expr, dict) and expr.get('type') == 'symbol'
+                and expr.get('name') not in seen
+                and self._is_free_form_object(expr.get('name'), seen + (name,)))
+
     def _resolve_type(self, name: str, visited: Set[str] = None) -> TypeInfo:
         """Resolve a type name to OpenAPI type info"""
         if visited is None:

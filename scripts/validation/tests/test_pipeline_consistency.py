@@ -48,7 +48,8 @@ def request(body, responses=(), tests=None):
     return item
 
 
-def error_example(code, error_type, error_code, tracking="TRK-20260115-ABC123", details="{}"):
+def error_example(code, error_type, error_code, tracking="TRK-20260115-ABC123", details=None):
+    details = {} if details is None else details
     return {"name": f"{code} example", "code": int(code),
             "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": json.dumps({"errorType": error_type, "errorMessage": "m", "errorCode": error_code,
@@ -91,18 +92,21 @@ class TestCollectionChecks(unittest.TestCase):
                                        f"pm.expect([{codes}]).to.include(pm.response.code);")])
         self.assertEqual(cats - {"B-OPERATION-NOT-IN-COLLECTION"}, set())
 
-    def test_error_details_not_json(self):
-        examples = all_dd_error_examples()
-        examples[0] = error_example("400", "ValidationError", "MISSING_REQUIRED_FIELD", details='{"field": oops}')
-        self.assertIn("B-EXAMPLE-DETAILS-NOT-JSON", run_collection([request(CLEAN_BODY, examples)]))
+    def test_error_details_string_is_not_an_object(self):
+        """D6: errorDetails is a JSON object; a string holding JSON (the pre-D6 form) is flagged."""
+        for details in ('{"field": "docSourceAll"}', '{"field": oops}', ["docSourceAll"]):
+            with self.subTest(details=details):
+                examples = all_dd_error_examples()
+                examples[0] = error_example("400", "ValidationError", "MISSING_REQUIRED_FIELD", details=details)
+                self.assertIn("B-EXAMPLE-DETAILS-NOT-OBJECT", run_collection([request(CLEAN_BODY, examples)]))
 
     def test_error_details_unresolved_token(self):
         examples = all_dd_error_examples()
         examples[0] = error_example("422", "ValidationError", "INVALID_ENUM_VALUE",
-                                    details='{"allowed": {mailClass_enum}}')
+                                    details={"allowed": "{mailClass_enum}"})
         cats = run_collection([request(CLEAN_BODY, examples)])
         self.assertIn("B-EXAMPLE-DETAILS-UNRESOLVED-TOKEN", cats)
-        self.assertIn("B-EXAMPLE-DETAILS-NOT-JSON", cats)
+        self.assertNotIn("B-EXAMPLE-DETAILS-NOT-OBJECT", cats)
 
     def test_saved_example_differs_from_spec(self):
         """D10/N4: a saved response must equal the spec example for its status and code."""
@@ -110,7 +114,7 @@ class TestCollectionChecks(unittest.TestCase):
         for e in examples:
             body = json.loads(e["body"])
             if body.get("errorCode") == "INVALID_TOKEN":
-                body["errorDetails"] = '{"reason": "invalid signature"}'
+                body["errorDetails"] = {"reason": "invalid signature"}
                 e["body"] = json.dumps(body)
         self.assertIn("B-EXAMPLE-DIFFERS-FROM-SPEC", run_collection([request(CLEAN_BODY, examples)]))
 
@@ -161,13 +165,13 @@ class TestCollectionChecks(unittest.TestCase):
         """N5: an error example must name a field that exists in the endpoint body."""
         examples = all_dd_error_examples()
         examples[0] = error_example("400", "ValidationError", "MISSING_REQUIRED_FIELD",
-                                    details='{"field": "bogusField"}')
+                                    details={"field": "bogusField"})
         self.assertIn("B-EXAMPLE-FIELD-NOT-IN-BODY", run_collection([request(CLEAN_BODY, examples)]))
 
     def test_error_example_real_dotted_path_accepted(self):
         examples = all_dd_error_examples()
         examples[0] = error_example("400", "ValidationError", "INVALID_FORMAT",
-                                    details='{"errors": [{"field": "recipientAddressSource.recipientAddressByList.addressList[0].zip"}]}')
+                                    details={"errors": [{"field": "recipientAddressSource.recipientAddressByList.addressList[0].zip"}]})
         cats = run_collection([request(CLEAN_BODY, examples)])
         self.assertNotIn("B-EXAMPLE-FIELD-NOT-IN-BODY", cats)
 
@@ -178,7 +182,7 @@ class TestCollectionChecks(unittest.TestCase):
         zip_body = tools.body_paths(SPEC["paths"]["/batch/zip"]["post"]["requestBody"]["content"]
                                     ["application/json"]["schema"])
         zip_body = {k: v for k, v in zip_body.items() if not k.startswith(("jobTemplate", "jobOptions"))}
-        problems = V.field_ref_problems('{"fields": ["jobTemplate", "jobOptions"]}',
+        problems = V.field_ref_problems({"fields": ["jobTemplate", "jobOptions"]},
                                         "MUTUAL_EXCLUSION_VIOLATION", zip_body)
         self.assertEqual({k for k, _ in problems}, {"IMPOSSIBLE-ERROR"})
 
@@ -263,12 +267,33 @@ class TestSpecChecks(unittest.TestCase):
         V.check_spec_examples(spec, DD, F)
         self.assertIn(("C-RESPONSE-EXAMPLE-MISSING", "*"), F.items)
 
+    def test_spec_error_details_string_is_flagged(self):
+        """D6: a spec error example whose errorDetails is a string fails the schema and the check."""
+        spec = copy.deepcopy(SPECX)
+        ex = next(iter(spec["paths"]["/static"]["post"]["responses"]["400"]["content"]["application/json"]["examples"].values()))
+        ex["value"]["errorDetails"] = json.dumps(ex["value"]["errorDetails"])
+        F = V.Findings()
+        V.check_spec_examples(spec, DD, F)
+        self.assertIn(("C-EXAMPLE-DETAILS-NOT-OBJECT", "*"), F.items)
+        self.assertIn(("C-RESPONSE-EXAMPLE-INVALID", "*"), F.items)
+
+    def test_dd_object_rule_expects_free_form_object_schema(self):
+        """D6: the gate's model of a DD `object` rule is type object, additionalProperties true;
+        a spec that still types errorDetails as a string is a Layer A finding."""
+        self.assertEqual({k: v for k, v in DD.expected("errorDetails").items() if k != "_equivalent_ref"},
+                         {"type": "object", "additionalProperties": True})
+        specs = self.specs()
+        specs["final"]["components"]["schemas"]["errorDetails"] = {
+            "description": specs["final"]["components"]["schemas"]["errorDetails"]["description"], "type": "string"}
+        F = run_dd(specs)
+        self.assertIn("errorDetails", " ".join(F.items.get(("A-RULE-STRUCTURE-MISMATCH", "*"), [])))
+
     def test_spec_example_naming_non_body_field_is_flagged(self):
         """N5: the pre-2026-10-07 'recipientAddressSource.postalCode' must be caught."""
         spec = copy.deepcopy(SPECX)
         for ex in spec["paths"]["/static"]["post"]["responses"]["400"]["content"]["application/json"]["examples"].values():
             if ex["value"]["errorCode"] == "INVALID_FORMAT":
-                ex["value"]["errorDetails"] = '{"errors": [{"field": "recipientAddressSource.postalCode"}]}'
+                ex["value"]["errorDetails"] = {"errors": [{"field": "recipientAddressSource.postalCode"}]}
         F = V.Findings()
         V.check_spec_examples(spec, DD, F)
         self.assertIn(("C-EXAMPLE-FIELD-NOT-IN-BODY", "*"), F.items)

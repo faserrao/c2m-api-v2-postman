@@ -69,6 +69,7 @@ _DESC: dict[str, str] = {
     "string":        "A plain text string value.",
     "integer":       "A whole-number integer value.",
     "boolean":       "A boolean true/false value.",
+    "object":        "A JSON object with free-form keys (D6).",
     # Payment variant type-discriminator keys (JSON property name that identifies the variant)
     '"creditCard"':  "JSON property key identifying the credit-card payment variant.",
     '"invoice"':     "JSON property key identifying the invoice payment variant.",
@@ -91,7 +92,7 @@ _ENDPOINT_MAP: dict[str, tuple[str, str]] = {
     "submitMultiZipAddressCaptureParams":     ("POST", "/batch/zip/address-capture"),
 }
 
-PRIMITIVES = {"string", "integer", "id", "number", "boolean"}
+PRIMITIVES = {"string", "integer", "id", "number", "boolean", "object"}  # object: D6
 
 
 # ---------------------------------------------------------------------------
@@ -509,7 +510,7 @@ def _resolve_leaf_type(type_str: str, rules: dict, depth: int = 0) -> str:
     """Follow primitive/alias chains to get a final base type string."""
     if depth > 10:
         return type_str
-    if type_str in ("string", "integer", "boolean", "number"):
+    if type_str in ("string", "integer", "boolean", "number", "object"):
         return type_str
     if type_str == "id":
         return "integer"
@@ -599,7 +600,7 @@ def _expand_to_leaves(
         return  # runaway-recursion guard
 
     # Bare primitive keywords — leaf immediately
-    if rule_name in ("string", "integer", "boolean", "number"):
+    if rule_name in ("string", "integer", "boolean", "number", "object"):
         field_key = path[-1][0] if path else rule_name
         _add_leaf(path, rule_name, is_required, in_variant, field_key, rows)
         return
@@ -652,7 +653,7 @@ def _expand_to_leaves(
 
     elif kind == "alias":
         target = rule["rhs"]
-        if target not in rules or target in ("string", "integer", "boolean", "number"):
+        if target not in rules or target in ("string", "integer", "boolean", "number", "object"):
             # Alias to bare primitive keyword — scalar, no extra path segment
             field_key = path[-1][0] if path else rule_name
             leaf_type = _resolve_leaf_type(target, rules)

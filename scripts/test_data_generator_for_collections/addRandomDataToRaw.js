@@ -149,7 +149,7 @@ let oneOfFixtures = {
                     month: 12,
                     year: 2029
                 },
-                cvv: 123
+                cvv: "123"  // D6: a string, so a leading zero is kept
             }
         },
         // Variant 2: invoicePayment
@@ -163,8 +163,7 @@ let oneOfFixtures = {
         {
             achDetails: {
                 routingNumber: "021000021",
-                accountNumber: "1234567890",
-                checkDigit: 5
+                accountNumber: "1234567890"
             }
         },
         // Variant 4: userCreditPayment
@@ -235,13 +234,14 @@ let oneOfFixtures = {
     // ResourceNotFoundError, ServerError (from EBNF DD errorType rule).
     // This fixture block is intentionally excluded from spec-driven generation
     // (errorResponse is not a oneOf variant schema — see loadOneOfFixturesFromSpec comment).
+    // D6: errorDetails is a JSON object, not a string holding JSON.
     errorResponse: [
         // Variant 1: ValidationError - Missing Field
         {
             errorType: "ValidationError",
             errorMessage: "Required field is missing from request body",
             errorCode: "MISSING_REQUIRED_FIELD",
-            errorDetails: JSON.stringify({ field: "documentId", location: "requestBody" }),
+            errorDetails: { field: "documentId", location: "requestBody" },
             errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${hexSuffix()}`
         },
         // Variant 2: ValidationError - Invalid OneOf (field name matches EBNF DD: docSourceAll)
@@ -249,7 +249,7 @@ let oneOfFixtures = {
             errorType: "ValidationError",
             errorMessage: "Request contains invalid oneOf field structure",
             errorCode: "INVALID_ONEOF",
-            errorDetails: JSON.stringify({ field: "docSourceAll", issue: "must contain exactly one variant" }),
+            errorDetails: { field: "docSourceAll", issue: "must contain exactly one variant" },
             errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${hexSuffix()}`
         },
         // Variant 3: ValidationError - Invalid Format (field name matches EBNF DD: zip)
@@ -257,7 +257,7 @@ let oneOfFixtures = {
             errorType: "ValidationError",
             errorMessage: "Field contains invalid format or value",
             errorCode: "INVALID_FORMAT",
-            errorDetails: JSON.stringify({ field: "zip", provided: "1234", expected: "5 or 9 digits" }),
+            errorDetails: { field: "zip", provided: "1234", expected: "5 or 9 digits" },
             errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${hexSuffix()}`
         },
         // Variant 4: AuthenticationError - Missing Auth
@@ -265,7 +265,7 @@ let oneOfFixtures = {
             errorType: "AuthenticationError",
             errorMessage: "Authorization header is missing or invalid",
             errorCode: "MISSING_AUTH_HEADER",
-            errorDetails: JSON.stringify({ expected: "Bearer <token>", received: "none" }),
+            errorDetails: { expected: "Bearer <token>", received: "none" },
             errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${hexSuffix()}`
         },
         // Variant 5: AuthenticationError - Expired Token
@@ -273,7 +273,7 @@ let oneOfFixtures = {
             errorType: "AuthenticationError",
             errorMessage: "Authentication token has expired",
             errorCode: "EXPIRED_TOKEN",
-            errorDetails: JSON.stringify({ expiredAt: "2026-02-16T12:00:00Z", currentTime: "2026-02-16T15:30:00Z" }),
+            errorDetails: { expiredAt: "2026-02-16T12:00:00Z", currentTime: "2026-02-16T15:30:00Z" },
             errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${hexSuffix()}`
         },
         // Variant 6: AuthorizationError - Insufficient Permissions
@@ -281,7 +281,7 @@ let oneOfFixtures = {
             errorType: "AuthorizationError",
             errorMessage: "User does not have required permissions for this operation",
             errorCode: "INSUFFICIENT_PERMISSIONS",
-            errorDetails: JSON.stringify({ required: "jobs:submit", provided: "templates:read" }),  // L-2/H5: must match INSUFFICIENT_PERMISSIONS in the DD @error_examples block
+            errorDetails: { required: "jobs:submit", provided: "templates:read" },  // L-2/H5: must match INSUFFICIENT_PERMISSIONS in the DD @error_examples block
             errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${hexSuffix()}`
         },
         // Variant 7: ResourceNotFoundError - Job Not Found
@@ -289,7 +289,7 @@ let oneOfFixtures = {
             errorType: "ResourceNotFoundError",
             errorMessage: "Requested job does not exist",
             errorCode: "JOB_NOT_FOUND",
-            errorDetails: JSON.stringify({ resourceType: "job", jobId: "JOB-12345" }),
+            errorDetails: { resourceType: "job", jobId: "JOB-12345" },
             errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${hexSuffix()}`
         },
         // Variant 8: ResourceNotFoundError - Resource Not Found
@@ -297,7 +297,7 @@ let oneOfFixtures = {
             errorType: "ResourceNotFoundError",
             errorMessage: "Requested resource does not exist",
             errorCode: "RESOURCE_NOT_FOUND",
-            errorDetails: JSON.stringify({ resourceType: "document", resourceId: "DOC-67890" }),
+            errorDetails: { resourceType: "document", resourceId: "DOC-67890" },
             errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${hexSuffix()}`
         },
         // Variant 9: ValidationError - Multiple Field Errors (field names match EBNF DD)
@@ -305,12 +305,12 @@ let oneOfFixtures = {
             errorType: "ValidationError",
             errorMessage: "Request validation failed for multiple fields",
             errorCode: "INVALID_FORMAT",
-            errorDetails: JSON.stringify({
+            errorDetails: {
                 errors: [
                     { field: "documentId", issue: "not found in document library" },
                     { field: "recipientAddressSource.zip", issue: "invalid format - must be 5 or 9 digits" }  // B-new-2: DD rule is recipientAddressSource
                 ]
-            }),
+            },
             errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${hexSuffix()}`
         },
         // Variant 10: ServerError - Internal Error
@@ -318,7 +318,7 @@ let oneOfFixtures = {
             errorType: "ServerError",
             errorMessage: "An unexpected error occurred while processing the request",
             errorCode: "SERVER_ERROR",  // A1: DD canonical code (was "INTERNAL_SERVER_ERROR")
-            errorDetails: JSON.stringify({ timestamp: new Date().toISOString(), requestId: `req-${hexSuffix()}${hexSuffix()}` }),
+            errorDetails: { timestamp: new Date().toISOString(), requestId: `req-${hexSuffix()}${hexSuffix()}` },
             errorTrackingId: `TRK-${new Date().toISOString().slice(0,10).replace(/-/g, '')}-${hexSuffix()}`
         }
     ]
@@ -713,7 +713,7 @@ function generateRandomValue(key, existingValue) {
     } else if (keyLower.includes('month')) {
         return faker.number.int({ min: 1, max: 12 });
     } else if (keyLower.includes('cvv')) {
-        return faker.number.int({ min: 100, max: 999 });
+        return String(faker.number.int({ min: 100, max: 999 }));  // D6: cvv is a string
     } else if (keyLower.includes('routing')) {
         return faker.finance.routingNumber();
     } else if (keyLower.includes('account')) {

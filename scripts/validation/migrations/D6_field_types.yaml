@@ -1,0 +1,22 @@
+name: D6 — field types (errorDetails object, cvv string, checkDigit removed)
+# User decision 2026-10-16 (1A + 2a + 3A):
+# - errorDetails: a JSON object (new DD primitive `object` -> type object,
+#   additionalProperties true), not a string holding JSON. The content of every
+#   example is unchanged: json_decoded_fields decodes the baseline strings first.
+# - cvv: string (a leading zero is kept; 3 digits, or 4 for American Express).
+# - checkDigit: removed from achDetails. The ninth digit of an ABA routing number
+#   is its check digit, so a separate field could only repeat or contradict it.
+rules:
+  removed: [checkDigit]
+  changed: [errorDetails, cvv, achDetails]
+schemas:
+  removed: [checkDigit]
+  changed: [errorDetails, errorResponse, cvv, creditCardDetails, achDetails]
+json_decoded_fields: [errorDetails]
+value_changes:
+  - {field: cvv, from: 123, to: "123"}
+  - {field: cvv, from: "<Integer>", to: "<String>"}   # Getting Started type placeholder
+allowed_added_paths: []
+allowed_removed_paths:
+  - "\\.checkDigit$"
+retired_names: [checkDigit]
