@@ -297,6 +297,43 @@ class TestPerOperationStatusAssertions(unittest.TestCase):
         self.assertIsNone(V.Findings.tracking("B-TEST-STATUS-ASSERTION", "Test"))
 
 
+class TestCollectionCoverage(unittest.TestCase):
+    """L10/L8 (D8): Real-World and Getting Started cover every job endpoint (not auth, by
+    design); Real-World authenticates like Linked."""
+
+    @staticmethod
+    def findings(label, name):
+        path = REPO_ROOT / "postman" / "generated" / f"c2mapiv2-{name}.json"
+        F = V.Findings()
+        V.check_collection(label, json.loads(path.read_text()), V.COLLECTIONS[label][1], SPEC, V.SpecTools(SPEC), F)
+        return F
+
+    def test_real_world_covers_every_job_endpoint_and_authenticates(self):
+        cats = {c for (c, _s) in self.findings("Real-World", "real-world-use-cases-collection").items}
+        self.assertNotIn("B-OPERATION-NOT-IN-COLLECTION", cats)
+        self.assertNotIn("B-NO-AUTH", cats)
+
+    def test_getting_started_scope_is_job_endpoints(self):
+        cats = {c for (c, _s) in self.findings("GS-Test", "getting-started-test-collection").items}
+        self.assertNotIn("B-OPERATION-NOT-IN-COLLECTION", cats)
+
+    def test_job_only_collection_missing_a_job_endpoint_is_flagged(self):
+        coll = json.loads((REPO_ROOT / "postman" / "generated" /
+                           "c2mapiv2-real-world-use-cases-collection.json").read_text())
+        def drop(items):
+            return [dict(it, item=drop(it["item"])) if "item" in it else it for it in items
+                    if "item" in it or it["request"]["url"].get("path") != ["batch", "split"]]
+        coll["item"] = drop(coll["item"])
+        F = V.Findings()
+        V.check_collection("Real-World", coll, False, SPEC, V.SpecTools(SPEC), F)
+        self.assertIn("POST /batch/split", " ".join(F.items.get(("B-OPERATION-NOT-IN-COLLECTION", "Real-World"), [])))
+
+    def test_coverage_findings_are_errors(self):
+        for label in ("GS-Linked", "GS-Test", "Real-World"):
+            self.assertIsNone(V.Findings.tracking("B-OPERATION-NOT-IN-COLLECTION", label))
+        self.assertIsNone(V.Findings.tracking("B-NO-AUTH", "Real-World"))
+
+
 def run_findings_for(collection):
     F = V.Findings()
     V.check_collection("Test", collection, False, SPEC, V.SpecTools(SPEC), F)

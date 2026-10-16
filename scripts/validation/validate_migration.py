@@ -40,6 +40,10 @@ Migration file (YAML):
        name: Mutually exclusive fields}       # one that never appears is INCOMPLETE
   value_changes:                      # intended value changes, matched by leaf field name;
     - {field: country, from: US, to: USA}   # one that never occurs is INCOMPLETE
+  added_requests:                     # new collection requests / config examples, by name
+    - {where: Real-World, name: Utility Company - Monthly Bills}   # where: a collection
+    - {where: catalog, name: Utility Company - Monthly Bills}      # or config label; one never
+                                                                   # seen is INCOMPLETE
   json_decoded_fields: [errorDetails] # fields that were a string holding JSON and are now that
                                       # JSON (D6): baseline values are decoded before comparing,
                                       # so the content must be unchanged; one never decoded is INCOMPLETE
@@ -256,6 +260,8 @@ class Migration:
         self.value_changes_seen = set()
         self.added_examples = list(data.get("added_examples") or [])
         self.added_examples_seen = set()
+        self.added_requests = list(data.get("added_requests") or [])
+        self.added_requests_seen = set()
         self.json_decoded = set(data.get("json_decoded_fields") or [])
         self.json_decoded_seen = set()
 
@@ -265,6 +271,14 @@ class Migration:
             if ae.get("operation") == operation and str(ae.get("status")) == str(status) and (
                     (key is not None and ae.get("key") == key) or (name is not None and ae.get("name") == name)):
                 self.added_examples_seen.add(i)
+                return True
+        return False
+
+    def added_request(self, where, name):
+        """True if a new request / config example `name` in `where` is declared in added_requests."""
+        for i, ar in enumerate(self.added_requests):
+            if ar.get("where") == where and ar.get("name") == name:
+                self.added_requests_seen.add(i)
                 return True
         return False
 
@@ -406,6 +420,8 @@ def compare(baseline, current, mig, is_random=None):
         b_cfg, c_cfg = baseline["configs"].get(label, {}), current["configs"].get(label, {})
         for name in sorted(set(b_cfg) | set(c_cfg)):
             if name not in c_cfg or name not in b_cfg:
+                if name not in b_cfg and mig.added_request(label, name):
+                    continue
                 rep.add("UNEXPECTED", f"{label} example", f"{name!r} {'removed' if name not in c_cfg else 'added'}")
                 continue
             b, c = b_cfg[name], c_cfg[name]
@@ -427,6 +443,8 @@ def compare(baseline, current, mig, is_random=None):
         b_used, c_used = {}, {}
         for key in sorted(set(b_col) | set(c_col)):
             if key not in c_col or key not in b_col:
+                if key not in b_col and mig.added_request(label, key):
+                    continue
                 rep.add("UNEXPECTED", f"{label} request", f"{key!r} {'removed' if key not in c_col else 'added'}")
                 continue
             b, c = b_col[key], c_col[key]
@@ -465,6 +483,9 @@ def compare(baseline, current, mig, is_random=None):
     for i, vc in enumerate(mig.value_changes):
         if i not in mig.value_changes_seen:
             rep.add("INCOMPLETE", "value change", f"{vc} declared but never seen")
+    for i, ar in enumerate(mig.added_requests):
+        if i not in mig.added_requests_seen:
+            rep.add("INCOMPLETE", "added request", f"{ar} declared but never seen")
     for name in sorted(mig.json_decoded - mig.json_decoded_seen):
         rep.add("INCOMPLETE", "json decoded field", f"{name}: no baseline value held JSON to decode")
     return rep

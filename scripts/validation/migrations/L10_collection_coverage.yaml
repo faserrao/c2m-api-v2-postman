@@ -1,0 +1,21 @@
+name: L10 (D8) — Real-World covers every job endpoint; JWT pre-request script (L8)
+# User decision 2026-10-16:
+# - Real-World gains business scenarios for the three job endpoints it lacked
+#   (/batch/split, /batch/split/address-capture, /batch/zip/address-capture).
+# - Real-World gets the same JWT pre-request script as Linked (L8; collection event,
+#   not recorded by snapshots).
+# - Getting Started (and Real-World) cover the job endpoints only, by design: the
+#   consistency gate encodes that scope instead of tracking the auth endpoints as open.
+# The new requests are content the gates validate; nothing that existed may change.
+added_requests:
+  - {where: catalog, name: Utility Company - Monthly Bills}
+  - {where: catalog, name: HR Department - Annual Benefit Statements}
+  - {where: catalog, name: Insurance Agency - Policy Renewal Notices}
+  - {where: Real-World, name: Utility Company - Monthly Bills}
+  - {where: Real-World, name: HR Department - Annual Benefit Statements}
+  - {where: Real-World, name: Insurance Agency - Policy Renewal Notices}
+rules:
+  changed: []
+schemas:
+  changed: []
+allowed_added_paths: []

@@ -244,6 +244,113 @@ examples:
         - fundraising
         - donor-appeal
 
+  # L10 (D8, 2026-10-16): the three job endpoints Real-World did not cover.
+
+  - name: Utility Company - Monthly Bills
+    method: POST
+    path: /batch/split
+    tags:
+      - real-world
+      - utility
+      - billing
+    description: Utility company prints a month of customer bills as one PDF and splits it into one mailing per customer, giving each customer's address
+    select:
+      docSourceStandard: documentIdSource
+      paymentDetails: ach
+    values:
+      jobTemplate: utility_bill
+      # intentional: 2-item array — one PDF, one page range and address per customer
+      pdfSplitJobsWithAddress:
+        - startPage: 1
+          endPage: 2
+          recipientAddressSource:
+            recipientAddressByList:
+              addressList:
+                - firstName: Maria
+                  lastName: Garcia
+                  address1: 742 Elm St
+                  city: Austin
+                  state: TX
+                  zip: "78702"
+                  country: USA
+        - startPage: 3
+          endPage: 4
+          recipientAddressSource:
+            recipientAddressByList:
+              addressList:
+                - firstName: David
+                  lastName: Chen
+                  address1: 19 Lake Rd
+                  city: Austin
+                  state: TX
+                  zip: "78704"
+                  country: USA
+      tags:
+        - utility
+        - monthly-bill
+        - split-pdf
+
+  - name: HR Department - Annual Benefit Statements
+    method: POST
+    path: /batch/split/address-capture
+    tags:
+      - real-world
+      - human-resources
+      - address-capture
+    description: HR department prints every employee's two-page benefit statement as one PDF, with each employee's home address on the first page of their statement
+    select:
+      docSourceStandard: requestIdSource
+      paymentDetails: invoice
+    values:
+      # jobOptions, not jobTemplate: this endpoint's canonical request (Linked) carries
+      # jobOptions, the other side of the jobTemplate / jobOptions choice
+      jobOptions:
+        documentClass: letter
+        layout: address_on_first_page
+        productionTime: standard
+        envelope: double_window
+        color: black_and_white
+        paperType: white
+        printOption: double_sided
+        mailClass: first_class
+      # intentional: 2-item array — each employee's statement is its own page range
+      pdfSplitJobsNoAddress:
+        - startPage: 1
+          endPage: 2
+        - startPage: 3
+          endPage: 4
+      tags:
+        - human-resources
+        - benefits
+        - annual-statement
+
+  - name: Insurance Agency - Policy Renewal Notices
+    method: POST
+    path: /batch/zip/address-capture
+    tags:
+      - real-world
+      - insurance
+      - zip-processing
+    description: Insurance agency uploads a ZIP of renewal notices, one PDF per policyholder, each with the policyholder's address printed on it
+    select:
+      zipDocumentSource: zipDocumentIdSource
+      paymentDetails: creditCard
+    values:
+      # jobOptions, not jobTemplate (see HR Department above)
+      jobOptions:
+        documentClass: letter
+        layout: address_on_first_page
+        productionTime: three_day
+        envelope: double_window
+        color: full_color
+        paperType: white
+        printOption: single_sided
+        mailClass: first_class
+      tags:
+        - insurance
+        - renewal
+        - zip-processing
+
   # ============================================================================
   # GETTING STARTED - Educational Pattern Examples
   # ============================================================================

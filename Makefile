@@ -1576,6 +1576,11 @@ postman-generate-use-case-collection:
 		$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-real-world-use-cases-collection.json \
 		$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-real-world-use-cases-collection.json \
 		--spec $(C2MAPIV2_OPENAPI_SPEC)
+	@# L8 (D8): the same JWT pre-request script as Linked, so the use cases authenticate
+	@node scripts/active/add_pre_request_script.js \
+		$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-real-world-use-cases-collection.json \
+		postman/scripts/jwt-pre-request.js \
+		$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-real-world-use-cases-collection.json
 	@echo "✅ Real World Use Cases collection generated"
 
 # Upload enhanced test collection with all oneOf examples

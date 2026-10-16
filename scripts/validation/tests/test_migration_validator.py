@@ -98,6 +98,35 @@ class TestJsonDecodedFields(unittest.TestCase):
         self.assertIn(("INCOMPLETE", "json"), kinds(rep))
 
 
+class TestAddedRequests(unittest.TestCase):
+    """L10: a declared new collection request / config example is accepted; others are not."""
+
+    def pair(self):
+        before, after = snapshot(False), snapshot(False)
+        after["collections"]["Real-World"]["New Case"] = dict(after["collections"]["Real-World"]["POST /static"])
+        after["configs"]["catalog"]["New Case"] = dict(after["configs"]["catalog"]["Ex"])
+        return before, after
+
+    def test_declared_additions_are_clean(self):
+        mig = M.Migration({"name": "l10", "added_requests": [
+            {"where": "Real-World", "name": "New Case"}, {"where": "catalog", "name": "New Case"}]})
+        self.assertEqual(M.compare(*self.pair(), mig, NEVER_RANDOM).items, [])
+
+    def test_undeclared_addition_is_reported(self):
+        mig = M.Migration({"name": "l10", "added_requests": [{"where": "catalog", "name": "New Case"}]})
+        self.assertIn(("UNEXPECTED", "Real-World"), kinds(M.compare(*self.pair(), mig, NEVER_RANDOM)))
+
+    def test_declared_but_never_added_is_incomplete(self):
+        mig = M.Migration({"name": "l10", "added_requests": [{"where": "Real-World", "name": "Missing"}]})
+        rep = M.compare(snapshot(False), snapshot(False), mig, NEVER_RANDOM)
+        self.assertIn(("INCOMPLETE", "added"), kinds(rep))
+
+    def test_removal_is_still_reported(self):
+        before, after = self.pair()
+        mig = M.Migration({"name": "l10", "added_requests": [{"where": "Real-World", "name": "New Case"}]})
+        self.assertIn(("UNEXPECTED", "Real-World"), kinds(M.compare(after, before, mig, NEVER_RANDOM)))
+
+
 class TestCompare(unittest.TestCase):
 
     def test_identical_snapshots_with_null_migration_are_clean(self):

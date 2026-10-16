@@ -57,13 +57,14 @@ COLLECTIONS = {
     "Real-World": ("real-world-use-cases-collection.json", False),
 }
 
+# L10 (D8, 2026-10-16): collections that cover the job endpoints only, by design. Getting
+# Started is for exploring job requests against a mock, and Real-World is business
+# scenarios; neither carries the auth endpoints. Each must still cover every job endpoint.
+JOB_ENDPOINTS_ONLY = {"GS-Linked", "GS-Test", "Real-World"}
+
 # (category, scope) -> tracking reference. scope is a collection label, or "*" for any.
 # Categories not listed here are ERRORs. Remove an entry as soon as its fix lands.
 KNOWN_OPEN = {
-    ("B-OPERATION-NOT-IN-COLLECTION", "GS-Linked"): "L10 (Getting Started has no auth endpoints)",
-    ("B-OPERATION-NOT-IN-COLLECTION", "GS-Test"): "L10 (Getting Started has no auth endpoints)",
-    ("B-OPERATION-NOT-IN-COLLECTION", "Real-World"): "L10 (Real-World covers 4 of 7 job endpoints)",
-    ("B-NO-AUTH", "Real-World"): "L8 (Real-World has no auth / pre-request script)",
     ("B-PLACEHOLDER-IN-EXAMPLE", "Test"): "L6 (auth examples carry <dateTime>/<string>)",
     ("B-EXAMPLE-ORIGINAL-REQUEST", "Test"): "L6 (random auth ttl_seconds can fall below 3600 — intermittent)",
 }
@@ -792,7 +793,7 @@ def check_collection(label, collection, typed, spec, tools, F):
                     F.add("B-TEST-STATUS-ASSERTION", label,
                           f"{tag}: accepts {sorted(codes - declared)} undeclared, rejects {sorted(declared - codes)} declared")
     for key in ops:
-        if seen[key] == 0:
+        if seen[key] == 0 and not (label in JOB_ENDPOINTS_ONLY and not uses_dd_errors(ops[key])):
             F.add("B-OPERATION-NOT-IN-COLLECTION", label, f"{key[0].upper()} {key[1]}")
 
 
