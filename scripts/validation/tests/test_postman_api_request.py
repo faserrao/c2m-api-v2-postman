@@ -136,6 +136,24 @@ class TestMakefileSpecPayloads(unittest.TestCase):
         self.assertEqual(offenders, [])
 
 
+class TestMakefileScriptsExist(unittest.TestCase):
+    """M3 (2026-10-16): every script the Makefile runs exists. A target pointing at a
+    retired script fails only when someone runs it (postman-extract-oneof-examples called
+    a script archived on 2026-09-08)."""
+
+    def test_every_makefile_script_path_exists(self):
+        import re
+        mk = (REPO_ROOT / "Makefile").read_text().replace("$(SCRIPTS_DIR)", "scripts")
+        paths = set(re.findall(r"(?<![\w/$.-])((?:scripts|tests)/[\w./-]+\.(?:py|js|sh))", mk))
+        self.assertGreater(len(paths), 30)
+        self.assertEqual(sorted(p for p in paths if not (REPO_ROOT / p).exists()), [])
+
+    def test_duplicate_collection_validator_is_retired(self):
+        """M3: validate_all_collections_against_spec.py duplicated the conformance gate +
+        consistency gate (every fault it checks is caught there) and is archived."""
+        self.assertFalse((REPO_ROOT / "scripts" / "validation" / "validate_all_collections_against_spec.py").exists())
+
+
 class TestMakefileSecurityRepoPath(unittest.TestCase):
     """Local builds take the JWT auth script from the security repo cloned beside this one.
     Until 2026-10-13 the Makefile looked for ../c2m-api-v2-security (the folder name CI

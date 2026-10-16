@@ -1543,20 +1543,6 @@ postman-test-collection-upload:
 # ========================================================================
 # USE CASE COLLECTION ENHANCEMENT
 # ========================================================================
-# Extract all oneOf examples from OpenAPI and patch test collection
-.PHONY: postman-extract-oneof-examples
-postman-extract-oneof-examples:
-	@echo "📊 Extracting all oneOf examples from OpenAPI spec..."
-	@if [ ! -f "$(POSTMAN_TEST_COLLECTION_FLAT)" ]; then \
-		echo "⚠️  Test collection not found. Run postman-create-test-collection first."; \
-		exit 1; \
-	fi
-	@$(VENV_PYTHON) scripts/active/extract_all_oneof_examples.py \
-		$(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES) \
-		$(POSTMAN_TEST_COLLECTION_FLAT) \
-		$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-test-collection-enhanced.json
-	@echo "✅ Enhanced test collection with all oneOf examples"
-
 # Generate curated use case collection (Real World Use Cases only)
 .PHONY: postman-generate-use-case-collection
 postman-generate-use-case-collection:
@@ -1582,34 +1568,6 @@ postman-generate-use-case-collection:
 		postman/scripts/jwt-pre-request.js \
 		$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-real-world-use-cases-collection.json
 	@echo "✅ Real World Use Cases collection generated"
-
-# Upload enhanced test collection with all oneOf examples
-.PHONY: postman-upload-enhanced-collection
-postman-upload-enhanced-collection:
-	@echo "📤 Updating test collection with enhanced oneOf examples..."
-	@ENHANCED_FILE="$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-test-collection-enhanced.json"; \
-	if [ ! -f "$$ENHANCED_FILE" ]; then \
-		echo "⚠️  Enhanced collection not found. Run postman-extract-oneof-examples first."; \
-		exit 1; \
-	fi; \
-	if [ ! -f "$(POSTMAN_TEST_COLLECTION_UID_FILE)" ]; then \
-		echo "❌ Test collection UID file not found. Run postman-create-test-collection first."; \
-		exit 1; \
-	fi; \
-	TEST_COLLECTION_UID=$$(cat $(POSTMAN_TEST_COLLECTION_UID_FILE)); \
-	if [ -z "$$TEST_COLLECTION_UID" ]; then \
-		echo "❌ Test collection UID is empty"; exit 1; \
-	fi; \
-	echo "🔄 Updating existing test collection $$TEST_COLLECTION_UID..."; \
-	RESPONSE=$$(jq -c '{collection: .}' "$$ENHANCED_FILE" | \
-		curl --silent --location --request PUT "$(POSTMAN_COLLECTIONS_URL)/$$TEST_COLLECTION_UID" \
-			$(POSTMAN_CURL_HEADERS_XC) \
-			--data-binary @-); \
-	if echo "$$RESPONSE" | jq -e '.collection.uid' > /dev/null 2>&1; then \
-		echo "✅ Test collection updated with enhanced oneOf examples"; \
-	else \
-		echo "❌ Failed to update test collection: $$RESPONSE"; exit 1; \
-	fi
 
 # Upload Real World Use Cases collection only
 # NOTE: Getting Started collections uploaded by postman-upload-getting-started-all
@@ -1759,7 +1717,6 @@ postman-inject-docs-link-all:
 	@for collection in \
 		"$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-linked-collection-flat.json" \
 		"$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-test-collection-flat.json" \
-		"$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-test-collection-enhanced.json" \
 		"$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-real-world-use-cases-collection.json" \
 		"$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-linked-collection.json" \
 		"$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-test-collection.json"; do \
@@ -2873,21 +2830,6 @@ validate-collections-deep: ## Deep field audit of all *.json files in postman/ge
 	@$(VENV_PYTHON) scripts/validation/validate_collections_deep.py \
 		--spec $(C2MAPIV2_OPENAPI_SPEC) \
 		--dir $(POSTMAN_GENERATED_DIR)
-
-.PHONY: validate-all-collections
-validate-all-collections: ## Validate ALL active collections against the OpenAPI spec (fields + enums)
-	@echo "🔍 Validating all active Postman collections against the OpenAPI spec..."
-	@$(VENV_PYTHON) scripts/validation/validate_all_collections_against_spec.py \
-		--spec $(C2MAPIV2_OPENAPI_SPEC) \
-		--dir postman/generated
-
-.PHONY: validate-all-collections-report
-validate-all-collections-report: ## Same as validate-all-collections but writes a Markdown report
-	@echo "🔍 Validating all active Postman collections against the OpenAPI spec..."
-	@$(VENV_PYTHON) scripts/validation/validate_all_collections_against_spec.py \
-		--spec $(C2MAPIV2_OPENAPI_SPEC) \
-		--dir postman/generated \
-		--report reports/dd-validation-report.md
 
 .PHONY: validate-spec-against-dd
 validate-spec-against-dd: ## Validate OpenAPI spec faithfully represents the EBNF DD (enums, properties, required)
