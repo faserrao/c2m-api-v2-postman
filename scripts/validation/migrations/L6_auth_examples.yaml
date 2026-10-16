@@ -1,0 +1,13 @@
+name: L6 — auth examples carry real values; originalRequest is the request
+# 2026-10-16. Test collection: add_auth_examples.js replaced the auth request bodies after
+# the saved responses were added, so their originalRequest kept an earlier randomised body
+# (ttl_seconds could fall below the overlay's 3600 minimum); it now updates them too. The
+# revoke request's tokenId URL variable was "<string>"; it is the overlay parameter's
+# new example, tok_st_9f3d2c (the token the short-token example issues). Snapshots record
+# neither originalRequest bodies nor URL variables nor spec parameters, so this check
+# proves only that nothing else changed; the new tests cover the change itself.
+rules:
+  changed: []
+schemas:
+  changed: []
+allowed_added_paths: []

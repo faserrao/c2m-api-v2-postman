@@ -142,6 +142,8 @@ paths:
           schema:
             type: string
           description: The token ID to revoke
+          # L6: the short-term token issued in the /auth/tokens/short success example
+          example: "tok_st_9f3d2c"
       responses:
         '204':
           description: Revoked (idempotent)

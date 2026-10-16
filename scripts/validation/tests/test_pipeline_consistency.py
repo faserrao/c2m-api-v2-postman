@@ -356,6 +356,72 @@ class TestSavedResponsesEverywhere(unittest.TestCase):
         self.assertIsNone(V.Findings.tracking("B-NO-SAVED-RESPONSES", "GS-Test"))
 
 
+class TestAuthExamplesL6(unittest.TestCase):
+    """L6: auth saved responses' originalRequest is the request; tokenId is a real value."""
+
+    SCRIPT = REPO_ROOT / "scripts" / "active" / "add_auth_examples.js"
+    OVERLAY = REPO_ROOT / "openapi" / "overlays" / "auth.tokens.yaml"
+
+    def run_script(self, items, overlay=None):
+        import subprocess
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            src, out = Path(d) / "in.json", Path(d) / "out.json"
+            src.write_text(json.dumps({"info": {"name": "t"}, "item": items}))
+            r = subprocess.run(["node", str(self.SCRIPT), str(src), str(out), "--auth-overlay",
+                                str(overlay or self.OVERLAY)], capture_output=True, text=True)
+            return r, (json.loads(out.read_text()) if out.exists() else None)
+
+    @staticmethod
+    def items():
+        stale = {"mode": "raw", "raw": json.dumps({"grant_type": "assertion", "ttl_seconds": 12})}
+        long_tok = {"name": "POST /auth/tokens/long", "request": {
+            "method": "POST", "url": {"path": ["auth", "tokens", "long"]}, "body": {"mode": "raw", "raw": "{}"}},
+            "response": [{"code": 201, "name": "ok", "originalRequest": {"method": "POST", "body": dict(stale)}}]}
+        revoke = {"name": "POST /auth/tokens/:tokenId/revoke", "request": {
+            "method": "POST", "url": {"path": ["auth", "tokens", ":tokenId", "revoke"],
+                                      "variable": [{"key": "tokenId", "value": "<string>"}]}},
+            "response": [{"code": 204, "name": "ok", "originalRequest": {
+                "method": "POST", "url": {"path": ["auth", "tokens", ":tokenId", "revoke"],
+                                          "variable": [{"key": "tokenId", "value": "<string>"}]}}}]}
+        return [long_tok, revoke]
+
+    def test_saved_original_request_follows_the_new_body(self):
+        r, out = self.run_script(self.items())
+        self.assertEqual(r.returncode, 0, r.stderr)
+        long_tok = out["item"][0]
+        self.assertEqual(long_tok["response"][0]["originalRequest"]["body"]["raw"], long_tok["request"]["body"]["raw"])
+        self.assertGreaterEqual(json.loads(long_tok["request"]["body"]["raw"])["ttl_seconds"], 3600)
+
+    def test_token_id_takes_the_overlay_example(self):
+        example = yaml.safe_load(self.OVERLAY.read_text())["paths"]["/auth/tokens/{tokenId}/revoke"]["post"]["parameters"][0]["example"]
+        r, out = self.run_script(self.items())
+        self.assertEqual(r.returncode, 0, r.stderr)
+        revoke = out["item"][1]
+        self.assertEqual(revoke["request"]["url"]["variable"][0]["value"], example)
+        self.assertEqual(revoke["response"][0]["originalRequest"]["url"]["variable"][0]["value"], example)
+
+    def test_path_parameter_without_example_stops_the_script(self):
+        import tempfile
+        text = self.OVERLAY.read_text().replace('          example: "tok_st_9f3d2c"\n', "")
+        with tempfile.NamedTemporaryFile("w", suffix=".yaml", delete=False) as f:
+            f.write(text)
+        r, _ = self.run_script(self.items(), overlay=f.name)
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn("has no example", r.stderr)
+
+    def test_original_request_that_differs_is_an_error(self):
+        examples = all_dd_error_examples()
+        examples[0]["originalRequest"]["body"]["raw"] = json.dumps({"docSourceAll": "other"})
+        cats = run_collection([request(CLEAN_BODY, examples)])
+        self.assertIn("B-EXAMPLE-ORIGINAL-REQUEST-DIFFERS", cats)
+        self.assertIsNone(V.Findings.tracking("B-EXAMPLE-ORIGINAL-REQUEST-DIFFERS", "Test"))
+
+    def test_nothing_is_tracked_as_open(self):
+        """With L6 fixed, the gate's KNOWN_OPEN table is empty: every finding is an ERROR."""
+        self.assertEqual(V.KNOWN_OPEN, {})
+
+
 def run_findings_for(collection):
     F = V.Findings()
     V.check_collection("Test", collection, False, SPEC, V.SpecTools(SPEC), F)

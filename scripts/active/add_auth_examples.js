@@ -64,10 +64,50 @@ function loadAuthExamplesFromOverlay(overlayPath) {
   return examples;
 }
 
+/**
+ * L6: path-parameter examples from the overlay, keyed like the request bodies
+ * ("POST /auth/tokens/:tokenId/revoke" → { tokenId: "tok_st_9f3d2c" }), so collection
+ * URL variables carry a real value instead of a "<string>" placeholder.
+ */
+function loadAuthPathExamplesFromOverlay(overlayPath) {
+  const overlay = yaml.load(fs.readFileSync(overlayPath, 'utf8'));
+  const out = {};
+  for (const [pathKey, pathItem] of Object.entries(overlay.paths || {})) {
+    const operation = pathItem.post;
+    if (!operation) continue;
+    const params = (operation.parameters || []).filter(p => p.in === 'path');
+    if (params.length === 0) continue;
+    const values = {};
+    for (const p of params) {
+      if (p.example === undefined) {
+        console.error(`❌ ${pathKey}: path parameter '${p.name}' has no example in the auth overlay`);
+        process.exit(1);
+      }
+      values[p.name] = String(p.example);
+    }
+    out[`POST ${pathKey.replace(/\{(\w+)\}/g, ':$1')}`] = values;
+  }
+  return out;
+}
+
+/** Set the values of a Postman URL's path variables (url.variable[].value). */
+function setPathVariables(url, values) {
+  if (!url || typeof url !== 'object') return 0;
+  let n = 0;
+  for (const v of url.variable || []) {
+    if (Object.prototype.hasOwnProperty.call(values, v.key)) {
+      v.value = values[v.key];
+      n++;
+    }
+  }
+  return n;
+}
+
 // Load auth examples from the overlay (single source of truth).
 // --auth-overlay overrides; fallback uses the assumed repo layout (scripts/active/ → ../../ = root).
 const overlayPath = authOverlayArg || path.resolve(__dirname, '../../openapi/overlays/auth.tokens.yaml');
 const authExamples = loadAuthExamplesFromOverlay(overlayPath);
+const authPathExamples = loadAuthPathExamplesFromOverlay(overlayPath);
 
 // Read the collection
 const collection = JSON.parse(fs.readFileSync(inputFile, 'utf8'));
@@ -111,8 +151,29 @@ function updateAuthEndpoints(items) {
           });
         }
         
+        // L6: every saved response's originalRequest is this request (as
+        // add_error_responses_to_collection.js does), not an earlier randomised body
+        for (const saved of item.response || []) {
+          if (!saved.originalRequest) continue;
+          saved.originalRequest.body = Object.assign({}, saved.originalRequest.body,
+                                                     { mode: 'raw', raw: item.request.body.raw });
+        }
+
         updatedCount++;
         console.log(`✅ Updated request body for: ${requestName}`);
+      }
+      // L6: path variables (e.g. :tokenId) take the overlay's parameter example
+      if (authPathExamples[requestName]) {
+        let n = setPathVariables(item.request.url, authPathExamples[requestName]);
+        for (const saved of item.response || []) {
+          n += setPathVariables((saved.originalRequest || {}).url, authPathExamples[requestName]);
+        }
+        if (n === 0) {
+          console.error(`❌ ${requestName}: no URL variable matched ${Object.keys(authPathExamples[requestName]).join(', ')}`);
+          process.exit(1);
+        }
+        updatedCount++;
+        console.log(`✅ Set path variables for: ${requestName}`);
       }
     }
   }

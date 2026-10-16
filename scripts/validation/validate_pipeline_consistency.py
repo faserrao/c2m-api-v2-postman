@@ -65,8 +65,6 @@ JOB_ENDPOINTS_ONLY = {"GS-Linked", "GS-Test", "Real-World"}
 # (category, scope) -> tracking reference. scope is a collection label, or "*" for any.
 # Categories not listed here are ERRORs. Remove an entry as soon as its fix lands.
 KNOWN_OPEN = {
-    ("B-PLACEHOLDER-IN-EXAMPLE", "Test"): "L6 (auth examples carry <dateTime>/<string>)",
-    ("B-EXAMPLE-ORIGINAL-REQUEST", "Test"): "L6 (random auth ttl_seconds can fall below 3600 — intermittent)",
 }
 
 
@@ -638,6 +636,13 @@ def iter_requests(collection, folder=()):
             yield "/".join(f for f in folder if f), it
 
 
+def _json_or_text(raw):
+    try:
+        return json.loads(raw) if raw else None
+    except json.JSONDecodeError:
+        return raw
+
+
 def url_path(url):
     if isinstance(url, dict):
         return re.sub(r"/:([A-Za-z_]\w*)", r"/{\1}", "/" + "/".join(url.get("path", [])))
@@ -709,9 +714,14 @@ def check_collection(label, collection, typed, spec, tools, F):
                         F.add("B-FILLER-VALUE", label, f"{tag}: body{p_}={v!r}")
         # saved response examples
         saved_pairs = set()
+        req_raw = (req.get("body") or {}).get("raw") or ""
         for ex in it.get("response") or []:
             code, name = str(ex.get("code")), ex.get("name")
             where = f"{tag} / {name!r} ({code})"
+            # L6 (2026-10-16): a saved response's originalRequest is the request it answers
+            orig_raw = (((ex.get("originalRequest") or {}).get("body")) or {}).get("raw") or ""
+            if _json_or_text(orig_raw) != _json_or_text(req_raw):
+                F.add("B-EXAMPLE-ORIGINAL-REQUEST-DIFFERS", label, f"{where}: originalRequest body is not the request body")
             resp = op.get("responses", {}).get(code)
             if resp is None:
                 F.add("B-EXAMPLE-STATUS-UNDECLARED", label, where)
