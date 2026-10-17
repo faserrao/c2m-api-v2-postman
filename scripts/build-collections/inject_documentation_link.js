@@ -9,7 +9,7 @@
  *   node inject_documentation_link.js <collection.json> <docs-url>
  *
  * Example:
- *   node inject_documentation_link.js postman/generated/c2mapiv2-test-collection.json \
+ *   node inject_documentation_link.js postman/generated/c2mapiv2-test-collection-flat.json \
  *     https://click2mail.github.io/c2m-api-v2-postman-artifacts/
  */
 

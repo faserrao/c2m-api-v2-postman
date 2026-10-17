@@ -186,6 +186,34 @@ class TestMakefileScriptsExist(unittest.TestCase):
             self.assertEqual(sorted(f for f in filters if not (REPO_ROOT / f).is_dir()), [], f"{event}: path filter names a missing directory")
             self.assertEqual(sorted(build_dirs - filters), [], f"{event}: a scripts/ directory the build uses is not a CI trigger")
 
+    def test_every_script_parses(self):
+        """2026-10-17: dev-tools/git-pull-rebase.sh had been truncated mid-string (like git-push.sh
+        in Aug 2026) and nothing noticed, because no build runs it. Every tracked script must at
+        least parse: bash -n, node --check, and Python compile with warnings as errors."""
+        import warnings
+        files = subprocess.run(["git", "ls-files", "scripts", "tests"], cwd=REPO_ROOT,
+                               capture_output=True, text=True).stdout.split()
+        bad = []
+        for f in files:
+            p = REPO_ROOT / f
+            if f.endswith(".sh"):
+                r = subprocess.run(["bash", "-n", str(p)], capture_output=True, text=True)
+                if r.returncode:
+                    bad.append(f"{f}: {r.stderr.strip()[:120]}")
+            elif f.endswith(".js"):
+                r = subprocess.run(["node", "--check", str(p)], capture_output=True, text=True)
+                if r.returncode:
+                    bad.append(f"{f}: {r.stderr.strip().splitlines()[0][:120]}")
+            elif f.endswith(".py"):
+                with warnings.catch_warnings():
+                    warnings.simplefilter("error")
+                    try:
+                        compile(p.read_text(), f, "exec")
+                    except (SyntaxError, SyntaxWarning) as e:
+                        bad.append(f"{f}: {e}")
+        self.assertGreater(len(files), 60)
+        self.assertEqual(bad, [])
+
     def test_every_referenced_target_exists(self):
         """Every target named as a prerequisite or in a `$(MAKE) target` call is defined
         (local-test-pipeline called a `clean` target that never existed; M3 removed

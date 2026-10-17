@@ -10,7 +10,7 @@ The OpenAPI spec (generated from EBNF) provides the metadata for validation and 
 
 Usage:
     python3 extract_template_from_collection.py \
-        --bootstrap postman-exports/REST\ API\ V2.postman_collection.json \
+        --bootstrap "archive/postman-exports/REST API V2.postman_collection (1).json" \
         --openapi openapi/c2mapiv2-openapi-spec-base.yaml \
         --template-output config/getting-started-template.yaml
 
