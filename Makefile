@@ -2345,15 +2345,13 @@ prism-test-select: ## Test endpoint with specific test body index
 .PHONY: validate-secrets
 validate-secrets: ## Validate secrets and environment configuration
 	@echo "🔐 Validating secrets and environment configuration..."
-	@chmod +x tests/validate-secrets.sh
-	@tests/validate-secrets.sh
+	@$(VALIDATE_SCRIPTS_DIR)/post-build/validate-secrets.sh
 
 # Validate pipeline outputs (OpenAPI, collections, artifacts, docs)
 .PHONY: validate-pipeline
 validate-pipeline: ## Validate pipeline outputs (OpenAPI, collections, docs)
 	@echo "📊 Validating pipeline outputs..."
-	@chmod +x tests/validate-pipeline-outputs.sh
-	@tests/validate-pipeline-outputs.sh
+	@$(VALIDATE_SCRIPTS_DIR)/post-build/validate-pipeline-outputs.sh
 
 # Validate mock servers (Prism and Postman)
 .PHONY: validate-mocks
@@ -2849,7 +2847,7 @@ validate-dd-gates: ## CI gate: spec vs DD, all 5 collections vs DD, catalog sele
 #   make openapi-build postman-build-golden-test-fixtures migration-snapshot MIGRATION=<name>
 # then, after the change and a fresh build:
 #   make validate-migration MIGRATION=<name>
-MIGRATION_DIR      := $(VALIDATE_SCRIPTS_DIR)/migrations
+MIGRATION_DIR      := migrations
 MIGRATION_BASELINE  = $(MIGRATION_DIR)/$(MIGRATION).baseline.json
 MIGRATION_ENV       = DD_EBNF_FILE="$(DD_EBNF_FILE)" C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" \
                       POSTMAN_GENERATED_DIR="$(POSTMAN_GENERATED_DIR)" C2MAPIV2_POSTMAN_API_NAME_KC="$(C2MAPIV2_POSTMAN_API_NAME_KC)"

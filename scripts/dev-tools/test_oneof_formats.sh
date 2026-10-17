@@ -143,7 +143,7 @@ start_prism() {
 
     # Wait for Prism to start
     echo "Waiting for Prism to start..."
-    for i in {1..10}; do
+    for _ in {1..10}; do
         if curl -s "${PRISM_URL}" > /dev/null 2>&1; then
             echo -e "${GREEN}✓${NC} Prism started successfully (PID: $PRISM_PID)"
             return 0
@@ -167,15 +167,18 @@ test_request() {
     print_test "$test_name"
 
     # Make request
-    local response=$(curl -s -w "\n%{http_code}" \
+    local response
+    response=$(curl -s -w "\n%{http_code}" \
         -X POST "${PRISM_URL}${endpoint}" \
         -H "Content-Type: application/json" \
         -H "Accept: application/json" \
         -d "$payload" 2>&1)
 
     # Extract status code and body
-    local http_code=$(echo "$response" | tail -n1)
-    local body=$(echo "$response" | sed '$d')
+    local http_code
+    http_code=$(echo "$response" | tail -n1)
+    local body
+    body=$(echo "$response" | sed '$d')
 
     # Check status code
     if [ "$http_code" = "$expected_status" ]; then
@@ -183,7 +186,8 @@ test_request() {
 
         # Show response body (first 200 chars)
         if [ -n "$body" ]; then
-            local preview=$(echo "$body" | head -c 200)
+            local preview
+            preview=$(echo "$body" | head -c 200)
             echo -e "  ${BLUE}Response:${NC} ${preview}..."
         fi
 

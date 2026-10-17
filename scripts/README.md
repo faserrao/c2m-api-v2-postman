@@ -7,13 +7,14 @@
 | `lib/` | Python helpers shared by generators and validators (`oneof_resolver.py`) | yes |
 | `build-docs-sdk/` | DD tables, artifacts index, SDK generation | yes |
 | `publish-postman/` | Postman API calls and environment files | yes |
-| `validate/` | validators and gates; `tests/` (golden suites), `migrations/` (change declarations + baselines), `post-build/` (CI checks after publishing: `ci_verify.sh`, Newman, report) | yes |
+| `validate/` | validators and gates; `tests/` (golden suites), `post-build/` (CI checks after publishing: `ci_verify.sh`, `validate-secrets.sh`, `validate-pipeline-outputs.sh`, Newman, report) | yes |
 | `dev-tools/` | local developer helpers (context switch, push helpers, Prism probe, EBNF preview, one-off extractors); not used by the build | no |
 | `python_env/` | `requirements.txt` (pinned) and the `e2o.venv` virtual environment | `requirements.txt` only |
 
 The Makefile refers to these only through `SPEC_SCRIPTS_DIR`, `COLLECTION_SCRIPTS_DIR`, `DOCS_SDK_SCRIPTS_DIR`,
 `PUBLISH_SCRIPTS_DIR`, `VALIDATE_SCRIPTS_DIR` and `DEV_TOOLS_DIR`. Retired scripts are in
-`archive/scripts/retired-2026-10-17/`.
+`archive/scripts/retired-2026-10-17/`. Migration declarations and baselines (data, not code) are in the repo-root
+`migrations/`. Every tracked shell script must pass `shellcheck -S warning` (golden test).
 
 Full reference: [c2m-api-v2-manuals: development/SCRIPTS_REFERENCE.md](https://github.com/click2mail/c2m-api-v2-manuals/blob/master/development/SCRIPTS_REFERENCE.md)
 and `development/DD_OpenAPI_Postman_System_Manual.md`.

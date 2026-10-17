@@ -25,7 +25,8 @@ fetch_secret() {
     echo "🔐 Fetching credentials from AWS Secrets Manager..." >&2
     
     # Fetch the secret
-    local secret_json=$(aws secretsmanager get-secret-value \
+    local secret_json
+    secret_json=$(aws secretsmanager get-secret-value \
         --secret-id "$secret_name" \
         --region "$region" \
         --query 'SecretString' \

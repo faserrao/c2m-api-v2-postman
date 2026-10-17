@@ -140,7 +140,7 @@ run_secret_validation() {
 
     cd "$PROJECT_ROOT" || return 1
 
-    if bash tests/validate-secrets.sh; then
+    if bash scripts/validate/post-build/validate-secrets.sh; then
         log_success "Secret validation passed"
         return 0
     else
@@ -158,7 +158,7 @@ run_pipeline_validation() {
 
     # The script reports every check before exiting 1 on any failure; a failure fails this step
     # (2026-10-17: it used to be logged as a warning and ignored — no step may mask a failure).
-    bash tests/validate-pipeline-outputs.sh
+    bash scripts/validate/post-build/validate-pipeline-outputs.sh
     local exit_code=$?
 
     if [[ $exit_code -eq 0 ]]; then

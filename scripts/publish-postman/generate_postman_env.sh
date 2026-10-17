@@ -4,7 +4,6 @@
 set -euo pipefail
 
 # Configuration
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ENV_TEMPLATE_FILE="${1:-}"
 OUTPUT_FILE="${2:-}"
 

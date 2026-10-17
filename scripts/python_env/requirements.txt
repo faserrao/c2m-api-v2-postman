@@ -1,13 +1,10 @@
-# Python packages the pipeline imports (scripts/active, scripts/validation,
-# scripts/utilities, scripts/test_data_generator_for_collections, tests) — nothing else.
+# Python packages the pipeline imports (scripts/build-spec, build-collections, lib, build-docs-sdk,
+# publish-postman, validate, dev-tools) — nothing else.
 # Pinned: Faker's seeded output is part of the spec examples (byte-identical rebuilds).
 # A golden test (test_postman_api_request.py) fails if this list and the imports drift.
 # Works on Python 3.11 (CI) through 3.14.
-click==8.2.1
 Faker==33.1.0
 jsonschema==4.24.0
 lark==1.2.2
 pytest==9.1.1
-python-dotenv==1.1.1
 PyYAML==6.0.2
-requests==2.32.5

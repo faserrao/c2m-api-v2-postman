@@ -12,7 +12,6 @@ set -eo pipefail
 PROJECT_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 OPENAPI_SPEC="${PROJECT_ROOT}/openapi/c2mapiv2-openapi-spec-final.yaml"
 SDK_BASE_DIR="${PROJECT_ROOT}/sdk"
-OPENAPI_GENERATOR_VERSION="latest"
 
 # Derive server URL from spec servers[0].url at runtime; fall back to known production URL.
 # This ensures SDK examples point to the canonical server declared in the spec.
@@ -122,14 +121,16 @@ generate_sdk() {
     local output_dir=$2
     
     # Get generator command
-    local generator_cmd=$(get_generator_cmd)
+    local generator_cmd
+    generator_cmd=$(get_generator_cmd)
     if [ -z "$generator_cmd" ]; then
         print_error "OpenAPI Generator not found"
         return 1
     fi
     
     # Get language-specific parameters
-    local params=$(get_generator_params "$language")
+    local params
+    params=$(get_generator_params "$language")
     if [ -z "$params" ]; then
         print_error "Unknown language: $language"
         return 1

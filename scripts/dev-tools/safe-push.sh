@@ -82,14 +82,15 @@ echo -e "${BLUE}═════════════════════�
 echo -e "${BLUE}STEP 4: Test Build (Optional)${NC}"
 echo -e "${BLUE}═══════════════════════════════════════════${NC}"
 echo ""
-echo "Run local build to test changes? (y/n)"
-echo "(Takes ~8 minutes, but catches errors before CI/CD)"
+echo "Run the CI gates locally first? (y/n)"
+echo "(Builds all collections and runs every gate CI runs before publishing; no Postman calls)"
 read -r answer
 
 if [ "$answer" = "y" ]; then
     echo ""
     echo "Running build..."
-    if ! make postman-instance-build-without-tests; then
+    if ! make validate-configs postman-build-golden-test-fixtures validate-collections-conformance-gate-all \
+            validate-dd-gates validate-pipeline-consistency validate-collections-conformance-test; then
         echo ""
         echo -e "${RED}✗ Local build failed${NC}"
         echo "Fix errors before pushing."
@@ -118,7 +119,8 @@ echo ""
 echo "Commit message: ${CYAN}$COMMIT_MSG${NC}"
 echo ""
 echo "This will:"
-echo "  1. Stage data_dictionary/ and openapi/ files"
+echo "  1. Stage changes to tracked files under data_dictionary/, openapi/ and config/ (the DD, the base spec,"
+echo "     faker_hints.yaml, c2m_provider_mappings.yaml) — new files are not added"
 echo "  2. Commit with your message"
 echo "  3. Push to the remote for the current context (.git-context: $(git ctx-show))"
 echo "  4. Trigger GitHub Actions workflow automatically"
@@ -139,8 +141,9 @@ echo -e "${BLUE}STEP 7: Committing and Pushing${NC}"
 echo -e "${BLUE}═══════════════════════════════════════════${NC}"
 echo ""
 
-# Stage changes
-git add data_dictionary/ openapi/
+# Stage changes: the DD and everything make openapi-build regenerates from it (CI fails if a
+# regenerated file is stale). -u: tracked files only, so untracked scratch files stay out.
+git add -u data_dictionary/ openapi/ config/
 
 # Commit
 git commit -m "$COMMIT_MSG"

@@ -120,8 +120,8 @@ echo -e "${GREEN}✓ Safe to commit!${NC}"
 echo ""
 echo "Next steps:"
 echo "  1. Preview changes:  ./scripts/dev-tools/preview-ebnf-changes.sh"
-echo "  2. Test build:       make postman-instance-build-without-tests"
-echo "  3. Commit & push:    git add . && git commit && git push"
+echo "  2. Test build:       make postman-build-golden-test-fixtures validate-dd-gates validate-pipeline-consistency   (local, no Postman calls)"
+echo "  3. Commit & push:    ./scripts/dev-tools/safe-push.sh \"message\""
 echo ""
 
 exit 0

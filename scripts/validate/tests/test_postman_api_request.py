@@ -191,7 +191,7 @@ class TestMakefileScriptsExist(unittest.TestCase):
         in Aug 2026) and nothing noticed, because no build runs it. Every tracked script must at
         least parse: bash -n, node --check, and Python compile with warnings as errors."""
         import warnings
-        files = subprocess.run(["git", "ls-files", "scripts", "tests"], cwd=REPO_ROOT,
+        files = subprocess.run(["git", "ls-files", "scripts"], cwd=REPO_ROOT,
                                capture_output=True, text=True).stdout.split()
         bad = []
         for f in files:
@@ -213,6 +213,23 @@ class TestMakefileScriptsExist(unittest.TestCase):
                         bad.append(f"{f}: {e}")
         self.assertGreater(len(files), 60)
         self.assertEqual(bad, [])
+
+    def test_shell_scripts_pass_shellcheck(self):
+        """2026-10-17: shellcheck found fetch_aws_credentials.sh's error handler could never run
+        (`local x=$(cmd) || { …; exit 1; }` — `local` returns 0, so a failed AWS call passed on an
+        empty secret). Every tracked shell script must be clean at warning level. GitHub's Ubuntu
+        runners ship shellcheck; locally the test is skipped if it is not installed."""
+        import shutil
+        if not shutil.which("shellcheck"):
+            if os.environ.get("CI"):
+                self.fail("shellcheck not found on the CI runner")
+            self.skipTest("shellcheck not installed (brew install shellcheck)")
+        files = [f for f in subprocess.run(["git", "ls-files", "scripts"], cwd=REPO_ROOT,
+                                           capture_output=True, text=True).stdout.split() if f.endswith(".sh")]
+        self.assertGreater(len(files), 10)
+        r = subprocess.run(["shellcheck", "-S", "warning", "-f", "gcc", *files], cwd=REPO_ROOT,
+                           capture_output=True, text=True)
+        self.assertEqual(r.stdout.strip(), "", r.stdout)
 
     def test_every_referenced_target_exists(self):
         """Every target named as a prerequisite or in a `$(MAKE) target` call is defined
@@ -360,7 +377,7 @@ class TestDependencies(unittest.TestCase):
     # import name -> distribution name, where they differ
     DIST = {"yaml": "pyyaml", "dotenv": "python-dotenv", "faker": "faker"}
     DIRS = ("scripts/build-spec", "scripts/build-collections", "scripts/lib", "scripts/build-docs-sdk",
-            "scripts/publish-postman", "scripts/validate", "scripts/dev-tools", "tests")
+            "scripts/publish-postman", "scripts/validate", "scripts/dev-tools")
 
     def test_requirements_are_exactly_the_imported_packages(self):
         import re

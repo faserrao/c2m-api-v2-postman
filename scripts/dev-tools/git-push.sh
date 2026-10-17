@@ -18,9 +18,16 @@ if [[ -z "$1" ]]; then
 fi
 COMMIT_MSG="$1"
 
-# ---- 2. Stage everything ----------------------------------------------------
-echo "➕  Running: git add ."
-git add .
+# ---- 2. Stage changes to tracked files only ---------------------------------
+# Never `git add .`: build outputs, reports and scratch files would be committed. New files
+# must be added explicitly (git add <path>) before running this script.
+echo "➕  Running: git add -u"
+git add -u
+UNTRACKED=$(git ls-files --others --exclude-standard)
+if [[ -n "$UNTRACKED" ]]; then
+  echo "ℹ️  Not committed (untracked — git add them first if they belong in the commit):"
+  echo "$UNTRACKED" | sed 's/^/     /'
+fi
 
 # ---- 3. Commit --------------------------------------------------------------
 echo "📝  Running: git commit -m \"$COMMIT_MSG\""

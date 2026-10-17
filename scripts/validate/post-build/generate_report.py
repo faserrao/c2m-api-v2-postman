@@ -95,7 +95,7 @@ class ValidationReporter:
 
         try:
             result = subprocess.run(
-                ['bash', 'tests/validate-secrets.sh'],
+                ['bash', 'scripts/validate/post-build/validate-secrets.sh'],
                 capture_output=True,
                 text=True,
                 timeout=30
@@ -121,7 +121,7 @@ class ValidationReporter:
 
         try:
             result = subprocess.run(
-                ['bash', 'tests/validate-pipeline-outputs.sh'],
+                ['bash', 'scripts/validate/post-build/validate-pipeline-outputs.sh'],
                 capture_output=True,
                 text=True,
                 timeout=60

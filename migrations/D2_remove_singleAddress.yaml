@@ -1,6 +1,6 @@
 # Migration D2 (decided 2026-10-08): remove singleAddress — inline recipients are always a list.
 # Verified with: make validate-migration MIGRATION=D2_remove_singleAddress
-# Baseline:      scripts/validate/migrations/D2_remove_singleAddress.baseline.json (pre-D2 state)
+# Baseline:      migrations/D2_remove_singleAddress.baseline.json (pre-D2 state)
 #
 # Everything not declared here must be byte-for-byte unchanged (apart from randomly
 # generated test data, compared by path only — see validate_migration.py).

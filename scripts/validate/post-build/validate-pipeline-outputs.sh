@@ -54,13 +54,15 @@ validate_openapi_spec() {
         log_pass "Base OpenAPI spec exists"
         
         # Check structure
-        local title=$(yq eval '.info.title' openapi/c2mapiv2-openapi-spec-base.yaml 2>/dev/null)
+        local title
+        title=$(yq eval '.info.title' openapi/c2mapiv2-openapi-spec-base.yaml 2>/dev/null)
         if [ -n "$title" ]; then
             log_info "  Base spec title: $title"
         fi
         
         # Count paths
-        local path_count=$(yq eval '.paths | keys | length' openapi/c2mapiv2-openapi-spec-base.yaml 2>/dev/null || echo "0")
+        local path_count
+        path_count=$(yq eval '.paths | keys | length' openapi/c2mapiv2-openapi-spec-base.yaml 2>/dev/null || echo "0")
         log_info "  Base spec has $path_count paths"
     else
         log_fail "Base OpenAPI spec missing"
@@ -78,11 +80,13 @@ validate_openapi_spec() {
         fi
         
         # Check title (should not be "Auth Overlay")
-        local final_title=$(yq eval '.info.title' openapi/c2mapiv2-openapi-spec-final.yaml 2>/dev/null)
+        local final_title
+        final_title=$(yq eval '.info.title' openapi/c2mapiv2-openapi-spec-final.yaml 2>/dev/null)
         log_info "  Final spec title: $final_title"
         
         # Count total paths
-        local final_path_count=$(yq eval '.paths | keys | length' openapi/c2mapiv2-openapi-spec-final.yaml 2>/dev/null || echo "0")
+        local final_path_count
+        final_path_count=$(yq eval '.paths | keys | length' openapi/c2mapiv2-openapi-spec-final.yaml 2>/dev/null || echo "0")
         log_info "  Final spec has $final_path_count paths"
     else
         log_fail "Final OpenAPI spec missing"
@@ -93,7 +97,8 @@ validate_openapi_spec() {
         log_pass "OpenAPI spec with examples exists"
 
         # Check if SDK code samples (x-codeSamples) were added
-        local has_code_samples=$(yq eval '[.. | select(has("x-codeSamples"))] | length' openapi/c2mapiv2-openapi-spec-final-with-examples.yaml 2>/dev/null || echo "0")
+        local has_code_samples
+        has_code_samples=$(yq eval '[.. | select(has("x-codeSamples"))] | length' openapi/c2mapiv2-openapi-spec-final-with-examples.yaml 2>/dev/null || echo "0")
         if [ "$has_code_samples" -gt "0" ]; then
             log_pass "SDK code samples found in spec ($has_code_samples endpoints)"
         else
@@ -112,7 +117,8 @@ validate_postman_collections() {
         log_pass "Linked collection exists"
         
         # Validate structure
-        local info_name=$(jq -r '.info.name' postman/generated/c2mapiv2-linked-collection-flat.json 2>/dev/null)
+        local info_name
+        info_name=$(jq -r '.info.name' postman/generated/c2mapiv2-linked-collection-flat.json 2>/dev/null)
         if [ -n "$info_name" ] && [ "$info_name" != "null" ]; then
             log_pass "Linked collection has valid info block"
             log_info "  Collection name: $info_name"
@@ -121,7 +127,8 @@ validate_postman_collections() {
         fi
         
         # Check if flattened
-        local nested_count=$(jq '[.item[] | select(has("item"))] | length' postman/generated/c2mapiv2-linked-collection-flat.json 2>/dev/null || echo "-1")
+        local nested_count
+        nested_count=$(jq '[.item[] | select(has("item"))] | length' postman/generated/c2mapiv2-linked-collection-flat.json 2>/dev/null || echo "-1")
         if [ "$nested_count" = "0" ]; then
             log_pass "Linked collection is properly flattened"
         else
@@ -129,11 +136,13 @@ validate_postman_collections() {
         fi
         
         # Check item count
-        local item_count=$(jq '.item | length' postman/generated/c2mapiv2-linked-collection-flat.json 2>/dev/null || echo "0")
+        local item_count
+        item_count=$(jq '.item | length' postman/generated/c2mapiv2-linked-collection-flat.json 2>/dev/null || echo "0")
         log_info "  Collection has $item_count items"
         
         # Check if pre-request script was added
-        local has_prerequest=$(jq '.event[] | select(.listen == "prerequest") | length' postman/generated/c2mapiv2-linked-collection-flat.json 2>/dev/null || echo "0")
+        local has_prerequest
+        has_prerequest=$(jq '.event[] | select(.listen == "prerequest") | length' postman/generated/c2mapiv2-linked-collection-flat.json 2>/dev/null || echo "0")
         if [ "$has_prerequest" -gt "0" ]; then
             log_pass "Pre-request script found in linked collection"
         else
@@ -141,7 +150,8 @@ validate_postman_collections() {
         fi
         
         # Check request naming format
-        local first_request_name=$(jq -r '.item[0].name' postman/generated/c2mapiv2-linked-collection-flat.json 2>/dev/null)
+        local first_request_name
+        first_request_name=$(jq -r '.item[0].name' postman/generated/c2mapiv2-linked-collection-flat.json 2>/dev/null)
         if [[ "$first_request_name" =~ ^[A-Z]+\ / ]]; then
             log_pass "Request naming follows 'METHOD /path' format"
             log_info "  Example: $first_request_name"
@@ -157,7 +167,8 @@ validate_postman_collections() {
         log_pass "Test collection exists"
         
         # Check if tests were added (check all nesting levels with recursive descent)
-        local test_count=$(jq '[.. | objects | .event? // empty | .[]? | select(.listen == "test") | .script.exec[] | select(contains("pm.test"))] | length' postman/generated/c2mapiv2-test-collection-fixed.json 2>/dev/null || echo "0")
+        local test_count
+        test_count=$(jq '[.. | objects | .event? // empty | .[]? | select(.listen == "test") | .script.exec[] | select(contains("pm.test"))] | length' postman/generated/c2mapiv2-test-collection-fixed.json 2>/dev/null || echo "0")
         if [ "$test_count" -gt "0" ]; then
             log_pass "Test scripts found in collection ($test_count test assertions)"
         else
@@ -165,7 +176,8 @@ validate_postman_collections() {
         fi
         
         # Check if examples were added (check all nesting levels with recursive descent)
-        local example_count=$(jq '[.. | .request?.body?.raw? | select(. != null and . != "")] | length' postman/generated/c2mapiv2-test-collection-fixed.json 2>/dev/null || echo "0")
+        local example_count
+        example_count=$(jq '[.. | .request?.body?.raw? | select(. != null and . != "")] | length' postman/generated/c2mapiv2-test-collection-fixed.json 2>/dev/null || echo "0")
         if [ "$example_count" -gt "0" ]; then
             log_pass "Request examples found ($example_count requests with body)"
         else
@@ -189,7 +201,8 @@ validate_postman_artifacts() {
     
     for uid_file in "${uid_files[@]}"; do
         if [ -f "$uid_file" ]; then
-            local uid=$(cat "$uid_file" 2>/dev/null | tr -d '\n')
+            local uid
+            uid=$(cat "$uid_file" 2>/dev/null | tr -d '\n')
             if [ -n "$uid" ]; then
                 log_pass "$(basename $uid_file) contains UID: ${uid:0:20}..."
             else
@@ -212,14 +225,17 @@ validate_postman_artifacts() {
         log_pass "Mock environment file exists"
         
         # Validate environment structure
-        local env_name=$(jq -r '.name' postman/mock-env.json 2>/dev/null)
+        local env_name
+        env_name=$(jq -r '.name' postman/mock-env.json 2>/dev/null)
         if [ -n "$env_name" ] && [ "$env_name" != "null" ]; then
             log_info "  Environment name: $env_name"
         fi
         
         # Check for auth variables
-        local has_client_id=$(jq '.environment.values[] | select(.key == "clientId") | length' postman/mock-env.json 2>/dev/null || echo "0")
-        local has_client_secret=$(jq '.environment.values[] | select(.key == "clientSecret") | length' postman/mock-env.json 2>/dev/null || echo "0")
+        local has_client_id
+        has_client_id=$(jq '.environment.values[] | select(.key == "clientId") | length' postman/mock-env.json 2>/dev/null || echo "0")
+        local has_client_secret
+        has_client_secret=$(jq '.environment.values[] | select(.key == "clientSecret") | length' postman/mock-env.json 2>/dev/null || echo "0")
 
         if [ "$has_client_id" -gt "0" ] && [ "$has_client_secret" -gt "0" ]; then
             log_pass "Auth credentials found in environment"
@@ -248,7 +264,8 @@ validate_documentation() {
         log_pass "Redoc documentation exists"
 
         # Check file size (should be substantial)
-        local file_size=$(stat -f%z "docs/index.html" 2>/dev/null || stat -c%s "docs/index.html" 2>/dev/null || echo "0")
+        local file_size
+        file_size=$(stat -f%z "docs/index.html" 2>/dev/null || stat -c%s "docs/index.html" 2>/dev/null || echo "0")
         if [ "$file_size" -gt 100000 ]; then
             log_pass "Documentation file size OK ($(($file_size / 1024))KB)"
         else

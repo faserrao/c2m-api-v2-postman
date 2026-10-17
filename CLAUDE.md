@@ -22,7 +22,7 @@ See top-level `CLAUDE.md` (`C2M_API_v2/CLAUDE.md`) for full project context and 
 | `scripts/validate/validate_configs_against_dd.py` | V1–V8 build-time config validators |
 | `scripts/validate/validate_collections_against_spec.py` | Spec-driven conformance gate (K-V3…K-V6) |
 | `scripts/validate/validate_pipeline_consistency.py` | End-to-end DD → spec → Postman consistency gate (saved examples, error map, spec examples, `@doc` descriptions); `KNOWN_OPEN` table lists tracked open findings (empty since L6, 2026-10-16) |
-| `scripts/validate/validate_migration.py` | Migration check: `snapshot` the whole system, then `compare` a rebuild under a declared migration (`scripts/validate/migrations/*.yaml`) — UNEXPECTED / INCOMPLETE / LOST; `retired` scans for removed names. Make: `migration-snapshot`, `validate-migration`, `validate-migration-retired` (`MIGRATION=<name>`) |
+| `scripts/validate/validate_migration.py` | Migration check: `snapshot` the whole system, then `compare` a rebuild under a declared migration (`migrations/*.yaml`) — UNEXPECTED / INCOMPLETE / LOST; `retired` scans for removed names. Make: `migration-snapshot`, `validate-migration`, `validate-migration-retired` (`MIGRATION=<name>`) |
 
 ---
 
@@ -31,7 +31,7 @@ See top-level `CLAUDE.md` (`C2M_API_v2/CLAUDE.md`) for full project context and 
 - **Constants over inline strings**: every reused string literal (schema names, content types, field names, enum fallbacks) lives behind a module-level constant.
 - **`@doc` annotations**: rule descriptions live in `data_dictionary/c2mapiv2-dd.ebnf` as `(* @doc Description. *)` preceding-line annotations. They feed the DD table (`generate_dd_table.py`) and, since X4, every spec `description` (component + inline properties). The gate fails on a missing or different description. OpenAPI 3.0 forbids siblings beside `$ref`: scalar alias rules are written out as the target schema plus a description; array aliases stay `$ref`.
 - **Error examples come from the DD (D10)**: the `@error_examples` block holds every example's summary/message/details; the translator renders them per endpoint; `add_error_responses_to_collection.js` copies the spec's examples into Test, Linked and Real-World. `config/error-response-examples.yaml`, V6 and `add_response_examples.py` are retired.
-- **Prove a contract change with a migration**: snapshot before, declare the change in `scripts/validate/migrations/<name>.yaml`, rebuild, compare — zero findings required (used for D2 and X4).
+- **Prove a contract change with a migration**: snapshot before, declare the change in `migrations/<name>.yaml`, rebuild, compare — zero findings required (used for D2 and X4).
 - **`ph<>` format is defensive only**: `fix_oneOf_placeholders.js` now writes the first canonical enum value (`propDef.enum[0]`) directly for `jobOptions` fields. The `ph<val1|val2|...>` handler in `addRandomDataToRaw.js` is a fallback for manually-constructed collections only.
 - **Repeatable spec builds (M4)**: spec examples use `_EXAMPLE_NOW` and sha256-seeded IDs — two builds from the same DD are byte-identical. Never reintroduce `random`/`datetime.now()` into spec examples (`test_spec_generation_is_repeatable` fails).
 - **No silent no-ops**: pipeline scripts exit 1 when they process nothing; Makefile no longer masks guarded steps with `|| echo "Skipping"`.
@@ -49,7 +49,7 @@ See top-level `CLAUDE.md` (`C2M_API_v2/CLAUDE.md`) for full project context and 
 - **Newman runs the published Test collection**: `ci_verify.sh` (CI, against the published Postman mock) and `prism-mock-test` / `postman-mock` run `c2mapiv2-test-collection-flat.json`, never the intermediate `-fixed` file (L6). Each request asserts its operation's declared statuses (D7) — a hung mock that returns 500 now fails the build (rerun; to-do in the manuals).
 - **Every collection carries saved responses** (gate `B-NO-SAVED-RESPONSES`, D9), and each saved `originalRequest` is its request (`B-EXAMPLE-ORIGINAL-REQUEST-DIFFERS`, L6). Getting Started and Real-World cover the job endpoints only, by design (`JOB_ENDPOINTS_ONLY`).
 - **No built-in client credentials (L12)**: `fetch_aws_credentials.sh` / `generate_postman_env.sh` leave `clientId`/`clientSecret` empty unless `C2M_CLIENT_*` is set; the pre-request scripts then skip token fetching. CI copies only `.txt` metadata to the artifacts repo, wipes `openapi/ postman/ docs/ sdks/` there first, and fails if an environment file would be published.
-- **Migration declarations** (`scripts/validate/migrations/*.yaml`): besides rules/schemas/paths, `value_changes`, `added_examples`, `json_decoded_fields` (D6), `added_requests` (L10), `saved_responses_added` (D9), `nondeterministic`, `path_rewrites` (also applied to string values).
+- **Migration declarations** (`migrations/*.yaml`): besides rules/schemas/paths, `value_changes`, `added_examples`, `json_decoded_fields` (D6), `added_requests` (L10), `saved_responses_added` (D9), `nondeterministic`, `path_rewrites` (also applied to string values).
 - **Pushes**: until the user lifts it (2026-10-16), push to the `click2mail` remote only, not `origin`.
 - **Derived artifacts**: `config/faker_hints.yaml`, `config/c2m_provider_mappings.yaml`, `openapi/c2mapiv2-openapi-spec-*.yaml` — all generated. Do not edit directly.
 
