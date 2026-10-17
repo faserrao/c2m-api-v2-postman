@@ -2024,11 +2024,6 @@ docs-serve-bg:
 	@nohup python3 -m http.server $(DOCS_PORT) --directory "$(DOCS_DIR)" >/dev/null 2>&1 & echo $$! > "$(DOCS_PID_FILE)"
 	@echo "🌐 Docs served in background on http://localhost:$(DOCS_PORT) (PID: $$(cat $(DOCS_PID_FILE)))"
 
-# Fix template banner if it disappears
-.PHONY: fix-template-banner
-fix-template-banner:
-	@$(DOCS_SDK_SCRIPTS_DIR)/fix-template-banner.sh
-
 # Stop documentation server
 .PHONY: docs-stop
 docs-stop:

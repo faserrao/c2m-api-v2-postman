@@ -156,7 +156,8 @@ run_pipeline_validation() {
 
     cd "$PROJECT_ROOT" || return 1
 
-    # Pipeline validation returns 1 if any failures, but we want to see all results
+    # The script reports every check before exiting 1 on any failure; a failure fails this step
+    # (2026-10-17: it used to be logged as a warning and ignored — no step may mask a failure).
     bash tests/validate-pipeline-outputs.sh
     local exit_code=$?
 
@@ -164,9 +165,8 @@ run_pipeline_validation() {
         log_success "Pipeline validation passed"
         return 0
     else
-        log_warning "Pipeline validation has failures (see details above)"
-        # Don't fail CI for expected pipeline failures
-        return 0
+        log_error "Pipeline validation failed (see details above)"
+        return 1
     fi
 }
 

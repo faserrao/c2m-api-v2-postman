@@ -392,6 +392,10 @@ class TestDependencies(unittest.TestCase):
         self.assertNotIn('$PROJECT_ROOT/venv', ci)
         self.assertNotIn("pip install --quiet requests", ci)
         self.assertIn('VENV="$PROJECT_ROOT/scripts/python_env/e2o.venv"', ci)
+        # ...and no check's failure is downgraded to a warning (validate-pipeline-outputs.sh was)
+        self.assertNotIn("Don't fail CI", ci)
+        body = ci.split("run_pipeline_validation() {", 1)[1].split("\n}", 1)[0]
+        self.assertIn("return 1", body)
         r = subprocess.run(["bash", "-c", 'SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"; eval "$(grep "^PROJECT_ROOT=" "$0")"; echo "$PROJECT_ROOT"',
                             str(REPO_ROOT / "scripts" / "validate" / "post-build" / "ci_verify.sh")], capture_output=True, text=True)
         self.assertEqual(Path(r.stdout.strip()).resolve(), REPO_ROOT.resolve())

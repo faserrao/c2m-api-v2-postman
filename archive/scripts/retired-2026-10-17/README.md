@@ -15,5 +15,6 @@ by CI, or by another active script. Kept for reference only; nothing here is mai
 | `utilities/deploy-docs.sh` | Obsolete: docs are published by CI to the artifacts repository's GitHub Pages; target `deploy-docs` removed. |
 | `utilities/fix_document_source_identifier.py` | One-time collection fix. |
 | `utilities/debug_v10_api.py` | Probed the Postman "API" resource (`postman/postman_api_uid.txt`), which the pipeline stopped creating on 2026-02-19. Retired in the follow-up check. |
+| `fix-template-banner.sh` | Its only real step reverted the final spec with `git checkout` when it contained "Auth Overlay" — a string no spec has any more, on a file that is no longer tracked; the rest just ran `make docs-build docs-serve-bg` (and `pkill`ed any server on the docs port). It had no `set -e`, so it reported success even when every step failed. Target `fix-template-banner` removed. |
 | `utilities/verify_mocks.py` | Could not work against this all-POST API (empty bodies are rejected before schema checks). |
 | `test_data_generator_for_collections/package*.json` | Dead: no nested `node_modules` exists, so `addRandomDataToRaw.js` loads Faker 9.9.0 from the repo root, not the 8.4.1 pinned here. |

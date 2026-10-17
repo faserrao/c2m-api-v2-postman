@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -uo pipefail   # explicit checks below; exits 1 when Prism answers 4xx/5xx
 
 # === Prism Test Script ===
 # Extracts the request body for an endpoint (e.g. /static) from a Postman collection and sends it
@@ -10,8 +11,8 @@ PRISM_URL="${PRISM_URL:-http://127.0.0.1:4010}"
 OUTPUT_FILE="${OUTPUT_FILE:-prism_test_body.json}"
 AUTH_TOKEN="${AUTH_TOKEN:-dummy-token}"   # Prism checks that a bearer token is present, not its value
 
-ENDPOINT="$1"
-ACTION="$2"  # Optional: --list or --select <n>
+ENDPOINT="${1:-}"
+ACTION="${2:-}"  # Optional: --list or --select <n>
 SELECT_INDEX=1
 
 if [[ -z "$ENDPOINT" ]]; then
@@ -21,7 +22,7 @@ fi
 
 # If --select is specified, get the index
 if [[ "$ACTION" == "--select" ]]; then
-  if [[ -z "$3" ]]; then
+  if [[ -z "${3:-}" ]]; then
     echo "❌ Missing index for --select"
     exit 1
   fi
@@ -80,10 +81,17 @@ echo "📦 Request body saved to $OUTPUT_FILE"
 
 # Send to Prism mock server
 echo "🚀 Sending request to Prism mock server: $PRISM_URL$ENDPOINT"
-curl --silent -X POST "$PRISM_URL$ENDPOINT" \
+RESPONSE=$(curl --silent -X POST "$PRISM_URL$ENDPOINT" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $AUTH_TOKEN" \
-  -w '\nHTTP %{http_code}\n' \
-  -d @"$OUTPUT_FILE"
+  -w '\n%{http_code}' \
+  -d @"$OUTPUT_FILE") || { echo "❌ Could not reach Prism at $PRISM_URL (make prism-start)"; exit 1; }
+STATUS="${RESPONSE##*$'\n'}"
+echo "${RESPONSE%$'\n'*}"
+echo "HTTP $STATUS"
 
+if [[ "$STATUS" -ge 400 ]]; then
+  echo "❌ Prism rejected the request for $ENDPOINT (HTTP $STATUS)"
+  exit 1
+fi
 echo "✅ Test completed for endpoint: $ENDPOINT"
