@@ -306,10 +306,6 @@ POSTMAN_API_REQUEST              := $(PUBLISH_SCRIPTS_DIR)/postman_api_request.s
 # Spec deletes loop until the list is empty; stop if specs are still listed after this many passes
 POSTMAN_DELETE_MAX_PASSES        ?= 50
 FIX_COLLECTION_URLS              := $(COLLECTION_SCRIPTS_DIR)/fix_collection_urls_v2.py
-JQ_ADD_INFO                      := --arg name "$$(POSTMAN_LINKED_COLLECTION_NAME)" '. as $$c | {info: {name: $$name, schema: "$$(POSTMAN_SCHEMA_V2)"}, item: $$c.item}'
-JQ_AUTO_FIX                      := jq 'walk(if type == "object" and (has("name") and (has("request") | not) and (has("item") | not)) then . + { "item": [] } else . end)'
-JQ_FIX_URLS                      := jq 'walk(if type == "object" and has("url") and (.url | type) == "object" and .url.raw then .url.raw |= sub("http://localhost"; "{{baseUrl}}") else . end)'
-JQ_VERIFY_URLS                   := jq -r '.. | objects | select(has("url")) | .url.raw? // empty'
 MERGE_POSTMAN_OVERRIDES          := $(COLLECTION_SCRIPTS_DIR)/jq/merge_overrides.jq
 NODE_COLLECTION_VALIDATE         := node -e "const {Collection}=require('postman-collection'); const fs=require('fs'); const data=JSON.parse(fs.readFileSync('$(POSTMAN_TEST_COLLECTION_FIXED)','utf8')); try { new Collection(data); console.log('✅ Collection is valid.'); } catch(e) { console.error('❌ Validation failed:', e.message); process.exit(1); }"
 POSTMAN_VALIDATOR                := $(COLLECTION_SCRIPTS_DIR)/validate_collection.js
@@ -2311,7 +2307,7 @@ postman-workspace-debug:
 .PHONY: prism-test-endpoint
 prism-test-endpoint: ## Test specific endpoint with Prism mock server
 	@if [ -z "$(PRISM_TEST_ENDPOINT)" ]; then \
-		echo "❌ Please specify PRISM_TEST_ENDPOINT. Example: make prism-test-endpoint PRISM_TEST_ENDPOINT=/jobs/single-doc"; \
+		echo "❌ Please specify PRISM_TEST_ENDPOINT. Example: make prism-test-endpoint PRISM_TEST_ENDPOINT=/static"; \
 		exit 1; \
 	fi
 	@if ! lsof -i :$(PRISM_PORT) -t >/dev/null; then \
@@ -2325,7 +2321,7 @@ prism-test-endpoint: ## Test specific endpoint with Prism mock server
 .PHONY: prism-test-list
 prism-test-list: ## List available test bodies for endpoint
 	@if [ -z "$(PRISM_TEST_ENDPOINT)" ]; then \
-		echo "❌ Please specify PRISM_TEST_ENDPOINT. Example: make prism-test-list PRISM_TEST_ENDPOINT=/jobs/single-doc"; \
+		echo "❌ Please specify PRISM_TEST_ENDPOINT. Example: make prism-test-list PRISM_TEST_ENDPOINT=/static"; \
 		exit 1; \
 	fi
 	@$(DEV_TOOLS_DIR)/prism_test.sh "$(PRISM_TEST_ENDPOINT)" --list

@@ -1,3 +1,3 @@
 # addRandomDataToRaw.js
 
-Documentation moved to [c2m-api-v2-manuals: development/README-addRandomDataToRaw.md](https://github.com/click2mail/c2m-api-v2-manuals/blob/main/development/README-addRandomDataToRaw.md).
+Documentation: [c2m-api-v2-manuals: development/SCRIPTS_REFERENCE.md](https://github.com/click2mail/c2m-api-v2-manuals/blob/master/development/SCRIPTS_REFERENCE.md), section "`build-collections/addRandomDataToRaw.js` — details".

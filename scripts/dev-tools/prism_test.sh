@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 
 # === Prism Test Script ===
-# Extracts request body for a given endpoint from a Postman collection and sends it to Prism mock.
+# Extracts the request body for an endpoint (e.g. /static) from a Postman collection and sends it
+# to a running Prism mock (make prism-start). Defaults to the Test collection, which has real values.
+# Overridable: COLLECTION_FILE, PRISM_URL, OUTPUT_FILE, AUTH_TOKEN.
 
-COLLECTION_FILE="postman/generated/c2mapiv2-collection-fixed.json"
-PRISM_URL="http://127.0.0.1:4010"
-OUTPUT_FILE="prism_test_body.json"
+COLLECTION_FILE="${COLLECTION_FILE:-postman/generated/c2mapiv2-test-collection-flat.json}"
+PRISM_URL="${PRISM_URL:-http://127.0.0.1:4010}"
+OUTPUT_FILE="${OUTPUT_FILE:-prism_test_body.json}"
+AUTH_TOKEN="${AUTH_TOKEN:-dummy-token}"   # Prism checks that a bearer token is present, not its value
 
 ENDPOINT="$1"
 ACTION="$2"  # Optional: --list or --select <n>
@@ -25,15 +28,23 @@ if [[ "$ACTION" == "--select" ]]; then
   SELECT_INDEX="$3"
 fi
 
+if [[ ! -f "$COLLECTION_FILE" ]]; then
+  echo "❌ Collection not found: $COLLECTION_FILE (run make postman-build-golden-test-fixtures)"
+  exit 1
+fi
+
 echo "🔍 Searching for request body in collection for endpoint: $ENDPOINT ..."
 
-# Extract all matching request bodies (escaped JSON strings)
+# One compact JSON body per line, for requests whose path is exactly $ENDPOINT
+# (bodies are stored pretty-printed; "/static" must not also match "/static/address-capture")
 RAW_BODIES=$(jq -r \
   --arg endpoint "$ENDPOINT" \
-  '.. | objects | select(has("request")) | select(.request.url.raw | contains($endpoint)) | .request.body.raw // empty' \
+  '.. | objects | select(has("request") and (.request | type) == "object")
+   | select(("/" + ((.request.url.path // []) | join("/"))) == $endpoint)
+   | .request.body.raw // empty | select(length > 0) | fromjson | tojson' \
   "$COLLECTION_FILE")
 
-BODY_COUNT=$(echo "$RAW_BODIES" | wc -l | tr -d ' ')
+BODY_COUNT=$(printf '%s' "$RAW_BODIES" | grep -c . || true)
 
 if [[ "$BODY_COUNT" -eq 0 ]]; then
   echo "❌ No request body found for endpoint: $ENDPOINT"
@@ -44,7 +55,7 @@ if [[ "$ACTION" == "--list" ]]; then
   echo "📋 Found $BODY_COUNT request bodies:"
   INDEX=1
   echo "$RAW_BODIES" | while read -r line; do
-    echo "[$INDEX] $(echo "$line" | jq -r . | jq -c .)"
+    echo "[$INDEX] $line"
     INDEX=$((INDEX + 1))
   done
   exit 0
@@ -58,22 +69,21 @@ fi
 # Select the desired body
 SELECTED_BODY=$(echo "$RAW_BODIES" | sed -n "${SELECT_INDEX}p")
 
-# Unescape the JSON string
-UNESCAPED_BODY=$(echo "$SELECTED_BODY" | jq -r . 2>/dev/null)
-
-if ! echo "$UNESCAPED_BODY" | jq empty 2>/dev/null; then
-  echo "❌ The selected request body (index $SELECT_INDEX) is not valid JSON."
+if [[ -z "$SELECTED_BODY" ]]; then
+  echo "❌ No request body at index $SELECT_INDEX (found $BODY_COUNT)"
   exit 1
 fi
 
 # Save request body
-echo "$UNESCAPED_BODY" | jq . > "$OUTPUT_FILE"
+echo "$SELECTED_BODY" | jq . > "$OUTPUT_FILE"
 echo "📦 Request body saved to $OUTPUT_FILE"
 
 # Send to Prism mock server
 echo "🚀 Sending request to Prism mock server: $PRISM_URL$ENDPOINT"
 curl --silent -X POST "$PRISM_URL$ENDPOINT" \
   -H "Content-Type: application/json" \
-  -d @"$OUTPUT_FILE" | jq .
+  -H "Authorization: Bearer $AUTH_TOKEN" \
+  -w '\nHTTP %{http_code}\n' \
+  -d @"$OUTPUT_FILE"
 
 echo "✅ Test completed for endpoint: $ENDPOINT"

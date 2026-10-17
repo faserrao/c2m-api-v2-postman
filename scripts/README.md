@@ -15,5 +15,5 @@ The Makefile refers to these only through `SPEC_SCRIPTS_DIR`, `COLLECTION_SCRIPT
 `PUBLISH_SCRIPTS_DIR`, `VALIDATE_SCRIPTS_DIR` and `DEV_TOOLS_DIR`. Retired scripts are in
 `archive/scripts/retired-2026-10-17/`.
 
-Full reference: [c2m-api-v2-manuals: development/SCRIPTS_REFERENCE.md](https://github.com/click2mail/c2m-api-v2-manuals/blob/main/development/SCRIPTS_REFERENCE.md)
+Full reference: [c2m-api-v2-manuals: development/SCRIPTS_REFERENCE.md](https://github.com/click2mail/c2m-api-v2-manuals/blob/master/development/SCRIPTS_REFERENCE.md)
 and `development/DD_OpenAPI_Postman_System_Manual.md`.
