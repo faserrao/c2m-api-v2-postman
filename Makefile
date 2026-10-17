@@ -254,8 +254,6 @@ SECURITY_POSTMAN_SCRIPTS_DIR     := ../c2m-api-v2-postman-security/postman/scrip
 endif
 # Token updated 2025-09-09
 
-# JWT test collection output
-TEST_COLLECTION_WITH_JWT_TESTS   := $(POSTMAN_DIR)/generated/c2mapiv2-test-collection-jwt.json
 
 # ========================================================================
 # JQ FILTERS AND SCRIPTS
@@ -267,7 +265,6 @@ JQ_ADD_INFO_FILE                 := $(JQ_DIR)/add_info.jq
 JQ_FIX_URLS_FILE                 := $(JQ_DIR)/fix_urls.jq
 JQ_AUTO_FIX_FILE                 := $(JQ_DIR)/auto_fix.jq
 JQ_VERIFY_URLS_FILE              := $(JQ_DIR)/verify_urls.jq
-JQ_SANITIZE_COLLECTION_FILE      := $(JQ_DIR)/sanitize_collection.jq
 
 # tiny runners for jq operations
 jqf = jq -f $(1) $(2)
@@ -300,13 +297,11 @@ POSTMAN_API_REQUEST              := $(SCRIPTS_DIR)/active/postman_api_request.sh
 # Spec deletes loop until the list is empty; stop if specs are still listed after this many passes
 POSTMAN_DELETE_MAX_PASSES        ?= 50
 FIX_COLLECTION_URLS              := $(SCRIPTS_DIR)/active/fix_collection_urls_v2.py
-FIX_PATHS_SCRIPT                 := $(SCRIPTS_DIR)/jq/fix_paths.jq
 JQ_ADD_INFO                      := --arg name "$$(POSTMAN_LINKED_COLLECTION_NAME)" '. as $$c | {info: {name: $$name, schema: "$$(POSTMAN_SCHEMA_V2)"}, item: $$c.item}'
 JQ_AUTO_FIX                      := jq 'walk(if type == "object" and (has("name") and (has("request") | not) and (has("item") | not)) then . + { "item": [] } else . end)'
 JQ_FIX_URLS                      := jq 'walk(if type == "object" and has("url") and (.url | type) == "object" and .url.raw then .url.raw |= sub("http://localhost"; "{{baseUrl}}") else . end)'
 JQ_VERIFY_URLS                   := jq -r '.. | objects | select(has("url")) | .url.raw? // empty'
 MERGE_POSTMAN_OVERRIDES          := $(SCRIPTS_DIR)/jq/merge_overrides.jq
-MERGE_SCRIPT                     := $(SCRIPTS_DIR)/jq/merge.jq
 NODE_COLLECTION_VALIDATE         := node -e "const {Collection}=require('postman-collection'); const fs=require('fs'); const data=JSON.parse(fs.readFileSync('$(POSTMAN_TEST_COLLECTION_FIXED)','utf8')); try { new Collection(data); console.log('✅ Collection is valid.'); } catch(e) { console.error('❌ Validation failed:', e.message); process.exit(1); }"
 POSTMAN_VALIDATOR                := $(SCRIPTS_DIR)/active/validate_collection.js
 INSTALL_PYTHON_MODULES           := install -r $(SCRIPTS_DIR)/python_env/requirements.txt
@@ -329,7 +324,7 @@ VENV_PYTEST                      := $(VENV_DIR)/bin/pytest
 PYTHON3                          := python3
 
 # Newman status assertions: each request asserts the statuses its own operation declares
-# in the spec (D7, 2026-10-16) — add_tests.js / add_tests_jwt.js read them via --spec.
+# in the spec (D7, 2026-10-16) — add_tests.js reads them via --spec.
 SUPPORT_EMAIL                    ?= support@click2mail.com
 C2MAPIV2_API_URL                 ?= https://api.click2mail.com/v2
 API_TITLE                        ?= C2M API v2
@@ -816,10 +811,6 @@ generate-openapi-spec-from-ebnf-dd:
 		--provider-aliases config/c2m_provider_aliases.yaml
 	@echo "✅ Faker hints derived from DD @hint annotations → config/faker_hints.yaml"
 	@echo "✅ Provider mappings derived from DD enums + aliases → config/c2m_provider_mappings.yaml"
-	# --- Fix anonymous oneOf schemas to named schemas ---
-	@echo "🔧 Fixing anonymous oneOf schemas in OpenAPI spec..."
-	$(VENV_PYTHON) $(SCRIPTS_DIR)/active/fix_openapi_oneOf_schemas.py $(C2MAPIV2_OPENAPI_SPEC_BASE) $(C2MAPIV2_OPENAPI_SPEC_BASE)
-	@echo "✅ OneOf schemas fixed (anonymous → named)"
 
 # Generate data dictionary reference table (Markdown + CSV) from EBNF
 .PHONY: generate-data-dictionary-table
@@ -896,31 +887,6 @@ clean-openapi-spec-diff:
 postman-login:
 	@echo "🔐 Logging in to Postman..."
 	@postman login --with-api-key $(POSTMAN_API_KEY)
-
-# ========================================================================
-# JWT AUTHENTICATION TESTING
-# ========================================================================
-# Run JWT authentication tests
-.PHONY: jwt-test
-jwt-test:
-	@echo "🔐 Running JWT authentication tests..."
-	@cd $(PROJECT_ROOT) && npm test -- tests/jwt-auth-tests.js || \
-		node tests/jwt-auth-tests.js
-
-# Add JWT tests to Postman collection
-.PHONY: postman-add-jwt-tests
-postman-add-jwt-tests:
-	@echo "🔧 Adding JWT-specific tests to collection..."
-	@if [ -f "$(TEST_COLLECTION_WITH_TESTS)" ]; then \
-		node scripts/active/add_tests_jwt.js \
-			"$(TEST_COLLECTION_WITH_TESTS)" \
-			"$(TEST_COLLECTION_WITH_JWT_TESTS)" \
-			--spec "$(C2MAPIV2_OPENAPI_SPEC)" \
-			--auth-overlay "$(OPENAPI_AUTH_OVERLAY)"; \
-		echo "✅ JWT tests added to collection"; \
-	else \
-		echo "⚠️  Test collection not found. Run 'make postman-create-test-collection' first."; \
-	fi
 
 # ========================================================================
 # PYTHON ENVIRONMENT FIXES
@@ -1965,14 +1931,6 @@ prism-mock-test:
 		--reporter-html-export $(REPORT_HTML)
 	@echo "✅ Newman test report generated at $(REPORT_HTML)"
 
-# Sanitize collection placeholders
-.PHONY: postman-test-collection-fix-examples
-postman-test-collection-fix-examples:
-	@echo "🧹 Sanitizing Postman collection placeholders..."
-	$(call guard-file,$(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES))
-	$(call jqf,$(JQ_SANITIZE_COLLECTION_FILE),$(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES)) > $(POSTMAN_GENERATED_DIR)/c2m.collection.fixed.json
-	@echo "✅ Sanitized collection saved to $(POSTMAN_GENERATED_DIR)/c2m.collection.fixed.json"
-
 # Run tests against Postman mock server
 .PHONY: postman-mock
 postman-mock:
@@ -2622,46 +2580,6 @@ clean-sdk: ## Clean all generated SDKs
 	@echo "🧹 Cleaning generated SDKs..."
 	@rm -rf sdk/
 	@echo "✅ SDKs cleaned"
-
-# ========================================================================
-# DOCUMENTATION DEPLOYMENT
-# ========================================================================
-# Deploy documentation to hosting service
-.PHONY: deploy-docs
-deploy-docs: docs-build ## Deploy API documentation
-	@echo "🚀 Deploying API documentation..."
-	@if [ -x "$(SCRIPTS_DIR)/utilities/deploy-docs.sh" ]; then \
-		$(SCRIPTS_DIR)/utilities/deploy-docs.sh; \
-	else \
-		echo "⚠️  Documentation deployment not implemented yet"; \
-		echo "   TODO: Implement $(SCRIPTS_DIR)/utilities/deploy-docs.sh"; \
-		echo "   Consider deploying to GitHub Pages, S3, or similar"; \
-	fi
-
-# ========================================================================
-# MAINTENANCE UTILITIES
-# ========================================================================
-# Clean up scripts directory
-.PHONY: cleanup-scripts
-cleanup-scripts: ## Clean up obsolete scripts
-	@echo "🧹 Cleaning up scripts directory..."
-	@$(SCRIPTS_DIR)/utilities/cleanup-scripts-directory.sh
-
-# Clean up OpenAPI directory
-.PHONY: cleanup-openapi
-cleanup-openapi: ## Clean up old OpenAPI files
-	@echo "🧹 Cleaning up OpenAPI directory..."
-	@$(SCRIPTS_DIR)/utilities/cleanup-openapi-directory.sh
-
-# Clean up docs directory
-.PHONY: cleanup-docs
-cleanup-docs: ## Clean up temporary documentation files
-	@echo "🧹 Cleaning up docs directory..."
-	@$(SCRIPTS_DIR)/utilities/cleanup-docs-directory.sh
-
-# Clean all directories
-.PHONY: cleanup-all
-cleanup-all: cleanup-scripts cleanup-openapi cleanup-docs ## Clean all temporary and obsolete files
 
 # ========================================================================
 # GIT WORKFLOW HELPERS

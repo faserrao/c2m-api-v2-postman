@@ -1,7 +1,7 @@
 /**
  * declared_statuses.js — D7: the HTTP statuses each OpenAPI operation declares.
  *
- * Shared by add_tests.js and add_tests_jwt.js, so every request's Newman status
+ * Used by add_tests.js, so every request's Newman status
  * assertion lists exactly its own operation's responses (from the spec, which is
  * generated from the DD and the auth overlay) instead of one global list.
  * validate_pipeline_consistency.py checks the result (B-TEST-STATUS-ASSERTION).

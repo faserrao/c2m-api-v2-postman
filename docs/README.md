@@ -181,17 +181,10 @@ make docs-serve
 # Access at http://localhost:8080
 ```
 
-### Production Build
-```bash
-# Build for production
-make docs-build-prod
-
-# Deploy to GitHub Pages
-make deploy-docs TARGET=github-pages
-
-# Deploy to S3
-make deploy-docs TARGET=s3
-```
+### Publishing
+There is no local deploy target. CI (`.github/workflows/api-ci-cd.yml`) builds the docs on
+every push to `main` and force-pushes them to the `c2m-api-v2-postman-artifacts` repository,
+which serves them on GitHub Pages.
 
 ## Customization
 
@@ -258,21 +251,9 @@ Comprehensive JWT authentication documentation:
 
 ## Deployment
 
-### GitHub Pages
-```bash
-make deploy-docs TARGET=github-pages
-```
-Deploys to: https://[username].github.io/[repo]/
-
-### AWS S3
-```bash
-make deploy-docs TARGET=s3 S3_BUCKET=my-docs-bucket
-```
-
-### Netlify
-```bash
-make deploy-docs TARGET=netlify
-```
+Published by CI to GitHub Pages from the `c2m-api-v2-postman-artifacts` repository
+(see "Publishing" above). The former `make deploy-docs` target and `deploy-docs.sh`
+were retired on 2026-10-17 (`archive/scripts/retired-2026-10-17/`).
 
 ### Local Preview
 ```bash
@@ -287,7 +268,7 @@ cd docs && python -m http.server 8080
 1. Modify OpenAPI spec: `openapi/c2mapiv2-openapi-spec-final.yaml`
 2. Rebuild docs: `make docs-build`
 3. Test locally: `make docs-serve`
-4. Deploy: `make deploy-docs`
+4. Publish: push to `main`; CI publishes the docs
 
 ### Adding Custom Content
 1. Edit templates in `templates/` directory

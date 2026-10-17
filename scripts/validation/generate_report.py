@@ -17,7 +17,8 @@ Options:
 Components Integrated:
     - Secret configuration validation (validate-secrets.sh)
     - Pipeline output validation (validate-pipeline-outputs.sh)
-    - Mock server verification (verify_mocks.py)
+    - Mock server verification (mock-verification-*.json, if present; verify_mocks.py was
+      retired 2026-10-17 — it could not work against this all-POST API)
     - Newman test results (run_newman.sh)
 """
 
