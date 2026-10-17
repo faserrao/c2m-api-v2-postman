@@ -106,12 +106,21 @@ LOCALHOST_URL                    := http://127.0.0.1
 #--- Directories ---
 # User customizations
 POSTMAN_CUSTOM_DIR               := $(POSTMAN_DIR)/custom
+# Collection-level JWT pre-request script (Linked, Getting Started, Real-World; Test in fixture builds)
+JWT_PRE_REQUEST_SCRIPT           := $(POSTMAN_DIR)/scripts/jwt-pre-request.js
 # Auto-generated files
 POSTMAN_GENERATED_DIR            := $(POSTMAN_DIR)/generated
 # Generated SDKs
 SDKS_DIR                         := sdks
 # Helper scripts
 SCRIPTS_DIR                      := scripts
+# One variable per scripts/ sub-directory (2026-10-17 reorganisation); recipes use these, never literal paths
+SPEC_SCRIPTS_DIR                 := $(SCRIPTS_DIR)/build-spec
+COLLECTION_SCRIPTS_DIR           := $(SCRIPTS_DIR)/build-collections
+DOCS_SDK_SCRIPTS_DIR             := $(SCRIPTS_DIR)/build-docs-sdk
+PUBLISH_SCRIPTS_DIR              := $(SCRIPTS_DIR)/publish-postman
+VALIDATE_SCRIPTS_DIR             := $(SCRIPTS_DIR)/validate
+DEV_TOOLS_DIR                    := $(SCRIPTS_DIR)/dev-tools
 # Documentation output
 DOCS_DIR                         := docs
 # EBNF source files
@@ -260,7 +269,7 @@ endif
 # ========================================================================
 # ---- jq filters (centralized) ----
 # These filters manipulate JSON data throughout the pipeline
-JQ_DIR                           := scripts/jq
+JQ_DIR                           := $(COLLECTION_SCRIPTS_DIR)/jq
 JQ_ADD_INFO_FILE                 := $(JQ_DIR)/add_info.jq
 JQ_FIX_URLS_FILE                 := $(JQ_DIR)/fix_urls.jq
 JQ_AUTO_FIX_FILE                 := $(JQ_DIR)/auto_fix.jq
@@ -290,23 +299,23 @@ endef
 # SCRIPT PATHS
 # ========================================================================
 #--- SCRIPTS ---
-ADD_TESTS_SCRIPT                 := $(SCRIPTS_DIR)/active/add_tests.js
-EBNF_TO_OPENAPI_SCRIPT           := $(SCRIPTS_DIR)/active/ebnf_to_openapi_dynamic_v3.py
+ADD_TESTS_SCRIPT                 := $(COLLECTION_SCRIPTS_DIR)/add_tests.js
+EBNF_TO_OPENAPI_SCRIPT           := $(SPEC_SCRIPTS_DIR)/ebnf_to_openapi_dynamic_v3.py
 # Postman API call that exits 1 on a non-2xx status (cleanup targets; curl --silent alone exits 0)
-POSTMAN_API_REQUEST              := $(SCRIPTS_DIR)/active/postman_api_request.sh
+POSTMAN_API_REQUEST              := $(PUBLISH_SCRIPTS_DIR)/postman_api_request.sh
 # Spec deletes loop until the list is empty; stop if specs are still listed after this many passes
 POSTMAN_DELETE_MAX_PASSES        ?= 50
-FIX_COLLECTION_URLS              := $(SCRIPTS_DIR)/active/fix_collection_urls_v2.py
+FIX_COLLECTION_URLS              := $(COLLECTION_SCRIPTS_DIR)/fix_collection_urls_v2.py
 JQ_ADD_INFO                      := --arg name "$$(POSTMAN_LINKED_COLLECTION_NAME)" '. as $$c | {info: {name: $$name, schema: "$$(POSTMAN_SCHEMA_V2)"}, item: $$c.item}'
 JQ_AUTO_FIX                      := jq 'walk(if type == "object" and (has("name") and (has("request") | not) and (has("item") | not)) then . + { "item": [] } else . end)'
 JQ_FIX_URLS                      := jq 'walk(if type == "object" and has("url") and (.url | type) == "object" and .url.raw then .url.raw |= sub("http://localhost"; "{{baseUrl}}") else . end)'
 JQ_VERIFY_URLS                   := jq -r '.. | objects | select(has("url")) | .url.raw? // empty'
-MERGE_POSTMAN_OVERRIDES          := $(SCRIPTS_DIR)/jq/merge_overrides.jq
+MERGE_POSTMAN_OVERRIDES          := $(COLLECTION_SCRIPTS_DIR)/jq/merge_overrides.jq
 NODE_COLLECTION_VALIDATE         := node -e "const {Collection}=require('postman-collection'); const fs=require('fs'); const data=JSON.parse(fs.readFileSync('$(POSTMAN_TEST_COLLECTION_FIXED)','utf8')); try { new Collection(data); console.log('✅ Collection is valid.'); } catch(e) { console.error('❌ Validation failed:', e.message); process.exit(1); }"
-POSTMAN_VALIDATOR                := $(SCRIPTS_DIR)/active/validate_collection.js
+POSTMAN_VALIDATOR                := $(COLLECTION_SCRIPTS_DIR)/validate_collection.js
 INSTALL_PYTHON_MODULES           := install -r $(SCRIPTS_DIR)/python_env/requirements.txt
 
-ADD_EXAMPLES_TO_COLLECTION_SCRIPT := node $(SCRIPTS_DIR)/test_data_generator_for_collections/addRandomDataToRaw.js
+ADD_EXAMPLES_TO_COLLECTION_SCRIPT := node $(COLLECTION_SCRIPTS_DIR)/addRandomDataToRaw.js
 ADD_EXAMPLES_TO_COLLECTION_ARGS  := --input  $(POSTMAN_COLLECTION_RAW) --output $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES) \
                                     --spec $(C2MAPIV2_OPENAPI_SPEC_BASE) --faker-hints config/faker_hints.yaml
 ADD_EXAMPLES_TO_COLLECTION       := $(ADD_EXAMPLES_TO_COLLECTION_SCRIPT) $(ADD_EXAMPLES_TO_COLLECTION_ARGS)
@@ -817,7 +826,7 @@ generate-openapi-spec-from-ebnf-dd:
 generate-data-dictionary-table:
 	@echo "📋 Generating data dictionary table from $(DD_EBNF_FILE)..."
 	@mkdir -p reports
-	@$(VENV_PYTHON) $(SCRIPTS_DIR)/active/generate_dd_table.py \
+	@$(VENV_PYTHON) $(DOCS_SDK_SCRIPTS_DIR)/generate_dd_table.py \
 		--ebnf $(DD_EBNF_FILE) \
 		--output-dir reports \
 		--spec $(C2MAPIV2_OPENAPI_SPEC)
@@ -829,7 +838,7 @@ ARTIFACTS_INDEX_ORG ?= click2mail
 generate-artifacts-index:
 	@echo "📑 Generating artifacts index..."
 	@mkdir -p reports
-	@$(VENV_PYTHON) $(SCRIPTS_DIR)/active/generate_artifacts_index.py \
+	@$(VENV_PYTHON) $(DOCS_SDK_SCRIPTS_DIR)/generate_artifacts_index.py \
 		--org $(ARTIFACTS_INDEX_ORG) \
 		--artifacts-repo "$(ARTIFACTS_REPO_NAME)" \
 		--reports-dir reports \
@@ -843,7 +852,7 @@ generate-artifacts-index:
 .PHONY: openapi-merge-overlays
 openapi-merge-overlays: $(C2MAPIV2_OPENAPI_SPEC_BASE) $(OPENAPI_AUTH_OVERLAY)
 	@echo "🔗 Merging auth overlay into generated OpenAPI..."
-	@$(VENV_PYTHON) scripts/active/merge_openapi_overlays.py \
+	@$(VENV_PYTHON) $(SPEC_SCRIPTS_DIR)/merge_openapi_overlays.py \
 		$(C2MAPIV2_OPENAPI_SPEC_BASE) $(OPENAPI_AUTH_OVERLAY) $(C2MAPIV2_OPENAPI_SPEC)
 	# Success and error examples are written by the translator from the DD
 	# (@error_examples, standardResponse @hint values) — add_response_examples.py retired (D10)
@@ -1146,9 +1155,9 @@ postman-api-full-publish:
 $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES): $(C2MAPIV2_OPENAPI_SPEC)
 	@echo "🔧 Adding SDK code samples to OpenAPI spec..."
 	@if command -v $(VENV_PYTHON) >/dev/null 2>&1; then \
-		$(VENV_PYTHON) $(SCRIPTS_DIR)/utilities/add-sdk-samples-to-spec.py $(C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES) --sdk-langs config/sdk-languages.yaml; \
+		$(VENV_PYTHON) $(SPEC_SCRIPTS_DIR)/add-sdk-samples-to-spec.py $(C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES) --sdk-langs config/sdk-languages.yaml; \
 	else \
-		python3 $(SCRIPTS_DIR)/utilities/add-sdk-samples-to-spec.py $(C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES) --sdk-langs config/sdk-languages.yaml; \
+		python3 $(SPEC_SCRIPTS_DIR)/add-sdk-samples-to-spec.py $(C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES) --sdk-langs config/sdk-languages.yaml; \
 	fi
 
 # Generate Postman collection from OpenAPI spec and add metadata
@@ -1164,7 +1173,7 @@ postman-api-linked-collection-generate: $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES) |
 	@mv $(POSTMAN_COLLECTION_RAW).tmp $(POSTMAN_COLLECTION_RAW)
 	@echo "✅ Collection generated with 'info' block"
 	@echo "🔧 Fixing oneOf placeholders in collection..."
-	@node scripts/active/fix_oneOf_placeholders.js $(C2MAPIV2_OPENAPI_SPEC_BASE) $(POSTMAN_COLLECTION_RAW) $(POSTMAN_COLLECTION_RAW)
+	@node $(COLLECTION_SCRIPTS_DIR)/fix_oneOf_placeholders.js $(C2MAPIV2_OPENAPI_SPEC_BASE) $(POSTMAN_COLLECTION_RAW) $(POSTMAN_COLLECTION_RAW)
 	@echo "✅ OneOf placeholders fixed (e.g., <integer> → <oneOf>)"
 
 # ========================================================================
@@ -1183,12 +1192,12 @@ postman-linked-collection-flatten:
 	@$(PYTHON) $(FIX_COLLECTION_URLS) $(POSTMAN_LINKED_COLLECTION_FLAT) $(POSTMAN_LINKED_COLLECTION_FLAT)
 	@echo "✅ URL raw fields fixed"
 	@echo "🔐 Adding auth examples to linked collection..."
-	@node scripts/active/add_auth_examples.js $(POSTMAN_LINKED_COLLECTION_FLAT) $(POSTMAN_LINKED_COLLECTION_FLAT) --auth-overlay "$(OPENAPI_AUTH_OVERLAY)"
+	@node $(COLLECTION_SCRIPTS_DIR)/add_auth_examples.js $(POSTMAN_LINKED_COLLECTION_FLAT) $(POSTMAN_LINKED_COLLECTION_FLAT) --auth-overlay "$(OPENAPI_AUTH_OVERLAY)"
 	@# X1: saved responses = the spec's examples (the converter synthesised wrong ones)
-	@node scripts/active/add_error_responses_to_collection.js $(POSTMAN_LINKED_COLLECTION_FLAT) $(POSTMAN_LINKED_COLLECTION_FLAT) --spec $(C2MAPIV2_OPENAPI_SPEC)
+	@node $(COLLECTION_SCRIPTS_DIR)/add_error_responses_to_collection.js $(POSTMAN_LINKED_COLLECTION_FLAT) $(POSTMAN_LINKED_COLLECTION_FLAT) --spec $(C2MAPIV2_OPENAPI_SPEC)
 	@echo "✅ Auth examples added"
 	@echo "📝 Adding pre-request script to collection..."
-	@node scripts/active/add_pre_request_script.js $(POSTMAN_LINKED_COLLECTION_FLAT) postman/scripts/jwt-pre-request.js $(POSTMAN_LINKED_COLLECTION_FLAT)
+	@node $(COLLECTION_SCRIPTS_DIR)/add_pre_request_script.js $(POSTMAN_LINKED_COLLECTION_FLAT) $(JWT_PRE_REQUEST_SCRIPT) $(POSTMAN_LINKED_COLLECTION_FLAT)
 	@echo "✅ Pre-request script added"
 
 # ========================================================================
@@ -1304,7 +1313,7 @@ postman-test-collection-add-error-responses:
 		echo "❌ Collection $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES) not found. Run postman-test-collection-add-examples first."; \
 		exit 1; \
 	fi
-	node scripts/active/add_error_responses_to_collection.js $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES) $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES) --spec $(C2MAPIV2_OPENAPI_SPEC)
+	node $(COLLECTION_SCRIPTS_DIR)/add_error_responses_to_collection.js $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES) $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES) --spec $(C2MAPIV2_OPENAPI_SPEC)
 	@echo "✅ Error responses added to $(POSTMAN_TEST_COLLECTION_WITH_EXAMPLES)"
 	@echo " "
 	@echo " "
@@ -1468,7 +1477,7 @@ postman-test-collection-flatten-rename:
 postman-test-collection-add-auth-examples:
 	@echo "🔐 Adding auth examples to test collection..."
 	@$(call guard-file,$(POSTMAN_TEST_COLLECTION_FLAT))
-	@node $(SCRIPTS_DIR)/active/add_auth_examples.js $(POSTMAN_TEST_COLLECTION_FLAT) $(POSTMAN_TEST_COLLECTION_FLAT) --auth-overlay "$(OPENAPI_AUTH_OVERLAY)"
+	@node $(COLLECTION_SCRIPTS_DIR)/add_auth_examples.js $(POSTMAN_TEST_COLLECTION_FLAT) $(POSTMAN_TEST_COLLECTION_FLAT) --auth-overlay "$(OPENAPI_AUTH_OVERLAY)"
 	@echo "✅ Auth examples added to test collection"
 
 # ========================================================================
@@ -1513,7 +1522,7 @@ postman-test-collection-upload:
 .PHONY: postman-generate-use-case-collection
 postman-generate-use-case-collection:
 	@echo "📚 Generating Real World Use Cases collection from YAML catalog (v4 - values only)..."
-	@$(VENV_PYTHON) scripts/active/generate_curated_collections_v4.py \
+	@$(VENV_PYTHON) $(COLLECTION_SCRIPTS_DIR)/generate_curated_collections_v4.py \
 		--config config/curated-examples-catalog.yaml \
 		--linked $(POSTMAN_LINKED_COLLECTION_FLAT) \
 		--openapi $(C2MAPIV2_OPENAPI_SPEC) \
@@ -1524,14 +1533,14 @@ postman-generate-use-case-collection:
 		--output-name $(C2MAPIV2_POSTMAN_API_NAME_KC)-real-world-use-cases-collection \
 		--schema-url $(POSTMAN_SCHEMA_V2)
 	@# X2: saved responses = the spec's examples, with originalRequest = each use case's request
-	@node scripts/active/add_error_responses_to_collection.js \
+	@node $(COLLECTION_SCRIPTS_DIR)/add_error_responses_to_collection.js \
 		$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-real-world-use-cases-collection.json \
 		$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-real-world-use-cases-collection.json \
 		--spec $(C2MAPIV2_OPENAPI_SPEC)
 	@# L8 (D8): the same JWT pre-request script as Linked, so the use cases authenticate
-	@node scripts/active/add_pre_request_script.js \
+	@node $(COLLECTION_SCRIPTS_DIR)/add_pre_request_script.js \
 		$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-real-world-use-cases-collection.json \
-		postman/scripts/jwt-pre-request.js \
+		$(JWT_PRE_REQUEST_SCRIPT) \
 		$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-real-world-use-cases-collection.json
 	@echo "✅ Real World Use Cases collection generated"
 
@@ -1566,7 +1575,7 @@ postman-upload-use-case-collection:
 .PHONY: postman-generate-getting-started-collection
 postman-generate-getting-started-collection: postman-api-linked-collection-generate
 	@echo "📚 Generating Getting Started collection (placeholders) from YAML catalog..."
-	@$(VENV_PYTHON) scripts/active/generate_curated_collections_v4.py \
+	@$(VENV_PYTHON) $(COLLECTION_SCRIPTS_DIR)/generate_curated_collections_v4.py \
 		--config config/curated-examples-catalog.yaml \
 		--linked $(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-linked-collection-flat.json \
 		--openapi $(C2MAPIV2_OPENAPI_SPEC) \
@@ -1582,7 +1591,7 @@ postman-generate-getting-started-collection: postman-api-linked-collection-gener
 .PHONY: postman-generate-getting-started-with-examples
 postman-generate-getting-started-with-examples:
 	@echo "📚 Generating Getting Started collections from template..."
-	@$(VENV_PYTHON) scripts/utilities/generate_getting_started_collections.py \
+	@$(VENV_PYTHON) $(COLLECTION_SCRIPTS_DIR)/generate_getting_started_collections.py \
 		--template config/getting-started-template.yaml \
 		--faker-hints config/faker_hints.yaml \
 		--schema-url $(POSTMAN_SCHEMA_V2) \
@@ -1590,7 +1599,7 @@ postman-generate-getting-started-with-examples:
 		--output-test $(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-test-collection.json
 	@# D9: saved responses = the spec's examples, so a mock built from a Getting Started fork answers
 	@for f in getting-started-linked-collection getting-started-test-collection; do \
-		node scripts/active/add_error_responses_to_collection.js \
+		node $(COLLECTION_SCRIPTS_DIR)/add_error_responses_to_collection.js \
 			$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-$$f.json \
 			$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-$$f.json \
 			--spec $(C2MAPIV2_OPENAPI_SPEC) || exit 1; \
@@ -1675,7 +1684,7 @@ postman-inject-docs-link:
 		echo "❌ Collection file not found: $(COLLECTION_FILE)"; \
 		exit 1; \
 	fi; \
-	node scripts/active/inject_documentation_link.js "$(COLLECTION_FILE)" "$(REDOC_DOCS_URL)"
+	node $(COLLECTION_SCRIPTS_DIR)/inject_documentation_link.js "$(COLLECTION_FILE)" "$(REDOC_DOCS_URL)"
 
 # Inject documentation link into all generated collections
 .PHONY: postman-inject-docs-link-all
@@ -1688,7 +1697,7 @@ postman-inject-docs-link-all:
 		"$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-linked-collection.json" \
 		"$(POSTMAN_GENERATED_DIR)/$(C2MAPIV2_POSTMAN_API_NAME_KC)-getting-started-test-collection.json"; do \
 		if [ -f "$$collection" ]; then \
-			node scripts/active/inject_documentation_link.js "$$collection" "$(REDOC_DOCS_URL)" || exit 1; \
+			node $(COLLECTION_SCRIPTS_DIR)/inject_documentation_link.js "$$collection" "$(REDOC_DOCS_URL)" || exit 1; \
 		fi; \
 	done; \
 	echo "✅ Documentation links injected into all collections"
@@ -1709,18 +1718,18 @@ postman-env-create:
 	fi
 	@echo "🔐 Fetching AWS credentials..."
 	@# Source credentials from AWS Secrets Manager (or use defaults)
-	@eval $$(USE_LOCAL_CREDS=true ./scripts/active/fetch_aws_credentials.sh) && \
+	@eval $$(USE_LOCAL_CREDS=true ./$(PUBLISH_SCRIPTS_DIR)/fetch_aws_credentials.sh) && \
 	export C2M_BASE_URL=$$(cat $(POSTMAN_MOCK_URL_FILE)) && \
 	export ENV_NAME="C2M API - Mock Server" && \
-	./scripts/active/generate_postman_env.sh "" $(POSTMAN_ENV_FILE)
+	./$(PUBLISH_SCRIPTS_DIR)/generate_postman_env.sh "" $(POSTMAN_ENV_FILE)
 	@echo "✅ Mock environment file written to $(POSTMAN_ENV_FILE) with auth credentials"
 	
 	@echo "🌐 Creating AWS Dev environment for token testing..."
 	@mkdir -p $(dir $(POSTMAN_AWS_ENV_FILE))
-	@eval $$(USE_LOCAL_CREDS=true ./scripts/active/fetch_aws_credentials.sh) && \
+	@eval $$(USE_LOCAL_CREDS=true ./$(PUBLISH_SCRIPTS_DIR)/fetch_aws_credentials.sh) && \
 	export C2M_BASE_URL="$$C2M_BASE_URL" && \
 	export ENV_NAME="C2M API - AWS Dev" && \
-	./scripts/active/generate_postman_env.sh "" $(POSTMAN_AWS_ENV_FILE)
+	./$(PUBLISH_SCRIPTS_DIR)/generate_postman_env.sh "" $(POSTMAN_AWS_ENV_FILE)
 	@echo "✅ AWS Dev environment file written to $(POSTMAN_AWS_ENV_FILE)"
 
 # ========================================================================
@@ -1983,9 +1992,9 @@ docs-build:
 	@echo "📚 Building API documentation with Redoc..."
 	@echo "🔧 Adding SDK code samples to OpenAPI spec..."
 	@if [ -f "$(VENV_PYTHON)" ]; then \
-		$(VENV_PYTHON) $(SCRIPTS_DIR)/utilities/add-sdk-samples-to-spec.py $(C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES) --sdk-langs config/sdk-languages.yaml; \
+		$(VENV_PYTHON) $(SPEC_SCRIPTS_DIR)/add-sdk-samples-to-spec.py $(C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES) --sdk-langs config/sdk-languages.yaml; \
 	else \
-		python3 $(SCRIPTS_DIR)/utilities/add-sdk-samples-to-spec.py $(C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES) --sdk-langs config/sdk-languages.yaml; \
+		python3 $(SPEC_SCRIPTS_DIR)/add-sdk-samples-to-spec.py $(C2MAPIV2_OPENAPI_SPEC) $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES) --sdk-langs config/sdk-languages.yaml; \
 	fi
 	$(REDOCLY) build-docs $(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES) -o $(REDOC_HTML_OUTPUT) -t $(DOCS_DIR)/custom-redoc-template.hbs
 	$(SWAGGER) bundle $(C2MAPIV2_OPENAPI_SPEC) --outfile $(OPENAPI_BUNDLED_FILE) --type yaml
@@ -2022,7 +2031,7 @@ docs-serve-bg:
 # Fix template banner if it disappears
 .PHONY: fix-template-banner
 fix-template-banner:
-	@$(SCRIPTS_DIR)/active/fix-template-banner.sh
+	@$(DOCS_SDK_SCRIPTS_DIR)/fix-template-banner.sh
 
 # Stop documentation server
 .PHONY: docs-stop
@@ -2310,7 +2319,7 @@ prism-test-endpoint: ## Test specific endpoint with Prism mock server
 		exit 1; \
 	fi
 	@echo "🧪 Testing endpoint: $(PRISM_TEST_ENDPOINT)"
-	@$(SCRIPTS_DIR)/utilities/prism_test.sh "$(PRISM_TEST_ENDPOINT)"
+	@$(DEV_TOOLS_DIR)/prism_test.sh "$(PRISM_TEST_ENDPOINT)"
 
 # List available test bodies for an endpoint
 .PHONY: prism-test-list
@@ -2319,7 +2328,7 @@ prism-test-list: ## List available test bodies for endpoint
 		echo "❌ Please specify PRISM_TEST_ENDPOINT. Example: make prism-test-list PRISM_TEST_ENDPOINT=/jobs/single-doc"; \
 		exit 1; \
 	fi
-	@$(SCRIPTS_DIR)/utilities/prism_test.sh "$(PRISM_TEST_ENDPOINT)" --list
+	@$(DEV_TOOLS_DIR)/prism_test.sh "$(PRISM_TEST_ENDPOINT)" --list
 
 # Test specific endpoint with selected test body
 .PHONY: prism-test-select
@@ -2332,7 +2341,7 @@ prism-test-select: ## Test endpoint with specific test body index
 		echo "❌ Please specify PRISM_TEST_INDEX (e.g., PRISM_TEST_INDEX=2)"; \
 		exit 1; \
 	fi
-	@$(SCRIPTS_DIR)/utilities/prism_test.sh "$(PRISM_TEST_ENDPOINT)" --select "$(PRISM_TEST_INDEX)"
+	@$(DEV_TOOLS_DIR)/prism_test.sh "$(PRISM_TEST_ENDPOINT)" --select "$(PRISM_TEST_INDEX)"
 
 # ========================================================================
 # POST-BUILD VALIDATION SYSTEM
@@ -2386,7 +2395,7 @@ validate-local-personal: ## Run complete validation suite (personal workspace)
 	@$(MAKE) validate-mocks
 	@echo ""
 	@echo "📊 Generating consolidated validation report..."
-	@python3 scripts/validation/generate_report.py --workspace personal --build-type local
+	@python3 $(VALIDATE_SCRIPTS_DIR)/post-build/generate_report.py --workspace personal --build-type local
 	@echo ""
 	@echo "════════════════════════════════════════════════════════════════"
 	@echo "✅ Local validation complete (Personal Workspace)"
@@ -2409,7 +2418,7 @@ validate-local-team: ## Run complete validation suite (team workspace)
 	@$(MAKE) validate-mocks
 	@echo ""
 	@echo "📊 Generating consolidated validation report..."
-	@python3 scripts/validation/generate_report.py --workspace team --build-type local
+	@python3 $(VALIDATE_SCRIPTS_DIR)/post-build/generate_report.py --workspace team --build-type local
 	@echo ""
 	@echo "════════════════════════════════════════════════════════════════"
 	@echo "✅ Local validation complete (Team Workspace)"
@@ -2438,7 +2447,7 @@ validate-github-personal: ## CI validation for personal workspace (no Prism)
 	@echo "ℹ️  Skipping Prism mock tests (not available in CI)"
 	@echo ""
 	@echo "📊 Generating consolidated validation report..."
-	@python3 scripts/validation/generate_report.py --workspace personal --build-type github
+	@python3 $(VALIDATE_SCRIPTS_DIR)/post-build/generate_report.py --workspace personal --build-type github
 	@echo ""
 	@echo "════════════════════════════════════════════════════════════════"
 	@echo "✅ GitHub validation complete (Personal Workspace)"
@@ -2461,7 +2470,7 @@ validate-github-team: ## CI validation for team workspace (no Prism)
 	@echo "ℹ️  Skipping Prism mock tests (not available in CI)"
 	@echo ""
 	@echo "📊 Generating consolidated validation report..."
-	@python3 scripts/validation/generate_report.py --workspace team --build-type github
+	@python3 $(VALIDATE_SCRIPTS_DIR)/post-build/generate_report.py --workspace team --build-type github
 	@echo ""
 	@echo "════════════════════════════════════════════════════════════════"
 	@echo "✅ GitHub validation complete (Team Workspace)"
@@ -2479,15 +2488,15 @@ generate-sdk: ## Generate SDK from OpenAPI specification
 		echo "   Run 'make openapi-build' first"; \
 		exit 1; \
 	fi
-	@if [ -x "$(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh" ]; then \
+	@if [ -x "$(DOCS_SDK_SCRIPTS_DIR)/generate-sdk-v2.sh" ]; then \
 		if [ -n "$(LANG)" ]; then \
-			$(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh $(LANG); \
+			$(DOCS_SDK_SCRIPTS_DIR)/generate-sdk-v2.sh $(LANG); \
 		else \
-			$(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh; \
+			$(DOCS_SDK_SCRIPTS_DIR)/generate-sdk-v2.sh; \
 		fi \
 	else \
 		echo "⚠️  SDK generation script not implemented yet"; \
-		echo "   TODO: Implement $(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh"; \
+		echo "   TODO: Implement $(DOCS_SDK_SCRIPTS_DIR)/generate-sdk-v2.sh"; \
 		echo "   Consider using OpenAPI Generator or similar tool"; \
 	fi
 
@@ -2495,67 +2504,67 @@ generate-sdk: ## Generate SDK from OpenAPI specification
 .PHONY: generate-sdk-python
 generate-sdk-python: ## Generate Python SDK
 	@echo "🐍 Generating Python SDK..."
-	@$(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh python sdk/python
+	@$(DOCS_SDK_SCRIPTS_DIR)/generate-sdk-v2.sh python sdk/python
 
 # Generate JavaScript/Node.js SDK
 .PHONY: generate-sdk-javascript
 generate-sdk-javascript: ## Generate JavaScript SDK
 	@echo "🟨 Generating JavaScript SDK..."
-	@$(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh javascript sdk/javascript
+	@$(DOCS_SDK_SCRIPTS_DIR)/generate-sdk-v2.sh javascript sdk/javascript
 
 # Generate TypeScript SDK
 .PHONY: generate-sdk-typescript
 generate-sdk-typescript: ## Generate TypeScript SDK
 	@echo "🔷 Generating TypeScript SDK..."
-	@$(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh typescript sdk/typescript
+	@$(DOCS_SDK_SCRIPTS_DIR)/generate-sdk-v2.sh typescript sdk/typescript
 
 # Generate Java SDK
 .PHONY: generate-sdk-java
 generate-sdk-java: ## Generate Java SDK
 	@echo "☕ Generating Java SDK..."
-	@$(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh java sdk/java
+	@$(DOCS_SDK_SCRIPTS_DIR)/generate-sdk-v2.sh java sdk/java
 
 # Generate Go SDK
 .PHONY: generate-sdk-go
 generate-sdk-go: ## Generate Go SDK
 	@echo "🐹 Generating Go SDK..."
-	@$(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh go sdk/go
+	@$(DOCS_SDK_SCRIPTS_DIR)/generate-sdk-v2.sh go sdk/go
 
 # Generate Ruby SDK
 .PHONY: generate-sdk-ruby
 generate-sdk-ruby: ## Generate Ruby SDK
 	@echo "💎 Generating Ruby SDK..."
-	@$(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh ruby sdk/ruby
+	@$(DOCS_SDK_SCRIPTS_DIR)/generate-sdk-v2.sh ruby sdk/ruby
 
 # Generate PHP SDK
 .PHONY: generate-sdk-php
 generate-sdk-php: ## Generate PHP SDK
 	@echo "🐘 Generating PHP SDK..."
-	@$(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh php sdk/php
+	@$(DOCS_SDK_SCRIPTS_DIR)/generate-sdk-v2.sh php sdk/php
 
 # Generate C# SDK
 .PHONY: generate-sdk-csharp
 generate-sdk-csharp: ## Generate C# SDK
 	@echo "🔷 Generating C# SDK..."
-	@$(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh csharp sdk/csharp
+	@$(DOCS_SDK_SCRIPTS_DIR)/generate-sdk-v2.sh csharp sdk/csharp
 
 # Generate Swift SDK (iOS)
 .PHONY: generate-sdk-swift
 generate-sdk-swift: ## Generate Swift SDK
 	@echo "🦉 Generating Swift SDK..."
-	@$(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh swift sdk/swift
+	@$(DOCS_SDK_SCRIPTS_DIR)/generate-sdk-v2.sh swift sdk/swift
 
 # Generate Kotlin SDK (Android)
 .PHONY: generate-sdk-kotlin
 generate-sdk-kotlin: ## Generate Kotlin SDK
 	@echo "🤖 Generating Kotlin SDK..."
-	@$(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh kotlin sdk/kotlin
+	@$(DOCS_SDK_SCRIPTS_DIR)/generate-sdk-v2.sh kotlin sdk/kotlin
 
 # Generate Rust SDK
 .PHONY: generate-sdk-rust
 generate-sdk-rust: ## Generate Rust SDK
 	@echo "🦀 Generating Rust SDK..."
-	@$(SCRIPTS_DIR)/utilities/generate-sdk-v2.sh rust sdk/rust
+	@$(DOCS_SDK_SCRIPTS_DIR)/generate-sdk-v2.sh rust sdk/rust
 
 # Generate all SDKs
 .PHONY: generate-sdk-all
@@ -2588,7 +2597,7 @@ clean-sdk: ## Clean all generated SDKs
 .PHONY: git-pull-rebase
 git-pull-rebase: ## Pull latest changes with rebase
 	@echo "🔄 Pulling latest changes with rebase..."
-	@$(SCRIPTS_DIR)/utilities/git-pull-rebase.sh
+	@$(DEV_TOOLS_DIR)/git-pull-rebase.sh
 
 # Quick save (add, commit, push)
 .PHONY: git-save
@@ -2598,7 +2607,7 @@ git-save: ## Quick git save (requires MSG="commit message")
 		exit 1; \
 	fi
 	@echo "💾 Saving changes: $(MSG)"
-	@$(SCRIPTS_DIR)/utilities/git-push.sh "$(MSG)"
+	@$(DEV_TOOLS_DIR)/git-push.sh "$(MSG)"
 
 # ========================================================================
 # AUTHENTICATION CONFIGURATION
@@ -2609,17 +2618,17 @@ postman-auth-setup: ## Configure authentication for Postman collection
 	@echo "🔐 Setting up authentication configuration..."
 	@if [ -f "$(SECURITY_POSTMAN_SCRIPTS_DIR)/jwt-auth-provider.js" ]; then \
 		echo "📋 Using JWT auth provider script from security repo..."; \
-		node scripts/active/add_pre_request_script.js "$(POSTMAN_TEST_COLLECTION_WITH_TESTS)" "$(SECURITY_POSTMAN_SCRIPTS_DIR)/jwt-auth-provider.js" "$(POSTMAN_TEST_COLLECTION_WITH_TESTS)" || \
+		node $(COLLECTION_SCRIPTS_DIR)/add_pre_request_script.js "$(POSTMAN_TEST_COLLECTION_WITH_TESTS)" "$(SECURITY_POSTMAN_SCRIPTS_DIR)/jwt-auth-provider.js" "$(POSTMAN_TEST_COLLECTION_WITH_TESTS)" || \
 			{ echo "❌ Failed to add auth provider script"; exit 1; }; \
 		echo "✅ Auth provider script added to test collection"; \
 	else \
 		echo "📋 Auth provider script not found in security repo, using local script..."; \
-		if [ -f "$(POSTMAN_DIR)/scripts/jwt-pre-request.js" ]; then \
-			node scripts/active/add_pre_request_script.js "$(POSTMAN_TEST_COLLECTION_WITH_TESTS)" "$(POSTMAN_DIR)/scripts/jwt-pre-request.js" "$(POSTMAN_TEST_COLLECTION_WITH_TESTS)" || \
+		if [ -f "$(JWT_PRE_REQUEST_SCRIPT)" ]; then \
+			node $(COLLECTION_SCRIPTS_DIR)/add_pre_request_script.js "$(POSTMAN_TEST_COLLECTION_WITH_TESTS)" "$(JWT_PRE_REQUEST_SCRIPT)" "$(POSTMAN_TEST_COLLECTION_WITH_TESTS)" || \
 				{ echo "❌ Failed to add local auth provider script"; exit 1; }; \
 			echo "✅ Local auth provider script added to test collection"; \
 		else \
-			echo "❌ No auth provider script found (security repo or $(POSTMAN_DIR)/scripts/jwt-pre-request.js)"; \
+			echo "❌ No auth provider script found (security repo or $(JWT_PRE_REQUEST_SCRIPT))"; \
 			exit 1; \
 		fi; \
 	fi
@@ -2730,37 +2739,37 @@ postman-publish-both: ## [Removed] Cross-publishing not allowed with strict 1:1 
 # COLLECTION CONFORMANCE VALIDATION (spec-driven, non-hardcoded)
 # ========================================================================
 # Path variables are injected via env so they are NOT duplicated in the Python
-# script (single source of truth). See scripts/validation/SPEC_DRIVEN_VALIDATOR.md
+# script (single source of truth). See c2m-api-v2-manuals/validation-system/VALIDATION_REFERENCE.md
 .PHONY: validate-collections-conformance
 validate-collections-conformance: ## Validate generated collections conform to the OpenAPI spec
-	@C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" POSTMAN_GENERATED_DIR="$(POSTMAN_GENERATED_DIR)" C2MAPIV2_POSTMAN_API_NAME_KC="$(C2MAPIV2_POSTMAN_API_NAME_KC)" $(VENV_PYTHON) scripts/validation/validate_collections_against_spec.py $(VALIDATE_ARGS)
+	@C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" POSTMAN_GENERATED_DIR="$(POSTMAN_GENERATED_DIR)" C2MAPIV2_POSTMAN_API_NAME_KC="$(C2MAPIV2_POSTMAN_API_NAME_KC)" $(VENV_PYTHON) $(VALIDATE_SCRIPTS_DIR)/validate_collections_against_spec.py $(VALIDATE_ARGS)
 
 .PHONY: validate-collections-conformance-test
 validate-collections-conformance-test: ## Run all validation golden tests (validator + resolver + DD constraints unit tests)
-	@C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" POSTMAN_GENERATED_DIR="$(POSTMAN_GENERATED_DIR)" C2MAPIV2_POSTMAN_API_NAME_KC="$(C2MAPIV2_POSTMAN_API_NAME_KC)" $(VENV_PYTHON) scripts/validation/tests/test_validate_collections.py && \
-	C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" $(VENV_PYTEST) scripts/validation/tests/test_oneof_resolver.py -v && \
-	$(VENV_PYTEST) scripts/validation/tests/test_dd_constraints.py -v && \
-	$(VENV_PYTEST) scripts/validation/tests/test_pipeline_consistency.py -v && \
-	$(VENV_PYTEST) scripts/validation/tests/test_migration_validator.py -v && \
-	$(VENV_PYTEST) scripts/validation/tests/test_postman_api_request.py -v
+	@C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" POSTMAN_GENERATED_DIR="$(POSTMAN_GENERATED_DIR)" C2MAPIV2_POSTMAN_API_NAME_KC="$(C2MAPIV2_POSTMAN_API_NAME_KC)" $(VENV_PYTHON) $(VALIDATE_SCRIPTS_DIR)/tests/test_validate_collections.py && \
+	C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" $(VENV_PYTEST) $(VALIDATE_SCRIPTS_DIR)/tests/test_oneof_resolver.py -v && \
+	$(VENV_PYTEST) $(VALIDATE_SCRIPTS_DIR)/tests/test_dd_constraints.py -v && \
+	$(VENV_PYTEST) $(VALIDATE_SCRIPTS_DIR)/tests/test_pipeline_consistency.py -v && \
+	$(VENV_PYTEST) $(VALIDATE_SCRIPTS_DIR)/tests/test_migration_validator.py -v && \
+	$(VENV_PYTEST) $(VALIDATE_SCRIPTS_DIR)/tests/test_postman_api_request.py -v
 
 .PHONY: validate-collections-deep
 validate-collections-deep: ## Deep field audit of all *.json files in postman/generated (auto-discovers, exit 1 on errors)
-	@$(VENV_PYTHON) scripts/validation/validate_collections_deep.py \
+	@$(VENV_PYTHON) $(VALIDATE_SCRIPTS_DIR)/validate_collections_deep.py \
 		--spec $(C2MAPIV2_OPENAPI_SPEC) \
 		--dir $(POSTMAN_GENERATED_DIR)
 
 .PHONY: validate-spec-against-dd
 validate-spec-against-dd: ## Validate OpenAPI spec faithfully represents the EBNF DD (enums, properties, required)
 	@echo "🔍 Validating OpenAPI spec against EBNF Data Dictionary..."
-	@$(VENV_PYTHON) scripts/validation/validate_spec_against_dd.py \
+	@$(VENV_PYTHON) $(VALIDATE_SCRIPTS_DIR)/validate_spec_against_dd.py \
 		--dd $(DD_EBNF_FILE) \
 		--spec $(C2MAPIV2_OPENAPI_SPEC)
 
 .PHONY: validate-spec-against-dd-report
 validate-spec-against-dd-report: ## Same as validate-spec-against-dd but writes a Markdown report
 	@echo "🔍 Validating OpenAPI spec against EBNF Data Dictionary..."
-	@$(VENV_PYTHON) scripts/validation/validate_spec_against_dd.py \
+	@$(VENV_PYTHON) $(VALIDATE_SCRIPTS_DIR)/validate_spec_against_dd.py \
 		--dd $(DD_EBNF_FILE) \
 		--spec $(C2MAPIV2_OPENAPI_SPEC) \
 		--report reports/spec-vs-dd-report.md
@@ -2769,7 +2778,7 @@ validate-spec-against-dd-report: ## Same as validate-spec-against-dd but writes 
 validate-configs: ## Validate all config file field names against the EBNF Data Dictionary
 	@echo "🔍 Validating config files against DD rule names..."
 	@DD_EBNF_FILE="$(DD_EBNF_FILE)" \
-	$(VENV_PYTHON) scripts/validation/validate_configs_against_dd.py \
+	$(VENV_PYTHON) $(VALIDATE_SCRIPTS_DIR)/validate_configs_against_dd.py \
 		--dd $(DD_EBNF_FILE) \
 		--catalog config/curated-examples-catalog.yaml \
 		--template config/getting-started-template.yaml \
@@ -2782,7 +2791,7 @@ validate-postman-against-dd: ## Detailed Postman-to-DD validator: enum values, f
 	C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" \
 	POSTMAN_GENERATED_DIR="$(POSTMAN_GENERATED_DIR)" \
 	C2MAPIV2_POSTMAN_API_NAME_KC="$(C2MAPIV2_POSTMAN_API_NAME_KC)" \
-	$(VENV_PYTHON) scripts/validation/validate_postman_against_dd.py \
+	$(VENV_PYTHON) $(VALIDATE_SCRIPTS_DIR)/validate_postman_against_dd.py \
 		--dd $(DD_EBNF_FILE) \
 		--spec $(C2MAPIV2_OPENAPI_SPEC)
 
@@ -2793,7 +2802,7 @@ validate-postman-against-dd-report: ## Same as validate-postman-against-dd but w
 	C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" \
 	POSTMAN_GENERATED_DIR="$(POSTMAN_GENERATED_DIR)" \
 	C2MAPIV2_POSTMAN_API_NAME_KC="$(C2MAPIV2_POSTMAN_API_NAME_KC)" \
-	$(VENV_PYTHON) scripts/validation/validate_postman_against_dd.py \
+	$(VENV_PYTHON) $(VALIDATE_SCRIPTS_DIR)/validate_postman_against_dd.py \
 		--dd $(DD_EBNF_FILE) \
 		--spec $(C2MAPIV2_OPENAPI_SPEC) \
 		--report reports/postman-vs-dd-report.md
@@ -2802,7 +2811,7 @@ validate-postman-against-dd-report: ## Same as validate-postman-against-dd but w
 validate-catalog-against-spec: ## Validate curated-examples-catalog.yaml select: keys and variant names against the OpenAPI spec
 	@C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" \
 	POSTMAN_LINKED_COLLECTION_FLAT="$(POSTMAN_LINKED_COLLECTION_FLAT)" \
-	$(VENV_PYTHON) scripts/validation/validate_catalog_against_spec.py \
+	$(VENV_PYTHON) $(VALIDATE_SCRIPTS_DIR)/validate_catalog_against_spec.py \
 		--catalog config/curated-examples-catalog.yaml \
 		--spec $(C2MAPIV2_OPENAPI_SPEC) \
 		--linked $(POSTMAN_LINKED_COLLECTION_FLAT)
@@ -2818,7 +2827,7 @@ validate-collections-conformance-gate-all: ## CI gate: fail if ANY of the 5 cano
 	@C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" \
 	POSTMAN_GENERATED_DIR="$(POSTMAN_GENERATED_DIR)" \
 	C2MAPIV2_POSTMAN_API_NAME_KC="$(C2MAPIV2_POSTMAN_API_NAME_KC)" \
-	$(VENV_PYTHON) scripts/validation/validate_collections_against_spec.py \
+	$(VENV_PYTHON) $(VALIDATE_SCRIPTS_DIR)/validate_collections_against_spec.py \
 		--path-prefix "/" --exit-status \
 		$(CONFORMANCE_GATE_REPORT)
 
@@ -2833,14 +2842,14 @@ CANONICAL_COLLECTIONS := $(POSTMAN_LINKED_COLLECTION_FLAT) $(POSTMAN_TEST_COLLEC
 .PHONY: validate-dd-gates
 validate-dd-gates: ## CI gate: spec vs DD, all 5 collections vs DD, catalog select: keys vs spec (fail on any FAIL)
 	@echo "🔍 Spec faithfully represents the DD..."
-	@$(VENV_PYTHON) scripts/validation/validate_spec_against_dd.py \
+	@$(VENV_PYTHON) $(VALIDATE_SCRIPTS_DIR)/validate_spec_against_dd.py \
 		--dd $(DD_EBNF_FILE) --spec $(C2MAPIV2_OPENAPI_SPEC) $(DD_GATES_SPEC_REPORT)
 	@echo "🔍 All 5 canonical collections vs DD (fields, enums, ranges, cross-field)..."
-	@$(VENV_PYTHON) scripts/validation/validate_postman_against_dd.py \
+	@$(VENV_PYTHON) $(VALIDATE_SCRIPTS_DIR)/validate_postman_against_dd.py \
 		--dd $(DD_EBNF_FILE) --spec $(C2MAPIV2_OPENAPI_SPEC) \
 		--collections $(CANONICAL_COLLECTIONS) --exit-status $(DD_GATES_POSTMAN_REPORT)
 	@echo "🔍 Catalog select: keys vs spec..."
-	@$(VENV_PYTHON) scripts/validation/validate_catalog_against_spec.py \
+	@$(VENV_PYTHON) $(VALIDATE_SCRIPTS_DIR)/validate_catalog_against_spec.py \
 		--catalog config/curated-examples-catalog.yaml --spec $(C2MAPIV2_OPENAPI_SPEC) \
 		--linked $(POSTMAN_LINKED_COLLECTION_FLAT) --exit-status
 
@@ -2849,7 +2858,7 @@ validate-dd-gates: ## CI gate: spec vs DD, all 5 collections vs DD, catalog sele
 #   make openapi-build postman-build-golden-test-fixtures migration-snapshot MIGRATION=<name>
 # then, after the change and a fresh build:
 #   make validate-migration MIGRATION=<name>
-MIGRATION_DIR      := scripts/validation/migrations
+MIGRATION_DIR      := $(VALIDATE_SCRIPTS_DIR)/migrations
 MIGRATION_BASELINE  = $(MIGRATION_DIR)/$(MIGRATION).baseline.json
 MIGRATION_ENV       = DD_EBNF_FILE="$(DD_EBNF_FILE)" C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" \
                       POSTMAN_GENERATED_DIR="$(POSTMAN_GENERATED_DIR)" C2MAPIV2_POSTMAN_API_NAME_KC="$(C2MAPIV2_POSTMAN_API_NAME_KC)"
@@ -2857,17 +2866,17 @@ MIGRATION_ENV       = DD_EBNF_FILE="$(DD_EBNF_FILE)" C2MAPIV2_OPENAPI_SPEC="$(C2
 .PHONY: migration-snapshot
 migration-snapshot: ## Record the system state before a migration (MIGRATION=<name>)
 	@test -n "$(MIGRATION)" || { echo "❌ set MIGRATION=<name>"; exit 1; }
-	@$(MIGRATION_ENV) $(VENV_PYTHON) scripts/validation/validate_migration.py snapshot --out $(MIGRATION_BASELINE)
+	@$(MIGRATION_ENV) $(VENV_PYTHON) $(VALIDATE_SCRIPTS_DIR)/validate_migration.py snapshot --out $(MIGRATION_BASELINE)
 
 .PHONY: validate-migration
 validate-migration: ## Check a migration against its baseline: complete, nothing lost, nothing else changed (MIGRATION=<name>)
 	@test -n "$(MIGRATION)" || { echo "❌ set MIGRATION=<name>"; exit 1; }
-	@$(MIGRATION_ENV) $(VENV_PYTHON) scripts/validation/validate_migration.py compare \
+	@$(MIGRATION_ENV) $(VENV_PYTHON) $(VALIDATE_SCRIPTS_DIR)/validate_migration.py compare \
 		--baseline $(MIGRATION_BASELINE) --migration $(MIGRATION_DIR)/$(MIGRATION).yaml --exit-status $(MIGRATION_REPORT)
 
 .PHONY: validate-migration-retired
 validate-migration-retired: ## Retired names of a migration must not appear anywhere (MIGRATION=<name>)
-	@$(VENV_PYTHON) scripts/validation/validate_migration.py retired --migration $(MIGRATION_DIR)/$(MIGRATION).yaml --exit-status
+	@$(VENV_PYTHON) $(VALIDATE_SCRIPTS_DIR)/validate_migration.py retired --migration $(MIGRATION_DIR)/$(MIGRATION).yaml --exit-status
 
 # CI GATE: end-to-end DD → spec → Postman consistency (response examples, error-map
 # consistency, spec examples, cross-field rules). Known-open findings are listed in
@@ -2880,7 +2889,7 @@ validate-pipeline-consistency: ## CI gate: DD → spec → Postman end-to-end co
 	C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES="$(C2MAPIV2_OPENAPI_SPEC_WITH_EXAMPLES)" \
 	POSTMAN_GENERATED_DIR="$(POSTMAN_GENERATED_DIR)" \
 	C2MAPIV2_POSTMAN_API_NAME_KC="$(C2MAPIV2_POSTMAN_API_NAME_KC)" \
-	$(VENV_PYTHON) scripts/validation/validate_pipeline_consistency.py --exit-status \
+	$(VENV_PYTHON) $(VALIDATE_SCRIPTS_DIR)/validate_pipeline_consistency.py --exit-status \
 		$(PIPELINE_CONSISTENCY_REPORT)
 
 .PHONY: validate-collections-conformance-gate
@@ -2894,7 +2903,7 @@ validate-collections-conformance-gate: ## CI gate: fail if the freshly-built Lin
 	C2MAPIV2_OPENAPI_SPEC="$(C2MAPIV2_OPENAPI_SPEC)" \
 	POSTMAN_GENERATED_DIR="$$GATE_DIR" \
 	C2MAPIV2_POSTMAN_API_NAME_KC="$(C2MAPIV2_POSTMAN_API_NAME_KC)" \
-	$(VENV_PYTHON) scripts/validation/validate_collections_against_spec.py \
+	$(VENV_PYTHON) $(VALIDATE_SCRIPTS_DIR)/validate_collections_against_spec.py \
 		--path-prefix "/" --exit-status \
 		--collections "$$GATE_DIR/$(C2MAPIV2_POSTMAN_API_NAME_KC)-linked-collection-flat.json" \
 		$(CONFORMANCE_GATE_REPORT)
@@ -2967,11 +2976,11 @@ context-show: ## Show current development context
 
 .PHONY: context-set-personal
 context-set-personal: ## Set context to personal (faserrao repo → personal Postman)
-	@./scripts/utilities/set-context.sh personal
+	@./$(DEV_TOOLS_DIR)/set-context.sh personal
 
 .PHONY: context-set-click2mail
 context-set-click2mail: ## Set context to click2mail (click2mail repo → corporate Postman)
-	@./scripts/utilities/set-context.sh click2mail
+	@./$(DEV_TOOLS_DIR)/set-context.sh click2mail
 
 # ========================================================================
 # VARIABLE DEBUGGING

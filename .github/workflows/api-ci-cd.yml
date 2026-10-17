@@ -9,9 +9,12 @@ on:
       - 'data_dictionary/**'           # EBNF data dictionary (source of truth)
       - 'config/**'                     # Configuration files (templates, catalogs)
       - 'Makefile'                      # Build configuration
-      - 'scripts/active/**'             # Generation scripts
-      - 'scripts/validation/**'         # Validation scripts
-      - 'scripts/test_data_generator_for_collections/**'  # Test data generation
+      - 'scripts/build-spec/**'         # DD → OpenAPI
+      - 'scripts/build-collections/**'  # OpenAPI → Postman collections (incl. test data)
+      - 'scripts/lib/**'                # Shared Python helpers (oneof_resolver)
+      - 'scripts/build-docs-sdk/**'     # DD tables, artifacts index, docs, SDKs
+      - 'scripts/publish-postman/**'    # Postman API calls and environments
+      - 'scripts/validate/**'           # Validators, golden tests, migrations, post-build checks
       - '.github/workflows/api-ci-cd.yml'  # Workflow changes
       - '.env.example'                  # Copied by the Getting Started guide (smoke test)
       - '.git-context'                  # Workspace selector
@@ -26,9 +29,12 @@ on:
       - 'data_dictionary/**'           # EBNF data dictionary (source of truth)
       - 'config/**'                     # Configuration files (templates, catalogs)
       - 'Makefile'                      # Build configuration
-      - 'scripts/active/**'             # Generation scripts
-      - 'scripts/validation/**'         # Validation scripts
-      - 'scripts/test_data_generator_for_collections/**'  # Test data generation
+      - 'scripts/build-spec/**'         # DD → OpenAPI
+      - 'scripts/build-collections/**'  # OpenAPI → Postman collections (incl. test data)
+      - 'scripts/lib/**'                # Shared Python helpers (oneof_resolver)
+      - 'scripts/build-docs-sdk/**'     # DD tables, artifacts index, docs, SDKs
+      - 'scripts/publish-postman/**'    # Postman API calls and environments
+      - 'scripts/validate/**'           # Validators, golden tests, migrations, post-build checks
       - '.github/workflows/api-ci-cd.yml'  # Workflow changes
       - '.env.example'                  # Copied by the Getting Started guide (smoke test)
       - '.git-context'                  # Workspace selector
@@ -367,7 +373,7 @@ jobs:
           echo "   Repository: ${{ github.repository }}"
 
           # Run CI validation script
-          ./scripts/validation/ci_verify.sh "$WORKSPACE"
+          ./scripts/validate/post-build/ci_verify.sh "$WORKSPACE"
 
       - name: Generate artifacts index
         if: always()

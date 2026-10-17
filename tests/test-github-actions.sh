@@ -222,8 +222,8 @@ test_paths_permissions() {
     
     # Check if scripts are executable
     local scripts=(
-        "scripts/active/add_tests.js"
-        "scripts/active/validate_collection.js"
+        "scripts/build-collections/add_tests.js"
+        "scripts/build-collections/validate_collection.js"
     )
     
     for script in "${scripts[@]}"; do

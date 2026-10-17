@@ -21,7 +21,7 @@
    1) Big picture: how this file is used
    ----------------------------------------------------------------------------
    - EBNF is the SOURCE OF TRUTH in the pipeline.
-   - A translator (scripts/active/ebnf_to_openapi_dynamic_v3.py) converts this EBNF
+   - A translator (scripts/build-spec/ebnf_to_openapi_dynamic_v3.py) converts this EBNF
      into an OpenAPI (YAML) specification: schemas, field descriptions, request
      examples, success and error examples, numeric limits and cross-field rules.
    - The Postman collections, mock server, docs and SDKs are generated from that
@@ -269,7 +269,7 @@
      specification and the collections against this file.
    - A change to the request or response contract is proven with a migration check
      (make migration-snapshot before, make validate-migration after; see
-     scripts/validation/migrations/).
+     scripts/validate/migrations/).
 
    ============================================================================ *)
 

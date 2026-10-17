@@ -197,8 +197,8 @@ test_directory_structure() {
         "postman/custom"
         "postman/generated"
         "scripts"
-        "scripts/active"
-        "scripts/utilities"
+        "scripts/build-spec"
+        "scripts/build-collections"
         "docs"
     )
     
@@ -230,9 +230,9 @@ test_scripts() {
     
     # Check Python scripts
     local python_scripts=(
-        "scripts/active/ebnf_to_openapi_dynamic_v3.py"
-        "scripts/active/merge_openapi_overlays.py"
-        "scripts/active/fix_collection_urls_v2.py"
+        "scripts/build-spec/ebnf_to_openapi_dynamic_v3.py"
+        "scripts/build-spec/merge_openapi_overlays.py"
+        "scripts/build-collections/fix_collection_urls_v2.py"
     )
     
     for script in "${python_scripts[@]}"; do
@@ -248,10 +248,10 @@ test_scripts() {
     
     # Check Node.js scripts
     local node_scripts=(
-        "scripts/active/add_tests.js"
-        "scripts/active/validate_collection.js"
-        "scripts/active/add_pre_request_script.js"
-        "scripts/active/add_auth_examples.js"
+        "scripts/build-collections/add_tests.js"
+        "scripts/build-collections/validate_collection.js"
+        "scripts/build-collections/add_pre_request_script.js"
+        "scripts/build-collections/add_auth_examples.js"
     )
     
     for script in "${node_scripts[@]}"; do
@@ -364,9 +364,9 @@ test_collection_processing() {
 EOF
     
     # Test adding pre-request script
-    if [ -f "scripts/active/add_pre_request_script.js" ] && [ -f "postman/scripts/jwt-pre-request.js" ]; then
+    if [ -f "scripts/build-collections/add_pre_request_script.js" ] && [ -f "postman/scripts/jwt-pre-request.js" ]; then
         log_info "Testing pre-request script addition..."
-        if node scripts/active/add_pre_request_script.js "$test_collection" postman/scripts/jwt-pre-request.js "$test_collection" &>/dev/null; then
+        if node scripts/build-collections/add_pre_request_script.js "$test_collection" postman/scripts/jwt-pre-request.js "$test_collection" &>/dev/null; then
             log_success "Pre-request script addition succeeded"
             
             # Check if script was added
